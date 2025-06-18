@@ -11,7 +11,8 @@ const NavigationSidebar = () => {
     pathname.includes("/dashboard/pool-rate") ||
     pathname.includes("/dashboard/pool-configuration") ||
     pathname.includes("/dashboard/template-pool-mapping") ||
-    pathname.includes("/dashboard/template") 
+    pathname.includes("/dashboard/template") ||
+    pathname.includes("/dashboard/ceiling-configuration")
   );
   const [planningOpen, setPlanningOpen] = useState(
     pathname.includes("/dashboard/project-budget-status")
@@ -20,7 +21,8 @@ const NavigationSidebar = () => {
     pathname.includes("/dashboard/pool-rate") ||
     pathname.includes("/dashboard/pool-configuration") ||
     pathname.includes("/dashboard/template-pool-mapping") ||
-    pathname.includes("/dashboard/template") 
+    pathname.includes("/dashboard/template") ||
+    pathname.includes("/dashboard/ceiling-configuration")
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedPage, setSelectedPage] = useState(pathname);
@@ -32,14 +34,16 @@ const NavigationSidebar = () => {
       pathname.includes("/dashboard/pool-rate") ||
       pathname.includes("/dashboard/pool-configuration") ||
       pathname.includes("/dashboard/template-pool-mapping") ||
-      pathname.includes("/dashboard/template")
+      pathname.includes("/dashboard/template") ||
+      pathname.includes("/dashboard/ceiling-configuration")
     );
     setPlanningOpen(pathname.includes("/dashboard/project-budget-status"));
     setConfigurationOpen(
       pathname.includes("/dashboard/pool-rate") ||
       pathname.includes("/dashboard/pool-configuration") ||
       pathname.includes("/dashboard/template-pool-mapping") ||
-      pathname.includes("/dashboard/template")
+      pathname.includes("/dashboard/template") ||
+      pathname.includes("/dashboard/ceiling-configuration")
     );
   }, [pathname]);
 
@@ -178,6 +182,18 @@ const NavigationSidebar = () => {
                   }}
                 >
                   Template
+                </Link>
+                <Link
+                  to="/dashboard/ceiling-configuration"
+                  className={`block text-xs sm:text-sm text-gray-200 hover:text-white hover:bg-gray-800 px-3 py-1 rounded transition ease-in-out duration-200 ${
+                    selectedPage === "/dashboard/ceiling-configuration" ? "bg-gray-800 underline font-semibold" : ""
+                  }`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleLinkClick("/dashboard/ceiling-configuration");
+                  }}
+                >
+                  Ceiling Configuration
                 </Link>
               </div>
             )}

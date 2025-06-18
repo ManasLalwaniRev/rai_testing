@@ -1,42 +1,39 @@
-import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";
-import ProjectHoursDetails from "./ProjectHoursDetails";
-import ProjectPlanTable from "./ProjectPlanTable";
-import ProjectDirectCostTable from "./ProjectDirectCostTable";
-import RevenueAnalysisTable from "./RevenueAnalysisTable";
-import ProjectAmountsTable from "./ProjectAmountsTable";
+import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import ProjectHoursDetails from './ProjectHoursDetails';
+import ProjectPlanTable from './ProjectPlanTable';
+import RevenueAnalysisTable from './RevenueAnalysisTable';
 
 const ProjectBudgetStatus = () => {
   const [projects, setProjects] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showHours, setShowHours] = useState(false);
-  const [showDirectCost, setShowDirectCost] = useState(false);
-  const [showAmounts, setShowAmounts] = useState(false);
+  const [showRevenueAnalysis, setShowRevenueAnalysis] = useState(false);
   const [hoursProjectId, setHoursProjectId] = useState(null);
-  const [directCostProjectId, setDirectCostProjectId] = useState(null);
-  const [amountsProjectId, setAmountsProjectId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searched, setSearched] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [showRevenueAnalysis, setShowRevenueAnalysis] = useState(false);
   const [forecastData, setForecastData] = useState([]);
-  const [isForecastLoading, setIsForecastLoading] = useState(false); 
+  const [isForecastLoading, setIsForecastLoading] = useState(false);
   const hoursRefs = useRef({});
+  const inputRef = useRef(null);
 
   useEffect(() => {
     setLoading(true);
     axios
-      .get("https://test-api-3tmq.onrender.com/Project/GetAllProjects")
+      .get('https://test-api-3tmq.onrender.com/Project/GetAllProjects')
       .then((res) => {
         const transformedData = res.data.map((project) => ({
           projId: project.projectId,
           projName: project.name,
           projTypeDc: project.description,
           orgId: project.orgId,
-          projMgrName: "Manager Name",
+          projMgrName: 'Manager Name',
           startDate: project.startDate,
           endDate: project.endDate,
         }));
@@ -44,22 +41,21 @@ const ProjectBudgetStatus = () => {
         setLoading(false);
       })
       .catch(() => {
+        console.error('Error fetching projects');
         setProjects([]);
         setLoading(false);
       });
   }, []);
 
   const handleSearch = () => {
-    const term = searchTerm.trim();
-    if (term === "") {
+    const term = searchTerm.trim().toLowerCase();
+    if (term === '') {
       setFilteredProjects([]);
       setSearched(true);
       return;
     }
     setLoading(true);
-    const filtered = projects.filter(
-      (p) => p.projId.toLowerCase() === term.toLowerCase()
-    );
+    const filtered = projects.filter((p) => p.projId.toLowerCase() === term);
     setFilteredProjects(filtered);
     setSearched(true);
     setLoading(false);
@@ -67,7 +63,7 @@ const ProjectBudgetStatus = () => {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSearch();
       setShowSuggestions(false);
     }
@@ -76,8 +72,7 @@ const ProjectBudgetStatus = () => {
   const handleInputChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-
-    if (value.trim() === "") {
+    if (value.trim() === '') {
       setFilteredProjects([]);
       setSearched(false);
       setSuggestions([]);
@@ -95,9 +90,7 @@ const ProjectBudgetStatus = () => {
   const handleSuggestionClick = (projId) => {
     setSearchTerm(projId);
     setShowSuggestions(false);
-    const filtered = projects.filter(
-      (p) => p.projId.toLowerCase() === projId.toLowerCase()
-    );
+    const filtered = projects.filter((p) => p.projId.toLowerCase() === projId.toLowerCase());
     setFilteredProjects(filtered);
     setSearched(true);
   };
@@ -106,10 +99,6 @@ const ProjectBudgetStatus = () => {
     setSelectedPlan(plan);
     setShowHours(false);
     setHoursProjectId(null);
-    setShowDirectCost(false);
-    setDirectCostProjectId(null);
-    setShowAmounts(false);
-    setAmountsProjectId(null);
     setShowRevenueAnalysis(false);
     setForecastData([]);
     setIsForecastLoading(false);
@@ -131,73 +120,30 @@ const ProjectBudgetStatus = () => {
     } else {
       setShowHours(true);
       setHoursProjectId(projId);
-      setShowDirectCost(false);
-      setDirectCostProjectId(null);
-      setShowAmounts(false);
-      setAmountsProjectId(null);
       setShowRevenueAnalysis(false);
-      setIsForecastLoading(true); // Start loading
+      setIsForecastLoading(true);
 
       try {
-        const employeeApi = selectedPlan.plType === "EAC"
-          ? `https://test-api-3tmq.onrender.com/Project/GetEACDataByPlanId/${selectedPlan.plId}`
-          : `https://test-api-3tmq.onrender.com/Project/GetForecastDataByPlanId/${selectedPlan.plId}`;
-        console.log("Fetching forecast data from:", employeeApi);
+        const employeeApi =
+          selectedPlan.plType === 'EAC'
+            ? `https://test-api-3tmq.onrender.com/Project/GetEACDataByPlanId/${selectedPlan.plId}`
+            : `https://test-api-3tmq.onrender.com/Project/GetForecastDataByPlanId/${selectedPlan.plId}`;
+        console.log('Fetching forecast data from:', employeeApi);
         const response = await axios.get(employeeApi);
         if (!Array.isArray(response.data)) {
-          console.error("Invalid forecast data format:", response.data);
+          console.error('Invalid forecast data format:', response.data);
           setForecastData([]);
         } else {
           setForecastData(response.data);
         }
       } catch (err) {
-        console.error("Failed to fetch forecast data:", err.message, err.response?.data);
+        console.error('Failed to fetch forecast data:', err.message, err.response?.data);
         setForecastData([]);
       } finally {
-        setIsForecastLoading(false); 
+        setIsForecastLoading(false);
       }
     }
   };
-
-  // const handleDirectCostTabClick = (projId) => {
-  //   if (!selectedPlan) {
-  //     setShowDirectCost(false);
-  //     setDirectCostProjectId(null);
-  //     return;
-  //   }
-  //   if (showDirectCost && directCostProjectId === projId) {
-  //     setShowDirectCost(false);
-  //     setDirectCostProjectId(null);
-  //   } else {
-  //     setShowDirectCost(true);
-  //     setDirectCostProjectId(projId);
-  //     setShowHours(false);
-  //     setHoursProjectId(null);
-  //     setShowAmounts(false);
-  //     setAmountsProjectId(null);
-  //     setShowRevenueAnalysis(false);
-  //   }
-  // };
-
-  // const handleAmountsTabClick = (projId) => {
-  //   if (!selectedPlan) {
-  //     setShowAmounts(false);
-  //     setAmountsProjectId(null);
-  //     return;
-  //   }
-  //   if (showAmounts && amountsProjectId === projId) {
-  //     setShowAmounts(false);
-  //     setAmountsProjectId(null);
-  //   } else {
-  //     setShowAmounts(true);
-  //     setAmountsProjectId(projId);
-  //     setShowHours(false);
-  //     setHoursProjectId(null);
-  //     setShowDirectCost(false);
-  //     setDirectCostProjectId(null);
-  //     setShowRevenueAnalysis(false);
-  //   }
-  // };
 
   const handleRevenueAnalysisTabClick = () => {
     if (!selectedPlan) {
@@ -210,10 +156,6 @@ const ProjectBudgetStatus = () => {
       setShowRevenueAnalysis(true);
       setShowHours(false);
       setHoursProjectId(null);
-      setShowDirectCost(false);
-      setDirectCostProjectId(null);
-      setShowAmounts(false);
-      setAmountsProjectId(null);
     }
   };
 
@@ -221,7 +163,7 @@ const ProjectBudgetStatus = () => {
     if (showHours && hoursProjectId && selectedPlan) {
       const ref = hoursRefs.current[hoursProjectId];
       if (ref && ref.current) {
-        ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
   }, [showHours, hoursProjectId, selectedPlan]);
@@ -232,30 +174,33 @@ const ProjectBudgetStatus = () => {
         setShowSuggestions(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const inputRef = useRef(null);
 
   if (loading && projects.length === 0) {
     return (
       <div className="flex justify-center items-center h-64 font-inter">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-        <span className="ml-2 text-gray-600 text-sm sm:text-base">
-          Loading...
-        </span>
+        <span className="ml-2 text-gray-600 text-sm sm:text-base">Loading...</span>
       </div>
     );
   }
 
   return (
     <div className="p-2 sm:p-4 space-y-6 text-sm sm:text-base text-gray-800 font-inter">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        closeButton
+      />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 relative w-full sm:w-auto">
-          <label className="font-semibold text-xs sm:text-sm">
-            Project ID:
-          </label>
+          <label className="font-semibold text-xs sm:text-sm">Project ID:</label>
           <div className="relative w-full sm:w-64">
             <input
               type="text"
@@ -292,13 +237,9 @@ const ProjectBudgetStatus = () => {
       </div>
 
       {loading ? (
-        <div className="text-gray-500 italic text-xs sm:text-sm">
-          Loading...
-        </div>
+        <div className="text-gray-500 italic text-xs sm:text-sm">Loading...</div>
       ) : searched && filteredProjects.length === 0 ? (
-        <div className="text-gray-500 italic text-xs sm:text-sm">
-          No project found with that ID.
-        </div>
+        <div className="text-gray-500 italic text-xs sm:text-sm">No project found with that ID.</div>
       ) : (
         filteredProjects.map((project) => {
           if (!hoursRefs.current[project.projId]) {
@@ -310,15 +251,13 @@ const ProjectBudgetStatus = () => {
               key={project.projId}
               className="space-y-4 border p-2 sm:p-4 rounded shadow bg-white mb-8"
             >
-              <h2 className="font-semibold text-sm sm:text-base text-blue-600">
-                Project: {project.projId}
-              </h2>
+              <h2 className="font-semibold text-sm sm:text-base text-blue-600">Project: {project.projId}</h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
-                <Field label="Project ID" value={project.projId} />
+                <Field label="Project" value={project.projId} />
                 <Field label="Project Name" value={project.projName} />
                 <Field label="Description" value={project.projTypeDc} />
-                <Field label="Organization ID" value={project.orgId} />
+                <Field label="Organization" value={project.orgId} />
                 <Field label="Start Date" value={project.startDate} />
                 <Field label="End Date" value={project.endDate} />
               </div>
@@ -331,39 +270,13 @@ const ProjectBudgetStatus = () => {
 
               <div className="flex flex-wrap gap-2 sm:gap-4 text-blue-600 underline text-xs sm:text-sm cursor-pointer">
                 <span
-                  className={`cursor-pointer ${
-                    showHours && hoursProjectId === project.projId
-                      ? "font-semibold text-blue-800"
-                      : ""
-                  }`}
+                  className={`cursor-pointer ${showHours && hoursProjectId === project.projId ? 'font-semibold text-blue-800' : ''}`}
                   onClick={() => handleHoursTabClick(project.projId)}
                 >
                   Hours
                 </span>
-                {/* <span
-                  className={`cursor-pointer ${
-                    showDirectCost && directCostProjectId === project.projId
-                      ? "font-semibold text-blue-800"
-                      : ""
-                  }`}
-                  onClick={() => handleDirectCostTabClick(project.projId)}
-                >
-                  Direct Cost
-                </span> */}
-                {/* <span
-                  className={`cursor-pointer ${
-                    showAmounts && amountsProjectId === project.projId
-                      ? "font-semibold text-blue-800"
-                      : ""
-                  }`}
-                  onClick={() => handleAmountsTabClick(project.projId)}
-                >
-                  Amounts
-                </span> */}
                 <span
-                  className={`cursor-pointer ${
-                    showRevenueAnalysis ? "font-semibold text-blue-800" : ""
-                  }`}
+                  className={`cursor-pointer ${showRevenueAnalysis ? 'font-semibold text-blue-800' : ''}`}
                   onClick={handleRevenueAnalysisTabClick}
                 >
                   Revenue Analysis
@@ -373,114 +286,38 @@ const ProjectBudgetStatus = () => {
               {showRevenueAnalysis && selectedPlan && (
                 <div className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16">
                   <div className="mb-4 text-xs sm:text-sm text-gray-800">
-                    <span className="font-semibold">Project ID:</span>{" "}
-                    {selectedPlan.projId || project.projId},{" "}
-                    <span className="font-semibold">Type:</span>{" "}
-                    {selectedPlan.plType || "N/A"},{" "}
-                    <span className="font-semibold">Version:</span>{" "}
-                    {selectedPlan.version || "N/A"},{" "}
-                    <span className="font-semibold">Status:</span>{" "}
-                    {selectedPlan.status || "N/A"}
+                    <span className="font-semibold">Project ID:</span> {selectedPlan.projId || project.projId},{' '}
+                    <span className="font-semibold">Type:</span> {selectedPlan.plType || 'N/A'},{' '}
+                    <span className="font-semibold">Version:</span> {selectedPlan.version || 'N/A'},{' '}
+                    <span className="font-semibold">Status:</span> {selectedPlan.status || 'N/A'}
                   </div>
-                  <RevenueAnalysisTable
-                    planId={selectedPlan.plId}
-                    status={selectedPlan.status}
-                  />
+                  <RevenueAnalysisTable planId={selectedPlan.plId} status={selectedPlan.status} />
                 </div>
               )}
 
-              {!showRevenueAnalysis &&
-                showHours &&
-                selectedPlan &&
-                hoursProjectId === project.projId && (
-                  <div
-                    ref={hoursRefs.current[project.projId]}
-                    className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
-                  >
-                    <div className="mb-4 text-xs sm:text-sm text-gray-800">
-                      <span className="font-semibold">Project ID:</span>{" "}
-                      {selectedPlan.projId || project.projId},{" "}
-                      <span className="font-semibold">Type:</span>{" "}
-                      {selectedPlan.plType || "N/A"},{" "}
-                      <span className="font-semibold">Version:</span>{" "}
-                      {selectedPlan.version || "N/A"},{" "}
-                      <span className="font-semibold">Status:</span>{" "}
-                      {selectedPlan.status || "N/A"}
-                    </div>
-                    {console.log("Rendering ProjectHoursDetails with props:", {
-                      planId: selectedPlan.plId,
-                      status: selectedPlan.status,
-                      planType: selectedPlan.plType,
-                      closedPeriod: selectedPlan.closedPeriod,
-                      startDate: project.startDate,
-                      endDate: project.endDate,
-                      employees: forecastData,
-                      isForecastLoading,
-                    })}
-                    <ProjectHoursDetails
-                      planId={selectedPlan.plId}
-                      status={selectedPlan.status}
-                      planType={selectedPlan.plType}
-                      closedPeriod={selectedPlan.closedPeriod}
-                      startDate={project.startDate}
-                      endDate={project.endDate}
-                      employees={forecastData}
-                      isForecastLoading={isForecastLoading}
-                    />
+              {!showRevenueAnalysis && showHours && selectedPlan && hoursProjectId === project.projId && (
+                <div
+                  ref={hoursRefs.current[project.projId]}
+                  className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
+                >
+                  <div className="mb-4 text-xs sm:text-sm text-gray-800">
+                    <span className="font-semibold">Project ID:</span> {selectedPlan.projId || project.projId},{' '}
+                    <span className="font-semibold">Type:</span> {selectedPlan.plType || 'N/A'},{' '}
+                    <span className="font-semibold">Version:</span> {selectedPlan.version || 'N/A'},{' '}
+                    <span className="font-semibold">Status:</span> {selectedPlan.status || 'N/A'}
                   </div>
-                )}
-
-              {!showRevenueAnalysis &&
-                showDirectCost &&
-                selectedPlan &&
-                directCostProjectId === project.projId && (
-                  <div
-                    className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
-                    style={{ marginTop: 16 }}
-                  >
-                    <div className="mb-4 text-xs sm:text-sm text-gray-800">
-                      <span className="font-semibold">Project ID:</span>{" "}
-                      {selectedPlan.projId || project.projId},{" "}
-                      <span className="font-semibold">Type:</span>{" "}
-                      {selectedPlan.plType || "N/A"},{" "}
-                      <span className="font-semibold">Version:</span>{" "}
-                      {selectedPlan.version || "N/A"},{" "}
-                      <span className="font-semibold">Status:</span>{" "}
-                      {selectedPlan.status || "N/A"}
-                    </div>
-                    <ProjectDirectCostTable
-                      plan={selectedPlan}
-                      status={selectedPlan.status}
-                      plType={selectedPlan.plType}
-                    />
-                  </div>
-                )}
-
-              {!showRevenueAnalysis &&
-                showAmounts &&
-                selectedPlan &&
-                amountsProjectId === project.projId && (
-                  <div
-                    className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
-                    style={{ marginTop: 16 }}
-                  >
-                    <div className="mb-4 text-xs sm:text-sm text-gray-800">
-                      <span className="font-semibold">Project ID:</span>{" "}
-                      {selectedPlan.projId || project.projId},{" "}
-                      <span className="font-semibold">Type:</span>{" "}
-                      {selectedPlan.plType || "N/A"},{" "}
-                      <span className="font-semibold">Version:</span>{" "}
-                      {selectedPlan.version || "N/A"},{" "}
-                      <span className="font-semibold">Status:</span>{" "}
-                      {selectedPlan.status || "N/A"}
-                    </div>
-                    <ProjectAmountsTable
-                      plan={selectedPlan}
-                      status={selectedPlan.status}
-                      plType={selectedPlan.plType}
-                    />
-                  </div>
-                )}
+                  <ProjectHoursDetails
+                    planId={selectedPlan.plId}
+                    status={selectedPlan.status}
+                    planType={selectedPlan.plType}
+                    closedPeriod={selectedPlan.closedPeriod}
+                    startDate={project.startDate}
+                    endDate={project.endDate}
+                    employees={forecastData}
+                    isForecastLoading={isForecastLoading}
+                  />
+                </div>
+              )}
             </div>
           );
         })
@@ -491,21 +328,14 @@ const ProjectBudgetStatus = () => {
 
 const Field = ({ label, value }) => (
   <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
-    <label className="font-semibold text-xs sm:text-sm w-full sm:w-32">
-      {label}:
-    </label>
+    <label className="font-semibold text-xs sm:text-sm w-full sm:w-32">{label}:</label>
     <input
       type="text"
       className="border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-      defaultValue={value || ""}
+      defaultValue={value || ''}
       readOnly
     />
   </div>
 );
 
 export default ProjectBudgetStatus;
-
-
-
-
-

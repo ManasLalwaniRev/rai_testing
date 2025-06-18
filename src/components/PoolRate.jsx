@@ -118,7 +118,7 @@ const PoolRate = ({ userName = 'User' }) => {
             console.log(`Rates for pool ${pool.poolId}, month ${monthIndex}:`, fetchedRates);
             const monthData = fetchedRates.find(item => item.month === monthIndex);
             monthRates[pool.poolId] = {
-              targetRate: monthData ? monthData.targetRate.toString() : '',
+              targetRate: monthData ? monthData.targetRate.toString() : '0',
               id: monthData ? monthData.id : 0,
             };
           });
@@ -157,26 +157,15 @@ const PoolRate = ({ userName = 'User' }) => {
         isNavigating.current = true;
         pendingNavigation.current = nextPath;
 
-        if (!toast.isActive('unsaved-changes-navigation-warning')) {
-          toast.warn(
-            'You have unsaved changes. Please save your data before navigating to another page!',
-            {
-              position: 'top-center',
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              toastId: 'unsaved-changes-navigation-warning',
-              onClose: () => {
-                console.log('Toast closed, resetting navigation state');
-                isNavigating.current = false;
-                pendingNavigation.current = null;
-              },
-            }
-          );
+        const userConfirmed = window.confirm('You have unsaved changes. Are you sure you want to leave?');
+        if (userConfirmed) {
+          isNavigating.current = false;
+          pendingNavigation.current = null;
+          return true; // Allow navigation
+        } else {
+          isNavigating.current = false;
+          return false; // Block navigation
         }
-        return false; // Block navigation
       }
       isNavigating.current = false;
       return true; // Allow navigation
@@ -218,17 +207,6 @@ const PoolRate = ({ userName = 'User' }) => {
     const handleBeforeUnload = (event) => {
       if (editMonths.size > 0 && !isNavigating.current) {
         console.log('BeforeUnload triggered: Unsaved changes detected', Array.from(editMonths));
-        if (!toast.isActive('unsaved-changes-warning')) {
-          toast.warn('Please save your updated data before leaving the page!', {
-            position: 'top-center',
-            autoClose: 3000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            toastId: 'unsaved-changes-warning',
-          });
-        }
         event.preventDefault();
         event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
         return event.returnValue;
@@ -243,7 +221,8 @@ const PoolRate = ({ userName = 'User' }) => {
   }, [editMonths]);
 
   const handleTargetRateChange = (month, poolId, value) => {
-    if (value === '' || !isNaN(value)) {
+    // Allow empty string or valid number (including decimal points)
+    if (value === '' || !isNaN(value) || value === '.') {
       setMonthlyData((prev) =>
         prev.map((item) =>
           item.month === month
@@ -258,7 +237,7 @@ const PoolRate = ({ userName = 'User' }) => {
         )
       );
       const monthIndex = months.indexOf(month);
-      const initialValue = initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate || '';
+      const initialValue = initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate || '0';
       const hasChanged = value !== initialValue;
       setEditMonths((prev) => {
         const newSet = new Set(prev);
@@ -295,13 +274,13 @@ const PoolRate = ({ userName = 'User' }) => {
       const updatedRates = { ...monthData.rates };
       const poolsToProcess = pools.filter((pool) => selectedPools.includes(pool.poolId));
       poolsToProcess.forEach((pool) => {
-        const currentRate = monthData.rates[pool.poolId]?.targetRate || '';
+        const currentRate = monthData.rates[pool.poolId]?.targetRate || '0';
         if (currentRate === findValue) {
           updatedRates[pool.poolId] = {
             ...updatedRates[pool.poolId],
             targetRate: replaceValue,
           };
-          const initialValue = initialMonthlyData.current[monthIndex]?.rates[pool.poolId]?.targetRate || '';
+          const initialValue = initialMonthlyData.current[monthIndex]?.rates[pool.poolId]?.targetRate || '0';
           const hasChanged = replaceValue !== initialValue;
           setEditMonths((prev) => {
             const newSet = new Set(prev);
@@ -400,7 +379,7 @@ const PoolRate = ({ userName = 'User' }) => {
     }
   };
 
-  // Allow navigation after user acknowledges toast
+  // Allow navigation after user acknowledges alert
   const proceedWithNavigation = () => {
     if (pendingNavigation.current && !isNavigating.current) {
       const targetPath = pendingNavigation.current;

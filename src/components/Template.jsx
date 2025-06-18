@@ -138,7 +138,7 @@ const Template = ({ updatedBy = "User" }) => {
     <div className="bg-white p-6 rounded-lg shadow-lg">
       
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">Templates</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2 bg-blue-50 py-2 px-4 rounded-lg">Templates</h2>
         <button
           onClick={() => setIsFormOpen(!isFormOpen)}
           className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition ease-in-out duration-200"

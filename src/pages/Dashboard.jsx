@@ -2,10 +2,11 @@ import React from "react";
 import NavigationSidebar from "../components/NavigationSidebar";
 import { Routes, Route } from "react-router-dom";
 import ProjectBudgetStatus from "../components/ProjectBudgetStatus";
-import Configuration from "../components/PoolRate";
+import PoolRate from "../components/PoolRate";
 import PoolConfigurationTable from "../components/PoolConfigurationTable";
 import TemplatePoolMapping from "../components/TemplatePoolMapping";
-import Template from "../components/Template"; 
+import Template from "../components/Template";
+import CeilingConfiguration from "../components/CeilingConfiguration";
 
 const Dashboard = () => {
   return (
@@ -58,10 +59,11 @@ const Dashboard = () => {
               }
             />
             <Route path="/project-budget-status" element={<ProjectBudgetStatus />} />
-            <Route path="/pool-rate" element={<Configuration />} />
+            <Route path="/pool-rate" element={<PoolRate />} />
             <Route path="/pool-configuration" element={<PoolConfigurationTable />} />
             <Route path="/template-pool-mapping" element={<TemplatePoolMapping />} />
-            <Route path="/template" element={<Template />} /> 
+            <Route path="/template" element={<Template />} />
+            <Route path="/ceiling-configuration" element={<CeilingConfiguration />} />
           </Routes>
         </div>
       </div>
