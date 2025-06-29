@@ -2,11 +2,17 @@ import React from "react";
 import NavigationSidebar from "../components/NavigationSidebar";
 import { Routes, Route } from "react-router-dom";
 import ProjectBudgetStatus from "../components/ProjectBudgetStatus";
+import NewBusiness from "../components/NewBusiness";
 import PoolRate from "../components/PoolRate";
 import PoolConfigurationTable from "../components/PoolConfigurationTable";
 import TemplatePoolMapping from "../components/TemplatePoolMapping";
 import Template from "../components/Template";
 import CeilingConfiguration from "../components/CeilingConfiguration";
+import GlobalConfiguration from "../components/GlobalConfiguration";
+import ProspectiveIdSetup from "../components/ProspectiveIdSetup";
+import DisplaySettings from "../components/DisplaySettings";
+import AnnualHolidays from "../components/HolidayCalendar";
+import MaintainFiscalYearPeriods from "../components/MaintainFiscalYearPeriods";
 
 const Dashboard = () => {
   return (
@@ -59,11 +65,17 @@ const Dashboard = () => {
               }
             />
             <Route path="/project-budget-status" element={<ProjectBudgetStatus />} />
+            <Route path="/new-business" element={<NewBusiness />} />
             <Route path="/pool-rate" element={<PoolRate />} />
             <Route path="/pool-configuration" element={<PoolConfigurationTable />} />
             <Route path="/template-pool-mapping" element={<TemplatePoolMapping />} />
             <Route path="/template" element={<Template />} />
             <Route path="/ceiling-configuration" element={<CeilingConfiguration />} />
+            <Route path="/global-configuration" element={<GlobalConfiguration />} />
+            <Route path="/prospective-id-setup" element={<ProspectiveIdSetup />} />
+            <Route path="/display-settings" element={<DisplaySettings />} />
+            <Route path="/annual-holidays" element={<AnnualHolidays />} />
+            <Route path="/maintain-fiscal-year-periods" element={<MaintainFiscalYearPeriods />} />
           </Routes>
         </div>
       </div>

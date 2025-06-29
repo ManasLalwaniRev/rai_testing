@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+.synchronized-tables-outer {
+  width: 100%;
+  overflow: hidden;
+}
+.synchronized-tables-container {
+  display: flex;
+  max-height: 400px;
+  overflow-y: auto; /* One vertical scrollbar for both tables */
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: #fff;
+}
+.synchronized-table-scroll {
+  overflow-x: auto; /* Each table can scroll horizontally */
+  min-width: 0;
+  flex: 1 1 0;
+}
+.sticky-thead th {
+  position: sticky;
+  top: 0;
+  background: #f0f7ff;
+  z-index: 2;
+}
+.synchronized-tables-container table {
+  margin-bottom: 0;
+}

@@ -382,6 +382,7 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId }) => {
       } else if (action === 'Create Budget' || action === 'Create EAC') {
         const payloadTemplate = {
           projId: projectId,
+          plId: plan.plId,
           plType: action === 'Create Budget' ? 'BUD' : 'EAC',
           source: plan.source || '',
           type: plan.type || '',
@@ -391,7 +392,7 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId }) => {
           isCompleted: false,   
           isApproved: false,
           status: 'Working',
-          closedPeriod: new Date().toISOString(),
+          closedPeriod: new Date().toISOString().split('T')[0],
           createdBy: plan.createdBy || 'User',
           modifiedBy: plan.modifiedBy || 'User',
           approvedBy: '',
@@ -502,17 +503,17 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId }) => {
     <div className="p-4 relative z-10">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick />
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-bold">Project Plan Table</h2>
+        <h2 className="text-xs font-bold">Project Plan Table</h2>
         <div className="flex gap-2">
           {plans.length === 0 && (
-            <button
+            <button 
               onClick={() => setShowForm(true)}
               className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center text-sm"
               title="Create New Plan"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
+                className="h-4 w-4 mr-2"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -524,12 +525,12 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId }) => {
           )}
           <button
             onClick={() => fileInputRef.current.click()}
-            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center text-sm"
+            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center text-xs"
             title="Import Plan"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2"
+              className="h-4 w-4 mr-2"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -558,8 +559,8 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId }) => {
         </div>
       ) : (
         <div className="overflow-x-auto" style={{ maxHeight: '400px', minHeight: '100px', border: '1px solid #e5e7eb', borderRadius: '0.5rem', background: '#fff' }}>
-          <table className="min-w-full text-sm text-left border-collapse border border-gray-300">
-            <thead className="bg-gray-100 text-gray-800">
+          <table className="min-w-full text-xs text-left border-collapse border ">
+            <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
               <tr>
                 <th className="p-2 border font-normal">Export Plan</th>
                 <th className="p-2 border font-normal">Action</th>
@@ -590,7 +591,7 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId }) => {
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 cursor-pointer"
+                        className="h-4 w-4 cursor-pointer"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -677,3 +678,6 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId }) => {
 };
 
 export default ProjectPlanTable;
+
+
+

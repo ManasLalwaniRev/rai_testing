@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
 import BurdenCostCeilingDetails from "./BurdenCostCeilingDetails";
+import EmployeeHoursCeilings from "./EmployeeHoursCeilings";
+import DirectCostCeilings from "./DirectCostCeilings";
+import HoursCeilings from "./HoursCeilings";
+import CostFeeOverrideDetails from "./CostFeeOverrideDetails";
+
+const userName = "yourUserName"; // <-- Replace with actual user logic or prop
 
 const CeilingConfiguration = () => {
   const [projectInput, setProjectInput] = useState("");
@@ -7,36 +13,27 @@ const CeilingConfiguration = () => {
   const [isSearched, setIsSearched] = useState(false);
 
   const tabs = [
-    "Burden Cost Ceiling Details", 
+    "Burden Cost Ceiling Details",
     "Employee Hours Ceilings",
     "Direct Cost Ceilings",
     "Hours Ceilings",
     "Cost Fee Override Details",
-  ];                                
+  ];
 
   useEffect(() => {
-    if (projectInput) {
-      setIsSearched(true);
-    } else {
-      setIsSearched(false);
-    }
+    setIsSearched(!!projectInput);
   }, [projectInput]);
 
   const handleSearch = () => {
-    if (projectInput) {
-      setIsSearched(true);
-    }
+    if (projectInput) setIsSearched(true);
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleSearch();
-    }
+    if (e.key === "Enter") handleSearch();
   };
 
   const handleTabClick = (tab) => {
     if (activeTab === tab) {
-      // If the same tab is clicked, deselect it
       setActiveTab("");
       setIsSearched(false);
       setProjectInput("");
@@ -51,7 +48,6 @@ const CeilingConfiguration = () => {
         Ceiling Configuration
       </h1>
 
-      {/* Project Search Section */}
       <div className="mb-8">
         <label
           htmlFor="project"
@@ -78,7 +74,6 @@ const CeilingConfiguration = () => {
         </div>
       </div>
 
-      {/* Tabs Section */}
       <div className="border-b border-gray-200 mb-6">
         <nav className="flex flex-wrap gap-2 sm:gap-3" aria-label="Tabs">
           {tabs.map((tab) => (
@@ -97,58 +92,44 @@ const CeilingConfiguration = () => {
         </nav>
       </div>
 
-      {/* Tab Content */}
       <div className="min-h-[400px]">
         {activeTab === "Burden Cost Ceiling Details" && (
           <BurdenCostCeilingDetails
             projectId={projectInput}
             isSearched={isSearched}
+            updatedBy={userName}
           />
         )}
-
         {activeTab === "Employee Hours Ceilings" && (
-          <div className="animate-fade-in">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Employee Hours Ceilings
-            </h2>
-            <p className="text-gray-600">
-              No data available. Search for a project to view details.
-            </p>
-          </div>
+          <EmployeeHoursCeilings
+            projectId={projectInput}
+            isSearched={isSearched}
+          />
         )}
         {activeTab === "Direct Cost Ceilings" && (
-          <div className="animate-fade-in">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Direct Cost Ceilings
-            </h2>
-            <p className="text-gray-600">
-              No data available. Search for a project to view details.
-            </p>
-          </div>
+          <DirectCostCeilings
+            projectId={projectInput}
+            isSearched={isSearched}
+            updatedBy={userName}
+          />
         )}
         {activeTab === "Hours Ceilings" && (
-          <div className="animate-fade-in">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Hours Ceilings
-            </h2>
-            <p className="text-gray-600">
-              No data available. Search for a project to view details.
-            </p>
-          </div>
+          <HoursCeilings
+            projectId={projectInput}
+            isSearched={isSearched}
+            updatedBy={userName}
+          />
         )}
         {activeTab === "Cost Fee Override Details" && (
-          <div className="animate-fade-in">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">
-              Cost Fee Override Details
-            </h2>
-            <p className="text-gray-600">
-              No data available. Search for a project to view details.
-            </p>
-          </div>
+          <CostFeeOverrideDetails
+            projectId={projectInput}
+            isSearched={isSearched}
+            updatedBy={userName}
+          />
         )}
       </div>
     </div>
   );
 };
 
-export default CeilingConfiguration;  
+export default CeilingConfiguration;
