@@ -3,26 +3,29 @@
 .synchronized-tables-outer {
   width: 100%;
   overflow: hidden;
+  position: relative;
 }
+
 .synchronized-tables-container {
   display: flex;
-  max-height: 400px;
-  overflow-y: auto; /* One vertical scrollbar for both tables */
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   background: #fff;
 }
+
 .synchronized-table-scroll {
-  overflow-x: auto; /* Each table can scroll horizontally */
+  overflow-x: auto;
   min-width: 0;
   flex: 1 1 0;
 }
+
 .sticky-thead th {
-  position: sticky;
-  top: 0;
-  background: #f0f7ff;
-  z-index: 2;
+  position: sticky !important;
+  top: 0 !important;
+  background: #f0f7ff !important;
+  z-index: 2 !important;
 }
+
 .synchronized-tables-container table {
   margin-bottom: 0;
 }
