@@ -18,7 +18,7 @@ function transformApiResponseToRevenueAnalysisRows(
   let totalRevenueOverall = 0;
   let totalLaborCostRaw = 0; // Raw cost (base salary) for all labor
   let totalBurdenedLaborCost = 0; // Total burdened cost for all labor
-  let totalLaborRevenue = 0; // Total labor revenue (sum of tnmRevenue + cpffRevenue from payrollSalary)
+  let totalLaborRevenue = 0; // Total labor revenue (sum of revenue + revenue from payrollSalary)
   // Removed aggregation for these, will use top-level API response values directly
   // let totalFringeAggregated = 0;
   // let totalOverheadAggregated = 0;
@@ -77,10 +77,10 @@ function transformApiResponseToRevenueAnalysisRows(
 
     empSummary.emplSchedule?.payrollSalary.forEach(salaryEntry => {
       // Aggregate overall totals for the main summary rows
-      totalRevenueOverall += (salaryEntry.tnmRevenue || 0) + (salaryEntry.cpffRevenue || 0);
+      totalRevenueOverall += (salaryEntry.revenue || 0) //+ (salaryEntry.revenue || 0);
       totalLaborCostRaw += (salaryEntry.cost || 0); // Accumulate raw cost
       totalBurdenedLaborCost += (salaryEntry.totalBurdenCost || 0); // Accumulate burdened cost
-      totalLaborRevenue += (salaryEntry.tnmRevenue || 0) + (salaryEntry.cpffRevenue || 0);
+      totalLaborRevenue += (salaryEntry.revenue || 0) //+ (salaryEntry.revenue || 0);
 
       // Aggregate for current PLC detail (overall totals)
       plcDetail.rawCost += (salaryEntry.cost || 0); // PLC raw cost
@@ -91,7 +91,7 @@ function transformApiResponseToRevenueAnalysisRows(
       // Aggregate employee's overall totals (no monthly breakdown)
       employee.rawCost += (salaryEntry.cost || 0); // Employee raw cost
       employee.cost += (salaryEntry.totalBurdenCost || 0); // Employee burdened cost
-      employee.revenue += (salaryEntry.tnmRevenue || 0) + (salaryEntry.cpffRevenue || 0); // Aggregate employee revenue
+      employee.revenue += (salaryEntry.revenue || 0) //+ (salaryEntry.revenue || 0); // Aggregate employee revenue
     });
   });
 

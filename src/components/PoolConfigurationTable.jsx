@@ -175,3 +175,4 @@ const PoolConfigurationTable = () => {
 };
 
 export default PoolConfigurationTable;
+

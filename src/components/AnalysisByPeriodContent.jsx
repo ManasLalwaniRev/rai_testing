@@ -115,9 +115,11 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
             const monthRange = getMonthRangeKey(salaryEntry.month, salaryEntry.year);
 
             if (monthRange) {
-              tnmRevenueData[monthRange] = (tnmRevenueData[monthRange] || 0) + (salaryEntry.tnmRevenue || 0);
-              cpffRevenueData[monthRange] = (cpffRevenueData[monthRange] || 0) + (salaryEntry.cpffRevenue || 0);
-              revenueData[monthRange] = tnmRevenueData[monthRange] + cpffRevenueData[monthRange];
+              tnmRevenueData[monthRange] = (tnmRevenueData[monthRange] || 0) + (salaryEntry.revenue || 0);
+            //  cpffRevenueData[monthRange] = (cpffRevenueData[monthRange] || 0) + (salaryEntry.revenue || 0);
+              // revenueData[monthRange] = tnmRevenueData[monthRange] + cpffRevenueData[monthRange];
+              revenueData[monthRange] = (revenueData[monthRange] || 0) + (salaryEntry.revenue || 0);
+            //  tnmRevenueData[monthRange] = (tnmRevenueData[monthRange] || 0) + (salaryEntry.revenue || 0);
 
               totalExpenseData[monthRange] = (totalExpenseData[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
               totalStaffCostByMonth[monthRange] = (totalStaffCostByMonth[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
@@ -147,13 +149,16 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
       employee.cost = Object.values(employee.monthlyCost).reduce((sum, val) => sum + val, 0);
     });
 
-    let overallRevenueForProfit = 0;
-    if (selectedRevenueView === 't&m') {
-      overallRevenueForProfit = Object.values(tnmRevenueData).reduce((sum, val) => sum + val, 0);
-    } else if (selectedRevenueView === 'cpff') {
-      overallRevenueForProfit = Object.values(cpffRevenueData).reduce((sum, val) => sum + val, 0);
-    }
-    totalRevenueOverall = Object.values(revenueData).reduce((sum, val) => sum + val, 0);
+    // let overallRevenueForProfit = 0;
+    // if (selectedRevenueView === 't&m') {
+    //   overallRevenueForProfit = Object.values(tnmRevenueData).reduce((sum, val) => sum + val, 0);
+    // } else if (selectedRevenueView === 'cpff') {
+    //   overallRevenueForProfit = Object.values(cpffRevenueData).reduce((sum, val) => sum + val, 0);
+    // }
+    let overallRevenueForProfit = apiResponse.revenue || 0; // Use the top-level API revenue for overall profit calculation
+    // totalRevenueOverall = Object.values(revenueData).reduce((sum, val) => sum + val, 0);
+    totalRevenueOverall = apiResponse.revenue || 0;
+
 
     totalExpenseOverall = Object.values(totalExpenseData).reduce((sum, val) => sum + val, 0);
     const totalStaffCostOverall = Object.values(totalStaffCostByMonth).reduce((sum, val) => sum + val, 0);
