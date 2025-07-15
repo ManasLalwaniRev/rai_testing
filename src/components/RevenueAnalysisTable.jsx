@@ -1,3 +1,5 @@
+
+//  At Risk Working 
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
@@ -19,10 +21,6 @@ function transformApiResponseToRevenueAnalysisRows(
   let totalLaborCostRaw = 0; // Raw cost (base salary) for all labor
   let totalBurdenedLaborCost = 0; // Total burdened cost for all labor
   let totalLaborRevenue = 0; // Total labor revenue (sum of revenue + revenue from payrollSalary)
-  // Removed aggregation for these, will use top-level API response values directly
-  // let totalFringeAggregated = 0;
-  // let totalOverheadAggregated = 0;
-  // let totalGnaAggregated = 0;
 
   // Map to group employees by PLC
   const plcMap = new Map();
@@ -70,7 +68,6 @@ function transformApiResponseToRevenueAnalysisRows(
         profit: 0, // Initialize employee profit
         profitOnCost: '0.00%', // Initialize profitOnCost
         profitOnRevenue: '0.00%', // Initialize profitOnRevenue
-        // detailSummary: {}, // Removed as per request
       };
       plcDetail.employees.push(employee); // Add employee to PLC's list
     }
@@ -211,16 +208,12 @@ function transformApiResponseToRevenueAnalysisRows(
 const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVersion, status, periodOfPerformance }) => {
   const [expandedRows, setExpandedRows] = useState([]);
   const [expandedPlcRows, setExpandedPlcRows] = useState([]);
-  // const [expandedEmployeeDetails, setExpandedEmployeeDetails] = useState([]); // Removed as per request
-
   const [revenueData, setRevenueData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Use props instead of internal state for these values
-  // const [selectedPlanId] = useState(107);
-  // const [selectedTemplateId] = useState(1);
-  // const [selectedType] = useState('TARGET');
+  const [atRiskAmount, setAtRiskAmount] = useState("$0.00 - Placeholder"); // State for At risk Amount
+  const [atRiskFundedAmount, setAtRiskFundedAmount] = useState("$0.00 - Placeholder"); // New state for At risk + Funded
+  const [fundedAmount, setFundedAmount] = useState("$0.00 - Placeholder"); // New state for Funded
 
   // Use props for display values, or fallback to defaults
   const currentProjIdDisplay = projId || "Aggregated";
@@ -241,43 +234,21 @@ const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVe
     );
   };
 
-  // Removed as per request
-  // const toggleEmployeeDetail = (id) => {
-  //   setExpandedEmployeeDetails(prev =>
-  //     prev.includes(id) ? prev.filter(detailId => detailId !== id) : [...prev, id]
-  //   );
-  // };
-
   const expandAll = () => {
     setExpandedRows(revenueData.filter(row => row.type === 'expandable').map(row => row.id));
 
     const allPlcIds = [];
     revenueData.forEach(row => {
       if (row.id === 'labor-revenue' && row.plcDetails) {
-        row.plcDetails.forEach(plc => allPlcIds.push(plc.id));
+        row.plcDetails.forEach(plc => allPlcIds.push(`${row.id}-${plc.id}`)); // Corrected PLC ID for expansion
       }
     });
     setExpandedPlcRows(allPlcIds);
-
-    // Removed as per request
-    // const allEmployeeDetailIds = [];
-    // revenueData.forEach(row => {
-    //   if (row.id === 'labor-revenue' && row.plcDetails) {
-    //     row.plcDetails.forEach(plc => {
-    //       plc.employees?.forEach(emp => {
-    //         // ID format: plcId-employeeId
-    //         allEmployeeDetailIds.push(`${plc.id}-${emp.id}`);
-    //       });
-    //     });
-    //   }
-    // });
-    // setExpandedEmployeeDetails(allEmployeeDetailIds);
   };
 
   const collapseAll = () => {
     setExpandedRows([]);
     setExpandedPlcRows([]);
-    // setExpandedEmployeeDetails([]); // Removed as per request
   };
 
   // Modified formatValue to return empty string for undefined/null/empty string values
@@ -320,7 +291,7 @@ const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVe
         console.log(`Revenue Analysis: Fetching data from API (GET): ${apiFetchUrl}`);
 
         const response = await fetch(apiFetchUrl, {
-          method: 'GET',
+          method: 'GET', // Reverted to GET
           headers: {
             'Content-Type': 'application/json',
           },
@@ -328,12 +299,39 @@ const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVe
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`HTTP error! status: ${response.status}. Details: ${errorText}`);
+          console.error("API Error Response (Raw Text):", errorText);
+          try {
+            const errorData = JSON.parse(errorText);
+            console.error("API Error Response (Parsed JSON):", errorData);
+            throw new Error(`HTTP error! status: ${response.status}. Details: ${JSON.stringify(errorData.errors || errorData)}`);
+          } catch (jsonError) {
+            throw new Error(`HTTP error! status: ${response.status}. Raw response: ${errorText}`);
+          }
         }
 
         const apiResponse = await response.json();
         console.log("Revenue Analysis: Full API Raw Response:", apiResponse);
         
+        // Check for 'atRiskamt' in the API response and update state
+        if (apiResponse.atRiskAmt !== undefined && apiResponse.atRiskAmt !== null) {
+          setAtRiskAmount(formatValue(apiResponse.atRiskAmt));
+        } else {
+          setAtRiskAmount("$0.00 - Not Found"); // Indicate if not found
+        }
+
+        // Set Funded Amount
+        if (apiResponse.fundingValue !== undefined && apiResponse.fundingValue !== null) {
+          setFundedAmount(formatValue(apiResponse.fundingValue));
+        } else {
+          setFundedAmount("$0.00 - Not Found");
+        }
+
+        // Calculate and set At risk + Funded Amount
+        const atRisk = typeof apiResponse.atRiskAmt === 'number' ? apiResponse.atRiskAmt : 0;
+        const funded = typeof apiResponse.fundingValue === 'number' ? apiResponse.fundingValue : 0;
+        setAtRiskFundedAmount(formatValue(atRisk + funded));
+
+
         const transformedData = transformApiResponseToRevenueAnalysisRows(apiResponse);
         setRevenueData(transformedData);
         console.timeEnd('fetchData'); // End timer for overall fetch operation
@@ -378,8 +376,8 @@ const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVe
         </p>
       </div>
 
-      {/* Control Buttons including Cancel */}
-      <div className="mb-4 flex gap-4">
+      {/* Control Buttons including Cancel and At Risk Amount */}
+      <div className="mb-4 flex gap-4 items-center">
         <button
           onClick={expandAll}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200"
@@ -392,12 +390,31 @@ const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVe
         >
           Collapse All
         </button>
-        <button
+        {/* START: New wrapper for the three amount boxes */}
+        <div className="flex-grow flex justify-center gap-4">
+          {/* At Risk Amount Box */}
+          <div className="p-4 border border-gray-300 rounded-md shadow-sm bg-white">
+            <span className="font-semibold text-gray-700">At risk Amount: </span>
+            <span className="text-red-600 font-bold">{atRiskAmount}</span>
+          </div>
+          {/* Funded Amount Box */}
+          <div className="p-4 border border-gray-300 rounded-md shadow-sm bg-white">
+            <span className="font-semibold text-gray-700">Funded: </span>
+            <span className="text-green-600 font-bold">{fundedAmount}</span>
+          </div>
+          {/* At risk + Funded Amount Box */}
+          <div className="p-4 border border-gray-300 rounded-md shadow-sm bg-white">
+            <span className="font-semibold text-gray-700">At risk + Funded: </span>
+            <span className="text-purple-600 font-bold">{atRiskFundedAmount}</span>
+          </div>
+        </div>
+        {/* END: New wrapper for the three amount boxes */}
+        {/* <button
           onClick={onCancel}
           className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors duration-200 ml-auto"
         >
           Cancel
-        </button>
+        </button> */}
       </div>
 
       {/* Main table container */}
@@ -538,3 +555,4 @@ const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVe
 };
 
 export default RevenueAnalysisPage;
+
