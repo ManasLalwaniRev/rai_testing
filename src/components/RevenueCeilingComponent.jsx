@@ -2062,6 +2062,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
   const [overrideAdjustments, setOverrideAdjustments] = useState(false);
   const [useFixedRevenue, setUseFixedRevenue] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [setupData, setSetupData] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // Format date to YYYY-MM-DD for display
@@ -2137,6 +2138,27 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
     setPeriods(updatedPeriods);
   };
 
+  useEffect(() => {
+  const fetchSetupData = async () => {
+    if (!selectedPlan?.projId || !selectedPlan?.version || !selectedPlan?.plType) return;
+    try {
+      const url = `https://test-api-3tmq.onrender.com/ProjBgtRevSetup/GetByProjectId/${selectedPlan.projId}/${selectedPlan.version}/${selectedPlan.plType}`;
+      const response = await axios.get(url);
+      // Defensive: handle both array and object response
+      const data = Array.isArray(response.data) ? response.data[0] : response.data;
+      if (data) {
+        setUseFixedRevenue(!!data.overrideRevAmtFl);
+        setOverrideAdjustments(!!data.useBillBurdenRates);
+        setSetupData(data);
+      }
+    } catch (error) {
+      // Optionally show a toast or just log
+      console.error("Failed to fetch revenue setup data", error);
+    }
+  };
+  fetchSetupData();
+}, [selectedPlan]);
+
   const handleRevAdjBlur = async (index) => {
     const period = periods[index];
     if (period.id <= 0) return;
@@ -2161,6 +2183,30 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
       console.error("Upsert error:", error);
     }
   };
+
+  const handleSetupCheckboxChange = async (field, value) => {
+  if (!setupData) return;
+  const updatedSetup = {
+    ...setupData,
+    [field]: value,
+  };
+  setSetupData(updatedSetup);
+
+  // Update local checkbox state
+  if (field === "overrideRevAmtFl") setUseFixedRevenue(value);
+  if (field === "useBillBurdenRates") setOverrideAdjustments(value);
+
+  try {
+    await axios.post("https://test-api-3tmq.onrender.com/ProjBgtRevSetup/upsert", updatedSetup);
+    toast.success("Revenue setup updated successfully!");
+  } catch (error) {
+    toast.error("Failed to update revenue setup.");
+    // Optionally revert state on error
+    setSetupData(setupData);
+    if (field === "overrideRevAmtFl") setUseFixedRevenue(setupData.overrideRevAmtFl);
+    if (field === "useBillBurdenRates") setOverrideAdjustments(setupData.useBillBurdenRates);
+  }
+};
 
   /*
   const handleAddNewRow = () => {
@@ -2220,13 +2266,28 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
   };
 
   const projectDetails = selectedPlan ? (
-    <div className="mb-4 text-sm text-gray-800 font-normal">
-      <span>Project ID:</span> {selectedPlan.projId || 'N/A'},{' '}
-      <span>Type:</span> {selectedPlan.plType || 'N/A'},{' '}
-      <span>Version:</span> {selectedPlan.version || 'N/A'},{' '}
-      <span>Status:</span> {selectedPlan.status || 'N/A'},{' '}
-      <span>Period of Performance:</span> Start Date: {formatDate(selectedPlan.startDate)} - End Date: {formatDate(selectedPlan.endDate)}
-    </div>
+    <div className="mb-4 text-xs sm:text-sm text-gray-800 flex flex-wrap gap-x-2 gap-y-1">
+                  <span>
+                    <span className="font-semibold">Project ID: </span>
+                    {selectedPlan.projId}
+                  </span>
+                  <span>
+                    <span className="font-semibold">Type: </span>
+                    {selectedPlan.plType || "N/A"}
+                  </span>
+                  <span>
+                    <span className="font-semibold">Version: </span>
+                    {selectedPlan.version || "N/A"}
+                  </span>
+                  <span>
+                    <span className="font-semibold">Status: </span>
+                    {selectedPlan.status || "N/A"}
+                  </span>
+                  <span>
+  <span className="font-semibold">Period of Performance: </span>
+  Start Date: {formatDate(selectedPlan?.startDate) || "N/A"} | End Date: {formatDate(selectedPlan?.endDate) || "N/A"}
+</span>
+                </div>
   ) : null;
 
   return (
@@ -2261,7 +2322,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
               type="checkbox"
               className="text-sm font-normal"
               checked={useFixedRevenue}
-              onChange={(e) => setUseFixedRevenue(e.target.checked)}
+              onChange={(e) => handleSetupCheckboxChange("overrideRevAmtFl", e.target.checked)}
             />
           </div>
           <div>
@@ -2270,7 +2331,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
               type="checkbox"
               className="text-sm font-normal"
               checked={overrideAdjustments}
-              onChange={(e) => setOverrideAdjustments(e.target.checked)}
+              onChange={(e) => handleSetupCheckboxChange("useBillBurdenRates", e.target.checked)}
             />
           </div>
         </div>

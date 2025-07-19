@@ -245,7 +245,7 @@ const NavigationSidebar = () => {
                     </Link>
                   </div>
                 )}
-                <Link
+                {/* <Link
                   to="/dashboard/ceiling-configuration"
                   className={`block text-xs text-gray-200 hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition ease-in-out duration-200 ${
                     selectedPage === "/dashboard/ceiling-configuration" ? "bg-gray-800 underline" : ""
@@ -256,7 +256,7 @@ const NavigationSidebar = () => {
                   }}
                 >
                   Ceiling Configuration
-                </Link>
+                </Link> */}
                 <Link
                   to="/dashboard/template"
                   className={`block text-xs text-gray-200 hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition ease-in-out duration-200 ${
