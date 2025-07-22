@@ -4476,7 +4476,7 @@ const ProjectAmountsTable = ({
     const payload = {
       dctId: emp.emple.dctId || 0,
       plId: emp.emple.plId || 0,
-      acctId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId,
+      accId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId, 
       orgId: edited.orgId !== undefined ? edited.orgId : emp.emple.orgId,
       type: emp.emple.type || "",
       category: emp.emple.category || "",
@@ -4491,7 +4491,7 @@ const ProjectAmountsTable = ({
     try {
       await axios.put(
         "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
-        payload,
+        { ...payload, acctId: payload.accId },
         { headers: { "Content-Type": "application/json" } }
       );
       setEditedRowData((prev) => {
