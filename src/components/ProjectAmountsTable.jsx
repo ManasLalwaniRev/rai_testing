@@ -1228,7 +1228,6 @@
 //   { value: "Vendor Employee", label: "Vendor Employee" },
 //   { value: "Vendor", label: "Vendor" },
 //   { value: "Other", label: "Other" }
- 
 
 // ];
 
@@ -1258,7 +1257,7 @@
 //   fiscalYear: propFiscalYear,
 //   onSaveSuccess,
 //   refreshKey
-  
+
 // }) => {
 //   const [employees, setEmployees] = useState([]);
 //   const [durations, setDurations] = useState([]);
@@ -2532,7 +2531,7 @@
 //                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs"
 //               >
 //                 Replace All
-//               </button> 
+//               </button>
 //             </div>
 //           </div>
 //         </div>
@@ -2542,7 +2541,6 @@
 // };
 
 // export default ProjectAmountsTable;
-
 
 // import React, { useEffect, useState, useRef } from "react";
 // import axios from "axios";
@@ -2690,7 +2688,7 @@
 //                 type: item.empl?.type || "",
 //                 category: item.empl?.category || "",
 //                 dctId: item.dctId || 0, // Add this line
-//                 plId: item.pl_ID || 0, 
+//                 plId: item.pl_ID || 0,
 //                 plForecasts: [],
 //               },
 //             };
@@ -2899,11 +2897,11 @@
 //       updated[rowIdx] = {
 //         ...updated[rowIdx],
 //         emple: {
-//           ...updated[rowIdx].emple, 
+//           ...updated[rowIdx].emple,
 //           ...payload,
 //         }
 //       };
-//       return updated;   
+//       return updated;
 //     });
 //     toast.success("Employee updated successfully!", {
 //             toastId: `employee-update-${rowIdx}`,
@@ -2993,11 +2991,11 @@
 //     return {
 //       idType: emp.emple.type || "Employee",
 //       emplId: emp.emple.emplId || "-",
-//       // name: emp.emple.firstName || emp.emple.lastName 
-//       //   ? `${emp.emple.lastName || ''}${emp.emple.firstName && emp.emple.lastName ? ', ' : ''}${emp.emple.firstName || ''}` 
+//       // name: emp.emple.firstName || emp.emple.lastName
+//       //   ? `${emp.emple.lastName || ''}${emp.emple.firstName && emp.emple.lastName ? ', ' : ''}${emp.emple.firstName || ''}`
 //       //   : "-",
-//       name: emp.emple.category || emp.emple.firstName || emp.emple.lastName 
-//     ? emp.emple.category || `${emp.emple.lastName || ''}${emp.emple.firstName && emp.emple.lastName ? ', ' : ''}${emp.emple.firstName || ''}` 
+//       name: emp.emple.category || emp.emple.firstName || emp.emple.lastName
+//     ? emp.emple.category || `${emp.emple.lastName || ''}${emp.emple.firstName && emp.emple.lastName ? ', ' : ''}${emp.emple.firstName || ''}`
 //     : "-",
 //       acctId: emp.emple.accId || "-",
 //       orgId: emp.emple.orgId || "-",
@@ -3677,8 +3675,8 @@
 //                       <input
 //                         type="text"
 //                         name="name"
-//                         value={newEntry.lastName && newEntry.firstName 
-//                           ? `${newEntry.lastName}, ${newEntry.firstName}` 
+//                         value={newEntry.lastName && newEntry.firstName
+//                           ? `${newEntry.lastName}, ${newEntry.firstName}`
 //                           : newEntry.lastName || newEntry.firstName || ""}
 //                         readOnly
 //                         className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
@@ -3698,7 +3696,7 @@
 //                         placeholder="Enter Account"
 //                         readOnly={!isBudPlan}
 //                       />
-                      
+
 //                       <datalist id="account-list">
 //                         {nonLaborAccounts.map((account, index) => (
 //                           <option key={`${account.id}-${index}`} value={account.id}>
@@ -3719,7 +3717,7 @@
 //                         placeholder="Enter Organization"
 //                         readOnly={!isBudPlan}
 //                       />
-                      
+
 //                     </td>
 //                     <td className="border border-gray-300 px-2 py-0.5 text-center">
 //                       <input
@@ -3730,7 +3728,7 @@
 //                         className={`w-4 h-4 ${!isBudPlan ? "cursor-not-allowed" : ""}`}
 //                         disabled={!isBudPlan}
 //                       />
-                      
+
 //                     </td>
 //                     <td className="border border-gray-300 px-2 py-0.5 text-center">
 //                       <input
@@ -3741,7 +3739,7 @@
 //                         className={`w-4 h-4 ${!isBudPlan ? "cursor-not-allowed" : ""}`}
 //                         disabled={!isBudPlan}
 //                       />
-                     
+
 //                     </td>
 //                     <td className="border border-gray-300 px-2 py-0.5">
 //                       <input
@@ -3779,7 +3777,7 @@
 //                         }}
 //                         onClick={() => handleRowClick(actualEmpIdx)}
 //                       >
-                        
+
 //                         {/* {EMPLOYEE_COLUMNS.map((col) => (
 //                           <td
 //                             key={`${uniqueRowKey}-${col.key}`}
@@ -4099,8 +4097,8 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const EMPLOYEE_COLUMNS = [
   { key: "idType", label: "ID Type" },
@@ -4119,10 +4117,10 @@ const ID_TYPE_OPTIONS = [
   { value: "Employee", label: "Employee" },
   { value: "Vendor", label: "Vendor" },
   { value: "Vendor Employee", label: "Vendor Employee" },
-  { value: "Other", label: "Other" }
+  { value: "Other", label: "Other" },
 ];
 
-const ROW_HEIGHT_DEFAULT = 48; 
+const ROW_HEIGHT_DEFAULT = 48;
 
 function isMonthEditable(duration, closedPeriod, planType) {
   if (planType !== "EAC") return true;
@@ -4147,7 +4145,7 @@ const ProjectAmountsTable = ({
   planType,
   fiscalYear: propFiscalYear,
   onSaveSuccess,
-  refreshKey
+  refreshKey,
 }) => {
   const [employees, setEmployees] = useState([]);
   const [durations, setDurations] = useState([]);
@@ -4215,44 +4213,69 @@ const ProjectAmountsTable = ({
         const response = await axios.get(
           `https://test-api-3tmq.onrender.com/Project/GetDirectCostForecastDataByPlanId/${planId}`
         );
-        const apiData = Array.isArray(response.data) ? response.data : [response.data];
-
+        const apiData = Array.isArray(response.data)
+          ? response.data
+          : [response.data];
+        // console.log(apiData.length);
+        // console.log(JSON.stringify(apiData));
         if (apiData.length === 0) {
           setEmployees([]);
-          toast.info('No forecast data available for this plan.', {
-            toastId: 'no-forecast-data',
+          toast.info("No forecast data available for this plan.", {
+            toastId: "no-forecast-data",
             autoClose: 3000,
           });
         } else {
-          const employeeMap = new Map();
-          apiData.forEach((item, idx) => {
-            const emplId = item.empl?.id || `auto-${idx}`;
-            const existing = employeeMap.get(emplId) || {
-              emple: {
-                empleId: emplId,
-                emplId: item.empl?.id || "",
-                firstName: item.empl?.firstName || "",
-                lastName: item.empl?.lastName || "",
-                accId: item.empl?.acctId || "",
-                orgId: item.empl?.orgId || "",
-                perHourRate: item.empl?.hrRate || "",
-                isRev: item.empl?.isRev || false,
-                isBrd: item.empl?.isBrd || false,
-                status: item.empl?.status || "Act",
-                type: item.empl?.type || "",
-                category: item.empl?.category || "",
-                dctId: item.dctId || 0,
-                plId: item.pl_ID || 0, 
-                plForecasts: [],
-              },
-            };
-            existing.emple.plForecasts = [
-              ...existing.emple.plForecasts,
-              ...(item.empl?.plForecasts || []),
-            ];
-            employeeMap.set(emplId, existing);
-          });
-          const updatedEmployees = Array.from(employeeMap.values());
+          // const employeeMap = new Map();
+          // apiData.forEach((item, idx) => {
+          //   const emplId = item.empl?.id || `auto-${idx}`;
+          //   const existing = employeeMap.get(emplId) || {
+          //     emple: {
+          //       empleId: emplId,
+          //       emplId: item.empl?.id || "",
+          //       firstName: item.empl?.firstName || "",
+          //       lastName: item.empl?.lastName || "",
+          //       accId: item.empl?.acctId || "",
+          //       orgId: item.empl?.orgId || "",
+          //       perHourRate: item.empl?.hrRate || "",
+          //       isRev: item.empl?.isRev || false,
+          //       isBrd: item.empl?.isBrd || false,
+          //       status: item.empl?.status || "Act",
+          //       type: item.empl?.type || "",
+          //       category: item.empl?.category || "",
+          //       dctId: item.dctId || 0,
+          //       plId: item.pl_ID || 0,
+          //       plForecasts: [],
+          //     },
+          //   };
+          //   existing.emple.plForecasts = [
+          //     ...existing.emple.plForecasts,
+          //     ...(item.empl?.plForecasts || []),
+          //   ];
+          //   // console.log(emplId);
+          //   // console.log(JSON.stringify(existing));
+          //   employeeMap.set(emplId, existing);
+          // });
+          // const updatedEmployees = Array.from(employeeMap.values());
+          // setEmployees(updatedEmployees);
+          const updatedEmployees = apiData.map((item, idx) => ({
+            emple: {
+              empleId: item.empl?.id || `auto-${idx}`,
+              emplId: item.empl?.id || "",
+              firstName: item.empl?.firstName || "",
+              lastName: item.empl?.lastName || "",
+              accId: item.empl?.acctId || "",
+              orgId: item.empl?.orgId || "",
+              perHourRate: item.empl?.hrRate || "",
+              isRev: item.empl?.isRev || false,
+              isBrd: item.empl?.isBrd || false,
+              status: item.empl?.status || "Act",
+              type: item.empl?.type || "",
+              category: item.empl?.category || "",
+              dctId: item.dctId || 0,
+              plId: item.pl_ID || 0,
+              plForecasts: item.empl?.plForecasts || [],
+            },
+          }));
           setEmployees(updatedEmployees);
         }
         setInputValues({});
@@ -4261,15 +4284,19 @@ const ProjectAmountsTable = ({
         setError("Failed to load data. Please try again.");
         if (err.response && err.response.status === 500) {
           setEmployees([]);
-          toast.info('No forecast data available for this plan.', {
-            toastId: 'no-forecast-data',
+          toast.info("No forecast data available for this plan.", {
+            toastId: "no-forecast-data",
             autoClose: 3000,
           });
         } else {
-          toast.error('Failed to load forecast data: ' + (err.response?.data?.message || err.message), {
-            toastId: 'forecast-error',
-            autoClose: 3000,
-          });
+          toast.error(
+            "Failed to load forecast data: " +
+              (err.response?.data?.message || err.message),
+            {
+              toastId: "forecast-error",
+              autoClose: 3000,
+            }
+          );
         }
       } finally {
         setIsLoading(false);
@@ -4282,66 +4309,85 @@ const ProjectAmountsTable = ({
   useEffect(() => {
     const fetchEmployees = async () => {
       if (!projectId) {
-        console.warn('projectId is undefined, skipping employee fetch');
+        console.warn("projectId is undefined, skipping employee fetch");
         setEmployeeSuggestions([]);
         return;
       }
       if (!showNewForm) {
-        console.log('New entry form is not open, skipping employee fetch');
+        console.log("New entry form is not open, skipping employee fetch");
         setEmployeeSuggestions([]);
         return;
       }
       console.log(`Fetching employees for projectId: ${projectId}`);
       try {
-        const endpoint = newEntry.idType === 'Vendor' || newEntry.idType === 'Vendor Employee'
-          ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
-          : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
+        const endpoint =
+          newEntry.idType === "Vendor" || newEntry.idType === "Vendor Employee"
+            ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
+            : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
         const response = await axios.get(endpoint);
-        console.log('Employee suggestions response:', response.data);
+        console.log("Employee suggestions response:", response.data);
         const suggestions = Array.isArray(response.data)
           ? response.data.map((emp) => {
-              if (newEntry.idType === 'Vendor') {
+              if (newEntry.idType === "Vendor") {
                 return {
                   emplId: emp.vendId,
-                  firstName: '',
-                  lastName: emp.employeeName || '',
+                  firstName: "",
+                  lastName: emp.employeeName || "",
                 };
-              } else if (newEntry.idType === 'Vendor Employee') {
+              } else if (newEntry.idType === "Vendor Employee") {
                 return {
                   emplId: emp.empId,
-                  firstName: '',
-                  lastName: emp.employeeName || '',
+                  firstName: "",
+                  lastName: emp.employeeName || "",
                 };
               } else {
-                const [lastName, firstName] = (emp.employeeName || '').split(', ').map(str => str.trim());
+                const [lastName, firstName] = (emp.employeeName || "")
+                  .split(", ")
+                  .map((str) => str.trim());
                 return {
                   emplId: emp.empId,
-                  firstName: firstName || '',
-                  lastName: lastName || '',
+                  firstName: firstName || "",
+                  lastName: lastName || "",
                 };
               }
             })
           : [];
         setEmployeeSuggestions(suggestions);
-        console.log('Updated employeeSuggestions:', suggestions);
+        console.log("Updated employeeSuggestions:", suggestions);
       } catch (err) {
-        console.error('Error fetching employees:', err);
+        console.error("Error fetching employees:", err);
         setEmployeeSuggestions([]);
-        toast.error(`Failed to fetch ${newEntry.idType === 'Vendor' || newEntry.idType === 'Vendor Employee' ? 'vendor ' : ''}employee suggestions${projectId ? ' for project ID ' + projectId : '. Project ID is missing.'}`, {
-          toastId: 'employee-fetch-error',
-          autoClose: 3000,
-        });
+        toast.error(
+          `Failed to fetch ${
+            newEntry.idType === "Vendor" ||
+            newEntry.idType === "Vendor Employee"
+              ? "vendor "
+              : ""
+          }employee suggestions${
+            projectId
+              ? " for project ID " + projectId
+              : ". Project ID is missing."
+          }`,
+          {
+            toastId: "employee-fetch-error",
+            autoClose: 3000,
+          }
+        );
       }
     };
 
     const fetchNonLaborAccounts = async () => {
       if (!projectId) {
-        console.warn('projectId is undefined, skipping non-labor accounts fetch');
+        console.warn(
+          "projectId is undefined, skipping non-labor accounts fetch"
+        );
         setNonLaborAccounts([]);
         return;
       }
       if (!showNewForm) {
-        console.log('New entry form is not open, skipping non-labor accounts fetch');
+        console.log(
+          "New entry form is not open, skipping non-labor accounts fetch"
+        );
         setNonLaborAccounts([]);
         return;
       }
@@ -4350,20 +4396,29 @@ const ProjectAmountsTable = ({
         const response = await axios.get(
           `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
         );
-        console.log('Non-labor accounts response:', response.data);
-        const data = Array.isArray(response.data) ? response.data[0] : response.data;
+        console.log("Non-labor accounts response:", response.data);
+        const data = Array.isArray(response.data)
+          ? response.data[0]
+          : response.data;
         const accounts = Array.isArray(data.nonLaborAccounts)
           ? data.nonLaborAccounts.map((account) => ({ id: account }))
           : [];
         setNonLaborAccounts(accounts);
-        console.log('Updated nonLaborAccounts:', accounts);
+        console.log("Updated nonLaborAccounts:", accounts);
       } catch (err) {
-        console.error('Error fetching non-labor accounts:', err);
+        console.error("Error fetching non-labor accounts:", err);
         setNonLaborAccounts([]);
-        toast.error(`Failed to fetch non-labor accounts${projectId ? ' for project ID ' + projectId : '. Project ID is missing.'}`, {
-          toastId: 'non-labor-accounts-error',
-          autoClose: 3000,
-        });
+        toast.error(
+          `Failed to fetch non-labor accounts${
+            projectId
+              ? " for project ID " + projectId
+              : ". Project ID is missing."
+          }`,
+          {
+            toastId: "non-labor-accounts-error",
+            autoClose: 3000,
+          }
+        );
       }
     };
 
@@ -4377,26 +4432,28 @@ const ProjectAmountsTable = ({
   }, [projectId, showNewForm, newEntry.idType]);
 
   const handleIdChange = (value) => {
-    console.log('handleIdChange called with value:', value);
-    const selectedEmployee = employeeSuggestions.find((emp) => emp.emplId === value);
-    console.log('Selected employee:', selectedEmployee);
+    console.log("handleIdChange called with value:", value);
+    const selectedEmployee = employeeSuggestions.find(
+      (emp) => emp.emplId === value
+    );
+    console.log("Selected employee:", selectedEmployee);
     setNewEntry((prev) => ({
       ...prev,
       id: value,
-      firstName: selectedEmployee ? selectedEmployee.firstName || '' : '',
-      lastName: selectedEmployee ? selectedEmployee.lastName || '' : '',
-      acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : '',
+      firstName: selectedEmployee ? selectedEmployee.firstName || "" : "",
+      lastName: selectedEmployee ? selectedEmployee.lastName || "" : "",
+      acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
     }));
   };
 
   const handleRowFieldChange = (rowIdx, field, value) => {
     if (!isBudPlan || !isEditable) return;
-    setEditedRowData(prev => ({
+    setEditedRowData((prev) => ({
       ...prev,
       [rowIdx]: {
         ...prev[rowIdx],
         [field]: value,
-      }
+      },
     }));
   };
 
@@ -4413,7 +4470,8 @@ const ProjectAmountsTable = ({
       edited.orgId === undefined &&
       edited.isRev === undefined &&
       edited.isBrd === undefined
-    ) return;
+    )
+      return;
 
     const payload = {
       dctId: emp.emple.dctId || 0,
@@ -4436,28 +4494,30 @@ const ProjectAmountsTable = ({
         payload,
         { headers: { "Content-Type": "application/json" } }
       );
-      setEditedRowData(prev => {
+      setEditedRowData((prev) => {
         const newData = { ...prev };
         delete newData[rowIdx];
         return newData;
       });
-      setEmployees(prev => {
+      setEmployees((prev) => {
         const updated = [...prev];
         updated[rowIdx] = {
           ...updated[rowIdx],
           emple: {
-            ...updated[rowIdx].emple, 
+            ...updated[rowIdx].emple,
             ...payload,
-          }
+          },
         };
-        return updated;   
+        return updated;
       });
       toast.success("Employee updated successfully!", {
         toastId: `employee-update-${rowIdx}`,
         autoClose: 2000,
       });
     } catch (err) {
-      toast.error("Failed to update row: " + (err.response?.data?.message || err.message));
+      toast.error(
+        "Failed to update row: " + (err.response?.data?.message || err.message)
+      );
     }
   };
 
@@ -4477,9 +4537,13 @@ const ProjectAmountsTable = ({
     return {
       idType: emp.emple.type || "Employee",
       emplId: emp.emple.emplId || "-",
-      name: emp.emple.category || emp.emple.firstName || emp.emple.lastName 
-        ? emp.emple.category || `${emp.emple.lastName || ''}${emp.emple.firstName && emp.emple.lastName ? ', ' : ''}${emp.emple.firstName || ''}` 
-        : "-",
+      name:
+        emp.emple.category || emp.emple.firstName || emp.emple.lastName
+          ? emp.emple.category ||
+            `${emp.emple.lastName || ""}${
+              emp.emple.firstName && emp.emple.lastName ? ", " : ""
+            }${emp.emple.firstName || ""}`
+          : "-",
       acctId: emp.emple.accId || "-",
       orgId: emp.emple.orgId || "-",
       isRev: emp.emple.isRev ? (
@@ -4503,10 +4567,10 @@ const ProjectAmountsTable = ({
       emp.emple.plForecasts.forEach((forecast) => {
         const uniqueKey = `${forecast.month}_${forecast.year}`;
         // Use actualhours for EAC, forecastedhours otherwise
-      const value =
-        planType === "EAC" && forecast.actualamt !== undefined
-          ? forecast.actualamt
-          : forecast.forecastedamt ?? 0;
+        const value =
+          planType === "EAC" && forecast.actualamt !== undefined
+            ? forecast.actualamt
+            : forecast.forecastedamt ?? 0;
         monthAmounts[uniqueKey] = { value, ...forecast };
       });
     }
@@ -4519,14 +4583,16 @@ const ProjectAmountsTable = ({
       (d) => `${d.monthNo}_${d.year}` === uniqueKey
     );
     if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
-      toast.warn('Cannot edit amounts for a closed period.', {
-        toastId: 'closed-period-warning',
+      toast.warn("Cannot edit amounts for a closed period.", {
+        toastId: "closed-period-warning",
         autoClose: 3000,
       });
       return;
     }
     if (newValue === "" || /^\d*\.?\d*$/.test(newValue)) {
-      console.log(`Updating inputValues for ${empIdx}_${uniqueKey}: ${newValue}`);
+      console.log(
+        `Updating inputValues for ${empIdx}_${uniqueKey}: ${newValue}`
+      );
       setInputValues((prev) => ({
         ...prev,
         [`${empIdx}_${uniqueKey}`]: newValue,
@@ -4545,10 +4611,12 @@ const ProjectAmountsTable = ({
       (d) => `${d.monthNo}_${d.year}` === uniqueKey
     );
 
-    console.log(`handleForecastAmountBlur: empIdx=${empIdx}, uniqueKey=${uniqueKey}, newValue=${newValue}, original=${originalForecastedAmount}, month=${currentDuration?.monthNo}, year=${currentDuration?.year}`);
+    console.log(
+      `handleForecastAmountBlur: empIdx=${empIdx}, uniqueKey=${uniqueKey}, newValue=${newValue}, original=${originalForecastedAmount}, month=${currentDuration?.monthNo}, year=${currentDuration?.year}`
+    );
 
     if (newValue === originalForecastedAmount) {
-      console.log('No change in forecast amount, skipping API call');
+      console.log("No change in forecast amount, skipping API call");
       return;
     }
 
@@ -4558,23 +4626,28 @@ const ProjectAmountsTable = ({
         ...prev,
         [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
       }));
-      toast.warn('Cannot edit amounts for a closed period.', {
-        toastId: 'closed-period-warning',
+      toast.warn("Cannot edit amounts for a closed period.", {
+        toastId: "closed-period-warning",
         autoClose: 3000,
       });
       return;
     }
 
     if (!forecast || !forecast.forecastid) {
-      console.log('No forecast ID found, update skipped. Use "New" to add a new entry.');
+      console.log(
+        'No forecast ID found, update skipped. Use "New" to add a new entry.'
+      );
       setInputValues((prev) => ({
         ...prev,
         [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
       }));
-      toast.warn('Cannot update amount for a non-existing forecast. Please use the "New" button to add a new entry.', {
-        toastId: 'no-forecast-id-warning',
-        autoClose: 3000,
-      });
+      toast.warn(
+        'Cannot update amount for a non-existing forecast. Please use the "New" button to add a new entry.',
+        {
+          toastId: "no-forecast-id-warning",
+          autoClose: 3000,
+        }
+      );
       return;
     }
 
@@ -4596,14 +4669,14 @@ const ProjectAmountsTable = ({
       overhead: forecast?.overhead ?? 0,
       gna: forecast?.gna ?? 0,
       ...(planType === "EAC"
-    ? { actualamt: Number(newValue) || 0 }
-    : { forecastedamt: Number(newValue) || 0 }),
+        ? { actualamt: Number(newValue) || 0 }
+        : { forecastedamt: Number(newValue) || 0 }),
       createdat: forecast?.createdat ?? new Date(0).toISOString(),
       updatedat: new Date().toISOString().split("T")[0],
       displayText: forecast?.displayText ?? "",
     };
 
-    console.log('UpdateForecastAmount payload:', payload);
+    console.log("UpdateForecastAmount payload:", payload);
 
     try {
       await axios.put(
@@ -4613,22 +4686,26 @@ const ProjectAmountsTable = ({
       );
       setSuccessMessageText("Forecast updated!");
       setShowSuccessMessage(true);
-      toast.success('Forecast amount updated successfully!', {
-        toastId: 'forecast-update-success',
+      toast.success("Forecast amount updated successfully!", {
+        toastId: "forecast-update-success",
         autoClose: 3000,
       });
     } catch (err) {
-      console.error('API error:', err.response?.data || err);
+      console.error("API error:", err.response?.data || err);
       setInputValues((prev) => ({
         ...prev,
         [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
       }));
       setSuccessMessageText("Failed to update forecast.");
       setShowSuccessMessage(true);
-      toast.error('Failed to update forecast amount: ' + (err.response?.data?.message || err.message), {
-        toastId: 'forecast-update-error',
-        autoClose: 3000,
-      });
+      toast.error(
+        "Failed to update forecast amount: " +
+          (err.response?.data?.message || err.message),
+        {
+          toastId: "forecast-update-error",
+          autoClose: 3000,
+        }
+      );
     } finally {
       setTimeout(() => setShowSuccessMessage(false), 2000);
     }
@@ -4638,29 +4715,33 @@ const ProjectAmountsTable = ({
     if (!showNewForm || !isEditable) return;
 
     const newAmounts = {};
-    if (fillMethod === 'Copy From Source Record' && sourceRowIndex !== null) {
+    if (fillMethod === "Copy From Source Record" && sourceRowIndex !== null) {
       const sourceEmp = employees[sourceRowIndex];
       const sourceMonthAmounts = getMonthAmounts(sourceEmp);
       sortedDurations.forEach((duration) => {
         const uniqueKey = `${duration.monthNo}_${duration.year}`;
-        if (planType === 'EAC' && !isMonthEditable(duration, closedPeriod, planType)) {
-          newAmounts[uniqueKey] = newEntryPeriodAmounts[uniqueKey] || '0';
+        if (
+          planType === "EAC" &&
+          !isMonthEditable(duration, closedPeriod, planType)
+        ) {
+          newAmounts[uniqueKey] = newEntryPeriodAmounts[uniqueKey] || "0";
         } else {
-          newAmounts[uniqueKey] = sourceMonthAmounts[uniqueKey]?.value?.toString() || '0';
+          newAmounts[uniqueKey] =
+            sourceMonthAmounts[uniqueKey]?.value?.toString() || "0";
         }
       });
     }
 
     setNewEntryPeriodAmounts((prev) => ({ ...prev, ...newAmounts }));
     setShowFillValues(false);
-    setFillMethod('None');
+    setFillMethod("None");
     setSourceRowIndex(null);
   };
 
   const handleSaveNewEntry = async () => {
     if (!planId) {
-      toast.error('Plan ID is required to save a new entry.', {
-        toastId: 'no-plan-id',
+      toast.error("Plan ID is required to save a new entry.", {
+        toastId: "no-plan-id",
         autoClose: 3000,
       });
       return;
@@ -4669,7 +4750,9 @@ const ProjectAmountsTable = ({
     setIsLoading(true);
 
     const payloadForecasts = sortedDurations.map((duration) => ({
-      forecastedamt: Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) || 0,
+      forecastedamt:
+        Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) ||
+        0,
       forecastid: 0,
       projId: projectId,
       plId: planId,
@@ -4715,7 +4798,7 @@ const ProjectAmountsTable = ({
       plDct: {},
     };
 
-    console.log('AddNewDirectCost payload for new entry:', payload);
+    console.log("AddNewDirectCost payload for new entry:", payload);
 
     try {
       const response = await axios.post(
@@ -4741,9 +4824,10 @@ const ProjectAmountsTable = ({
           type: newEntry.idType || "Employee",
           plForecasts: payloadForecasts.map((forecast) => ({
             ...forecast,
-            forecastid: response.data?.plForecasts?.find(
-              (f) => f.month === forecast.month && f.year === forecast.year
-            )?.forecastid || 0,
+            forecastid:
+              response.data?.plForecasts?.find(
+                (f) => f.month === forecast.month && f.year === forecast.year
+              )?.forecastid || 0,
             createdat: new Date().toISOString(),
           })),
         },
@@ -4783,8 +4867,8 @@ const ProjectAmountsTable = ({
         onSaveSuccess();
       }
 
-      toast.success('New entry saved and added to table!', {
-        toastId: 'save-entry-success',
+      toast.success("New entry saved and added to table!", {
+        toastId: "save-entry-success",
         autoClose: 3000,
       });
     } catch (err) {
@@ -4797,7 +4881,7 @@ const ProjectAmountsTable = ({
       setSuccessMessageText("Failed to save entry.");
       setShowSuccessMessage(true);
       toast.error(`Failed to save new entry: ${errorMessage}`, {
-        toastId: 'save-entry-error',
+        toastId: "save-entry-error",
         autoClose: 5000,
       });
     } finally {
@@ -4808,7 +4892,9 @@ const ProjectAmountsTable = ({
 
   const handleRowClick = (actualEmpIdx) => {
     if (!isEditable) return;
-    setSelectedRowIndex(actualEmpIdx === selectedRowIndex ? null : actualEmpIdx);
+    setSelectedRowIndex(
+      actualEmpIdx === selectedRowIndex ? null : actualEmpIdx
+    );
     setSelectedColumnKey(null);
     setReplaceScope(actualEmpIdx === selectedRowIndex ? "all" : "row");
     if (showNewForm) setSourceRowIndex(actualEmpIdx);
@@ -4828,8 +4914,8 @@ const ProjectAmountsTable = ({
       (replaceScope === "row" && selectedRowIndex === null) ||
       (replaceScope === "column" && selectedColumnKey === null)
     ) {
-      toast.warn('Please select a valid scope and enter a value to find.', {
-        toastId: 'find-replace-warning',
+      toast.warn("Please select a valid scope and enter a value to find.", {
+        toastId: "find-replace-warning",
         autoClose: 3000,
       });
       return;
@@ -4862,23 +4948,29 @@ const ProjectAmountsTable = ({
         const displayedValue =
           inputValues[currentInputKey] !== undefined
             ? String(inputValues[currentInputKey])
-            : String(getMonthAmounts(emp)[uniqueKey]?.value ?? '');
+            : String(getMonthAmounts(emp)[uniqueKey]?.value ?? "");
 
         const findValueNormalized = findValue.trim();
         const displayedValueNormalized = displayedValue.trim();
         const isMatch =
           findValueNormalized === ""
-            ? displayedValueNormalized === "" || displayedValueNormalized === "0"
+            ? displayedValueNormalized === "" ||
+              displayedValueNormalized === "0"
             : displayedValueNormalized === findValueNormalized;
 
         if (isMatch) {
-          const newNumericValue = replaceValue === "" ? 0 : Number(replaceValue);
+          const newNumericValue =
+            replaceValue === "" ? 0 : Number(replaceValue);
 
           if (!isNaN(newNumericValue) || replaceValue === "") {
             const forecast = getMonthAmounts(emp)[uniqueKey];
             const originalForecastedAmount = forecast?.forecastedamt ?? 0;
 
-            if (forecast && forecast.forecastid && newNumericValue !== originalForecastedAmount) {
+            if (
+              forecast &&
+              forecast.forecastid &&
+              newNumericValue !== originalForecastedAmount
+            ) {
               updatedInputValues[currentInputKey] = replaceValue;
               replacementsCount++;
 
@@ -4923,16 +5015,20 @@ const ProjectAmountsTable = ({
       setSuccessMessageText(`Replaced ${replacementsCount} cells.`);
       setShowSuccessMessage(true);
       toast.success(`Replaced ${replacementsCount} cells successfully!`, {
-        toastId: 'find-replace-success',
+        toastId: "find-replace-success",
         autoClose: 3000,
       });
     } catch (err) {
       setSuccessMessageText("Failed to replace some values.");
       setShowSuccessMessage(true);
-      toast.error('Failed to replace values: ' + (err.response?.data?.message || err.message), {
-        toastId: 'replace-error',
-        autoClose: 3000,
-      });
+      toast.error(
+        "Failed to replace values: " +
+          (err.response?.data?.message || err.message),
+        {
+          toastId: "replace-error",
+          autoClose: 3000,
+        }
+      );
     } finally {
       setShowFindReplace(false);
       setFindValue("");
@@ -4949,14 +5045,24 @@ const ProjectAmountsTable = ({
     propFiscalYear && propFiscalYear !== "All"
       ? durations
           .filter((d) => d.year === parseInt(propFiscalYear))
-          .sort((a, b) => new Date(a.year, a.monthNo - 1, 1) - new Date(b.year, b.monthNo - 1, 1))
-      : durations.sort((a, b) => new Date(a.year, a.monthNo - 1, 1) - new Date(b.year, b.monthNo - 1, 1));
+          .sort(
+            (a, b) =>
+              new Date(a.year, a.monthNo - 1, 1) -
+              new Date(b.year, b.monthNo - 1, 1)
+          )
+      : durations.sort(
+          (a, b) =>
+            new Date(a.year, a.monthNo - 1, 1) -
+            new Date(b.year, b.monthNo - 1, 1)
+        );
 
   if (isLoading) {
     return (
       <div className="p-4 font-inter flex justify-center items-center">
         <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-xs text-gray-600">Loading forecast data...</span>
+        <span className="ml-2 text-xs text-gray-600">
+          Loading forecast data...
+        </span>
       </div>
     );
   }
@@ -4973,7 +5079,8 @@ const ProjectAmountsTable = ({
   }
 
   const rowCount = Math.max(
-    employees.filter((_, idx) => !hiddenRows[idx]).length + (showNewForm ? 1 : 0),
+    employees.filter((_, idx) => !hiddenRows[idx]).length +
+      (showNewForm ? 1 : 0),
     2
   );
 
@@ -5029,20 +5136,28 @@ const ProjectAmountsTable = ({
       {showFillValues && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-sm">
-            <h3 className="text-lg font-semibold mb-4">Fill Values to selected record/s</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Fill Values to selected record/s
+            </h3>
             <div className="mb-4">
-              <label className="block text-gray-700 text-xs font-medium mb-1">Select Fill Method</label>
+              <label className="block text-gray-700 text-xs font-medium mb-1">
+                Select Fill Method
+              </label>
               <select
                 value={fillMethod}
                 onChange={(e) => setFillMethod(e.target.value)}
                 className="w-full border border-gray-300 rounded-md p-2 text-xs"
               >
                 <option value="None">None</option>
-                <option value="Copy From Source Record">Copy from source record</option>
+                <option value="Copy From Source Record">
+                  Copy from source record
+                </option>
               </select>
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-xs font-medium mb-1">Start Period</label>
+              <label className="block text-gray-700 text-xs font-medium mb-1">
+                Start Period
+              </label>
               <input
                 type="text"
                 value={startDate}
@@ -5051,7 +5166,9 @@ const ProjectAmountsTable = ({
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-xs font-medium mb-1">End Period</label>
+              <label className="block text-gray-700 text-xs font-medium mb-1">
+                End Period
+              </label>
               <input
                 type="text"
                 value={endDate}
@@ -5064,7 +5181,7 @@ const ProjectAmountsTable = ({
                 type="button"
                 onClick={() => {
                   setShowFillValues(false);
-                  setFillMethod('None');
+                  setFillMethod("None");
                   setSourceRowIndex(null);
                 }}
                 className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 text-xs"
@@ -5092,7 +5209,12 @@ const ProjectAmountsTable = ({
           <div className="synchronized-table-scroll">
             <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
               <thead className="sticky-thead">
-                <tr style={{ height: `${ROW_HEIGHT_DEFAULT}px`, lineHeight: "normal" }}>
+                <tr
+                  style={{
+                    height: `${ROW_HEIGHT_DEFAULT}px`,
+                    lineHeight: "normal",
+                  }}
+                >
                   {EMPLOYEE_COLUMNS.map((col) => (
                     <th
                       key={col.key}
@@ -5108,13 +5230,20 @@ const ProjectAmountsTable = ({
                   <tr
                     key="new-entry"
                     className="bg-gray-50"
-                    style={{ height: `${ROW_HEIGHT_DEFAULT}px`, lineHeight: "normal" }}
+                    style={{
+                      height: `${ROW_HEIGHT_DEFAULT}px`,
+                      lineHeight: "normal",
+                    }}
                   >
-                    <td className="border border-gray-300 px-1.5 py-0.5"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <select
                         name="idType"
                         value={newEntry.idType || ""}
-                        onChange={(e) => setNewEntry({ ...newEntry, idType: e.target.value })}
+                        onChange={(e) =>
+                          setNewEntry({ ...newEntry, idType: e.target.value })
+                        }
                         className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
                       >
                         {ID_TYPE_OPTIONS.map((opt) => (
@@ -5124,7 +5253,9 @@ const ProjectAmountsTable = ({
                         ))}
                       </select>
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <input
                         type="text"
                         name="id"
@@ -5136,9 +5267,15 @@ const ProjectAmountsTable = ({
                       />
                       <datalist id="employee-id-list">
                         {employeeSuggestions
-                          .filter((emp) => emp.emplId && typeof emp.emplId === "string")
+                          .filter(
+                            (emp) =>
+                              emp.emplId && typeof emp.emplId === "string"
+                          )
                           .map((emp, index) => (
-                            <option key={`${emp.emplId}-${index}`} value={emp.emplId}>
+                            <option
+                              key={`${emp.emplId}-${index}`}
+                              value={emp.emplId}
+                            >
                               {emp.lastName && emp.firstName
                                 ? `${emp.lastName}, ${emp.firstName}`
                                 : emp.lastName || emp.firstName || emp.emplId}
@@ -5146,24 +5283,33 @@ const ProjectAmountsTable = ({
                           ))}
                       </datalist>
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <input
                         type="text"
                         name="name"
-                        value={newEntry.lastName && newEntry.firstName 
-                          ? `${newEntry.lastName}, ${newEntry.firstName}` 
-                          : newEntry.lastName || newEntry.firstName || ""}
+                        value={
+                          newEntry.lastName && newEntry.firstName
+                            ? `${newEntry.lastName}, ${newEntry.firstName}`
+                            : newEntry.lastName || newEntry.firstName || ""
+                        }
                         readOnly
                         className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
                         placeholder="Name (auto-filled)"
                       />
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <input
                         type="text"
                         name="acctId"
                         value={newEntry.acctId}
-                        onChange={(e) => isBudPlan && setNewEntry({ ...newEntry, acctId: e.target.value })}
+                        onChange={(e) =>
+                          isBudPlan &&
+                          setNewEntry({ ...newEntry, acctId: e.target.value })
+                        }
                         className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
                           !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
                         }`}
@@ -5173,18 +5319,26 @@ const ProjectAmountsTable = ({
                       />
                       <datalist id="account-list">
                         {nonLaborAccounts.map((account, index) => (
-                          <option key={`${account.id}-${index}`} value={account.id}>
+                          <option
+                            key={`${account.id}-${index}`}
+                            value={account.id}
+                          >
                             {account.id}
                           </option>
                         ))}
                       </datalist>
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <input
                         type="text"
                         name="orgId"
                         value={newEntry.orgId}
-                        onChange={(e) => isBudPlan && setNewEntry({ ...newEntry, orgId: e.target.value })}
+                        onChange={(e) =>
+                          isBudPlan &&
+                          setNewEntry({ ...newEntry, orgId: e.target.value })
+                        }
                         className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
                           !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
                         }`}
@@ -5192,37 +5346,57 @@ const ProjectAmountsTable = ({
                         readOnly={!isBudPlan}
                       />
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5 text-center"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <input
                         type="checkbox"
                         name="isRev"
                         checked={newEntry.isRev}
-                        onChange={(e) => isBudPlan && setNewEntry({ ...newEntry, isRev: e.target.checked })}
-                        className={`w-4 h-4 ${!isBudPlan ? "cursor-not-allowed" : ""}`}
+                        onChange={(e) =>
+                          isBudPlan &&
+                          setNewEntry({ ...newEntry, isRev: e.target.checked })
+                        }
+                        className={`w-4 h-4 ${
+                          !isBudPlan ? "cursor-not-allowed" : ""
+                        }`}
                         disabled={!isBudPlan}
                       />
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5 text-center"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <input
                         type="checkbox"
                         name="isBrd"
                         checked={newEntry.isBrd}
-                        onChange={(e) => isBudPlan && setNewEntry({ ...newEntry, isBrd: e.target.checked })}
-                        className={`w-4 h-4 ${!isBudPlan ? "cursor-not-allowed" : ""}`}
+                        onChange={(e) =>
+                          isBudPlan &&
+                          setNewEntry({ ...newEntry, isBrd: e.target.checked })
+                        }
+                        className={`w-4 h-4 ${
+                          !isBudPlan ? "cursor-not-allowed" : ""
+                        }`}
                         disabled={!isBudPlan}
                       />
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       <input
                         type="text"
                         name="status"
                         value={newEntry.status}
-                        onChange={(e) => setNewEntry({ ...newEntry, status: e.target.value })}
+                        onChange={(e) =>
+                          setNewEntry({ ...newEntry, status: e.target.value })
+                        }
                         className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
                         placeholder="Enter Status"
                       />
                     </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5"> {/* Changed px-2 to px-1.5 */}
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {" "}
+                      {/* Changed px-2 to px-1.5 */}
                       {Object.values(newEntryPeriodAmounts)
                         .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
                         .toFixed(2)}
@@ -5234,12 +5408,16 @@ const ProjectAmountsTable = ({
                   .map((emp, idx) => {
                     const actualEmpIdx = employees.findIndex((e) => e === emp);
                     const row = getEmployeeRow(emp, actualEmpIdx);
-                    const uniqueRowKey = `${emp.emple.emplId || "emp"}-${actualEmpIdx}`;
+                    const uniqueRowKey = `${
+                      emp.emple.emplId || "emp"
+                    }-${actualEmpIdx}`;
                     return (
                       <tr
                         key={uniqueRowKey}
                         className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
-                          selectedRowIndex === actualEmpIdx ? "bg-yellow-100" : "even:bg-gray-50"
+                          selectedRowIndex === actualEmpIdx
+                            ? "bg-yellow-100"
+                            : "even:bg-gray-50"
                         }`}
                         style={{
                           height: `${ROW_HEIGHT_DEFAULT}px`,
@@ -5252,12 +5430,30 @@ const ProjectAmountsTable = ({
                           if (isBudPlan && isEditable) {
                             if (col.key === "acctId") {
                               return (
-                                <td key={`${uniqueRowKey}-acctId`} className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"> {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                <td
+                                  key={`${uniqueRowKey}-acctId`}
+                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                                >
+                                  {" "}
+                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
                                   <input
                                     type="text"
-                                    value={editedRowData[actualEmpIdx]?.acctId !== undefined ? editedRowData[actualEmpIdx].acctId : row.acctId}
-                                    onChange={e => handleRowFieldChange(actualEmpIdx, "acctId", e.target.value)}
-                                    onBlur={() => handleRowFieldBlur(actualEmpIdx, emp)}
+                                    value={
+                                      editedRowData[actualEmpIdx]?.acctId !==
+                                      undefined
+                                        ? editedRowData[actualEmpIdx].acctId
+                                        : row.acctId
+                                    }
+                                    onChange={(e) =>
+                                      handleRowFieldChange(
+                                        actualEmpIdx,
+                                        "acctId",
+                                        e.target.value
+                                      )
+                                    }
+                                    onBlur={() =>
+                                      handleRowFieldBlur(actualEmpIdx, emp)
+                                    }
                                     className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
                                   />
                                 </td>
@@ -5265,12 +5461,30 @@ const ProjectAmountsTable = ({
                             }
                             if (col.key === "orgId") {
                               return (
-                                <td key={`${uniqueRowKey}-orgId`} className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"> {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                <td
+                                  key={`${uniqueRowKey}-orgId`}
+                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                                >
+                                  {" "}
+                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
                                   <input
                                     type="text"
-                                    value={editedRowData[actualEmpIdx]?.orgId !== undefined ? editedRowData[actualEmpIdx].orgId : row.orgId}
-                                    onChange={e => handleRowFieldChange(actualEmpIdx, "orgId", e.target.value)}
-                                    onBlur={() => handleRowFieldBlur(actualEmpIdx, emp)}
+                                    value={
+                                      editedRowData[actualEmpIdx]?.orgId !==
+                                      undefined
+                                        ? editedRowData[actualEmpIdx].orgId
+                                        : row.orgId
+                                    }
+                                    onChange={(e) =>
+                                      handleRowFieldChange(
+                                        actualEmpIdx,
+                                        "orgId",
+                                        e.target.value
+                                      )
+                                    }
+                                    onBlur={() =>
+                                      handleRowFieldBlur(actualEmpIdx, emp)
+                                    }
                                     className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
                                   />
                                 </td>
@@ -5278,12 +5492,30 @@ const ProjectAmountsTable = ({
                             }
                             if (col.key === "isRev") {
                               return (
-                                <td key={`${uniqueRowKey}-isRev`} className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"> {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                <td
+                                  key={`${uniqueRowKey}-isRev`}
+                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+                                >
+                                  {" "}
+                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
                                   <input
                                     type="checkbox"
-                                    checked={editedRowData[actualEmpIdx]?.isRev !== undefined ? editedRowData[actualEmpIdx].isRev : emp.emple.isRev}
-                                    onChange={e => handleRowFieldChange(actualEmpIdx, "isRev", e.target.checked)}
-                                    onBlur={() => handleRowFieldBlur(actualEmpIdx, emp)}
+                                    checked={
+                                      editedRowData[actualEmpIdx]?.isRev !==
+                                      undefined
+                                        ? editedRowData[actualEmpIdx].isRev
+                                        : emp.emple.isRev
+                                    }
+                                    onChange={(e) =>
+                                      handleRowFieldChange(
+                                        actualEmpIdx,
+                                        "isRev",
+                                        e.target.checked
+                                      )
+                                    }
+                                    onBlur={() =>
+                                      handleRowFieldBlur(actualEmpIdx, emp)
+                                    }
                                     className="w-4 h-4"
                                   />
                                 </td>
@@ -5291,12 +5523,30 @@ const ProjectAmountsTable = ({
                             }
                             if (col.key === "isBrd") {
                               return (
-                                <td key={`${uniqueRowKey}-isBrd`} className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"> {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                <td
+                                  key={`${uniqueRowKey}-isBrd`}
+                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+                                >
+                                  {" "}
+                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
                                   <input
                                     type="checkbox"
-                                    checked={editedRowData[actualEmpIdx]?.isBrd !== undefined ? editedRowData[actualEmpIdx].isBrd : emp.emple.isBrd}
-                                    onChange={e => handleRowFieldChange(actualEmpIdx, "isBrd", e.target.checked)}
-                                    onBlur={() => handleRowFieldBlur(actualEmpIdx, emp)}
+                                    checked={
+                                      editedRowData[actualEmpIdx]?.isBrd !==
+                                      undefined
+                                        ? editedRowData[actualEmpIdx].isBrd
+                                        : emp.emple.isBrd
+                                    }
+                                    onChange={(e) =>
+                                      handleRowFieldChange(
+                                        actualEmpIdx,
+                                        "isBrd",
+                                        e.target.checked
+                                      )
+                                    }
+                                    onBlur={() =>
+                                      handleRowFieldBlur(actualEmpIdx, emp)
+                                    }
                                     className="w-4 h-4"
                                   />
                                 </td>
@@ -5304,7 +5554,12 @@ const ProjectAmountsTable = ({
                             }
                           }
                           return (
-                            <td key={`${uniqueRowKey}-${col.key}`} className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"> {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                            <td
+                              key={`${uniqueRowKey}-${col.key}`}
+                              className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                            >
+                              {" "}
+                              {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
                               {row[col.key]}
                             </td>
                           );
@@ -5319,13 +5574,19 @@ const ProjectAmountsTable = ({
           <div className="synchronized-table-scroll">
             <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
               <thead className="sticky-thead">
-                <tr style={{ height: `${ROW_HEIGHT_DEFAULT}px`, lineHeight: "normal" }}>
+                <tr
+                  style={{
+                    height: `${ROW_HEIGHT_DEFAULT}px`,
+                    lineHeight: "normal",
+                  }}
+                >
                   {sortedDurations.map((duration) => {
                     const uniqueKey = `${duration.monthNo}_${duration.year}`;
                     return (
                       <th
                         key={uniqueKey}
-                        className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${ /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+                        className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
+                          /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
                           selectedColumnKey === uniqueKey ? "bg-yellow-100" : ""
                         }`}
                         style={{ cursor: isEditable ? "pointer" : "default" }}
@@ -5346,16 +5607,26 @@ const ProjectAmountsTable = ({
                   <tr
                     key="new-entry"
                     className="bg-gray-50"
-                    style={{ height: `${ROW_HEIGHT_DEFAULT}px`, lineHeight: "normal" }}
+                    style={{
+                      height: `${ROW_HEIGHT_DEFAULT}px`,
+                      lineHeight: "normal",
+                    }}
                   >
                     {sortedDurations.map((duration) => {
                       const uniqueKey = `${duration.monthNo}_${duration.year}`;
-                      const isInputEditable = isEditable && isMonthEditable(duration, closedPeriod, planType);
+                      const isInputEditable =
+                        isEditable &&
+                        isMonthEditable(duration, closedPeriod, planType);
                       return (
                         <td
                           key={`new-${uniqueKey}`}
-                          className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${ /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
-                            planType === "EAC" ? (isInputEditable ? "bg-green-50" : "bg-gray-200") : ""
+                          className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+                            /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+                            planType === "EAC"
+                              ? isInputEditable
+                                ? "bg-green-50"
+                                : "bg-gray-200"
+                              : ""
                           }`}
                         >
                           <input
@@ -5366,11 +5637,17 @@ const ProjectAmountsTable = ({
                               isInputEditable &&
                               setNewEntryPeriodAmounts((prev) => ({
                                 ...prev,
-                                [uniqueKey]: e.target.value.replace(/[^0-9.]/g, ""),
+                                [uniqueKey]: e.target.value.replace(
+                                  /[^0-9.]/g,
+                                  ""
+                                ),
                               }))
                             }
-                            className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${ /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
-                              !isInputEditable ? "cursor-not-allowed text-gray-400" : "text-gray-700"
+                            className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+                              /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
+                              !isInputEditable
+                                ? "cursor-not-allowed text-gray-400"
+                                : "text-gray-700"
                             }`}
                             disabled={!isInputEditable}
                             placeholder="Enter Amount"
@@ -5385,12 +5662,16 @@ const ProjectAmountsTable = ({
                   .map((emp, idx) => {
                     const actualEmpIdx = employees.findIndex((e) => e === emp);
                     const monthAmounts = getMonthAmounts(emp);
-                    const uniqueRowKey = `${emp.emple.emplId || "emp"}-${actualEmpIdx}`;
+                    const uniqueRowKey = `${
+                      emp.emple.emplId || "emp"
+                    }-${actualEmpIdx}`;
                     return (
                       <tr
                         key={uniqueRowKey}
                         className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
-                          selectedRowIndex === actualEmpIdx ? "bg-yellow-100" : "even:bg-gray-50"
+                          selectedRowIndex === actualEmpIdx
+                            ? "bg-yellow-100"
+                            : "even:bg-gray-50"
                         }`}
                         style={{
                           height: `${ROW_HEIGHT_DEFAULT}px`,
@@ -5404,20 +5685,36 @@ const ProjectAmountsTable = ({
                           const forecast = monthAmounts[uniqueKey];
                           const value =
                             inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
-                            (forecast?.value !== undefined ? forecast.value : "0");
-                          const isInputEditable = isEditable && isMonthEditable(duration, closedPeriod, planType);
+                            (forecast?.value !== undefined
+                              ? forecast.value
+                              : "0");
+                          const isInputEditable =
+                            isEditable &&
+                            isMonthEditable(duration, closedPeriod, planType);
                           return (
                             <td
                               key={`${uniqueRowKey}-${uniqueKey}`}
-                              className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${ /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
-                                selectedColumnKey === uniqueKey ? "bg-yellow-100" : ""
-                              } ${planType === "EAC" ? (isInputEditable ? "bg-green-50" : "bg-gray-200") : ""}`}
+                              className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+                                /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+                                selectedColumnKey === uniqueKey
+                                  ? "bg-yellow-100"
+                                  : ""
+                              } ${
+                                planType === "EAC"
+                                  ? isInputEditable
+                                    ? "bg-green-50"
+                                    : "bg-gray-200"
+                                  : ""
+                              }`}
                             >
                               <input
                                 type="text"
                                 inputMode="numeric"
-                                className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${ /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
-                                  !isInputEditable ? "cursor-not-allowed text-gray-400" : "text-gray-700"
+                                className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+                                  /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
+                                  !isInputEditable
+                                    ? "cursor-not-allowed text-gray-400"
+                                    : "text-gray-700"
                                 }`}
                                 value={value}
                                 onChange={(e) =>
@@ -5427,7 +5724,13 @@ const ProjectAmountsTable = ({
                                     e.target.value.replace(/[^0-9.]/g, "")
                                   )
                                 }
-                                onBlur={(e) => handleForecastAmountBlur(actualEmpIdx, uniqueKey, e.target.value)}
+                                onBlur={(e) =>
+                                  handleForecastAmountBlur(
+                                    actualEmpIdx,
+                                    uniqueKey,
+                                    e.target.value
+                                  )
+                                }
                                 disabled={!isInputEditable}
                                 placeholder="Enter Amount"
                               />
@@ -5446,9 +5749,14 @@ const ProjectAmountsTable = ({
       {showFindReplace && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-sm">
-            <h3 className="text-lg font-semibold mb-4">Find and Replace Amounts</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              Find and Replace Amounts
+            </h3>
             <div className="mb-3">
-              <label htmlFor="findValue" className="block text-gray-700 text-xs font-medium mb-1">
+              <label
+                htmlFor="findValue"
+                className="block text-gray-700 text-xs font-medium mb-1"
+              >
                 Find:
               </label>
               <input
@@ -5472,12 +5780,16 @@ const ProjectAmountsTable = ({
                 id="replaceValue"
                 className="w-full border border-gray-300 rounded-md p-2 text-xs"
                 value={replaceValue}
-                onChange={(e) => setReplaceValue(e.target.value.replace(/[^0-9.]/g, ""))}
+                onChange={(e) =>
+                  setReplaceValue(e.target.value.replace(/[^0-9.]/g, ""))
+                }
                 placeholder="New value (e.g., 120 or empty)"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 text-xs font-medium mb-1">Scope:</label>
+              <label className="block text-gray-700 text-xs font-medium mb-1">
+                Scope:
+              </label>
               <div className="flex gap-4 flex-wrap">
                 <label className="inline-flex items-center text-xs cursor-pointer">
                   <input
@@ -5501,7 +5813,11 @@ const ProjectAmountsTable = ({
                     disabled={selectedRowIndex === null}
                   />
                   <span className="ml-2">
-                    Selected Row ({selectedRowIndex !== null ? employees[selectedRowIndex]?.emple.emplId : "N/A"})
+                    Selected Row (
+                    {selectedRowIndex !== null
+                      ? employees[selectedRowIndex]?.emple.emplId
+                      : "N/A"}
+                    )
                   </span>
                 </label>
                 <label className="inline-flex items-center text-xs cursor-pointer">
@@ -5517,7 +5833,9 @@ const ProjectAmountsTable = ({
                   <span className="ml-2">
                     Selected Column (
                     {selectedColumnKey
-                      ? sortedDurations.find((d) => `${d.monthNo}_${d.year}` === selectedColumnKey)?.month
+                      ? sortedDurations.find(
+                          (d) => `${d.monthNo}_${d.year}` === selectedColumnKey
+                        )?.month
                       : "N/A"}
                     )
                   </span>
