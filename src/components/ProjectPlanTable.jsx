@@ -5197,43 +5197,8 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId, fiscalYear })
         </div>
       )}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xs font-bold">Project Plan Table</h2>
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={() => {
-              setIsActionLoading(true);
-              fileInputRef.current.click();
-            }}
-            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer"
-            title="Import Plan"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-              />
-            </svg>
-            Import
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={(e) => {
-              setIsActionLoading(true);
-              handleImportPlan(e);
-            }}
-            accept=".xlsx,.xls"
-            className="hidden"
-          />
-        </div>
+        {/* <h2 className="text-xs font-bold">Project Plan Table</h2> */}
+        
       </div>
       <div className="flex gap-2 mb-4">
         {plans.length > 0 && (
@@ -5321,6 +5286,42 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId, fiscalYear })
             </button>
           </>
         )}
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={() => {
+              setIsActionLoading(true);
+              fileInputRef.current.click();
+            }}
+            className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer"
+            title="Import Plan"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              />
+            </svg>
+            Import
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={(e) => {
+              setIsActionLoading(true);
+              handleImportPlan(e);
+            }}
+            accept=".xlsx,.xls"
+            className="hidden"
+          />
+        </div>
       </div>
       {plans.length === 0 ? (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
