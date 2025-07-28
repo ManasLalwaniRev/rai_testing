@@ -2266,8 +2266,10 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
   };
 
   const projectDetails = selectedPlan ? (
-    <div className="mb-4 text-xs sm:text-sm text-gray-800 flex flex-wrap gap-x-2 gap-y-1">
-                  <span>
+    <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">
+                  <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
+
+                    <span>
                     <span className="font-semibold">Project ID: </span>
                     {selectedPlan.projId}
                   </span>
@@ -2285,8 +2287,11 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
                   </span>
                   <span>
   <span className="font-semibold">Period of Performance: </span>
-  Start Date: {formatDate(selectedPlan?.startDate) || "N/A"} | End Date: {formatDate(selectedPlan?.endDate) || "N/A"}
+  Start Date: {formatDate(selectedPlan?.projStartDt) || "N/A"} | End Date: {formatDate(selectedPlan?.projEndDt) || "N/A"}
 </span>
+
+                  </div>
+                  
                 </div>
   ) : null;
 

@@ -12104,13 +12104,21 @@ const ProjectBudgetStatus = () => {
     setSearched(true);
     setErrorMessage("");
 
-    if (term.length < 2) {
+    if (!term) {  // Only check if the term is empty
       setFilteredProjects([]);
       setSelectedPlan(null);
       setRevenueAccount("");
       setPrefixes(new Set());
       return;
     }
+
+    // if (term.length < 2) {
+    //   setFilteredProjects([]);
+    //   setSelectedPlan(null);
+    //   setRevenueAccount("");
+    //   setPrefixes(new Set());
+    //   return;
+    // }
 
     setLoading(true);
     try {
@@ -12479,23 +12487,84 @@ const ProjectBudgetStatus = () => {
 //   setAnalysisError(null);
 // };
 
+// const handlePlanSelect = (plan) => {
+//   if (!plan || (selectedPlan && selectedPlan.plId === plan.plId)) {
+//     setSelectedPlan(null);
+//     localStorage.removeItem("selectedPlan");
+//     // DON'T clear searchTerm, filteredProjects, or revenueAccount
+//     // Keep the original search context
+    
+//     // Only reset tab states
+//     setShowHours(false);
+//     setShowAmounts(false);
+//     setHoursProjectId(null);
+//     setShowRevenueAnalysis(false);
+//     setShowAnalysisByPeriod(false);
+//     setShowPLC(false);
+//     setShowRevenueSetup(false);
+//     setShowFunding(false);
+//     setShowRevenueCeiling(false);
+//     setForecastData([]);
+//     setIsForecastLoading(false);
+//     setAnalysisApiData([]);
+//     setIsAnalysisLoading(false);
+//     setAnalysisError(null);
+//     return;
+//   }
+
+//   const project = {
+//     projId: plan.projId || "",
+//     projName: plan.projName || "",
+//     projStartDt: plan.projStartDt || "",
+//     projEndDt: plan.projEndDt || "",
+//     orgId: plan.orgId || "",
+//     fundedCost: plan.fundedCost || "",
+//     fundedFee: plan.fundedFee || "",
+//     fundedRev: plan.fundedRev || "",
+//   };
+
+//   // DON'T UPDATE SEARCH TERM - Keep original search
+//   // setSearchTerm(plan.projId); // <-- REMOVE THIS LINE
+  
+//   setFilteredProjects([project]);
+//   setRevenueAccount(plan.revenueAccount || "");
+//   setSelectedPlan(plan);
+//   localStorage.setItem("selectedPlan", JSON.stringify(plan));
+  
+//   // Reset other UI states
+//   setShowHours(false);
+//   setShowAmounts(false);
+//   setHoursProjectId(null);
+//   setShowRevenueAnalysis(false);
+//   setShowAnalysisByPeriod(false);
+//   setShowPLC(false);
+//   setShowRevenueSetup(false);
+//   setShowFunding(false);
+//   setShowRevenueCeiling(false);
+//   setForecastData([]);
+//   setIsForecastLoading(false);
+//   setAnalysisApiData([]);
+//   setIsAnalysisLoading(false);
+//   setAnalysisError(null);
+// };
+
 const handlePlanSelect = (plan) => {
   if (!plan || (selectedPlan && selectedPlan.plId === plan.plId)) {
     setSelectedPlan(null);
     localStorage.removeItem("selectedPlan");
-    // DON'T clear searchTerm, filteredProjects, or revenueAccount
-    // Keep the original search context
     
-    // Only reset tab states
-    setShowHours(false);
-    setShowAmounts(false);
-    setHoursProjectId(null);
-    setShowRevenueAnalysis(false);
-    setShowAnalysisByPeriod(false);
-    setShowPLC(false);
-    setShowRevenueSetup(false);
-    setShowFunding(false);
-    setShowRevenueCeiling(false);
+    // Only reset the plan-specific states, not the tab states
+    setShowHours(showHours); // Keep current tab state
+    setShowAmounts(showAmounts); // Keep current tab state
+    // Don't reset hoursProjectId to keep the tab open
+    setShowRevenueAnalysis(showRevenueAnalysis); // Keep current tab state
+    setShowAnalysisByPeriod(showAnalysisByPeriod); // Keep current tab state
+    setShowPLC(showPLC); // Keep current tab state
+    setShowRevenueSetup(showRevenueSetup); // Keep current tab state
+    setShowFunding(showFunding); // Keep current tab state
+    setShowRevenueCeiling(showRevenueCeiling); // Keep current tab state
+    
+    // Only reset data states
     setForecastData([]);
     setIsForecastLoading(false);
     setAnalysisApiData([]);
@@ -12515,24 +12584,13 @@ const handlePlanSelect = (plan) => {
     fundedRev: plan.fundedRev || "",
   };
 
-  // DON'T UPDATE SEARCH TERM - Keep original search
-  // setSearchTerm(plan.projId); // <-- REMOVE THIS LINE
-  
   setFilteredProjects([project]);
   setRevenueAccount(plan.revenueAccount || "");
   setSelectedPlan(plan);
   localStorage.setItem("selectedPlan", JSON.stringify(plan));
   
-  // Reset other UI states
-  setShowHours(false);
-  setShowAmounts(false);
-  setHoursProjectId(null);
-  setShowRevenueAnalysis(false);
-  setShowAnalysisByPeriod(false);
-  setShowPLC(false);
-  setShowRevenueSetup(false);
-  setShowFunding(false);
-  setShowRevenueCeiling(false);
+  // Keep the current tab states when selecting a new plan
+  // Only reset data states
   setForecastData([]);
   setIsForecastLoading(false);
   setAnalysisApiData([]);
@@ -13478,7 +13536,7 @@ return (
             </span>
           </div>
 
-          {showHours && selectedPlan && hoursProjectId === searchTerm && (
+          {/* {showHours && selectedPlan && hoursProjectId === searchTerm && (
             <div
               ref={(el) => (hoursRefs.current[searchTerm] = el)}
               className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
@@ -13519,17 +13577,67 @@ return (
                 onSaveSuccess={fetchForecastData}
               />
             </div>
+          )} */}
+
+    {showHours && selectedPlan && hoursProjectId === searchTerm && (
+        <div
+              ref={(el) => (hoursRefs.current[searchTerm] = el)}
+              className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
+            >
+            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">
+                <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
+
+                <span>
+                  <span className="font-semibold">Project ID: </span>
+                  {selectedPlan.projId}
+                </span>
+                <span>
+                  <span className="font-semibold">Type: </span>
+                  {selectedPlan.plType || "N/A"}
+                </span>
+                <span>
+                  <span className="font-semibold">Version: </span>
+                  {selectedPlan.version || "N/A"}
+                </span>
+                <span>
+                  <span className="font-semibold">Status: </span>
+                  {selectedPlan.status || "N/A"}
+                </span>
+                <span>
+                <span className="font-semibold">Period of Performance: </span>
+                Start Date: {formatDate(selectedPlan.projStartDt) || "N/A"} | End Date: {formatDate(selectedPlan.projEndDt) || "N/A"}
+                </span>
+
+                </div>
+                
+            </div>
+              <ProjectHoursDetails
+                planId={selectedPlan.plId}
+                projectId={selectedPlan.projId}
+                status={selectedPlan.status}
+                planType={selectedPlan.plType}
+                closedPeriod={selectedPlan.closedPeriod}
+                startDate={selectedPlan.projStartDt}      // CHANGE TO projStartDt
+                endDate={selectedPlan.projEndDt}          // CHANGE TO projEndDt
+                employees={forecastData}
+                isForecastLoading={isForecastLoading}
+                fiscalYear={fiscalYear}
+                onSaveSuccess={fetchForecastData}
+              />
+            </div>
           )}
 
-          {showAmounts &&
+    {showAmounts &&
             selectedPlan &&
             selectedPlan.projId.startsWith(searchTerm) && (
               <div
                 ref={(el) => (amountsRefs.current[searchTerm] = el)}
                 className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
               >
-                <div className="mb-4 text-xs sm:text-sm text-gray-800 flex flex-wrap gap-x-2 gap-y-1">
-                  <span>
+            <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">
+                <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
+
+                    <span>
                     <span className="font-semibold">Project ID: </span>
                     {selectedPlan.projId}
                   </span>
@@ -13549,6 +13657,9 @@ return (
                     <span className="font-semibold">Period of Performance: </span>
         Start Date: {formatDate(selectedPlan.projStartDt) || "N/A"} | End Date: {formatDate(selectedPlan.projEndDt) || "N/A"}
                   </span>
+
+                  </div>
+                  
                 </div>
                 <ProjectAmountsTable
                   initialData={selectedPlan}
@@ -13569,8 +13680,10 @@ return (
                 ref={(el) => (revenueRefs.current[searchTerm] = el)}
                 className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
               >
-                <div className="mb-4 text-xs sm:text-sm text-gray-800 flex flex-wrap gap-x-2 gap-y-1">
-                  <span>
+                <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">
+                  <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
+
+                    <span>
                     <span className="font-semibold">Project ID: </span>
                     {selectedPlan.projId}
                   </span>
@@ -13589,9 +13702,12 @@ return (
                   <span>
                     
                     <span className="font-semibold">Period of Performance: </span>
-        Start Date: {formatDate(selectedPlan.startDate) || "N/A"} | End Date: {formatDate(selectedPlan.endDate) || "N/A"}
+        Start Date: {formatDate(selectedPlan.projStartDt) || "N/A"} | End Date: {formatDate(selectedPlan.projEndDt) || "N/A"}
                   
                   </span>
+
+                  </div>
+                  
                 </div>
                 <RevenueAnalysisTable
                   planId={selectedPlan.plId}
@@ -13608,8 +13724,11 @@ return (
                 ref={(el) => (analysisRefs.current[searchTerm] = el)}
                 className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
               >
-                <div className="mb-4 text-xs sm:text-sm text-gray-800 flex flex-wrap gap-x-2 gap-y-1">
-                  <span>
+                <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">
+
+                  <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
+
+                    <span>
                     <span className="font-semibold">Project ID: </span>
                     {selectedPlan.projId}
                   </span>
@@ -13628,9 +13747,12 @@ return (
                   <span>
                     
                     <span className="font-semibold">Period of Performance: </span>
-        Start Date: {formatDate(selectedPlan.startDate) || "N/A"} | End Date: {formatDate(selectedPlan.endDate) || "N/A"}
+        Start Date: {formatDate(selectedPlan.projStartDt) || "N/A"} | End Date: {formatDate(selectedPlan.projEndDt) || "N/A"}
                   
                   </span>
+
+                  </div>
+                  
                 </div>
                 <AnalysisByPeriodContent
                   onCancel={onAnalysisCancel}

@@ -7503,7 +7503,7 @@ const ProjectPlanTable = ({ onPlanSelect, selectedPlan, projectId, fiscalYear, s
   const [editingVersionCodeIdx, setEditingVersionCodeIdx] = useState(null);
   const [editingVersionCodeValue, setEditingVersionCodeValue] = useState('');
 
-  const rowRefs = useRef({});
+  // const rowRefs = useRef({});
 
   const isChildProjectId = (projId) => {
     return projId && typeof projId === 'string' && projId.includes('.');
@@ -7606,14 +7606,14 @@ const formatDateWithTime = (dateStr) => {
     fetchPlans();
   }, [projectId]);
 
-  useEffect(() => {
-    if (selectedPlan && rowRefs.current[selectedPlan.plId]) {
-      rowRefs.current[selectedPlan.plId].scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    }
-  }, [selectedPlan, plans]);
+  // useEffect(() => {
+  //   if (selectedPlan && rowRefs.current[selectedPlan.plId]) {
+  //     rowRefs.current[selectedPlan.plId].scrollIntoView({
+  //       behavior: "smooth",
+  //       block: "center",
+  //     });
+  //   }
+  // }, [selectedPlan, plans]);
 
   // const handleRowClick = (plan) => {
   //   // Toggle selection without clearing plans
@@ -8356,7 +8356,7 @@ const formatDateWithTime = (dateStr) => {
               {plans.map((plan, idx) => (
                 <tr
                   key={`plan-${plan.plId || idx}-${plan.projId || 'unknown'}`}
-                  ref={el => { rowRefs.current[plan.plId] = el; }}
+                  // ref={el => { rowRefs.current[plan.plId] = el; }}
                   className={`even:bg-gray-50 hover:bg-blue-50 transition-all duration-200 cursor-pointer ${
   selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId 
     ? 'bg-blue-100 border-l-4 border-l-blue-600' : ''

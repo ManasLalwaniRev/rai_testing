@@ -10110,10 +10110,13 @@ const ProjectHoursDetails = ({
   const [localEmployees, setLocalEmployees] = useState(employees);
   const [fillStartDate, setFillStartDate] = useState(startDate);
   const [fillEndDate, setFillEndDate] = useState(endDate);
+  const [isLoading, setIsLoading] = useState(false);
   const debounceTimeout = useRef(null);
 
   const isEditable = status === "Working";
   const isBudPlan = planType === "BUD";
+
+  
 
   useEffect(() => {
     setLocalEmployees(employees);
@@ -10827,237 +10830,221 @@ const ProjectHoursDetails = ({
     }
   };
 
-  const handleFindReplace = async () => {
-    if (
-      !isEditable ||
-      findValue === "" ||
-      (replaceScope === "row" && selectedRowIndex === null) ||
-      (replaceScope === "column" && selectedColumnKey === null)
-    ) {
-      toast.warn("Please select a valid scope and enter a value to find.", {
-        toastId: "find-replace-warning",
-        autoClose: 3000,
-      });
-      return;
+
+const handleFindReplace = async () => {
+  if (
+    !isEditable ||
+    findValue === "" ||
+    (replaceScope === "row" && selectedRowIndex === null) ||
+    (replaceScope === "column" && selectedColumnKey === null)
+  ) {
+    toast.warn("Please select a valid scope and enter a value to find.", {
+      toastId: "find-replace-warning",
+      autoClose: 3000,
+    });
+    return;
+  }
+
+  // Show loading state
+  setIsLoading(true);
+
+  const updates = [];
+  const updatedInputValues = { ...inputValues };
+  let replacementsCount = 0;
+  let skippedCount = 0;
+
+  for (const empIdx in localEmployees) {
+    const emp = localEmployees[empIdx];
+    const actualEmpIdx = parseInt(empIdx, 10);
+
+    if (replaceScope === "row" && actualEmpIdx !== selectedRowIndex) {
+      continue;
     }
 
-    const updates = [];
-    const updatedInputValues = { ...inputValues };
-    let replacementsCount = 0;
+    for (const duration of sortedDurations) {
+      const uniqueKey = `${duration.monthNo}_${duration.year}`;
 
-    for (const empIdx in localEmployees) {
-      const emp = localEmployees[empIdx];
-      const actualEmpIdx = parseInt(empIdx, 10);
-
-      if (replaceScope === "row" && actualEmpIdx !== selectedRowIndex) {
+      if (replaceScope === "column" && uniqueKey !== selectedColumnKey) {
         continue;
       }
 
-      for (const duration of sortedDurations) {
-        const uniqueKey = `${duration.monthNo}_${duration.year}`;
+      if (!isMonthEditable(duration, closedPeriod, planType)) {
+        continue;
+      }
 
-        if (replaceScope === "column" && uniqueKey !== selectedColumnKey) {
-          continue;
+      const currentInputKey = `${actualEmpIdx}_${uniqueKey}`;
+      
+      // Get the actual displayed value
+      let displayedValue;
+      if (inputValues[currentInputKey] !== undefined) {
+        displayedValue = String(inputValues[currentInputKey]);
+      } else {
+        const monthHours = getMonthHours(emp);
+        const forecast = monthHours[uniqueKey];
+        if (forecast && forecast.value !== undefined) {
+          displayedValue = String(forecast.value);
+        } else {
+          displayedValue = "0";
         }
+      }
 
-        if (!isMonthEditable(duration, closedPeriod, planType)) {
-          continue;
-        }
-
-        const currentInputKey = `${actualEmpIdx}_${uniqueKey}`;
-        const displayedValue =
-          inputValues[currentInputKey] !== undefined
-            ? String(inputValues[currentInputKey])
-            : String(getMonthHours(emp)[uniqueKey]?.value ?? "");
-
-        const findValueNormalized = findValue.trim();
-        const displayedValueNormalized = displayedValue.trim();
-        const isMatch =
-          findValueNormalized === ""
-            ? displayedValueNormalized === "" ||
-              displayedValueNormalized === "0"
-            : displayedValueNormalized === findValueNormalized;
-
-        if (isMatch) {
-          // Only update if the value is actually changing
-          if (
-            String(displayedValueNormalized) === String(replaceValue.trim())
-          ) {
-            continue; // skip, no change
-          }
-          const newNumericValue =
-            replaceValue === "" || replaceValue === undefined
-              ? Number(displayedValue) // keep the current value as a number
-              : Number(replaceValue);
-
-          if (!isNaN(newNumericValue) || replaceValue === "") {
-            const forecast = getMonthHours(emp)[uniqueKey];
-            const originalForecastedHours = forecast?.forecastedhours ?? 0;
-
-            if (
-              forecast &&
-              forecast.forecastid &&
-              forecast.projId &&
-              forecast.plId &&
-              forecast.emplId &&
-              forecast.month &&
-              forecast.year &&
-              newNumericValue !== originalForecastedHours
-            ) {
-              updatedInputValues[currentInputKey] = replaceValue;
-              replacementsCount++;
-
-              const payload = {
-                forecastedamt: forecast.forecastedamt ?? 0,
-                forecastid: Number(forecast.forecastid),
-                projId: forecast.projId,
-                plId: forecast.plId,
-                emplId: forecast.emplId,
-                dctId: forecast.dctId ?? 0,
-                month: forecast.month,
-                year: forecast.year,
-                totalBurdenCost: forecast.totalBurdenCost ?? 0,
-                burden: forecast.burden ?? 0,
-                ccffRevenue: forecast.ccffRevenue ?? 0,
-                tnmRevenue: forecast.tnmRevenue ?? 0,
-                cost: forecast.cost ?? 0,
-                fringe: forecast.fringe ?? 0,
-                overhead: forecast.overhead ?? 0,
-                gna: forecast.gna ?? 0,
-                [planType === "EAC" ? "actualhours" : "forecastedhours"]:
-                  Number(newNumericValue) || 0,
-                // createdat: forecast.createdat ?? new Date(0).toISOString(),
-                updatedat: new Date().toISOString().split("T")[0],
-                displayText: forecast.displayText ?? "",
-              };
-              updates.push(
-                axios
-                  .put(
-                    `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${planType}`,
-                    payload,
-                    { headers: { "Content-Type": "application/json" } }
-                  )
-                  .catch((err) => {
-                    console.error(
-                      "Failed update for payload:",
-                      payload,
-                      err?.response?.data || err.message
-                    );
-                    // Optionally, collect failed payloads for user feedback
-                  })
-              );
-            }
-
-            // if (
-            //   forecast &&
-            //   forecast.forecastid &&
-            //   newNumericValue !== originalForecastedHours
-            // ) {
-            //   updatedInputValues[currentInputKey] = replaceValue;
-            //   replacementsCount++;
-
-            //   const payload = {
-            //     forecastedamt: forecast.forecastedamt ?? 0,
-            //     forecastid: Number(forecast.forecastid),
-            //     projId: forecast.projId ?? "",
-            //     plId: forecast.plId ?? 0,
-            //     emplId: forecast.emplId ?? "",
-            //     dctId: forecast.dctId ?? 0,
-            //     month: forecast.month ?? 0,
-            //     year: forecast.year ?? 0,
-            //     totalBurdenCost: forecast.totalBurdenCost ?? 0,
-            //     burden: forecast.burden ?? 0,
-            //     ccffRevenue: forecast.ccffRevenue ?? 0,
-            //     tnmRevenue: forecast.tnmRevenue ?? 0,
-            //     cost: forecast.cost ?? 0,
-            //     fringe: forecast.fringe ?? 0,
-            //     overhead: forecast.overhead ?? 0,
-            //     gna: forecast.gna ?? 0,
-            //     forecastedhours: Number(newNumericValue) || 0,
-            //     createdat: forecast.createdat ?? new Date(0).toISOString(),
-            //     updatedat: new Date().toISOString().split("T")[0],
-            //     displayText: forecast.displayText ?? "",
-            //   };
-            //   updates.push(
-            //     axios.put(
-            //       "https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours",
-            //       payload,
-            //       { headers: { "Content-Type": "application/json" } }
-            //     )
-            //   );
-            // }
+      const findValueTrimmed = findValue.trim();
+      const displayedValueTrimmed = displayedValue.trim();
+      
+      // Matching logic
+      let isMatch = false;
+      
+      if (findValueTrimmed === "0") {
+        const numValue = parseFloat(displayedValueTrimmed);
+        isMatch = displayedValueTrimmed === "" || 
+                 displayedValueTrimmed === "0" || 
+                 (!isNaN(numValue) && numValue === 0);
+      } else {
+        isMatch = displayedValueTrimmed === findValueTrimmed;
+        
+        if (!isMatch) {
+          const findNum = parseFloat(findValueTrimmed);
+          const displayNum = parseFloat(displayedValueTrimmed);
+          if (!isNaN(findNum) && !isNaN(displayNum)) {
+            isMatch = findNum === displayNum;
           }
         }
       }
-    }
 
-    setInputValues(updatedInputValues);
-    try {
+      if (isMatch) {
+        const newValue = replaceValue.trim();
+        const newNumericValue = newValue === "" ? 0 : (parseFloat(newValue) || 0);
+
+        const forecast = getMonthHours(emp)[uniqueKey];
+        
+        // Only proceed if we have a valid forecast with forecastid
+        if (forecast && forecast.forecastid) {
+          const originalValue = planType === "EAC" ? 
+            (forecast.actualhours ?? 0) : 
+            (forecast.forecastedhours ?? 0);
+
+          if (newNumericValue !== originalValue) {
+            updatedInputValues[currentInputKey] = newValue;
+            replacementsCount++;
+
+            const payload = {
+              forecastedamt: forecast.forecastedamt ?? 0,
+              forecastid: Number(forecast.forecastid),
+              projId: forecast.projId,
+              plId: forecast.plId,
+              emplId: forecast.emplId,
+              dctId: forecast.dctId ?? 0,
+              month: forecast.month,
+              year: forecast.year,
+              totalBurdenCost: forecast.totalBurdenCost ?? 0,
+              burden: forecast.burden ?? 0,
+              ccffRevenue: forecast.ccffRevenue ?? 0,
+              tnmRevenue: forecast.tnmRevenue ?? 0,
+              cost: forecast.cost ?? 0,
+              fringe: forecast.fringe ?? 0,
+              overhead: forecast.overhead ?? 0,
+              gna: forecast.gna ?? 0,
+              [planType === "EAC" ? "actualhours" : "forecastedhours"]: newNumericValue,
+              updatedat: new Date().toISOString().split("T")[0],
+              displayText: forecast.displayText ?? "",
+            };
+            
+            updates.push(
+              axios
+                .put(
+                  `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${planType}`,
+                  payload,
+                  { headers: { "Content-Type": "application/json" } }
+                )
+                .catch((err) => {
+                  console.error(
+                    "Failed update for payload:",
+                    payload,
+                    err?.response?.data || err.message
+                  );
+                })
+            );
+          }
+        } else {
+          // Skip cells without existing forecasts and count them
+          console.log(`Skipping cell without forecast: employee ${emp.emple?.emplId} for ${duration.monthNo}/${duration.year}`);
+          skippedCount++;
+        }
+      }
+    }
+  }
+
+  console.log(`Total replacements to make: ${replacementsCount}, Skipped: ${skippedCount}`);
+
+  setInputValues(updatedInputValues);
+  try {
+    if (updates.length > 0) {
       await Promise.all(updates);
-      setInputValues({ ...updatedInputValues });
-      // --- Add this block here ---
-      setLocalEmployees((prev) => {
-        const updated = [...prev];
-        for (const empIdx in updated) {
-          const emp = updated[empIdx];
-          const monthHours = getMonthHours(emp);
-          for (const duration of sortedDurations) {
-            const uniqueKey = `${duration.monthNo}_${duration.year}`;
-            const currentInputKey = `${empIdx}_${uniqueKey}`;
-            if (updatedInputValues[currentInputKey] !== undefined) {
-              if (emp.emple && Array.isArray(emp.emple.plForecasts)) {
-                const forecast = emp.emple.plForecasts.find(
-                  (f) =>
-                    f.month === duration.monthNo && f.year === duration.year
-                );
-                if (forecast) {
-                  if (planType === "EAC") {
-                    forecast.actualhours = Number(
-                      updatedInputValues[currentInputKey]
-                    );
-                  } else {
-                    forecast.forecastedhours = Number(
-                      updatedInputValues[currentInputKey]
-                    );
-                  }
+    }
+    
+    // Update local state only for cells that were actually updated
+    setLocalEmployees((prev) => {
+      const updated = [...prev];
+      for (const empIdx in updated) {
+        const emp = updated[empIdx];
+        for (const duration of sortedDurations) {
+          const uniqueKey = `${duration.monthNo}_${duration.year}`;
+          const currentInputKey = `${empIdx}_${uniqueKey}`;
+          if (updatedInputValues[currentInputKey] !== undefined) {
+            if (emp.emple && Array.isArray(emp.emple.plForecasts)) {
+              const forecast = emp.emple.plForecasts.find(
+                (f) => f.month === duration.monthNo && f.year === duration.year
+              );
+              if (forecast) {
+                const newValue = parseFloat(updatedInputValues[currentInputKey]) || 0;
+                if (planType === "EAC") {
+                  forecast.actualhours = newValue;
+                } else {
+                  forecast.forecastedhours = newValue;
                 }
               }
             }
           }
         }
-        return updated;
-      });
-      await Promise.all(updates);
-      if (replacementsCount > 0) {
-        toast.success(`Replaced ${replacementsCount} cells.`, {
-          autoClose: 2000,
-        });
-      } else {
-        toast.info("No cells replaced.", { autoClose: 2000 });
       }
-      // setSuccessMessageText(`Replaced ${replacementsCount} cells.`);
-      // setShowSuccessMessage(true);
-      // setTimeout(() => setShowSuccessMessage(false), 2000);
-    } catch (err) {
-      setSuccessMessageText("Failed to replace some values.");
-      setShowSuccessMessage(true);
-      toast.error(
-        "Failed to replace values: " +
-          (err.response?.data?.message || err.message),
-        {
-          toastId: "replace-error",
-          autoClose: 3000,
-        }
-      );
-    } finally {
-      setShowFindReplace(false);
-      setFindValue("");
-      setReplaceValue("");
-      setSelectedRowIndex(null);
-      setSelectedColumnKey(null);
-      setReplaceScope("all");
+      return updated;
+    });
+    
+    if (replacementsCount > 0) {
+      toast.success(`Successfully replaced ${replacementsCount} cells.`, {
+        autoClose: 2000,
+      });
     }
-  };
+    
+    // if (skippedCount > 0) {
+    //   toast.warn(`Skipped ${skippedCount} cells - forecast records must be created first before they can be edited.`, {
+    //     autoClose: 4000,
+    //   });
+    // }
+    
+    if (replacementsCount === 0 && skippedCount === 0) {
+      toast.info("No cells replaced.", { autoClose: 2000 });
+    }
+    
+  } catch (err) {
+    toast.error(
+      "Failed to replace values: " + (err.response?.data?.message || err.message),
+      {
+        toastId: "replace-error",
+        autoClose: 3000,
+      }
+    );
+  } finally {
+    // Hide loading state
+    setIsLoading(false);
+    setShowFindReplace(false);
+    setFindValue("");
+    setReplaceValue("");
+    setSelectedRowIndex(null);
+    setSelectedColumnKey(null);
+    setReplaceScope("all");
+  }
+};
 
   const handleRowClick = (actualEmpIdx) => {
     if (!isEditable) return;
@@ -11129,7 +11116,7 @@ const ProjectHoursDetails = ({
         </div>
       )}
 
-      <h2 className="text-xs font-semibold mb-3 text-gray-800">Hours</h2>
+      {/* <h2 className="text-xs font-semibold mb-3 text-gray-800">Hours</h2> */}
       <div className="w-full flex justify-between mb-4 gap-2">
         <div className="flex-grow"></div>
         <div className="flex gap-2">
@@ -11239,11 +11226,11 @@ const ProjectHoursDetails = ({
                 className="w-full border border-gray-300 rounded-md p-2 text-xs bg-gray-100 cursor-not-allowed"
               /> */}
               <input
-  type="date"
-  value={fillStartDate}
-  onChange={e => setFillStartDate(e.target.value)}
-  className="w-full border border-gray-300 rounded-md p-2 text-xs"
-/>
+                type="date"
+                value={fillStartDate}
+                onChange={(e) => setFillStartDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2 text-xs"
+              />
             </div>
             <div className="mb-4">
               <label className="block text-gray-700 text-xs font-medium mb-1">
@@ -11256,11 +11243,11 @@ const ProjectHoursDetails = ({
                 className="w-full border border-gray-300 rounded-md p-2 text-xs bg-gray-100 cursor-not-allowed"
               /> */}
               <input
-  type="date"
-  value={fillEndDate}
-  onChange={e => setFillEndDate(e.target.value)}
-  className="w-full border border-gray-300 rounded-md p-2 text-xs"
-/>
+                type="date"
+                value={fillEndDate}
+                onChange={(e) => setFillEndDate(e.target.value)}
+                className="w-full border border-gray-300 rounded-md p-2 text-xs"
+              />
             </div>
             <div className="flex justify-end gap-3">
               <button
@@ -11294,8 +11281,10 @@ const ProjectHoursDetails = ({
           No forecast data available for this plan.
         </div>
       ) : (
-        <div className="synchronized-tables-container" >
-          <div className="synchronized-table-scroll" >
+        
+        
+        <div className="synchronized-tables-container">
+          <div className="synchronized-table-scroll first">
             <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
               <thead className="sticky-thead">
                 <tr
@@ -11356,7 +11345,7 @@ const ProjectHoursDetails = ({
                         name="id"
                         value={newEntry.id}
                         onChange={(e) => handleIdChange(e.target.value)}
-                        className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                        className="w-full rounded px-1 py-0.5 text-xs outline-none focus:ring-0 no-datalist-border"
                         list="employee-id-list"
                         placeholder="Enter ID"
                       />
@@ -11764,7 +11753,7 @@ const ProjectHoursDetails = ({
             </table>
           </div>
 
-          <div className="synchronized-table-scroll">
+          <div className="synchronized-table-scroll last">
             <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
               <thead className="sticky-thead">
                 <tr
@@ -11939,6 +11928,9 @@ const ProjectHoursDetails = ({
             </table>
           </div>
         </div>
+
+        
+        
       )}
 
       {showFindReplace && (
@@ -12061,8 +12053,11 @@ const ProjectHoursDetails = ({
           </div>
         </div>
       )}
-    </div>
-  );
-};
+
+      
+      
+  </div>
+)}
+    
 
 export default ProjectHoursDetails;

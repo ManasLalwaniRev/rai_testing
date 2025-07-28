@@ -4907,6 +4907,310 @@ const ProjectAmountsTable = ({
     setReplaceScope(uniqueKey === selectedColumnKey ? "all" : "column");
   };
 
+  // const handleFindReplace = async () => {
+  //   if (
+  //     !isEditable ||
+  //     findValue === "" ||
+  //     (replaceScope === "row" && selectedRowIndex === null) ||
+  //     (replaceScope === "column" && selectedColumnKey === null)
+  //   ) {
+  //     toast.warn("Please select a valid scope and enter a value to find.", {
+  //       toastId: "find-replace-warning",
+  //       autoClose: 3000,
+  //     });
+  //     return;
+  //   }
+
+  //   const updates = [];
+  //   const updatedInputValues = { ...inputValues };
+  //   let replacementsCount = 0;
+
+  //   for (const empIdx in employees) {
+  //     const emp = employees[empIdx];
+  //     const actualEmpIdx = parseInt(empIdx, 10);
+
+  //     if (replaceScope === "row" && actualEmpIdx !== selectedRowIndex) {
+  //       continue;
+  //     }
+
+  //     for (const duration of sortedDurations) {
+  //       const uniqueKey = `${duration.monthNo}_${duration.year}`;
+
+  //       if (replaceScope === "column" && uniqueKey !== selectedColumnKey) {
+  //         continue;
+  //       }
+
+  //       if (!isMonthEditable(duration, closedPeriod, planType)) {
+  //         continue;
+  //       }
+
+  //       const currentInputKey = `${actualEmpIdx}_${uniqueKey}`;
+  //       const displayedValue =
+  //         inputValues[currentInputKey] !== undefined
+  //           ? String(inputValues[currentInputKey])
+  //           : String(getMonthAmounts(emp)[uniqueKey]?.value ?? "");
+
+  //       const findValueNormalized = findValue.trim();
+  //       const displayedValueNormalized = displayedValue.trim();
+  //       const isMatch =
+  //         findValueNormalized === ""
+  //           ? displayedValueNormalized === "" ||
+  //             displayedValueNormalized === "0"
+  //           : displayedValueNormalized === findValueNormalized;
+
+  //       if (isMatch) {
+  //         const newNumericValue =
+  //           replaceValue === "" ? 0 : Number(replaceValue);
+
+  //         if (!isNaN(newNumericValue) || replaceValue === "") {
+  //           const forecast = getMonthAmounts(emp)[uniqueKey];
+  //           const originalForecastedAmount = forecast?.forecastedamt ?? 0;
+
+  //           if (
+  //             forecast &&
+  //             forecast.forecastid &&
+  //             newNumericValue !== originalForecastedAmount
+  //           ) {
+  //             updatedInputValues[currentInputKey] = replaceValue;
+  //             replacementsCount++;
+
+  //             const payload = {
+  //               forecastedamt: Number(newNumericValue) || 0,
+  //               forecastid: Number(forecast.forecastid),
+  //               projId: forecast.projId || projectId || "22003.T.0069.00",
+  //               plId: forecast.plId || planId,
+  //               emplId: forecast.emplId || "",
+  //               dctId: forecast.dctId || 0,
+  //               month: forecast.month || duration.monthNo,
+  //               year: forecast.year || duration.year,
+  //               totalBurdenCost: forecast.totalBurdenCost || 0,
+  //               burden: forecast.burden || 0,
+  //               ccffRevenue: forecast.ccffRevenue || 0,
+  //               tnmRevenue: forecast.tnmRevenue || 0,
+  //               cost: forecast.cost || 0,
+  //               fringe: forecast.fringe || 0,
+  //               overhead: forecast.overhead || 0,
+  //               gna: forecast.gna || 0,
+  //               forecastedhours: forecast.forecastedhours || 0,
+  //               // createdat: forecast.createdat || new Date(0).toISOString(),
+  //               updatedat: new Date().toISOString().split("T")[0],
+  //               displayText: forecast.displayText || "",
+  //             };
+  //             updates.push(
+  //               axios.put(
+  //                 "https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount",
+  //                 payload,
+  //                 { headers: { "Content-Type": "application/json" } }
+  //               )
+  //             );
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   setInputValues(updatedInputValues);
+  //   try {
+  //     await Promise.all(updates);
+  //     setSuccessMessageText(`Replaced ${replacementsCount} cells.`);
+  //     setShowSuccessMessage(true);
+  //     toast.success(`Replaced ${replacementsCount} cells successfully!`, {
+  //       toastId: "find-replace-success",
+  //       autoClose: 3000,
+  //     });
+  //   } catch (err) {
+  //     setSuccessMessageText("Failed to replace some values.");
+  //     setShowSuccessMessage(true);
+  //     toast.error(
+  //       "Failed to replace values: " +
+  //         (err.response?.data?.message || err.message),
+  //       {
+  //         toastId: "replace-error",
+  //         autoClose: 3000,
+  //       }
+  //     );
+  //   } finally {
+  //     setShowFindReplace(false);
+  //     setFindValue("");
+  //     setReplaceValue("");
+  //     setSelectedRowIndex(null);
+  //     setSelectedColumnKey(null);
+  //     setReplaceScope("all");
+  //   }
+  // };
+  // const handleFindReplace = async () => {
+  //   if (
+  //     !isEditable ||
+  //     findValue === "" ||
+  //     (replaceScope === "row" && selectedRowIndex === null) ||
+  //     (replaceScope === "column" && selectedColumnKey === null)
+  //   ) {
+  //     toast.warn("Please select a valid scope and enter a value to find.", {
+  //       toastId: "find-replace-warning",
+  //       autoClose: 3000,
+  //     });
+  //     return;
+  //   }
+
+  //   // Add loading state
+  //   setIsLoading(true);
+
+  //   const updates = [];
+  //   const updatedInputValues = { ...inputValues };
+  //   let replacementsCount = 0;
+
+  //   for (const empIdx in employees) {
+  //     const emp = employees[empIdx];
+  //     const actualEmpIdx = parseInt(empIdx, 10);
+
+  //     if (replaceScope === "row" && actualEmpIdx !== selectedRowIndex) {
+  //       continue;
+  //     }
+
+  //     for (const duration of sortedDurations) {
+  //       const uniqueKey = `${duration.monthNo}_${duration.year}`;
+
+  //       if (replaceScope === "column" && uniqueKey !== selectedColumnKey) {
+  //         continue;
+  //       }
+
+  //       if (!isMonthEditable(duration, closedPeriod, planType)) {
+  //         continue;
+  //       }
+
+  //       const currentInputKey = `${actualEmpIdx}_${uniqueKey}`;
+  //       const displayedValue =
+  //         inputValues[currentInputKey] !== undefined
+  //           ? String(inputValues[currentInputKey])
+  //           : String(getMonthAmounts(emp)[uniqueKey]?.value ?? "");
+
+  //       const findValueNormalized = findValue.trim();
+  //       const displayedValueNormalized = displayedValue.trim();
+  //       const isMatch = const isMatch = displayedValueNormalized === findValueNormalized;
+         
+
+  //       if (isMatch) {
+  //         // Only update if the value is actually changing
+  //         if (
+  //           String(displayedValueNormalized) === String(replaceValue.trim())
+  //         ) {
+  //           continue; // skip, no change
+  //         }
+          
+  //         const newNumericValue =
+  //           replaceValue === "" ? 0 : Number(replaceValue);
+
+  //         if (!isNaN(newNumericValue) || replaceValue === "") {
+  //           const forecast = getMonthAmounts(emp)[uniqueKey];
+  //           const originalForecastedAmount = forecast?.forecastedamt ?? 0;
+
+  //           if (
+  //             forecast &&
+  //             forecast.forecastid &&
+  //             newNumericValue !== originalForecastedAmount
+  //           ) {
+  //             updatedInputValues[currentInputKey] = replaceValue;
+  //             replacementsCount++;
+
+  //             const payload = {
+  //               forecastedamt: Number(newNumericValue) || 0,
+  //               forecastid: Number(forecast.forecastid),
+  //               projId: forecast.projId || projectId || "22003.T.0069.00",
+  //               plId: forecast.plId || planId,
+  //               emplId: forecast.emplId || "",
+  //               dctId: forecast.dctId || 0,
+  //               month: forecast.month || duration.monthNo,
+  //               year: forecast.year || duration.year,
+  //               totalBurdenCost: forecast.totalBurdenCost || 0,
+  //               burden: forecast.burden || 0,
+  //               ccffRevenue: forecast.ccffRevenue || 0,
+  //               tnmRevenue: forecast.tnmRevenue || 0,
+  //               cost: forecast.cost || 0,
+  //               fringe: forecast.fringe || 0,
+  //               overhead: forecast.overhead || 0,
+  //               gna: forecast.gna || 0,
+  //               forecastedhours: forecast.forecastedhours || 0,
+  //               updatedat: new Date().toISOString().split("T")[0],
+  //               displayText: forecast.displayText || "",
+  //             };
+  //             updates.push(
+  //               axios
+  //                 .put(
+  //                   "https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount",
+  //                   payload,
+  //                   { headers: { "Content-Type": "application/json" } }
+  //                 )
+  //                 .catch((err) => {
+  //                   console.error(
+  //                     "Failed update for payload:",
+  //                     payload,
+  //                     err?.response?.data || err.message
+  //                   );
+  //                 })
+  //             );
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
+  //   setInputValues(updatedInputValues);
+  //   try {
+  //     await Promise.all(updates);
+  //     setInputValues({ ...updatedInputValues });
+      
+  //     // Update local state
+  //     setEmployees((prev) => {
+  //       const updated = [...prev];
+  //       for (const empIdx in updated) {
+  //         const emp = updated[empIdx];
+  //         for (const duration of sortedDurations) {
+  //           const uniqueKey = `${duration.monthNo}_${duration.year}`;
+  //           const currentInputKey = `${empIdx}_${uniqueKey}`;
+  //           if (updatedInputValues[currentInputKey] !== undefined) {
+  //             if (emp.emple && Array.isArray(emp.emple.plForecasts)) {
+  //               const forecast = emp.emple.plForecasts.find(
+  //                 (f) =>
+  //                   f.month === duration.monthNo && f.year === duration.year
+  //               );
+  //               if (forecast) {
+  //                 forecast.forecastedamt = Number(updatedInputValues[currentInputKey]);
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+  //       return updated;
+  //     });
+      
+  //     if (replacementsCount > 0) {
+  //       toast.success(`Replaced ${replacementsCount} cells.`, {
+  //         autoClose: 2000,
+  //       });
+  //     } else {
+  //       toast.info("No cells replaced.", { autoClose: 2000 });
+  //     }
+  //   } catch (err) {
+  //     toast.error(
+  //       "Failed to replace values: " +
+  //         (err.response?.data?.message || err.message),
+  //       {
+  //         toastId: "replace-error",
+  //         autoClose: 3000,
+  //       }
+  //     );
+  //   } finally {
+  //     // Reset loading state
+  //     setIsLoading(false);
+  //     setShowFindReplace(false);
+  //     setFindValue("");
+  //     setReplaceValue("");
+  //     setSelectedRowIndex(null);
+  //     setSelectedColumnKey(null);
+  //     setReplaceScope("all");
+  //   }
+  // };
+
   const handleFindReplace = async () => {
     if (
       !isEditable ||
@@ -4920,6 +5224,9 @@ const ProjectAmountsTable = ({
       });
       return;
     }
+
+    // Add loading state (remove this line if setIsLoading is not available)
+    setIsLoading(true);
 
     const updates = [];
     const updatedInputValues = { ...inputValues };
@@ -4952,11 +5259,7 @@ const ProjectAmountsTable = ({
 
         const findValueNormalized = findValue.trim();
         const displayedValueNormalized = displayedValue.trim();
-        const isMatch =
-          findValueNormalized === ""
-            ? displayedValueNormalized === "" ||
-              displayedValueNormalized === "0"
-            : displayedValueNormalized === findValueNormalized;
+        const isMatch = displayedValueNormalized === findValueNormalized;
 
         if (isMatch) {
           const newNumericValue =
@@ -4977,7 +5280,7 @@ const ProjectAmountsTable = ({
               const payload = {
                 forecastedamt: Number(newNumericValue) || 0,
                 forecastid: Number(forecast.forecastid),
-                projId: forecast.projId || projectId || "22003.T.0069.00",
+                projId: forecast.projId || projectId,
                 plId: forecast.plId || planId,
                 emplId: forecast.emplId || "",
                 dctId: forecast.dctId || 0,
@@ -4992,16 +5295,23 @@ const ProjectAmountsTable = ({
                 overhead: forecast.overhead || 0,
                 gna: forecast.gna || 0,
                 forecastedhours: forecast.forecastedhours || 0,
-                createdat: forecast.createdat || new Date(0).toISOString(),
                 updatedat: new Date().toISOString().split("T")[0],
                 displayText: forecast.displayText || "",
               };
               updates.push(
-                axios.put(
-                  "https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount",
-                  payload,
-                  { headers: { "Content-Type": "application/json" } }
-                )
+                axios
+                  .put(
+                    "https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount",
+                    payload,
+                    { headers: { "Content-Type": "application/json" } }
+                  )
+                  .catch((err) => {
+                    console.error(
+                      "Failed update for payload:",
+                      payload,
+                      err?.response?.data || err.message
+                    );
+                  })
               );
             }
           }
@@ -5012,15 +5322,40 @@ const ProjectAmountsTable = ({
     setInputValues(updatedInputValues);
     try {
       await Promise.all(updates);
-      setSuccessMessageText(`Replaced ${replacementsCount} cells.`);
-      setShowSuccessMessage(true);
-      toast.success(`Replaced ${replacementsCount} cells successfully!`, {
-        toastId: "find-replace-success",
-        autoClose: 3000,
+      setInputValues({ ...updatedInputValues });
+      
+      // Update local state
+      setEmployees((prev) => {
+        const updated = [...prev];
+        for (const empIdx in updated) {
+          const emp = updated[empIdx];
+          for (const duration of sortedDurations) {
+            const uniqueKey = `${duration.monthNo}_${duration.year}`;
+            const currentInputKey = `${empIdx}_${uniqueKey}`;
+            if (updatedInputValues[currentInputKey] !== undefined) {
+              if (emp.emple && Array.isArray(emp.emple.plForecasts)) {
+                const forecast = emp.emple.plForecasts.find(
+                  (f) =>
+                    f.month === duration.monthNo && f.year === duration.year
+                );
+                if (forecast) {
+                  forecast.forecastedamt = Number(updatedInputValues[currentInputKey]);
+                }
+              }
+            }
+          }
+        }
+        return updated;
       });
+      
+      if (replacementsCount > 0) {
+        toast.success(`Replaced ${replacementsCount} cells.`, {
+          autoClose: 2000,
+        });
+      } else {
+        toast.info("No cells replaced.", { autoClose: 2000 });
+      }
     } catch (err) {
-      setSuccessMessageText("Failed to replace some values.");
-      setShowSuccessMessage(true);
       toast.error(
         "Failed to replace values: " +
           (err.response?.data?.message || err.message),
@@ -5030,6 +5365,8 @@ const ProjectAmountsTable = ({
         }
       );
     } finally {
+      // Reset loading state (remove this line if setIsLoading is not available)
+      // setIsLoading(false);
       setShowFindReplace(false);
       setFindValue("");
       setReplaceValue("");
@@ -5086,7 +5423,7 @@ const ProjectAmountsTable = ({
 
   return (
     <div className="relative p-4 font-inter w-full synchronized-tables-outer">
-      <h2 className="text-xs font-semibold mb-3 text-gray-800">Amounts</h2>
+      {/* <h2 className="text-xs font-semibold mb-3 text-gray-800">Amounts</h2> */}
       <div className="w-full flex justify-between mb-4 gap-2">
         <div className="flex-grow"></div>
         <div className="flex gap-2">
@@ -5858,7 +6195,7 @@ const ProjectAmountsTable = ({
               <button
                 type="button"
                 onClick={handleFindReplace}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs cursor-pointer"
               >
                 Replace All
               </button>
