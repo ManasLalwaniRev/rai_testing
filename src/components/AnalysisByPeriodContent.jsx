@@ -2697,7 +2697,7 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
   const [expandedNonLaborAcctRows, setExpandedNonLaborAcctRows] = useState([]); // State for non-labor account expansion
   const [financialData, setFinancialData] = useState([]);
 
-  const [allApiData, setAllApiData] = useState(null);
+  const [allApiData, setAllApiData] = useState(null); // This will now hold the fiscalYear-filtered data
   const [dynamicDateRanges, setDynamicDateRanges] = useState([]);
 
   const [selectedOrgId, setSelectedOrgId] = useState('');
@@ -2718,23 +2718,23 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
   };
 
   /**
-   * Transforms the raw API response into the FinancialRow structure expected by the frontend.
-   * This function filters the provided apiResponse based on currentOrgId and selectedFiscalYear.
+   * Transforms the raw API response (which is now pre-filtered by fiscal year)
+   * into the FinancialRow structure expected by the frontend.
+   * This function filters the provided apiResponse based on currentOrgId.
    * It also dynamically calculates profit based on the selected revenue view.
    */
   const transformApiDataToFinancialRows = useCallback((
-    apiResponse,
+    apiResponse, // This apiResponse is now the pre-filtered allApiData
     currentOrgId,
     dynamicDateRanges,
     selectedRevenueView,
-    planType, // Added planType here
-    selectedFiscalYear // Added selectedFiscalYear here
+    planType // Added planType here
+    // selectedFiscalYear is implicitly handled by apiResponse being pre-filtered
   ) => {
-    console.log("transformApiDataToFinancialRows: apiResponse (full data)", apiResponse);
+    console.log("transformApiDataToFinancialRows: apiResponse (already fiscalYear-filtered)", apiResponse);
     console.log("transformApiDataToFinancialRows: currentOrgId", currentOrgId);
     console.log("transformApiDataToFinancialRows: dynamicDateRanges (columns)", dynamicDateRanges);
     console.log("transformApiDataToFinancialRows: planType", planType);
-    console.log("transformApiDataToFinancialRows: selectedFiscalYear (for filtering)", selectedFiscalYear);
 
 
     const financialRows = [];
@@ -2771,16 +2771,12 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
     const uniqueEmployeesMap = new Map();
     const nonLaborAcctDetailsMap = new Map(); // Map to group non-labor details by account ID and then by month
 
-    // Filter employee summaries based on orgId AND fiscal year at this stage
+    // Filter employee summaries based on orgId (fiscal year already handled by parent useEffect)
     const filteredEmployeeSummaries = (apiResponse.employeeForecastSummary || []).filter(empSummary => {
       const isOrgMatch = currentOrgId ? empSummary.orgID === currentOrgId : true;
-      const isFiscalYearMatch = selectedFiscalYear ?
-        (empSummary.emplSchedule?.payrollSalary?.some(salaryEntry =>
-          String(salaryEntry.year) === selectedFiscalYear
-        )) : true;
-      return isOrgMatch && isFiscalYearMatch;
+      return isOrgMatch;
     });
-    console.log("transformApiDataToFinancialRows: filteredEmployeeSummaries (after org and fiscal year filter)", filteredEmployeeSummaries);
+    console.log("transformApiDataToFinancialRows: filteredEmployeeSummaries (after org filter, fiscal year already applied)", filteredEmployeeSummaries);
 
 
     if (filteredEmployeeSummaries.length > 0) {
@@ -2804,12 +2800,7 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
 
         if (empSummary.emplSchedule && Array.isArray(empSummary.emplSchedule.payrollSalary)) {
           empSummary.emplSchedule.payrollSalary.forEach(salaryEntry => {
-            // Explicitly filter by fiscal year here for each individual salary entry
-            if (selectedFiscalYear && String(salaryEntry.year) !== selectedFiscalYear) {
-              console.log(`  Skipping employee salaryEntry for year ${salaryEntry.year} as it does not match selectedFiscalYear ${selectedFiscalYear}`);
-              return;
-            }
-
+            // No need for fiscalYear check here, as data is already pre-filtered
             const monthRange = getMonthRangeKey(salaryEntry.month, salaryEntry.year);
 
             if (monthRange) {
@@ -2848,19 +2839,16 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
       return acc;
     }, {});
 
-    // Combine direct and indirect costs, filtering by orgId AND fiscal year here
+    // Filter non-labor summaries based on orgId (fiscal year already handled by parent useEffect)
     const allNonLaborSummariesFiltered = [
       ...(apiResponse.directCOstForecastSummary || []),
       ...(apiResponse.indirectCostForecastSummary || [])
     ].filter(nonLaborSummary => {
       const isOrgMatch = currentOrgId ? nonLaborSummary.orgID === currentOrgId : true;
-      const isFiscalYearMatch = selectedFiscalYear ?
-        ((nonLaborSummary.directCostSchedule?.forecasts?.some(f => String(f.year) === selectedFiscalYear)) ||
-         (nonLaborSummary.indirectCostSchedule?.forecasts?.some(f => String(f.year) === selectedFiscalYear))) : true;
-      return isOrgMatch && isFiscalYearMatch;
+      return isOrgMatch;
     });
 
-    console.log("transformApiDataToFinancialRows: allNonLaborSummariesFiltered (after org and fiscal year filter)", allNonLaborSummariesFiltered);
+    console.log("transformApiDataToFinancialRows: allNonLaborSummariesFiltered (after org filter, fiscal year already applied)", allNonLaborSummariesFiltered);
 
 
     allNonLaborSummariesFiltered.forEach(nonLaborSummary => { // Use the already filtered list
@@ -2904,12 +2892,7 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
 
 
         schedules.forEach(scheduleEntry => {
-            // Explicitly filter by fiscal year here as well, in case the outer filter was not sufficient
-            if (selectedFiscalYear && String(scheduleEntry.year) !== selectedFiscalYear) {
-                console.log(`  Skipping non-labor scheduleEntry for year ${scheduleEntry.year} as it does not match selectedFiscalYear ${selectedFiscalYear}`);
-                return;
-            }
-
+            // No need for fiscalYear check here, as data is already pre-filtered
             const monthRange = getMonthRangeKey(scheduleEntry.month, scheduleEntry.year);
             if (monthRange) {
                 let entryCost = 0;
@@ -3111,65 +3094,99 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
     }
 
     try {
-      console.log("useEffect: Processing initialApiData...");
+      console.log("useEffect: Processing initialApiData for deep fiscal year filtering...");
       
-      const filteredApiData = { ...initialApiData };
+      const processedApiData = { ...initialApiData }; // Start with a copy
 
-      // Filter employee summaries based on fiscalYear
-      const employeeSummariesFiltered = (initialApiData.employeeForecastSummary || []).filter(empSummary => {
-        if (!fiscalYear || fiscalYear === "All") return true; // If no fiscal year selected or "All", include all
-        return empSummary.emplSchedule?.payrollSalary?.some(salaryEntry =>
-          String(salaryEntry.year) === fiscalYear
-        );
-      });
-      filteredApiData.employeeForecastSummary = employeeSummariesFiltered;
-      console.log("useEffect: employeeForecastSummary after fiscalYear filter:", employeeSummariesFiltered);
+      // Filter employee summaries and their internal payrollSalary
+      processedApiData.employeeForecastSummary = (initialApiData.employeeForecastSummary || [])
+        .map(empSummary => {
+          const filteredPayrollSalary = (empSummary.emplSchedule?.payrollSalary || []).filter(salaryEntry => {
+            return !fiscalYear || fiscalYear === "All" || String(salaryEntry.year) === fiscalYear;
+          });
 
-      // Filter non-labor summaries based on fiscalYear
-      const directCostSummariesFiltered = (initialApiData.directCOstForecastSummary || []).filter(nonLaborSummary => {
-        if (!fiscalYear || fiscalYear === "All") return true;
-        return nonLaborSummary.directCostSchedule?.forecasts?.some(f => String(f.year) === fiscalYear);
-      });
-      filteredApiData.directCOstForecastSummary = directCostSummariesFiltered;
-      console.log("useEffect: directCOstForecastSummary after fiscalYear filter:", directCostSummariesFiltered);
+          if (filteredPayrollSalary.length > 0) {
+            return {
+              ...empSummary,
+              emplSchedule: {
+                ...empSummary.emplSchedule,
+                payrollSalary: filteredPayrollSalary,
+              },
+            };
+          }
+          return null; // Mark for removal if no relevant data
+        })
+        .filter(Boolean); // Remove null entries
 
-      const indirectCostSummariesFiltered = (initialApiData.indirectCostForecastSummary || []).filter(nonLaborSummary => {
-        if (!fiscalYear || fiscalYear === "All") return true;
-        return nonLaborSummary.indirectCostSchedule?.forecasts?.some(f => String(f.year) === fiscalYear);
-      });
-      filteredApiData.indirectCostForecastSummary = indirectCostSummariesFiltered;
-      console.log("useEffect: indirectCostSummariesFiltered after fiscalYear filter:", indirectCostSummariesFiltered);
+      console.log("useEffect: employeeForecastSummary after deep fiscalYear filter:", processedApiData.employeeForecastSummary);
+
+      // Filter direct cost summaries and their internal forecasts
+      processedApiData.directCOstForecastSummary = (initialApiData.directCOstForecastSummary || [])
+        .map(nonLaborSummary => {
+          const filteredForecasts = (nonLaborSummary.directCostSchedule?.forecasts || []).filter(f => {
+            return !fiscalYear || fiscalYear === "All" || String(f.year) === fiscalYear;
+          });
+          if (filteredForecasts.length > 0) {
+            return {
+              ...nonLaborSummary,
+              directCostSchedule: {
+                ...nonLaborSummary.directCostSchedule,
+                forecasts: filteredForecasts,
+              },
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+      console.log("useEffect: directCOstForecastSummary after deep fiscalYear filter:", processedApiData.directCOstForecastSummary);
+
+      // Filter indirect cost summaries and their internal forecasts
+      processedApiData.indirectCostForecastSummary = (initialApiData.indirectCostForecastSummary || [])
+        .map(nonLaborSummary => {
+          const filteredForecasts = (nonLaborSummary.indirectCostSchedule?.forecasts || []).filter(f => {
+            return !fiscalYear || fiscalYear === "All" || String(f.year) === fiscalYear;
+          });
+          if (filteredForecasts.length > 0) {
+            return {
+              ...nonLaborSummary,
+              indirectCostSchedule: {
+                ...nonLaborSummary.indirectCostSchedule,
+                forecasts: filteredForecasts,
+              },
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+      console.log("useEffect: indirectCostSummariesFiltered after deep fiscalYear filter:", processedApiData.indirectCostForecastSummary);
 
 
-      setAllApiData(filteredApiData); // Set the filtered data to allApiData
+      setAllApiData(processedApiData); // Set the fiscalYear-filtered data to allApiData
 
       const uniqueOrgIds = new Set();
       const uniqueDateRangesSet = new Set();
 
-      // Collect org IDs and date ranges from the NOW FILTERED employee data
-      (filteredApiData.employeeForecastSummary || []).forEach(summary => {
+      // Collect org IDs and date ranges from the NOW FULLY FILTERED employee data
+      (processedApiData.employeeForecastSummary || []).forEach(summary => {
         uniqueOrgIds.add(summary.orgID);
         summary.emplSchedule?.payrollSalary?.forEach(salaryEntry => {
-          // This check is now redundant but harmless as data is already filtered
           const monthRangeKey = getMonthRangeKey(salaryEntry.month, salaryEntry.year);
           uniqueDateRangesSet.add(monthRangeKey);
         });
       });
 
-      // Collect org IDs and date ranges from the NOW FILTERED non-labor data
-      (filteredApiData.directCOstForecastSummary || []).forEach(nonLaborSummary => {
+      // Collect org IDs and date ranges from the NOW FULLY FILTERED non-labor data
+      (processedApiData.directCOstForecastSummary || []).forEach(nonLaborSummary => {
         uniqueOrgIds.add(nonLaborSummary.orgID);
         nonLaborSummary.directCostSchedule?.forecasts?.forEach(scheduleEntry => {
-          // This check is now redundant but harmless as data is already filtered
           const monthRangeKey = getMonthRangeKey(scheduleEntry.month, scheduleEntry.year);
           uniqueDateRangesSet.add(monthRangeKey);
         });
       });
 
-      (filteredApiData.indirectCostForecastSummary || []).forEach(nonLaborSummary => {
+      (processedApiData.indirectCostForecastSummary || []).forEach(nonLaborSummary => {
         uniqueOrgIds.add(nonLaborSummary.orgID);
         nonLaborSummary.indirectCostSchedule?.forecasts?.forEach(scheduleEntry => {
-          // This check is now redundant but harmless as data is already filtered
           const monthRangeKey = getMonthRangeKey(scheduleEntry.month, scheduleEntry.year);
           uniqueDateRangesSet.add(monthRangeKey);
         });
@@ -3220,12 +3237,11 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
     if (allApiData && selectedOrgId && dynamicDateRanges.length > 0) {
       console.log("useEffect (transform trigger): allApiData, selectedOrgId, dynamicDateRanges are ready. Transforming data...");
       const transformedData = transformApiDataToFinancialRows(
-        allApiData, // allApiData is now pre-filtered
+        allApiData, // allApiData is now pre-filtered by fiscal year
         selectedOrgId,
         dynamicDateRanges,
         selectedRevenueView,
-        type, // Pass the 'type' prop (which is plType)
-        fiscalYear // Pass the fiscalYear to the transformation function
+        type // Pass the 'type' prop (which is plType)
       );
       console.log("Transformed Data (after filter & transform):", transformedData);
       setFinancialData(transformedData);
@@ -3236,7 +3252,7 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
     setExpandedStaffRows([]);
     setExpandedEmployeeDetails([]);
     setExpandedNonLaborAcctRows([]); // Reset non-labor expansions
-  }, [allApiData, selectedOrgId, dynamicDateRanges, selectedRevenueView, transformApiDataToFinancialRows, type, fiscalYear]); // Add 'type' and 'fiscalYear' to dependencies
+  }, [allApiData, selectedOrgId, dynamicDateRanges, selectedRevenueView, transformApiDataToFinancialRows, type]); // Removed fiscalYear from dependencies as it's handled by allApiData now
 
   const toggleStaffRow = (id) => {
     setExpandedStaffRows(prev =>
