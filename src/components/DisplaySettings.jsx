@@ -185,7 +185,7 @@ const DisplaySettingsContent = () => {
       {/* Changed max-w-5xl to w-full px-8 for wider display */}
       <div className="w-full px-8 bg-white rounded-xl shadow-lg p-8 space-y-6 border border-gray-300">
         {/* Changed text-center to text-left */}
-        <h2 className="text-3xl font-bold text-left mb-6">Display Settings</h2>
+        <h2 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Display Settings</h2>
         {/* Added bg-gray-50, p-4, rounded-lg, border, and border-gray-300 to the grid container */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 bg-gray-50 p-4 rounded-lg border border-gray-300">
           {/* Left Column Fields */}

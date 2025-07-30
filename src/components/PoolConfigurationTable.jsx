@@ -9,7 +9,9 @@ const PoolConfigurationTable = () => {
   const [groupCodes, setGroupCodes] = useState([]);
   const [groupNames, setGroupNames] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,33 +52,48 @@ const PoolConfigurationTable = () => {
     fetchData();
   }, []);
 
-  const handleCheckboxChange = (rowIndex, groupCode) => {
-    setTableData(prev => {
-      const newData = [...prev];
-      newData[rowIndex] = {
-        ...newData[rowIndex],
-        [groupCode]: !newData[rowIndex][groupCode],
-      };
-      return newData;
-    });
+  const handleCheckboxChange = (orgId, acctId, groupCode) => {
+    setTableData(prev =>
+      prev.map(row => {
+        if (row.orgId === orgId && row.acctId === acctId) {
+          return {
+            ...row,
+            [groupCode]: !row[groupCode],
+          };
+        }
+        return row;
+      })
+    );
   };
 
   const handleSave = async () => {
-    const requestBody = tableData.map(row => ({
-      orgId: row.orgId,
-      acctId: row.acctId,
-      ...groupCodes.reduce((acc, code) => {
-        acc[code] = row[code] || false;
-        return acc;
-      }, {}),
-    }));
+    const changedRows = tableData
+      .filter(row => {
+        const origRow = originalTableData.find(o => o.orgId === row.orgId && o.acctId === row.acctId);
+        if (!origRow) return false;
+        return groupCodes.some(code => row[code] !== origRow[code]);
+      })
+      .map(row => ({
+        orgId: row.orgId,
+        acctId: row.acctId,
+        ...groupCodes.reduce((acc, code) => {
+          acc[code] = row[code] || false;
+          return acc;
+        }, {}),
+      }));
 
-    console.log("Sending POST request with body:", JSON.stringify(requestBody, null, 2));
+    if (changedRows.length === 0) {
+      toast.info("No changes to save.");
+      return;
+    }
 
+    console.log("Sending POST request with body:", JSON.stringify(changedRows, null, 2));
+
+    setIsSaving(true);
     try {
       const response = await axios.post(
         "https://test-api-3tmq.onrender.com/Orgnization/BulkUpSertOrgAccountPoolMapping",
-        requestBody,
+        changedRows,
         {
           headers: {
             "Content-Type": "application/json",
@@ -94,6 +111,8 @@ const PoolConfigurationTable = () => {
       setTableData([...originalTableData]);
       setTimeout(() => setError(null), 5000);
       toast.error(errorMessage);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -114,65 +133,95 @@ const PoolConfigurationTable = () => {
     );
   }
 
+  const filteredData = tableData.filter(row =>
+    row.acctId.toString().toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="p-4 sm:p-5 max-w-6xl mx-auto font-roboto bg-gray-50 rounded-xl shadow-md">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick />
-      <h2 className="text-2xl font-semibold text-gray-900 mb-3 bg-blue-50 py-2 px-4 rounded-lg">Pool Configuration</h2>
-      <div className="mb-3">
+      <h2 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Pool Configuration</h2>
+      <div className="flex justify-between mb-3 items-center">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="Search by Account ID"
+          className="border border-gray-300 rounded-md py-1 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+        />
         <button
           onClick={handleSave}
-          className="bg-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-sm shadow-sm transition-all duration-200"
+          disabled={isSaving}
+          className="bg-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-sm shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save
+          {isSaving ? (
+            <>
+              <div className="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+              Saving...
+            </>
+          ) : (
+            "Save"
+          )}
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-200 bg-white rounded-lg overflow-hidden shadow-sm">
-          <thead className="bg-blue-50">
-            <tr className="border-b border-gray-200">
-              <th className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200">
-                Org ID
-              </th>
-              <th className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200">
-                Account ID
-              </th>
-              {groupCodes.map((code, index) => (
-                <th
-                  key={index}
-                  className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200"
-                >
-                  {groupNames[code] || code}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((row, index) => (
-              <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                <td className="py-2 px-3 text-gray-600 text-xs font-medium whitespace-nowrap border-r border-gray-200">
-                  {row.orgId}
-                </td>
-                <td className="py-2 px-3 text-gray-600 text-xs font-medium whitespace-nowrap border-r border-gray-200">
-                  {row.acctId}
-                </td>
-                {groupCodes.map((code, idx) => (
-                  <td key={idx} className="py-2 px-3 border-r border-gray-200">
-                    <input
-                      type="checkbox"
-                      checked={row[code] === true}
-                      onChange={() => handleCheckboxChange(index, code)}
-                      className="h-4 w-4 text-blue-600 border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:ring-opacity-50 shadow-sm"
-                    />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+    
+      <div style={{ 
+  maxHeight: '500px', 
+  overflowY: 'auto', 
+  position: 'relative',
+  border: '1px solid #e5e7eb', // Optional: adds a border around the scrollable area
+  borderRadius: '0.5rem' // Matches your rounded corners
+}}>
+  <table className="min-w-full bg-white">
+    <thead className="bg-blue-50" style={{
+      position: 'sticky',
+      top: 0,
+      zIndex: 10,
+      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' // Optional: adds shadow below sticky header
+    }}>
+      <tr className="border-b border-gray-200">
+        <th className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200">
+          Org ID
+        </th>
+        <th className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200">
+          Account ID
+        </th>
+        {groupCodes.map((code, index) => (
+          <th
+            key={index}
+            className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200"
+          >
+            {groupNames[code] || code}
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {filteredData.map((row, index) => (
+        <tr key={`${row.orgId}-${row.acctId}`} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+          <td className="py-2 px-3 text-gray-600 text-xs font-medium whitespace-nowrap border-r border-gray-200">
+            {row.orgId}
+          </td>
+          <td className="py-2 px-3 text-gray-600 text-xs font-medium whitespace-nowrap border-r border-gray-200">
+            {row.acctId}
+          </td>
+          {groupCodes.map((code, idx) => (
+            <td key={idx} className="py-2 px-3 border-r border-gray-200">
+              <input
+                type="checkbox"
+                checked={row[code] === true}
+                onChange={() => handleCheckboxChange(row.orgId, row.acctId, code)}
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:ring-opacity-50 shadow-sm"
+              />
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
     </div>
   );
 };
 
 export default PoolConfigurationTable;
-

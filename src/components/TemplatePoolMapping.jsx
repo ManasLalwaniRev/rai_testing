@@ -151,7 +151,7 @@ const TemplatePoolMapping = () => {
   return (
     <div className="p-4 sm:p-6 max-w-4xl mx-auto min-h-screen font">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick />
-      <h1 className="text-2xl font-semibold text-gray-900 mb-4 sm:mb-6 bg-blue-50 py-2 px-4 rounded-lg">Template Pool Mapping</h1>
+      <h1 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Template Pool Mapping</h1>
       {loading && <p className="text-gray-600 text-sm">Loading...</p>}
       {isSaving && <p className="text-gray-600 text-sm">Saving...</p>}
       {error && <p className="text-red-600 text-sm mb-4">Error: {error}</p>}

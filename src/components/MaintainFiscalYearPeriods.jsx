@@ -116,11 +116,11 @@ const MaintainFiscalYearPeriods = () => {
       {/* Adjusted max-w-7xl to w-full px-8 for wider display within its parent */}
       <div className="w-full px-8 bg-white rounded-xl shadow-lg p-8 space-y-6 border border-gray-300">
         {/* Header with Save Button */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-900">Maintain Fiscal Year Periods</h2>
+        <div className="flex justify-between items-center gap-3 mb-6">
+          <h2 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Maintain Fiscal Year Periods</h2>
           <button
             onClick={handleSaveSettings}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 -mt-3 transition-colors duration-200"
           >
             Save
           </button>

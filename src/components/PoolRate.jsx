@@ -403,7 +403,7 @@ const PoolRate = ({ userName = 'User' }) => {
     <ErrorBoundary>
       <div className="p-4 max-w-6xl mx-auto font-roboto">
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick />
-        <h1 className="text-2xl font-semibold text-gray-900 mb-2 bg-blue-50 py-2 px-4 rounded-lg">Pool Rate</h1>
+        <h1 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Pool Rate</h1>
         {loading && <p className="text-gray-600 text-sm mb-2">Loading...</p>}
         {isSaving && <p className="text-gray-600 text-sm mb-2">Saving...</p>}
         {error && <p className="text-red-600 text-sm mb-2">Error: {error}</p>}

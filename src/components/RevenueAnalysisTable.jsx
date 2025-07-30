@@ -2965,12 +2965,12 @@ const RevenueAnalysisPage = ({ onCancel, planId, templateId, type, projId, budVe
   return (
     <div className="min-h-full bg-gradient-to-br from-blue-200 via-blue-100 to-indigo-50 p-8 text-gray-800 font-inter">
       {/* Header Section */}
-      <div className={`mb-6 p-6 ${getGlassmorphismClasses()}`}> {/* Applied glassmorphism here */}
-        <h1 className="text-xl font-semibold text-gray-900">Project Budgets / EACs {'>'} Revenue Analysis</h1>
+      {/* <div className={`mb-6 p-6 ${getGlassmorphismClasses()}`}> Applied glassmorphism here */}
+        {/* <h1 className="text-xl font-semibold text-gray-900">Project Budgets / EACs {'>'} Revenue Analysis</h1>
         <p className="text-sm text-gray-700 mt-2">
           Project ID: {currentProjIdDisplay} Type: BUD Version: {currentBudVersion} Status: {currentStatus} Period of Performance: {currentPeriodOfPerformance}
-        </p>
-      </div>
+        </p> */}
+      {/* </div> */}
 
       {/* Control Buttons including Cancel and At Risk Amount */}
       <div className="mb-4 flex gap-4 items-center">

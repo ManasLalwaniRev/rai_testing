@@ -361,11 +361,11 @@ const AnnualHolidaysPage = () => {
     <div className="min-h-screen bg-gray-100 text-gray-900 flex items-center justify-center p-4">
       {/* Adjusted max-w-7xl to w-full px-8 for wider display within its parent */}
       <div className="w-full px-8 bg-white rounded-xl shadow-lg p-8 space-y-6 border border-gray-300">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-gray-900">Setup Annual Holidays</h2>
+        <div className="flex justify-between items-center gap-2 mb-6">
+          <h2 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Setup Annual Holidays</h2>
           <button
             onClick={handleSaveCriteria}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-5 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+            className="bg-blue-600 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-xs py-1.5 px-3 -mt-4 shadow-sm hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save Criteria
           </button>

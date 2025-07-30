@@ -1850,7 +1850,7 @@ const LaborForm = () => {
     <div className="min-h-screen bg-gray-100 text-gray-900 flex items-center justify-center p-4">
       {/* Retained w-full px-8 for wider display within its parent */}
       <div className="w-full px-8 bg-white rounded-xl shadow-lg p-8 space-y-6 border border-gray-300">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">Global Configuration</h2>
+        <h2 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Global Configuration</h2>
 
         {/* Tab Navigation */}
         <div className="flex border-b border-gray-200 mb-6">

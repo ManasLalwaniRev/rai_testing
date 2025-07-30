@@ -137,11 +137,11 @@ const Template = ({ updatedBy = "User" }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2 bg-blue-50 py-2 px-4 rounded-lg">Templates</h2>
+      <div className="flex justify-between items-center gap-2 mb-4">
+        <h2 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Templates</h2>
         <button
           onClick={() => setIsFormOpen(!isFormOpen)}
-          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition ease-in-out duration-200"
+          className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 -mt-3 rounded-md hover:bg-blue-700 transition ease-in-out duration-200"
           disabled={isSubmitting}
         >
           <Plus className="w-5 h-5" />
