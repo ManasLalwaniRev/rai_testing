@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const PoolConfigurationTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -12,49 +12,67 @@ const PoolConfigurationTable = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [fiscalYear, setFiscalYear] = useState(new Date().getFullYear());
+
+  
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 16 }, (_, i) => currentYear - 5 + i);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const groupResponse = await axios.get("https://test-api-3tmq.onrender.com/Orgnization/GetAllPools");
-        console.log("Group codes API response:", groupResponse.data);
-        const codes = groupResponse.data.map(item => item.code);
-        const names = groupResponse.data.reduce((acc, item) => {
-          acc[item.code] = item.name;
-          return acc;
-        }, {});
-        setGroupCodes(codes);
-        setGroupNames(names);
+  
+  const fetchData = async () => {
+  setLoading(true);
+  try {
+    // Call GetAllPools without fiscalYear parameter
+    const groupResponse = await axios.get(
+      "https://test-api-3tmq.onrender.com/Orgnization/GetAllPools"
+    );
+    console.log("Group codes API response:", groupResponse.data);
 
-        const tableResponse = await axios.get("https://test-api-3tmq.onrender.com/Orgnization/GetAccountPools");
-        console.log("Table data API response:", tableResponse.data);
-        const tableDataRaw = tableResponse.data;
+    const codes = groupResponse.data.map((item) => item.code);
+    const names = groupResponse.data.reduce((acc, item) => {
+      acc[item.code] = item.name;
+      return acc;
+    }, {});
+    setGroupCodes(codes);
+    setGroupNames(names);
 
-        const mappedData = tableDataRaw.map(row => {
-          const mappedRow = { orgId: row.orgId || "", acctId: row.acctId || "" };
-          codes.forEach(code => {
-            mappedRow[code] = row[code.toUpperCase()] === true;
-          });
-          return mappedRow;
-        });
+    // Call GetAccountPools with fiscalYear parameter
+    const tableResponse = await axios.get(
+      `https://test-api-3tmq.onrender.com/Orgnization/GetAccountPools?Year=${fiscalYear}`
+    );
+    console.log("Table data API response:", tableResponse.data);
+    const tableDataRaw = tableResponse.data;
 
-        setTableData(mappedData);
-        setOriginalTableData(mappedData);
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError(err.response?.data?.message || err.message || "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    };
+    const mappedData = tableDataRaw.map((row) => {
+      const mappedRow = { orgId: row.orgId || "", acctId: row.acctId || "" };
+      codes.forEach((code) => {
+        mappedRow[code] = row[code.toUpperCase()] === true;
+      });
+      return mappedRow;
+    });
+
+    setTableData(mappedData);
+    setOriginalTableData(mappedData);
+    setError(null);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError(err.response?.data?.message || err.message || "Unknown error");
+    setTableData([]);
+    setOriginalTableData([]);
+    setGroupCodes([]);
+    setGroupNames({});
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchData();
-  }, []);
+  }, [fiscalYear]);
 
   const handleCheckboxChange = (orgId, acctId, groupCode) => {
-    setTableData(prev =>
-      prev.map(row => {
+    setTableData((prev) =>
+      prev.map((row) => {
         if (row.orgId === orgId && row.acctId === acctId) {
           return {
             ...row,
@@ -68,12 +86,14 @@ const PoolConfigurationTable = () => {
 
   const handleSave = async () => {
     const changedRows = tableData
-      .filter(row => {
-        const origRow = originalTableData.find(o => o.orgId === row.orgId && o.acctId === row.acctId);
+      .filter((row) => {
+        const origRow = originalTableData.find(
+          (o) => o.orgId === row.orgId && o.acctId === row.acctId
+        );
         if (!origRow) return false;
-        return groupCodes.some(code => row[code] !== origRow[code]);
+        return groupCodes.some((code) => row[code] !== origRow[code]);
       })
-      .map(row => ({
+      .map((row) => ({
         orgId: row.orgId,
         acctId: row.acctId,
         ...groupCodes.reduce((acc, code) => {
@@ -106,7 +126,8 @@ const PoolConfigurationTable = () => {
       toast.success("Data saved successfully");
     } catch (err) {
       console.error("API Error:", err);
-      const errorMessage = err.response?.data?.message || err.message || "Failed to update pool mapping";
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to update pool mapping";
       setError(errorMessage);
       setTableData([...originalTableData]);
       setTimeout(() => setError(null), 5000);
@@ -133,95 +154,139 @@ const PoolConfigurationTable = () => {
     );
   }
 
-  const filteredData = tableData.filter(row =>
+  const filteredData = tableData.filter((row) =>
     row.acctId.toString().toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="p-4 sm:p-5 max-w-6xl mx-auto font-roboto bg-gray-50 rounded-xl shadow-md">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick />
-      <h2 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Pool Configuration</h2>
-      <div className="flex justify-between mb-3 items-center">
+
+      <h2 className="w-full bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">
+        Pool Configuration
+      </h2>
+
+      {/* Fiscal Year Dropdown */}
+      <div className="flex items-center gap-4 mb-3">
+        <label htmlFor="fiscalYear" className="font-medium text-gray-700 text-sm">
+          Fiscal Year:
+        </label>
+        <select
+          id="fiscalYear"
+          value={fiscalYear}
+          onChange={(e) => setFiscalYear(parseInt(e.target.value))}
+          className="border border-gray-300 rounded-md py-1 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+        >
+          {years.map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+
+        {/* Spacer */}
+        <div className="flex-grow"></div>
+
+        {/* Search Box */}
         <input
           type="text"
           value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search by Account ID"
           className="border border-gray-300 rounded-md py-1 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
         />
+
+        {/* Save Button */}
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-sm shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="ml-3 bg-blue-600 hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-sm shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSaving ? (
             <>
-              <div className="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
-              Saving...
+              <div className="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>Saving...
             </>
           ) : (
             "Save"
           )}
         </button>
       </div>
-    
-      <div style={{ 
-  maxHeight: '500px', 
-  overflowY: 'auto', 
-  position: 'relative',
-  border: '1px solid #e5e7eb', // Optional: adds a border around the scrollable area
-  borderRadius: '0.5rem' // Matches your rounded corners
-}}>
-  <table className="min-w-full bg-white">
-    <thead className="bg-blue-50" style={{
-      position: 'sticky',
-      top: 0,
-      zIndex: 10,
-      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' // Optional: adds shadow below sticky header
-    }}>
-      <tr className="border-b border-gray-200">
-        <th className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200">
-          Org ID
-        </th>
-        <th className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200">
-          Account ID
-        </th>
-        {groupCodes.map((code, index) => (
-          <th
-            key={index}
-            className="py-2 px-3 text-left text-gray-800 font-semibold text-sm whitespace-nowrap border-r border-gray-200"
+
+      <div
+        style={{
+          maxHeight: "500px",
+          overflowY: "auto",
+          position: "relative",
+          border: "1px solid #e5e7eb",
+          borderRadius: "0.5rem",
+        }}
+      >
+        <table className="min-w-full bg-white">
+          <thead
+            className="bg-blue-50"
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 10,
+              boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+            }}
           >
-            {groupNames[code] || code}
-          </th>
-        ))}
-      </tr>
-    </thead>
-    <tbody>
-      {filteredData.map((row, index) => (
-        <tr key={`${row.orgId}-${row.acctId}`} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-          <td className="py-2 px-3 text-gray-600 text-xs font-medium whitespace-nowrap border-r border-gray-200">
-            {row.orgId}
-          </td>
-          <td className="py-2 px-3 text-gray-600 text-xs font-medium whitespace-nowrap border-r border-gray-200">
-            {row.acctId}
-          </td>
-          {groupCodes.map((code, idx) => (
-            <td key={idx} className="py-2 px-3 border-r border-gray-200">
-              <input
-                type="checkbox"
-                checked={row[code] === true}
-                onChange={() => handleCheckboxChange(row.orgId, row.acctId, code)}
-                className="h-4 w-4 text-blue-600 border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:ring-opacity-50 shadow-sm"
-              />
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+            <tr className="border-b border-gray-200">
+              <th className="py-2 px-3 text-left text-gray-800 font-normal text-xs whitespace-nowrap border-r border-gray-200">
+                Org ID
+              </th>
+              <th className="py-2 px-3 text-left text-gray-800 font-normal text-xs whitespace-nowrap border-r border-gray-200">
+                Account ID
+              </th>
+              {groupCodes.map((code, index) => (
+                <th
+                  key={index}
+                  className="py-2 px-3 text-left text-gray-800 font-normal text-xs whitespace-nowrap border-r border-gray-200"
+                >
+                  {groupNames[code] || code}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredData.map((row) => (
+              <tr
+                key={`${row.orgId}-${row.acctId}`}
+                className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              >
+                <td className="py-2 px-3 text-gray-600 text-xs font-xs whitespace-nowrap border-r border-gray-200">
+                  {row.orgId}
+                </td>
+                <td className="py-2 px-3 text-gray-600 text-xs font-xs whitespace-nowrap border-r border-gray-200">
+                  {row.acctId}
+                </td>
+                {groupCodes.map((code, idx) => (
+                  // <td key={idx} className="py-2 px-3 border-r border-gray-200">
+                  //   <input
+                  //     type="checkbox"
+                  //     checked={row[code] === true}
+                  //     onChange={() => handleCheckboxChange(row.orgId, row.acctId, code)}
+                  //     className="h-4 w-4 text-blue-600 border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:ring-opacity-50 shadow-sm"
+                  //   />
+                  // </td>
+                  <td key={idx} className="py-2 px-3 border-r border-gray-200 text-center align-middle">
+  <input
+    type="checkbox"
+    checked={row[code] === true}
+    onChange={() => handleCheckboxChange(row.orgId, row.acctId, code)}
+    className="h-3 w-3 text-blue-600 border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:ring-opacity-50 shadow-sm"
+  />
+</td>
+
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
 export default PoolConfigurationTable;
+

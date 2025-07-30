@@ -150,41 +150,11 @@ const RevenueSetupComponent = ({ selectedPlan, revenueAccount }) => {
       });
   };
 
-  const projectDetails = selectedPlan ? (
-    <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">
 
-                  <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
-
-                    <span>
-                    <span className="font-semibold">Project ID: </span>
-                    {selectedPlan.projId}
-                  </span>
-                  <span>
-                    <span className="font-semibold">Type: </span>
-                    {selectedPlan.plType || "N/A"}
-                  </span>
-                  <span>
-                    <span className="font-semibold">Version: </span>
-                    {selectedPlan.version || "N/A"}
-                  </span>
-                  <span>
-                    <span className="font-semibold">Status: </span>
-                    {selectedPlan.status || "N/A"}
-                  </span>
-                  <span>
-  <span className="font-semibold">Period of Performance: </span>
-  Start Date: {formatDate(selectedPlan.projStartDt) || "N/A"} | End Date: {formatDate(selectedPlan.projEndDt) || "N/A"}
-</span>
-
-                  </div>
-                  
-                </div>
-  ) : null;
 
   return (
-    <div className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16">
-      {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick /> */}
-      {projectDetails}
+    <div className=" p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16">
+     
       <div className="flex flex-col space-y-4">
         <div>
           <label className="text-sm font-normal">Revenue Formula</label>

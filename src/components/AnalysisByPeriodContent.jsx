@@ -2877,7 +2877,7 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
 
         // Group schedules by employee within the account group (even if it's a single DCT entry, it needs a 'group')
         const employeeId = nonLaborSummary.emplId || 'N/A_Employee'; // Use a default if emplId is missing
-        const employeeName = nonLaborSummary.name || `Entry for Account ${accountId}`; // More generic name
+        const employeeName = nonLaborSummary.name || ` ${accountId}`; // More generic name
 
         if (!acctGroup.employees.has(employeeId)) {
             acctGroup.employees.set(employeeId, {
@@ -3647,7 +3647,7 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
                         <>
                             {row.nonLaborAccts.map((acctGroup) => (
                                 <React.Fragment key={`${row.id}-${acctGroup.id}`}>
-                                    {/* Account Group Row for Non-Labor (e.g., "Account: 647-002-140 - Airfare") */}
+                                    {/* Account Group Row for Non-Labor (e.g., "Account: 647-004-140 - Hotel") */}
                                     <tr
                                         className="bg-gray-100 bg-opacity-20 hover:bg-gray-100 hover:bg-opacity-50 text-sm cursor-pointer group"
                                         onClick={() => toggleNonLaborAcctRow(`${row.id}-${acctGroup.id}`)} // Toggle for sub-level expansion
@@ -3678,12 +3678,19 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
                                     {expandedNonLaborAcctRows.includes(`${row.id}-${acctGroup.id}`) && acctGroup.employees && acctGroup.employees.length > 0 && (
                                         <React.Fragment> {/* Changed from <> to React.Fragment for consistency and clarity */}
                                             <tr className="bg-gray-100 bg-opacity-30">
-                                                <td className="py-2 px-4 text-left whitespace-nowrap" colSpan="4"></td> {/* Empty cells for alignment */}
-                                                <td className="py-2 pl-16 pr-4 text-left text-sm font-semibold text-gray-700 uppercase">Employee</td>
-                                                <td className="py-2 px-4 text-right text-sm font-semibold text-gray-700 uppercase">Total</td>
-                                                {dynamicDateRanges.map((range) => (
+                                                {/* Adjusted colSpan to align 'Employee' with 'Description' in the main table */}
+                                                <td className="py-2 pl-16 pr-4 text-left text-sm font-semibold text-gray-700 uppercase sticky left-0 z-10 bg-inherit">Employee</td>
+                                                <td className="py-2 px-4 text-left whitespace-nowrap" colSpan="4"></td> {/* Span remaining header columns before Total */}
+                                                <td className="py-2 px-4 text-right text-sm font-semibold text-gray-700 uppercase"></td>
+                                                 {/* <td className="py-2 px-4 text-right text-sm font-semibold text-gray-700 uppercase">Total</td> */}
+                                                {/* {dynamicDateRanges.map((range) => (
                                                     <td key={`header-employee-group-${range}`} className="py-2 px-4 text-right text-sm font-semibold text-gray-700 uppercase whitespace-nowrap">
                                                         {`${range.split('_')[0].split('/')[0]}/${range.split('_')[1]}`}
+                                                    </td>
+                                                ))} */}
+                                                {dynamicDateRanges.map((range) => (
+                                                    <td key={`header-employee-group-${range}`} className="py-2 px-4 text-right text-sm font-semibold text-gray-700 uppercase whitespace-nowrap">
+                                                        {/* {`${range.split('_')[0].split('/')[0]}/${range.split('_')[1]}`} */}
                                                     </td>
                                                 ))}
                                             </tr>
@@ -3692,10 +3699,11 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
                                                 <tr key={`${acctGroup.id}-${employeeGroup.id}`}
                                                     className="bg-gray-100 bg-opacity-40 hover:bg-gray-100 hover:bg-opacity-70 text-xs"
                                                 >
-                                                    <td className="py-2 px-4 text-left whitespace-nowrap" colSpan="4"></td> {/* Empty cells for alignment */}
+                                                    {/* Adjusted empty cell for alignment */}
                                                     <td className="py-2 pl-16 pr-4 whitespace-nowrap sticky left-0 z-10 bg-inherit flex items-center text-gray-800">
                                                         {employeeGroup.name}
                                                     </td>
+                                                    <td className="py-2 px-4 text-left whitespace-nowrap" colSpan="4"></td> {/* Span remaining header columns before Total */}
                                                     <td className="py-2 px-4 text-right whitespace-nowrap text-gray-800 font-semibold">{formatValue(employeeGroup.total)}</td>
                                                     {dynamicDateRanges.map((currentRange) => (
                                                         <td key={`${employeeGroup.id}-${currentRange}-monthly-total`} className="py-2 px-4 text-right whitespace-nowrap text-gray-800">
