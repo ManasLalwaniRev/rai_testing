@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -98,6 +97,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
         setUseFixedRevenue(!!data.overrideRevAmtFl);
         setOverrideAdjustments(!!data.useBillBurdenRates);
         setSetupData(data);
+        setAcctId(data.revAcctId);
       }
     } catch (error) {
       // Optionally show a toast or just log

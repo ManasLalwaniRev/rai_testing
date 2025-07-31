@@ -123,7 +123,7 @@ const ProjectAmountsTable = ({
         // console.log(JSON.stringify(apiData));
         if (apiData.length === 0) {
           setEmployees([]);
-          toast.info("No forecast data available for this plan.", {
+          toast.info('No forecast data available for this plan. Click "New" to add entries.', {
             toastId: "no-forecast-data",
             autoClose: 3000,
           });

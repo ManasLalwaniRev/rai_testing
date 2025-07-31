@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -67,76 +66,179 @@ const formatDateWithTime = (dateStr) => {
   }
 };
 
-  
+// const sortPlansByProjIdPlTypeVersion = (plansArray) => {
+//   return [...plansArray].sort((a, b) => {
+//     if (a.projId < b.projId) return -1;
+//     if (a.projId > b.projId) return 1;
+//     if (a.plType < b.plType) return -1;
+//     if (a.plType > b.plType) return 1;
+//     return (a.version || 0) - (b.version || 0);
+//   });
+// };
 
+// const sortPlansByProjIdPlTypeVersion = (plansArray) => {
+//   return [...plansArray].sort((a, b) => {
+//     if (a.projId < b.projId) return -1;
+//     if (a.projId > b.projId) return 1;
+//     if (a.plType < b.plType) return -1;
+//     if (a.plType > b.plType) return 1;
+//     return (a.version || 0) - (b.version || 0);
+//   });
+// };
+
+  const sortPlansByProjIdPlTypeVersion = (plansArray) => {
+  return [...plansArray].sort((a, b) => {
+    if (a.projId < b.projId) return -1;
+    if (a.projId > b.projId) return 1;
+
+    if (a.plType < b.plType) return -1;
+    if (a.plType > b.plType) return 1;
+
+    // Explicit numeric compare for version  
+    const aVersion = Number(a.version) || 0;
+    const bVersion = Number(b.version) || 0;
+    return aVersion - bVersion;
+  });
+};
+
+
+  // const fetchPlans = async () => {
+  //   if (!projectId) {
+  //     setPlans([]);
+  //     setLoading(false);
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   try {
+  //     const response = await axios.get(
+  //       `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
+  //     );
+  //     console.log('API Response:', response.data);
+  //     const transformedPlans = response.data.map((plan, idx) => ({
+  //       plId: plan.plId || plan.id || 0,
+  //       projId: plan.projId || projectId,
+  //       plType: plan.plType === 'Budget' ? 'BUD' : plan.plType === 'EAC' ? 'EAC' : plan.plType || '',
+  //       source: plan.source || '',
+  //       type: plan.type || '',
+  //       version: plan.version || 0,
+  //       versionCode: plan.versionCode || '',
+  //       finalVersion: !!plan.finalVersion,
+  //       isCompleted: !!plan.isCompleted,
+  //       isApproved: !!plan.isApproved,
+  //       status: plan.plType && plan.version ? (plan.status || 'Working') : '',
+  //       closedPeriod: plan.closedPeriod || '',
+  //       createdAt: plan.createdAt || '',
+  //       updatedAt: plan.updatedAt || '',
+  //       modifiedBy: plan.modifiedBy || '',
+  //       approvedBy: plan.approvedBy || '',
+  //       createdBy: plan.createdBy || '',
+  //       templateId: plan.templateId || 0,
+  //       projName: plan.projName || '',
+  //       projStartDt: plan.projStartDt || '',
+  //       projEndDt: plan.projEndDt || '',
+  //       orgId: plan.orgId || '',
+  //       fundedCost: plan.proj_f_cst_amt || '',
+  //       fundedFee: plan.proj_f_fee_amt || '',
+  //       fundedRev: plan.proj_f_tot_amt || '',
+  //       revenueAccount: plan.revenueAccount || '',
+  //     }));
+  //     console.log('Transformed Plans:', transformedPlans);
+  //     setPlans(transformedPlans);
+  //     setColumns([
+  //       'projId',
+  //       'plType',
+  //       'version',
+  //       'versionCode',
+  //       'source',
+  //       'type',
+  //       'isCompleted',
+  //       'isApproved',
+  //       'finalVersion',
+  //       'status',
+  //       'closedPeriod',
+  //       'createdAt',
+  //       'updatedAt',
+  //     ]);
+  //     // if (transformedPlans.length > 0 && !selectedPlan) {
+  //     //   onPlanSelect(transformedPlans[0]);
+  //     // }
+  //   } catch (error) {
+  //     console.error('Error fetching plans:', error.response?.data || error.message);
+  //     setPlans([]);
+  //     toast.error('Failed to fetch plans.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  
   const fetchPlans = async () => {
-    if (!projectId) {
-      setPlans([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
-      );
-      console.log('API Response:', response.data);
-      const transformedPlans = response.data.map((plan, idx) => ({
-        plId: plan.plId || plan.id || 0,
-        projId: plan.projId || projectId,
-        plType: plan.plType === 'Budget' ? 'BUD' : plan.plType === 'EAC' ? 'EAC' : plan.plType || '',
-        source: plan.source || '',
-        type: plan.type || '',
-        version: plan.version || 0,
-        versionCode: plan.versionCode || '',
-        finalVersion: !!plan.finalVersion,
-        isCompleted: !!plan.isCompleted,
-        isApproved: !!plan.isApproved,
-        status: plan.plType && plan.version ? (plan.status || 'Working') : '',
-        closedPeriod: plan.closedPeriod || '',
-        createdAt: plan.createdAt || '',
-        updatedAt: plan.updatedAt || '',
-        modifiedBy: plan.modifiedBy || '',
-        approvedBy: plan.approvedBy || '',
-        createdBy: plan.createdBy || '',
-        templateId: plan.templateId || 0,
-        projName: plan.projName || '',
-        projStartDt: plan.projStartDt || '',
-        projEndDt: plan.projEndDt || '',
-        orgId: plan.orgId || '',
-        fundedCost: plan.proj_f_cst_amt || '',
-        fundedFee: plan.proj_f_fee_amt || '',
-        fundedRev: plan.proj_f_tot_amt || '',
-        revenueAccount: plan.revenueAccount || '',
-      }));
-      console.log('Transformed Plans:', transformedPlans);
-      setPlans(transformedPlans);
-      setColumns([
-        'projId',
-        'plType',
-        'version',
-        'versionCode',
-        'source',
-        'type',
-        'isCompleted',
-        'isApproved',
-        'finalVersion',
-        'status',
-        'closedPeriod',
-        'createdAt',
-        'updatedAt',
-      ]);
-      // if (transformedPlans.length > 0 && !selectedPlan) {
-      //   onPlanSelect(transformedPlans[0]);
-      // }
-    } catch (error) {
-      console.error('Error fetching plans:', error.response?.data || error.message);
-      setPlans([]);
-      toast.error('Failed to fetch plans.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!projectId) {
+    setPlans([]);
+    setLoading(false);
+    return;
+  }
+  setLoading(true);
+  try {
+    const response = await axios.get(
+      `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
+    );
+    console.log('API Response:', response.data);
+    const transformedPlans = response.data.map((plan, idx) => ({
+      plId: plan.plId || plan.id || 0,
+      projId: plan.projId || projectId,
+      plType: plan.plType === 'Budget' ? 'BUD' : plan.plType === 'EAC' ? 'EAC' : plan.plType || '',
+      source: plan.source || '',
+      type: plan.type || '',
+      version: plan.version || 0,
+      versionCode: plan.versionCode || '',
+      finalVersion: !!plan.finalVersion,
+      isCompleted: !!plan.isCompleted,
+      isApproved: !!plan.isApproved,
+      status: plan.plType && plan.version ? (plan.status || 'Working') : '',
+      closedPeriod: plan.closedPeriod || '',
+      createdAt: plan.createdAt || '',
+      updatedAt: plan.updatedAt || '',
+      modifiedBy: plan.modifiedBy || '',
+      approvedBy: plan.approvedBy || '',
+      createdBy: plan.createdBy || '',
+      templateId: plan.templateId || 0,
+      projName: plan.projName || '',
+      projStartDt: plan.projStartDt || '',
+      projEndDt: plan.projEndDt || '',
+      orgId: plan.orgId || '',
+      fundedCost: plan.proj_f_cst_amt || '',
+      fundedFee: plan.proj_f_fee_amt || '',
+      fundedRev: plan.proj_f_tot_amt || '',
+      revenueAccount: plan.revenueAccount || '',
+    }));
+
+    const sortedPlans = sortPlansByProjIdPlTypeVersion(transformedPlans);  // <-- Sort here before setting state
+    console.log('Transformed & Sorted Plans:', sortedPlans);
+
+    setPlans(sortedPlans);
+    setColumns([
+      'projId',
+      'plType',
+      'version',
+      'versionCode',
+      'source',
+      'type',
+      'isCompleted',
+      'isApproved',
+      'finalVersion',
+      'status',
+      'closedPeriod',
+      'createdAt',
+      'updatedAt',
+    ]);
+  } catch (error) {
+    console.error('Error fetching plans:', error.response?.data || error.message);
+    setPlans([]);
+    toast.error('Failed to fetch plans.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchPlans();
@@ -368,84 +470,254 @@ const formatDateWithTime = (dateStr) => {
   }
 };
 
-  const handleActionSelect = async (idx, action) => {
-    const plan = plans[idx];
-    if (action === 'None') return;
-    try {
-      setIsActionLoading(true);
-      if (action === 'Delete') {
-        if (!plan.plId || Number(plan.plId) <= 0) {
-          toast.error('Cannot delete: Invalid plan ID.');
-          return;
-        }
-        const deleteUrl = `https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`;
-        toast.info('Deleting plan...');
-        try {
-          await axios.delete(deleteUrl);
-          toast.success('Plan deleted successfully!');
-        } catch (err) {
-          if (err.response && err.response.status === 404) {
-            toast.error('Plan not found on server. It may have already been deleted.');
-          } else {
-            toast.error('Error deleting plan: ' + (err.response?.data?.message || err.message));
-          }
-        }
-        await fetchPlans();
-      } else if (action === 'Create Budget' || action === 'Create Blank Budget' || action === 'Create EAC') {
-        const payloadTemplate = {
-          projId: plan.projId,
-          plId: plan.plId || 0,
-          plType: action === 'Create Budget' || action === 'Create Blank Budget' ? 'BUD' : 'EAC',
-          source: plan.source || '',
-          type: isChildProjectId(plan.projId) ? 'SYSTEM' : plan.type || '',
-          version: plan.version,
-          versionCode: plan.versionCode || '',
-          finalVersion: false,
-          isCompleted: false,
-          isApproved: false,
-          status: 'Working',
-          createdBy: plan.createdBy || 'User',
-          modifiedBy: plan.modifiedBy || 'User',
-          approvedBy: '',
-          templateId: plan.templateId || 1,
-        };
-        toast.info(`Creating ${action === 'Create Budget' ? 'Budget' : action === 'Create Blank Budget' ? 'Blank Budget' : 'EAC'}...`);
-        const response = await axios.post(
-          `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${action === 'Create Blank Budget' ? 'blank' : 'actual'}`,
-          payloadTemplate
-        );
-        const newPlanData = response.data;
-        const transformedNewPlan = {
-          ...newPlanData,
-          plId: newPlanData.plId || newPlanData.id,
-          plType: newPlanData.plType === 'Budget' ? 'BUD' : newPlanData.plType || '',
-          source: newPlanData.source || '',
-          type: newPlanData.type || (isChildProjectId(projectId) ? 'SYSTEM' : ''),
-          version: newPlanData.version,
-          versionCode: newPlanData.versionCode,
-          finalVersion: !!newPlanData.finalVersion,
-          isCompleted: !!newPlanData.isCompleted,
-          isApproved: !!newPlanData.isApproved,
-          status: newPlanData.plType && newPlanData.version ? (newPlanData.status === 'Approved' || newPlanData.status === 'Completed' ? newPlanData.status : 'Working') : '',
-          closedPeriod: newPlanData.closedPeriod || '',
-          createdAt: newPlanData.createdAt || '',
-          updatedAt: newPlanData.updatedAt || '',
-          modifiedBy: newPlanData.modifiedBy || '',
-          approvedBy: newPlanData.approvedBy || '',
-          createdBy: newPlanData.createdBy || '',
-          templateId: newPlanData.templateId || 0,
-        };
-        setPlans(prevPlans => sortPlansByVersion([...prevPlans, transformedNewPlan]));
-        toast.success(`${action === 'Create Budget' ? 'Budget' : action === 'Create Blank Budget' ? 'Blank Budget' : 'EAC'} created successfully!`);
-      } else {
-        toast.info(`Action "${action}" selected (API call not implemented)`);
+  // const handleActionSelect = async (idx, action) => {
+  //   const plan = plans[idx];
+  //   if (action === 'None') return;
+  //   try {
+  //     setIsActionLoading(true);
+  //     if (action === 'Delete') {
+  //       if (!plan.plId || Number(plan.plId) <= 0) {
+  //         toast.error('Cannot delete: Invalid plan ID.');
+  //         return;
+  //       }
+  //       const deleteUrl = `https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`;
+  //       toast.info('Deleting plan...');
+  //       try {
+  //         await axios.delete(deleteUrl);
+  //         toast.success('Plan deleted successfully!');
+  //       } catch (err) {
+  //         if (err.response && err.response.status === 404) {
+  //           toast.error('Plan not found on server. It may have already been deleted.');
+  //         } else {
+  //           toast.error('Error deleting plan: ' + (err.response?.data?.message || err.message));
+  //         }
+  //       }
+  //       await fetchPlans();
+  //     } else if (action === 'Create Budget' || action === 'Create Blank Budget' || action === 'Create EAC') {
+  //       const payloadTemplate = {
+  //         projId: plan.projId,
+  //         plId: plan.plId || 0,
+  //         plType: action === 'Create Budget' || action === 'Create Blank Budget' ? 'BUD' : 'EAC',
+  //         source: plan.source || '',
+  //         type: isChildProjectId(plan.projId) ? 'SYSTEM' : plan.type || '',
+  //         version: plan.version,
+  //         versionCode: plan.versionCode || '',
+  //         finalVersion: false,
+  //         isCompleted: false,
+  //         isApproved: false,
+  //         status: 'Working',
+  //         createdBy: plan.createdBy || 'User',
+  //         modifiedBy: plan.modifiedBy || 'User',
+  //         approvedBy: '',
+  //         templateId: plan.templateId || 1,
+  //       };
+  //       toast.info(`Creating ${action === 'Create Budget' ? 'Budget' : action === 'Create Blank Budget' ? 'Blank Budget' : 'EAC'}...`);
+  //       const response = await axios.post(
+  //         `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${action === 'Create Blank Budget' ? 'blank' : 'actual'}`,
+  //         payloadTemplate
+  //       );
+  //       const newPlanData = response.data;
+  //       const transformedNewPlan = {
+  //         ...newPlanData,
+  //         plId: newPlanData.plId || newPlanData.id,
+  //         plType: newPlanData.plType === 'Budget' ? 'BUD' : newPlanData.plType || '',
+  //         source: newPlanData.source || '',
+  //         type: newPlanData.type || (isChildProjectId(projectId) ? 'SYSTEM' : ''),
+  //         version: newPlanData.version,
+  //         versionCode: newPlanData.versionCode,
+  //         finalVersion: !!newPlanData.finalVersion,
+  //         isCompleted: !!newPlanData.isCompleted,
+  //         isApproved: !!newPlanData.isApproved,
+  //         status: newPlanData.plType && newPlanData.version ? (newPlanData.status === 'Approved' || newPlanData.status === 'Completed' ? newPlanData.status : 'Working') : '',
+  //         closedPeriod: newPlanData.closedPeriod || '',
+  //         createdAt: newPlanData.createdAt || '',
+  //         updatedAt: newPlanData.updatedAt || '',
+  //         modifiedBy: newPlanData.modifiedBy || '',
+  //         approvedBy: newPlanData.approvedBy || '',
+  //         createdBy: newPlanData.createdBy || '',
+  //         templateId: newPlanData.templateId || 0,
+  //       };
+  //       // setPlans(prevPlans => sortPlansByVersion([...prevPlans, transformedNewPlan]));
+  //       setPlans(prevPlans => sortPlansByProjIdAndVersion([...prevPlans, transformedNewPlan]));
+
+  //       toast.success(`${action === 'Create Budget' ? 'Budget' : action === 'Create Blank Budget' ? 'Blank Budget' : 'EAC'} created successfully!`);
+  //     } else {
+  //       toast.info(`Action "${action}" selected (API call not implemented)`);
+  //     }
+  //   } catch (err) {
+  //     toast.error('Error performing action: ' + (err.response?.data?.message || err.message));
+  //   } finally {
+  //     setIsActionLoading(false);
+  //   }
+  // };
+
+//   const handleActionSelect = async (idx, action) => {
+//   const plan = plans[idx];
+//   if (action === 'None') return;
+//   try {
+//     setIsActionLoading(true);
+//     if (action === 'Delete') {
+//       if (!plan.plId || Number(plan.plId) <= 0) {
+//         toast.error('Cannot delete: Invalid plan ID.');
+//         setIsActionLoading(false);
+//         return;
+//       }
+//       toast.info('Deleting plan...');
+//       try {
+//         await axios.delete(`https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`);
+//         toast.success('Plan deleted successfully!');
+//       } catch (err) {
+//         if (err.response && err.response.status === 404) {
+//           toast.error('Plan not found on server. It may have already been deleted.');
+//         } else {
+//           toast.error('Error deleting plan: ' + (err.response?.data?.message || err.message));
+//         }
+//         setIsActionLoading(false);
+//         return;
+//       }
+//       // Fetch fresh after deletion
+//       await fetchPlans();
+//     } else if (action === 'Create Budget' || action === 'Create Blank Budget' || action === 'Create EAC') {
+//       const payloadTemplate = {
+//         projId: plan.projId,
+//         plId: plan.plId || 0,
+//         plType: (action === 'Create Budget' || action === 'Create Blank Budget') ? 'BUD' : 'EAC',
+//         source: plan.source || '',
+//         type: isChildProjectId(plan.projId) ? 'SYSTEM' : plan.type || '',
+//         version: plan.version,
+//         versionCode: plan.versionCode || '',
+//         finalVersion: false,
+//         isCompleted: false,
+//         isApproved: false,
+//         status: 'Working',
+//         createdBy: plan.createdBy || 'User',
+//         modifiedBy: plan.modifiedBy || 'User',
+//         approvedBy: '',
+//         templateId: plan.templateId || 1,
+//       };
+//       toast.info(`Creating ${action === 'Create Budget' ? 'Budget' : action === 'Create Blank Budget' ? 'Blank Budget' : 'EAC'}...`);
+//       const response = await axios.post(
+//         `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${action === 'Create Blank Budget' ? 'blank' : 'actual'}`,
+//         payloadTemplate
+//       );
+//       const newPlanData = response.data;
+//       const transformedNewPlan = {
+//         ...newPlanData,
+//         plId: newPlanData.plId || newPlanData.id,
+//         plType: newPlanData.plType === 'Budget' ? 'BUD' : newPlanData.plType || '',
+//         source: newPlanData.source || '',
+//         type: newPlanData.type || (isChildProjectId(projectId) ? 'SYSTEM' : ''),
+//         version: newPlanData.version,
+//         versionCode: newPlanData.versionCode,
+//         finalVersion: !!newPlanData.finalVersion,
+//         isCompleted: !!newPlanData.isCompleted,
+//         isApproved: !!newPlanData.isApproved,
+//         status: newPlanData.plType && newPlanData.version
+//           ? (newPlanData.status === 'Approved' || newPlanData.status === 'Completed' ? newPlanData.status : 'Working')
+//           : '',
+//         closedPeriod: newPlanData.closedPeriod || '',
+//         createdAt: newPlanData.createdAt || '',
+//         updatedAt: newPlanData.updatedAt || '',
+//         modifiedBy: newPlanData.modifiedBy || '',
+//         approvedBy: newPlanData.approvedBy || '',
+//         createdBy: newPlanData.createdBy || '',
+//         templateId: newPlanData.templateId || 0,
+//       };
+//       // Insert new plan and sort immediately for instant UI update
+//       setPlans((prevPlans) =>
+//         sortPlansByProjIdPlTypeVersion([...prevPlans, transformedNewPlan])
+//       );
+//       toast.success(`${action === 'Create Budget' ? 'Budget' : action === 'Create Blank Budget' ? 'Blank Budget' : 'EAC'} created successfully!`);
+//     } else {
+//       toast.info(`Action "${action}" selected (API call not implemented)`);
+//     }
+//   } catch (err) {
+//     toast.error('Error performing action: ' + (err.response?.data?.message || err.message));
+//   } finally {
+//     setIsActionLoading(false);
+//   }
+// };
+
+const handleActionSelect = async (idx, action) => {
+  const plan = plans[idx];
+  if (action === 'None') return;
+  try {
+    setIsActionLoading(true);
+    if (action === 'Delete') {
+      if (!plan.plId || Number(plan.plId) <= 0) {
+        toast.error('Cannot delete: Invalid plan ID.');
+        setIsActionLoading(false);
+        return;
       }
-    } catch (err) {
-      toast.error('Error performing action: ' + (err.response?.data?.message || err.message));
-    } finally {
-      setIsActionLoading(false);
+      toast.info('Deleting plan...');
+      try {
+        await axios.delete(`https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`);
+        toast.success('Plan deleted successfully!');
+      } catch (err) {
+        if (err.response && err.response.status === 404) {
+          toast.error('Plan not found on server. It may have already been deleted.');
+        } else {
+          toast.error('Error deleting plan: ' + (err.response?.data?.message || err.message));
+        }
+        setIsActionLoading(false);
+        return;
+      }
+      await fetchPlans();               // <-- keep this after delete
+    } else if (
+      action === 'Create Budget' ||
+      action === 'Create Blank Budget' ||
+      action === 'Create EAC'
+    ) {
+      const payloadTemplate = {
+        projId: plan.projId,
+        plId: plan.plId || 0,
+        plType: (action === 'Create Budget' || action === 'Create Blank Budget') ? 'BUD' : 'EAC',
+        source: plan.source || '',
+        type: isChildProjectId(plan.projId) ? 'SYSTEM' : plan.type || '',
+        version: plan.version,
+        versionCode: plan.versionCode || '',
+        finalVersion: false,
+        isCompleted: false,
+        isApproved: false,
+        status: 'Working',
+        createdBy: plan.createdBy || 'User',
+        modifiedBy: plan.modifiedBy || 'User',
+        approvedBy: '',
+        templateId: plan.templateId || 1,
+      };
+      toast.info(
+        `Creating ${
+          action === 'Create Budget'
+            ? 'Budget'
+            : action === 'Create Blank Budget'
+            ? 'Blank Budget'
+            : 'EAC'
+        }...`
+      );
+      await axios.post(
+        `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${action === 'Create Blank Budget' ? 'blank' : 'actual'}`,
+        payloadTemplate
+      );
+      // Instead of manually adding to plans,
+      // REFETCH from backend so all fields and summary panel update correctly:
+      await fetchPlans();
+      toast.success(
+        `${action === 'Create Budget'
+          ? 'Budget'
+          : action === 'Create Blank Budget'
+          ? 'Blank Budget'
+          : 'EAC'} created successfully!`
+      );
+    } else {
+      toast.info(`Action "${action}" selected (API call not implemented)`);
     }
-  };
+  } catch (err) {
+    toast.error('Error performing action: ' + (err.response?.data?.message || err.message));
+  } finally {
+    setIsActionLoading(false);
+  }
+};
+
 
   const getActionOptions = (plan) => {
     let options = ['None'];
@@ -1034,3 +1306,4 @@ const formatDateWithTime = (dateStr) => {
 };
 
 export default ProjectPlanTable;
+
