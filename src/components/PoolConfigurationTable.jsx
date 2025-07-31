@@ -96,6 +96,7 @@ const PoolConfigurationTable = () => {
       .map((row) => ({
         orgId: row.orgId,
         acctId: row.acctId,
+        Year: fiscalYear,
         ...groupCodes.reduce((acc, code) => {
           acc[code] = row[code] || false;
           return acc;

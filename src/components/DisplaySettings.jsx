@@ -1,10 +1,3 @@
-// import React from "react";
-
-// const DisplaySettings = () => {
-//   return <div>Display Settings</div>;
-// };
-
-// export default DisplaySettings;
 
 'use client'; // Important for client-side functionality in Next.js App Router
 
