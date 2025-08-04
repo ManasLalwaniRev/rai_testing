@@ -349,9 +349,49 @@ const ProjectBudgetStatus = () => {
 
   // Updated tab click handler: only open tab if not already open; do not toggle off.
   
+//   const handlePlanSelect = (plan) => {
+//   // If no plan is selected (null/undefined), clear selection as usual
+//   if (!plan) {
+//     setSelectedPlan(null);
+//     localStorage.removeItem("selectedPlan");
+//     setActiveTab(null);
+//     setForecastData([]);
+//     setIsForecastLoading(false);
+//     setAnalysisApiData([]);
+//     setIsAnalysisLoading(false);
+//     setAnalysisError(null);
+//     return;
+//   }
+
+//   // If a different plan is selected, update state
+//   if (!selectedPlan || selectedPlan.plId !== plan.plId) {
+//     const project = {
+//       projId: plan.projId || "",
+//       projName: plan.projName || "",
+//       projStartDt: plan.projStartDt || "",
+//       projEndDt: plan.projEndDt || "",
+//       orgId: plan.orgId || "",
+//       fundedCost: plan.fundedCost || "",
+//       fundedFee: plan.fundedFee || "",
+//       fundedRev: plan.fundedRev || "",
+//     };
+
+//     setFilteredProjects([project]);
+//     setRevenueAccount(plan.revenueAccount || "");
+//     setSelectedPlan(plan);
+//     localStorage.setItem("selectedPlan", JSON.stringify(plan));
+//     setForecastData([]);
+//     setIsForecastLoading(false);
+//     setAnalysisApiData([]);
+//     setIsAnalysisLoading(false);
+//     setAnalysisError(null);
+//   }
+//   // If the same plan is clicked again, do nothing (don't deselect)
+// };
+  
   const handlePlanSelect = (plan) => {
-  // If no plan is selected (null/undefined), clear selection as usual
   if (!plan) {
+    // clear selection & reset state as before
     setSelectedPlan(null);
     localStorage.removeItem("selectedPlan");
     setActiveTab(null);
@@ -363,8 +403,12 @@ const ProjectBudgetStatus = () => {
     return;
   }
 
-  // If a different plan is selected, update state
-  if (!selectedPlan || selectedPlan.plId !== plan.plId) {
+  // Update if different plan OR if the same plan but with changes (to refresh buttons on checkbox change)
+  if (
+    !selectedPlan ||
+    selectedPlan.plId !== plan.plId ||
+    JSON.stringify(selectedPlan) !== JSON.stringify(plan)  // simple deep comparison; alternatively, you can check relevant fields explicitly
+  ) {
     const project = {
       projId: plan.projId || "",
       projName: plan.projName || "",
@@ -386,8 +430,10 @@ const ProjectBudgetStatus = () => {
     setIsAnalysisLoading(false);
     setAnalysisError(null);
   }
-  // If the same plan is clicked again, do nothing (don't deselect)
+
+  // if same plan with no changes, do nothing
 };
+
 
 
   
@@ -510,43 +556,50 @@ const ProjectBudgetStatus = () => {
                 className={`cursor-pointer ${activeTab === "hours" ? "font-normal text-blue-800" : ""}`}
                 onClick={() => handleTabClick('hours')}
               >
-                Hours
+                {/* Hours */}
+                Labor
               </span>
               <span
                 className={`cursor-pointer ${activeTab === "amounts" ? "font-normal text-blue-800" : ""}`}
                 onClick={() => handleTabClick('amounts')}
               >
-                Amounts
+                {/* Amounts */}
+                Other Cost
               </span>
               <span
                 className={`cursor-pointer ${activeTab === "revenueAnalysis" ? "font-normal text-blue-800" : ""}`}
                 onClick={() => handleTabClick('revenueAnalysis')}
               >
-                Revenue Analysis
+                {/* Revenue Analysis */}
+                Revenue Details
               </span>
               <span
                 className={`cursor-pointer ${activeTab === "analysisByPeriod" ? "font-normal text-blue-800" : ""}`}
                 onClick={() => handleTabClick('analysisByPeriod')}
               >
-                Analysis By Period
+                {/* Analysis By Period */}
+                Forecast By Period
               </span>
               <span
                 className={`cursor-pointer ${activeTab === "plc" ? "font-normal text-blue-800" : ""}`}
                 onClick={() => handleTabClick('plc')}
               >
-                PLC
+                {/* PLC */}
+                Labor Categories
               </span>
               <span
                 className={`cursor-pointer ${activeTab === "revenueSetup" ? "font-normal text-blue-800" : ""}`}
                 onClick={() => handleTabClick('revenueSetup')}
               >
-                Revenue Setup
+                {/* Revenue Setup */}
+                Revenue Definition
               </span>
               <span
                 className={`cursor-pointer ${activeTab === "revenueCeiling" ? "font-normal text-blue-800" : ""}`}
                 onClick={() => handleTabClick('revenueCeiling')}
               >
-                Revenue Ceiling
+                {/* Revenue Ceiling */}
+                Revenue Adjustment
               </span>
               <span
                 className={`cursor-pointer ${activeTab === "funding" ? "font-normal text-blue-800" : ""}`}
