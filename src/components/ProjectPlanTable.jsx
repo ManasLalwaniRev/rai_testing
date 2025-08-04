@@ -262,14 +262,21 @@ const formatDateWithTime = (dateStr) => {
   //   }
   // };
   
+//   const handleRowClick = (plan) => {
+//   // Only allow selection if clicking on a different plan
+//   if (selectedPlan && selectedPlan.plId === plan.plId) {
+//     onPlanSelect(null); // Unselect current plan
+//   } else {
+//     onPlanSelect(plan); // Select new plan
+//   }
+// };
+
   const handleRowClick = (plan) => {
-  // Only allow selection if clicking on a different plan
-  if (selectedPlan && selectedPlan.plId === plan.plId) {
-    onPlanSelect(null); // Unselect current plan
-  } else {
-    onPlanSelect(plan); // Select new plan
+  if (!selectedPlan || selectedPlan.plId !== plan.plId) {
+    onPlanSelect(plan);
   }
 };
+
 
   const handleExportPlan = async (plan) => {
     if (!plan.projId || !plan.version || !plan.plType) {
@@ -1273,7 +1280,7 @@ const handleActionSelect = async (idx, action) => {
                             type="checkbox"
                             checked={getCheckboxProps(plan, col, idx).checked}
                             disabled={getCheckboxProps(plan, col, idx).disabled}
-                            onClick={e => e.stopPropagation()}
+                            onClick={(e) => e.stopPropagation()}
                             onChange={() => handleCheckboxChange(idx, col)}
                             className="cursor-pointer"
                           />

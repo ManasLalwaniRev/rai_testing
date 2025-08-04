@@ -32,151 +32,140 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   const [loadingEmployee, setLoadingEmployee] = useState(false);
   const [loadingVendor, setLoadingVendor] = useState(false);
 
-
-
-
   const lookupTypeOptions = ["Select", "Employee", "Contract Employee"];
   const rateTypeOptions = ["Select", "Billing", "Actual"];
   const vendorLookupTypeOptions = ["Select", "Vendor", "Employee"];
 
   const dropdownStyles = {
-  //  Remove borders from datalist suggestions
-  noBorderDropdown: {
-    border: 'none',
-    outline: 'none',
-    boxShadow: 'none',
-    background: 'transparent'
-  }
-};
+    //  Remove borders from datalist suggestions
+    noBorderDropdown: {
+      border: "none",
+      outline: "none",
+      boxShadow: "none",
+      background: "transparent",
+    },
+  };
 
-useEffect(() => {
-  setHasFetchedPLC(false);
-}, [selectedProjectId]);
-
-
-  
+  useEffect(() => {
+    setHasFetchedPLC(false);
+  }, [selectedProjectId]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return dateString.split("T")[0];
   };
 
-  
+  // Move the function OUTSIDE useEffect and add useCallback
+  const fetchBillingRates = useCallback(async () => {
+    if (!selectedProjectId) {
+      // ✅ Clear states when no project selected
+      setBillingRatesSchedule([]);
+      setEditBillRate({});
+      setEditProjectPlcFields({});
+      return;
+    }
 
-// Move the function OUTSIDE useEffect and add useCallback
-const fetchBillingRates = useCallback(async () => {
-  if (!selectedProjectId) {
-    // ✅ Clear states when no project selected
-    setBillingRatesSchedule([]);
-    setEditBillRate({});
-    setEditProjectPlcFields({});
-    return;
-  }
-  
-//   setLoading(true);
-setLoadingPLC(true);
-  try {
-    const response = await axios.get(
-      `https://test-api-3tmq.onrender.com/api/ProjectPlcRates`
-    );
-    const filteredData = response.data.filter((item) =>
-      item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
-    );
+    //   setLoading(true);
+    setLoadingPLC(true);
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/api/ProjectPlcRates`
+      );
+      const filteredData = response.data.filter((item) =>
+        item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
+      );
 
-    // Check for duplicate IDs
-    const seenKeys = new Set();
-    const uniqueData = filteredData.map((item, index) => {
-      const id =
-        item.id ||
-        `${item.projId}-${item.laborCategoryCode}-${item.effectiveDate}-${index}`;
-      if (seenKeys.has(id)) {
-        console.warn(
-          `Duplicate key detected in billingRatesSchedule: ${id}. Using composite key.`
-        );
-        return { ...item, id: `${id}-${index}` };
-      }
-      seenKeys.add(id);
-      return { ...item, id };
-    });
+      // Check for duplicate IDs
+      const seenKeys = new Set();
+      const uniqueData = filteredData.map((item, index) => {
+        const id =
+          item.id ||
+          `${item.projId}-${item.laborCategoryCode}-${item.effectiveDate}-${index}`;
+        if (seenKeys.has(id)) {
+          console.warn(
+            `Duplicate key detected in billingRatesSchedule: ${id}. Using composite key.`
+          );
+          return { ...item, id: `${id}-${index}` };
+        }
+        seenKeys.add(id);
+        return { ...item, id };
+      });
 
-    setBillingRatesSchedule(
-      uniqueData.map((item) => ({
-        id: item.id,
-        plc: item.laborCategoryCode,
-        billRate: item.billingRate,
-        // rateType: item.rateType || "Select",
-        rateType: item.sBillRtTypeCd || "Select",
-        startDate: formatDate(item.effectiveDate),
-        endDate: formatDate(item.endDate),
-      }))
-    );
+      setBillingRatesSchedule(
+        uniqueData.map((item) => ({
+          id: item.id,
+          plc: item.laborCategoryCode,
+          billRate: item.billingRate,
+          // rateType: item.rateType || "Select",
+          rateType: item.sBillRtTypeCd || "Select",
+          startDate: formatDate(item.effectiveDate),
+          endDate: formatDate(item.endDate),
+        }))
+      );
 
-    const newEditBillRate = {};
-    const newEditProjectPlcFields = {};
-    uniqueData.forEach((item) => {
-      newEditBillRate[item.id] = item.billingRate;
-      newEditProjectPlcFields[item.id] = {
-        // rateType: item.rateType,
-        rateType: item.sBillRtTypeCd || "Select",
-        startDate: formatDate(item.effectiveDate),
-        endDate: formatDate(item.endDate),
-      };
-    });
-    setEditBillRate(newEditBillRate);
-    setEditProjectPlcFields(newEditProjectPlcFields);
-  } catch (error) {
-    console.error("Error fetching billing rates:", error);
-    toast.error(
-      `Failed to fetch billing rates: ${
-        error.response?.data?.message || error.message
-      }`
-    );
-  } finally {
-    // setLoading(false);
-    setLoadingPLC(false);
-  }
-}, [selectedProjectId]); // ✅ Memoized with dependency
+      const newEditBillRate = {};
+      const newEditProjectPlcFields = {};
+      uniqueData.forEach((item) => {
+        newEditBillRate[item.id] = item.billingRate;
+        newEditProjectPlcFields[item.id] = {
+          // rateType: item.rateType,
+          rateType: item.sBillRtTypeCd || "Select",
+          startDate: formatDate(item.effectiveDate),
+          endDate: formatDate(item.endDate),
+        };
+      });
+      setEditBillRate(newEditBillRate);
+      setEditProjectPlcFields(newEditProjectPlcFields);
+    } catch (error) {
+      console.error("Error fetching billing rates:", error);
+      toast.error(
+        `Failed to fetch billing rates: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      // setLoading(false);
+      setLoadingPLC(false);
+    }
+  }, [selectedProjectId]); // ✅ Memoized with dependency
 
+  // Move the function OUTSIDE useEffect and add useCallback
+  const fetchEmployees = useCallback(async () => {
+    if (
+      !selectedProjectId ||
+      typeof selectedProjectId !== "string" ||
+      selectedProjectId.trim() === ""
+    ) {
+      // ✅ Clear employees when no valid project selected
+      setEmployees([]);
+      return;
+    }
 
+    //   setLoading(true);
+    setLoadingEmployee(true);
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${selectedProjectId}`
+      );
+      setEmployees(
+        response.data.map((item) => ({
+          empId: item.empId,
+          employeeName: item.employeeName,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+      setEmployees([]);
+    } finally {
+      // setLoading(false);
+      setLoadingEmployee(false);
+    }
+  }, [selectedProjectId]); // Memoized with dependency
 
-
-// Move the function OUTSIDE useEffect and add useCallback
-const fetchEmployees = useCallback(async () => {
-  if (
-    !selectedProjectId ||
-    typeof selectedProjectId !== "string" ||
-    selectedProjectId.trim() === ""
-  ) {
-    // ✅ Clear employees when no valid project selected
-    setEmployees([]);
-    return;
-  }
-  
-//   setLoading(true);
-setLoadingEmployee(true);
-  try {
-    const response = await axios.get(
-      `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${selectedProjectId}`
-    );
-    setEmployees(
-      response.data.map((item) => ({
-        empId: item.empId,
-        employeeName: item.employeeName,
-      }))
-    );
-  } catch (error) {
-    console.error("Error fetching employees:", error);
-    setEmployees([]);
-  } finally {
-    // setLoading(false);
-    setLoadingEmployee(false);
-  }
-}, [selectedProjectId]); // Memoized with dependency
-
-// Simple useEffect that calls the memoized function
-useEffect(() => {
-  fetchEmployees();
-}, [fetchEmployees]); // Only runs when selectedProjectId changes
+  // Simple useEffect that calls the memoized function
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]); // Only runs when selectedProjectId changes
 
   // Fetch PLCs for search
   // useEffect(() => {
@@ -209,134 +198,129 @@ useEffect(() => {
   // }, [plcSearch]);
 
   const fetchPlcs = useCallback(async () => {
-  if (!plcSearch) {
-    setPlcs([]);
-    return;
-  }
-  
-  try {
-    const response = await axios.get(
-      `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${plcSearch}`
-    );
-    const filteredPlcs = response.data
-      .filter((item) =>
-        item.laborCategoryCode
-          .toLowerCase()
-          .includes(plcSearch.toLowerCase())
-      )
-      .map((item) => ({
-        laborCategoryCode: item.laborCategoryCode,
-        description: item.description || "",
-      }));
-    setPlcs(filteredPlcs);
-  } catch (error) {
-    console.error("Error fetching PLCs:", error);
-    setPlcs([]);
-  }
-}, [plcSearch]);
+    if (!plcSearch) {
+      setPlcs([]);
+      return;
+    }
 
-useEffect(() => {
-  const timeoutId = setTimeout(() => {
-    fetchPlcs();
-  }, 100); //  debounce to prevent excessive API calls while typing
-  
-  return () => clearTimeout(timeoutId);
-}, [fetchPlcs]);
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${plcSearch}`
+      );
+      const filteredPlcs = response.data
+        .filter((item) =>
+          item.laborCategoryCode.toLowerCase().includes(plcSearch.toLowerCase())
+        )
+        .map((item) => ({
+          laborCategoryCode: item.laborCategoryCode,
+          description: item.description || "",
+        }));
+      setPlcs(filteredPlcs);
+    } catch (error) {
+      console.error("Error fetching PLCs:", error);
+      setPlcs([]);
+    }
+  }, [plcSearch]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchPlcs();
+    }, 100); //  debounce to prevent excessive API calls while typing
 
+    return () => clearTimeout(timeoutId);
+  }, [fetchPlcs]);
 
   const fetchEmployeeBillingRates = useCallback(async () => {
-  if (!selectedProjectId) {
-    setEmployeeBillingRates([]);
-    setEditEmployeeBillRate({});
-    setEditEmployeeFields({});
-    return;
-  }
-  
-  setLoading(true);
-  try {
-    const response = await axios.get(
-      `https://test-api-3tmq.onrender.com/ProjEmplRt`
-    );
-    const filteredData = response.data.filter(
-      (item) =>
-        item.projId
-          .toLowerCase()
-          .startsWith(selectedProjectId.toLowerCase()) && item.emplId
-    );
+    if (!selectedProjectId) {
+      setEmployeeBillingRates([]);
+      setEditEmployeeBillRate({});
+      setEditEmployeeFields({});
+      return;
+    }
 
-    // Check for duplicate IDs
-    const seenKeys = new Set();
-    const uniqueData = filteredData.map((item, index) => {
-      const id =
-        item.projEmplRtKey ||
-        item.id ||
-        `${item.projId}-${item.emplId}-${item.startDt}-${index}`;
-      if (seenKeys.has(id)) {
-        console.warn(
-          `Duplicate key detected in employeeBillingRates: ${id}. Using composite key.`
-        );
-        return { ...item, id: `${id}-${index}` };
-      }
-      seenKeys.add(id);
-      return { ...item, id };
-    });
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/ProjEmplRt`
+      );
+      const filteredData = response.data.filter(
+        (item) =>
+          item.projId
+            .toLowerCase()
+            .startsWith(selectedProjectId.toLowerCase()) && item.emplId
+      );
 
-    setEmployeeBillingRates(
-      uniqueData.map((item) => ({
-        id: item.id,
-        lookupType: item.type || "Select",
-        empId: item.emplId,
-        employeeName:
-          item.employeeName ||
-          employees.find((emp) => emp.empId === item.emplId)
-            ?.employeeName ||
-          "",
-        plc: item.billLabCatCd,
-        plcDescription: item.plcDescription || "",
-        billRate: item.billRtAmt,
-        rateType: item.sBillRtTypeCd || "Select",
-        startDate: formatDate(item.startDt),
-        endDate: formatDate(item.endDt),
-      }))
-    );
+      // Check for duplicate IDs
+      const seenKeys = new Set();
+      const uniqueData = filteredData.map((item, index) => {
+        const id =
+          item.projEmplRtKey ||
+          item.id ||
+          `${item.projId}-${item.emplId}-${item.startDt}-${index}`;
+        if (seenKeys.has(id)) {
+          console.warn(
+            `Duplicate key detected in employeeBillingRates: ${id}. Using composite key.`
+          );
+          return { ...item, id: `${id}-${index}` };
+        }
+        seenKeys.add(id);
+        return { ...item, id };
+      });
 
-    const newEditEmployeeBillRate = {};
-    const newEditEmployeeFields = {};
-    uniqueData.forEach((item) => {
-      const id = item.id;
-      if (id) {
-        newEditEmployeeBillRate[id] = item.billRtAmt;
-        newEditEmployeeFields[id] = {
+      setEmployeeBillingRates(
+        uniqueData.map((item) => ({
+          id: item.id,
           lookupType: item.type || "Select",
+          empId: item.emplId,
+          employeeName:
+            item.employeeName ||
+            employees.find((emp) => emp.empId === item.emplId)?.employeeName ||
+            "",
+          plc: item.billLabCatCd,
+          plcDescription: item.plcDescription || "",
+          billRate: item.billRtAmt,
           rateType: item.sBillRtTypeCd || "Select",
           startDate: formatDate(item.startDt),
           endDate: formatDate(item.endDt),
-          empId: item.emplId,
-          employeeName: item.employeeName,
-          plc: item.billLabCatCd,
-          plcDescription: item.plcDescription,
-        };
-      }
-    });
-    setEditEmployeeBillRate(newEditEmployeeBillRate);
-    setEditEmployeeFields(newEditEmployeeFields);
-  } catch (error) {
-    console.error("Error fetching employee billing rates:", error);
-    toast.error(
-      `Failed to fetch employee billing rates: ${
-        error.response?.data?.message || error.message
-      }`
-    );
-    setEmployeeBillingRates([]);
-  } finally {
-    setLoading(false);
-  }
-}, [selectedProjectId, employees]);
+        }))
+      );
 
-// useEffect(() => {
-//   fetchEmployeeBillingRates();
-// }, [fetchEmployeeBillingRates]);
+      const newEditEmployeeBillRate = {};
+      const newEditEmployeeFields = {};
+      uniqueData.forEach((item) => {
+        const id = item.id;
+        if (id) {
+          newEditEmployeeBillRate[id] = item.billRtAmt;
+          newEditEmployeeFields[id] = {
+            lookupType: item.type || "Select",
+            rateType: item.sBillRtTypeCd || "Select",
+            startDate: formatDate(item.startDt),
+            endDate: formatDate(item.endDt),
+            empId: item.emplId,
+            employeeName: item.employeeName,
+            plc: item.billLabCatCd,
+            plcDescription: item.plcDescription,
+          };
+        }
+      });
+      setEditEmployeeBillRate(newEditEmployeeBillRate);
+      setEditEmployeeFields(newEditEmployeeFields);
+    } catch (error) {
+      console.error("Error fetching employee billing rates:", error);
+      toast.error(
+        `Failed to fetch employee billing rates: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+      setEmployeeBillingRates([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedProjectId, employees]);
+
+  // useEffect(() => {
+  //   fetchEmployeeBillingRates();
+  // }, [fetchEmployeeBillingRates]);
 
   // Fetch vendor billing rates
   // useEffect(() => {
@@ -562,98 +546,98 @@ useEffect(() => {
   // }, [selectedProjectId]);
 
   const fetchVendorBillingRates = useCallback(async () => {
-  if (!selectedProjectId) {
-    setVendorBillingRates([]);
-    setEditVendorBillRate({});
-    setEditVendorFields({});
-    return;
-  }
-  
-//   setLoading(true);
-setLoadingVendor(true);
-  try {
-    const response = await axios.get(
-      `https://test-api-3tmq.onrender.com/ProjVendRt`
-    );
-    const filteredData = response.data.filter((item) =>
-      item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
-    );
+    if (!selectedProjectId) {
+      setVendorBillingRates([]);
+      setEditVendorBillRate({});
+      setEditVendorFields({});
+      return;
+    }
 
-    // Check for duplicate IDs
-    const seenKeys = new Set();
-    const uniqueData = filteredData.map((item, index) => {
-      const id =
-        item.projVendRtKey ||
-        item.id ||
-        `${item.projId}-${item.vendId}-${item.startDt}-${index}`;
-      if (seenKeys.has(id)) {
-        console.warn(
-          `Duplicate key detected in vendorBillingRates: ${id}. Using composite key.`
-        );
-        return { ...item, id: `${id}-${index}` };
-      }
-      seenKeys.add(id);
-      return { ...item, id };
-    });
+    //   setLoading(true);
+    setLoadingVendor(true);
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/ProjVendRt`
+      );
+      const filteredData = response.data.filter((item) =>
+        item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
+      );
 
-    setVendorBillingRates(
-      uniqueData.map((item) => ({
-        id: item.id,
-        projVendRtKey: item.projVendRtKey,
-        lookupType: item.type || "Select",
-        vendorId: item.vendId || "",
-        vendorName: item.vendorName || item.vendEmplName || "",
-        vendorEmployee: item.vendEmplId || "",
-        vendorEmployeeName: item.vendEmplName || "",
-        plc: item.billLabCatCd,
-        plcDescription: item.plcDescription || item.description || "",
-        billRate: item.billRtAmt,
-        rateType: item.sBillRtTypeCd || "Select",
-        startDate: formatDate(item.startDt),
-        endDate: formatDate(item.endDt),
-      }))
-    );
+      // Check for duplicate IDs
+      const seenKeys = new Set();
+      const uniqueData = filteredData.map((item, index) => {
+        const id =
+          item.projVendRtKey ||
+          item.id ||
+          `${item.projId}-${item.vendId}-${item.startDt}-${index}`;
+        if (seenKeys.has(id)) {
+          console.warn(
+            `Duplicate key detected in vendorBillingRates: ${id}. Using composite key.`
+          );
+          return { ...item, id: `${id}-${index}` };
+        }
+        seenKeys.add(id);
+        return { ...item, id };
+      });
 
-    const newEditVendorBillRate = {};
-    const newEditVendorFields = {};
-    uniqueData.forEach((item) => {
-      const id = item.id;
-      newEditVendorBillRate[id] = item.billRtAmt;
-      newEditVendorFields[id] = {
-        lookupType: item.type || "Select",
-        rateType: item.sBillRtTypeCd || "Select",
-        startDate: formatDate(item.startDt),
-        endDate: formatDate(item.endDt),
-        vendorId: item.vendId || "",
-        vendorName: item.vendorName || item.vendEmplName || "",
-        vendorEmployee: item.vendEmplId || "",
-        vendorEmployeeName: item.vendEmplName || "",
-        plc: item.billLabCatCd,
-        plcDescription: item.plcDescription,
-      };
-    });
-    setEditVendorBillRate(newEditVendorBillRate);
-    setEditVendorFields(newEditVendorFields);
-  } catch (error) {
-    console.error("Error fetching vendor billing rates:", error);
-    toast.error(
-      `Failed to fetch vendor billing rates: ${
-        error.response?.data?.message || error.message
-      }`
-    );
-  } finally {
-    // setLoading(false);
-    setLoadingVendor(false);
-  }
-}, [selectedProjectId]);
+      setVendorBillingRates(
+        uniqueData.map((item) => ({
+          id: item.id,
+          projVendRtKey: item.projVendRtKey,
+          lookupType: item.type || "Select",
+          vendorId: item.vendId || "",
+          vendorName: item.vendorName || item.vendEmplName || "",
+          vendorEmployee: item.vendEmplId || "",
+          vendorEmployeeName: item.vendEmplName || "",
+          plc: item.billLabCatCd,
+          plcDescription: item.plcDescription || item.description || "",
+          billRate: item.billRtAmt,
+          rateType: item.sBillRtTypeCd || "Select",
+          startDate: formatDate(item.startDt),
+          endDate: formatDate(item.endDt),
+        }))
+      );
 
-// useEffect(() => {
-//   fetchVendorBillingRates();
-// }, [fetchVendorBillingRates]);
+      const newEditVendorBillRate = {};
+      const newEditVendorFields = {};
+      uniqueData.forEach((item) => {
+        const id = item.id;
+        newEditVendorBillRate[id] = item.billRtAmt;
+        newEditVendorFields[id] = {
+          lookupType: item.type || "Select",
+          rateType: item.sBillRtTypeCd || "Select",
+          startDate: formatDate(item.startDt),
+          endDate: formatDate(item.endDt),
+          vendorId: item.vendId || "",
+          vendorName: item.vendorName || item.vendEmplName || "",
+          vendorEmployee: item.vendEmplId || "",
+          vendorEmployeeName: item.vendEmplName || "",
+          plc: item.billLabCatCd,
+          plcDescription: item.plcDescription,
+        };
+      });
+      setEditVendorBillRate(newEditVendorBillRate);
+      setEditVendorFields(newEditVendorFields);
+    } catch (error) {
+      console.error("Error fetching vendor billing rates:", error);
+      toast.error(
+        `Failed to fetch vendor billing rates: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      // setLoading(false);
+      setLoadingVendor(false);
+    }
+  }, [selectedProjectId]);
+
+  // useEffect(() => {
+  //   fetchVendorBillingRates();
+  // }, [fetchVendorBillingRates]);
 
   const handleUpdate = async (id) => {
     // setLoading(true);
-    setLoadingAction(prev => ({...prev, [id]: true})); // ← Only specific row loading
+    setLoadingAction((prev) => ({ ...prev, [id]: true })); // ← Only specific row loading
     const updatedData = {
       plc: billingRatesSchedule.find((item) => item.id === id)?.plc, // PLC is not editable
       billRate: editBillRate[id],
@@ -736,28 +720,27 @@ setLoadingVendor(true);
   //   };
   //   fetchVendorEmployees();
   // }, [selectedProjectId]);
-  
+
   const fetchVendorEmployees = useCallback(async () => {
-  if (!selectedProjectId) {
-    setVendorEmployees([]);
-    return;
-  }
-  
-  try {
-    const response = await axios.get(
-      `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${selectedProjectId}`
-    );
-    setVendorEmployees(response.data);
-  } catch (error) {
-    setVendorEmployees([]);
-    console.error("Error fetching vendor employees:", error);
-  }
-}, [selectedProjectId]);
+    if (!selectedProjectId) {
+      setVendorEmployees([]);
+      return;
+    }
 
-useEffect(() => {
-  fetchVendorEmployees();
-}, [fetchVendorEmployees]);
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${selectedProjectId}`
+      );
+      setVendorEmployees(response.data);
+    } catch (error) {
+      setVendorEmployees([]);
+      console.error("Error fetching vendor employees:", error);
+    }
+  }, [selectedProjectId]);
 
+  useEffect(() => {
+    fetchVendorEmployees();
+  }, [fetchVendorEmployees]);
 
   const handleDelete = async (id) => {
     setLoading(true);
@@ -1133,7 +1116,7 @@ useEffect(() => {
       return;
     }
     // setLoading(true);
-    setLoadingAction(prev => ({...prev, [id]: false})); // Individual row loading
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // Individual row loading
     const updatedData = employeeBillingRates.find((item) => item.id === id);
     const fields = editEmployeeFields[id] || {};
 
@@ -1646,113 +1629,114 @@ useEffect(() => {
   //   }
   // };
 
-   const handleSaveNewVendorRate = async () => {
-      if (
-        !newVendorRate ||
-        !newVendorRate.vendorId ||
-        !newVendorRate.vendorName ||
-        !newVendorRate.plc ||
-        !newVendorRate.startDate ||
-        !newVendorRate.billRate
-      ) {
-        console.error(
-          "Please fill all required fields (Vendor ID, Vendor Name, PLC, Bill Rate, Start Date)"
-        );
-        return;
-      }
-      setLoading(true);
-      try {
-        await axios.post(`https://test-api-3tmq.onrender.com/ProjVendRt`, {
-          id: 0,
-          projId: selectedPlan?.projId || selectedProjectId,
-          vendId: newVendorRate.vendorId,
-          vendEmplId: newVendorRate.vendorEmployee,
-          billLabCatCd: newVendorRate.plc,
-          billDiscRt: 0,
-          companyId: "1",
-          billRtAmt: parseFloat(newVendorRate.billRate),
-          startDt: new Date(newVendorRate.startDate).toISOString(),
-          endDt: newVendorRate.endDate
-            ? new Date(newVendorRate.endDate).toISOString()
+  const handleSaveNewVendorRate = async () => {
+    if (
+      !newVendorRate ||
+      !newVendorRate.vendorId ||
+      !newVendorRate.vendorName ||
+      !newVendorRate.plc ||
+      !newVendorRate.startDate ||
+      !newVendorRate.billRate
+    ) {
+      console.error(
+        "Please fill all required fields (Vendor ID, Vendor Name, PLC, Bill Rate, Start Date)"
+      );
+      return;
+    }
+    setLoading(true);
+    try {
+      await axios.post(`https://test-api-3tmq.onrender.com/ProjVendRt`, {
+        id: 0,
+        projId: selectedPlan?.projId || selectedProjectId,
+        vendId: newVendorRate.vendorId,
+        vendEmplId: newVendorRate.vendorEmployee,
+        billLabCatCd: newVendorRate.plc,
+        billDiscRt: 0,
+        companyId: "1",
+        billRtAmt: parseFloat(newVendorRate.billRate),
+        startDt: new Date(newVendorRate.startDate).toISOString(),
+        endDt: newVendorRate.endDate
+          ? new Date(newVendorRate.endDate).toISOString()
+          : null,
+        sBillRtTypeCd: newVendorRate.rateType,
+        type: newVendorRate.lookupType,
+        modifiedBy: "admin",
+        timeStamp: new Date().toISOString(),
+      });
+      setNewVendorRate(null);
+      const fetchResponse = await axios.get(
+        `https://test-api-3tmq.onrender.com/ProjVendRt`
+      );
+      const filteredData = fetchResponse.data.filter((item) =>
+        item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
+      );
+      // setVendorBillingRates(
+      //   filteredData.map((item) => ({
+      //     id: item.id,
+      //     lookupType: item.type || "Select",
+      //     vendorId: item.vendId || "",
+      //     // vendorName: item.vendorName || "",
+      //     // vendorEmployee: item.vendEmplId || "",
+      //     vendorName: item.vendEmplName || newVendorRate.vendorName || "", // Use vendEmplName or fallback to newVendorRate.vendorName
+      //     vendorEmployee: item.vendEmplId || "",
+      //     vendorEmployeeName: item.vendEmplName || "",
+      //     plc: item.billLabCatCd,
+      //     plcDescription: item.description || "",
+      //     billRate: item.billRtAmt,
+      //     rateType: item.sBillRtTypeCd || "Select",
+      //     startDate: new Date(item.startDt).toISOString().split("T")[0],
+      //     endDate: item.endDt
+      //       ? new Date(item.endDt).toISOString().split("T")[0]
+      //       : null,
+      //   }))
+      // );
+      setVendorBillingRates(
+        filteredData.map((item) => ({
+          id: item.projVendRtKey || item.id,
+          projVendRtKey: item.projVendRtKey,
+          lookupType: item.type || "Select",
+          vendorId: item.vendId || "",
+          vendorName:
+            item.vendEmplName || newVendorRate.vendorEmployeeName || "", // Use vendEmplName
+          vendorEmployee: item.vendEmplId || "",
+          vendorEmployeeName:
+            item.vendEmplName || newVendorRate.vendorEmployeeName || "", // Use vendEmplName
+          plc: item.billLabCatCd,
+          plcDescription: item.plcDescription || "",
+          billRate: item.billRtAmt,
+          rateType: item.sBillRtTypeCd || "Select",
+          // startDate: new Date(item.startDt).toISOString().split("T")[0],
+          // endDate: item.endDt
+          //   ? new Date(item.endDt).toISOString().split("T")[0]
+          //   : null,
+          startDate: formatDate(item.startDt),
+          endDate: formatDate(item.endDt),
+        }))
+      );
+      const newEditVendorBillRate = {};
+      const newEditVendorFields = {};
+      filteredData.forEach((item) => {
+        newEditVendorBillRate[item.id] = item.billRtAmt;
+        newEditVendorFields[item.id] = {
+          lookupType: item.type || "Select",
+          rateType: item.sBillRtTypeCd || "Select",
+          startDate: new Date(item.startDt).toISOString().split("T")[0],
+          endDate: item.endDt
+            ? new Date(item.endDt).toISOString().split("T")[0]
             : null,
-          sBillRtTypeCd: newVendorRate.rateType,
-          type: newVendorRate.lookupType,
-          modifiedBy: "admin",
-          timeStamp: new Date().toISOString(),
-        });
-        setNewVendorRate(null);
-        const fetchResponse = await axios.get(
-          `https://test-api-3tmq.onrender.com/ProjVendRt`
-        );
-        const filteredData = fetchResponse.data.filter((item) =>
-          item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
-        );
-        // setVendorBillingRates(
-        //   filteredData.map((item) => ({
-        //     id: item.id,
-        //     lookupType: item.type || "Select",
-        //     vendorId: item.vendId || "",
-        //     // vendorName: item.vendorName || "",
-        //     // vendorEmployee: item.vendEmplId || "",
-        //     vendorName: item.vendEmplName || newVendorRate.vendorName || "", // Use vendEmplName or fallback to newVendorRate.vendorName
-        //     vendorEmployee: item.vendEmplId || "",
-        //     vendorEmployeeName: item.vendEmplName || "",
-        //     plc: item.billLabCatCd,
-        //     plcDescription: item.description || "",
-        //     billRate: item.billRtAmt,
-        //     rateType: item.sBillRtTypeCd || "Select",
-        //     startDate: new Date(item.startDt).toISOString().split("T")[0],
-        //     endDate: item.endDt
-        //       ? new Date(item.endDt).toISOString().split("T")[0]
-        //       : null,
-        //   }))
-        // );
-        setVendorBillingRates(
-          filteredData.map((item) => ({
-            id: item.projVendRtKey || item.id,
-            projVendRtKey: item.projVendRtKey,
-            lookupType: item.type || "Select",
-            vendorId: item.vendId || "",
-            vendorName: item.vendEmplName || newVendorRate.vendorEmployeeName || "", // Use vendEmplName
-            vendorEmployee: item.vendEmplId || "",
-            vendorEmployeeName:
-              item.vendEmplName || newVendorRate.vendorEmployeeName || "", // Use vendEmplName
-            plc: item.billLabCatCd,
-            plcDescription: item.plcDescription || "",
-            billRate: item.billRtAmt,
-            rateType: item.sBillRtTypeCd || "Select",
-            // startDate: new Date(item.startDt).toISOString().split("T")[0],
-            // endDate: item.endDt
-            //   ? new Date(item.endDt).toISOString().split("T")[0]
-            //   : null,
-            startDate: formatDate(item.startDt),
-            endDate: formatDate(item.endDt),
-          }))
-        );
-        const newEditVendorBillRate = {};
-        const newEditVendorFields = {};
-        filteredData.forEach((item) => {
-          newEditVendorBillRate[item.id] = item.billRtAmt;
-          newEditVendorFields[item.id] = {
-            lookupType: item.type || "Select",
-            rateType: item.sBillRtTypeCd || "Select",
-            startDate: new Date(item.startDt).toISOString().split("T")[0],
-            endDate: item.endDt
-              ? new Date(item.endDt).toISOString().split("T")[0]
-              : null,
-          };
-        });
-        setEditVendorBillRate(newEditVendorBillRate);
-        setEditVendorFields(newEditVendorFields);
-      } catch (error) {
-        console.error(
-          "Error adding vendor billing rate:",
-          error.response ? error.response.data : error.message
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+        };
+      });
+      setEditVendorBillRate(newEditVendorBillRate);
+      setEditVendorFields(newEditVendorFields);
+    } catch (error) {
+      console.error(
+        "Error adding vendor billing rate:",
+        error.response ? error.response.data : error.message
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleVendorBillRateChange = (id, value) => {
     setEditVendorBillRate((prev) => ({
@@ -1763,7 +1747,7 @@ useEffect(() => {
 
   const handleUpdateVendor = async (id) => {
     // setLoading(true);
-    setLoadingAction(prev => ({...prev, [id]: false})); // Individual row loading
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // Individual row loading
     const row = vendorBillingRates.find((r) => r.id === id);
     const projVendRtKey = row?.projVendRtKey || id;
     const fields = editVendorFields[id] || {};
@@ -1864,41 +1848,45 @@ useEffect(() => {
   //      setLoading(false);
   //    }
   //  };
-  
+
   const handleDeleteVendor = async (id) => {
-  const rate = vendorBillingRates.find((rate) => rate.id === id);
-  const deleteId = rate?.projVendRtKey || id; // Use projVendRtKey if available
-  setLoadingAction((prev) => ({ ...prev, [id]: true }));
-  try {
-    await axios.delete(`https://test-api-3tmq.onrender.com/ProjVendRt/${deleteId}`);
-    setVendorBillingRates((prev) => prev.filter((rate) => rate.id !== id));
-    setEditVendorBillRate((prev) => {
-      const newEditVendorBillRate = { ...prev };
-      delete newEditVendorBillRate[id];
-      return newEditVendorBillRate;
-    });
-    setEditVendorFields((prev) => {
-      const newEditVendorFields = { ...prev };
-      delete newEditVendorFields[id];
-      return newEditVendorFields;
-    });
-    setEditingVendorRowId(null);
-    toast.success("Vendor billing rate deleted successfully!");
-  } catch (error) {
-    console.error("Error deleting vendor billing rate:", error);
-    toast.error(
-      `Failed to delete vendor billing rate: ${error.response?.data?.message || error.message}`
-    );
-  } finally {
-    setLoadingAction((prev) => ({ ...prev, [id]: false }));
-  }
-};
+    const rate = vendorBillingRates.find((rate) => rate.id === id);
+    const deleteId = rate?.projVendRtKey || id; // Use projVendRtKey if available
+    setLoadingAction((prev) => ({ ...prev, [id]: true }));
+    try {
+      await axios.delete(
+        `https://test-api-3tmq.onrender.com/ProjVendRt/${deleteId}`
+      );
+      setVendorBillingRates((prev) => prev.filter((rate) => rate.id !== id));
+      setEditVendorBillRate((prev) => {
+        const newEditVendorBillRate = { ...prev };
+        delete newEditVendorBillRate[id];
+        return newEditVendorBillRate;
+      });
+      setEditVendorFields((prev) => {
+        const newEditVendorFields = { ...prev };
+        delete newEditVendorFields[id];
+        return newEditVendorFields;
+      });
+      setEditingVendorRowId(null);
+      toast.success("Vendor billing rate deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting vendor billing rate:", error);
+      toast.error(
+        `Failed to delete vendor billing rate: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      setLoadingAction((prev) => ({ ...prev, [id]: false }));
+    }
+  };
 
   const handleNewVendorRateChange = (field, value) => {
     setNewVendorRate((prev) => ({ ...prev, [field]: value }));
   };
 
-   const handleVendorFieldChange = (id, field, value) => {
+  const handleVendorFieldChange = (id, field, value) => {
     if (field === "billRate") {
       handleVendorBillRateChange(id, value);
       return;
@@ -1994,13 +1982,22 @@ useEffect(() => {
   };
 
   useEffect(() => {
-  if (!showPLC || hasFetchedPLC || !selectedProjectId) return;
-  fetchBillingRates();
-  fetchEmployeeBillingRates();
-  fetchVendorBillingRates();
-  setHasFetchedPLC(true);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [showPLC, hasFetchedPLC, selectedProjectId]);
+    if (!showPLC || hasFetchedPLC || !selectedProjectId) return;
+    fetchBillingRates();
+    fetchEmployeeBillingRates();
+    fetchVendorBillingRates();
+    setHasFetchedPLC(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPLC, hasFetchedPLC, selectedProjectId]);
+
+  const handlePlcInputChange = (value) => {
+  setPlcSearch(value);
+};
+
+const handlePlcSelect = (value) => {
+  handleNewRateChange("plc", value);
+  setPlcSearch(value);
+};
 
 
   return (
@@ -2239,7 +2236,10 @@ useEffect(() => {
                       className="w-full p-1 border rounded text-xs"
                       list="plc-list"
                     />
-                    <datalist id="plc-list" style={dropdownStyles.noBorderDropdown}>
+                    <datalist
+                      id="plc-list"
+                      style={dropdownStyles.noBorderDropdown}
+                    >
                       {plcs.map((plc) => (
                         <option
                           key={plc.laborCategoryCode}
@@ -2353,7 +2353,7 @@ useEffect(() => {
       </div>
 
       {/* Employee Billing Rates Schedule */}
-       <div className="mb-4">
+      <div className="mb-4">
         <h3 className="text-xs font-normal">Employee Billing Rates Schedule</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-xs border-collapse">
@@ -2413,11 +2413,7 @@ useEffect(() => {
                           ))}
                         </select>
                       ) : (
-                        <span
-                          
-                        >
-                          {item.lookupType}
-                        </span>
+                        <span>{item.lookupType}</span>
                       )}
                     </td>
                     <td className="border p-2 sm:w-1/8">
@@ -2437,11 +2433,7 @@ useEffect(() => {
                           disabled={employees.length === 0}
                         />
                       ) : (
-                        <span
-                          
-                        >
-                          {item.empId}
-                        </span>
+                        <span>{item.empId}</span>
                       )}
                       <datalist id="employee-list">
                         {employees.map((emp) => (
@@ -2452,11 +2444,7 @@ useEffect(() => {
                       </datalist>
                     </td>
                     <td className="border p-2 sm:w-1/8">
-                      <span
-                        
-                      >
-                        {item.employeeName}
-                      </span>
+                      <span>{item.employeeName}</span>
                     </td>
                     {/* <td className="border p-2 sm:w-1/8">
                       <input
@@ -2486,35 +2474,37 @@ useEffect(() => {
                       </datalist>
                     </td> */}
                     <td className="border p-2 sm:w-1/8">
-  {editingEmployeeRowId === item.id ? (
-    <input
-      type="text"
-      value={editEmployeeFields[item.id]?.plc || item.plc}
-      onChange={(e) => {
-        handleNewEmployeeRateChange("plc", e.target.value, item.id);
-        setPlcSearch(e.target.value);
-      }}
-      className="w-full p-1 border rounded text-xs"
-      list="plc-list"
-    />
-  ) : (
-    <span>{item.plc}</span>
-  )}
-  <datalist id="plc-list">
-    {plcs.map((plc) => (
-      <option
-        key={plc.laborCategoryCode}
-        value={plc.laborCategoryCode}
-      >
-        {plc.description}
-      </option>
-    ))}
-  </datalist>
-</td>
+                      {editingEmployeeRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={editEmployeeFields[item.id]?.plc || item.plc}
+                          onChange={(e) => {
+                            handleNewEmployeeRateChange(
+                              "plc",
+                              e.target.value,
+                              item.id
+                            );
+                            setPlcSearch(e.target.value);
+                          }}
+                          className="w-full p-1 border rounded text-xs"
+                          list="plc-list"
+                        />
+                      ) : (
+                        <span>{item.plc}</span>
+                      )}
+                      <datalist id="plc-list">
+                        {plcs.map((plc) => (
+                          <option
+                            key={plc.laborCategoryCode}
+                            value={plc.laborCategoryCode}
+                          >
+                            {plc.description}
+                          </option>
+                        ))}
+                      </datalist>
+                    </td>
                     <td className="border p-2 sm:w-1/8">
-                      <span
-                        
-                      >
+                      <span>
                         {plcs.find((plc) => plc.laborCategoryCode === item.plc)
                           ?.description || item.plcDescription}
                       </span>
@@ -2533,11 +2523,7 @@ useEffect(() => {
                           className="w-full p-1 border rounded text-xs"
                         />
                       ) : (
-                        <span
-                          
-                        >
-                          {item.billRate}
-                        </span>
+                        <span>{item.billRate}</span>
                       )}
                     </td>
                     <td className="border p-2 sm:w-1/8">
@@ -2563,11 +2549,7 @@ useEffect(() => {
                           ))}
                         </select>
                       ) : (
-                        <span
-                          
-                        >
-                          {item.rateType}
-                        </span>
+                        <span>{item.rateType}</span>
                       )}
                     </td>
                     <td className="border p-2 sm:w-1/8">
@@ -2588,11 +2570,7 @@ useEffect(() => {
                           className="w-full p-1 border rounded text-xs"
                         />
                       ) : (
-                        <span
-                         
-                        >
-                          {item.startDate}
-                        </span>
+                        <span>{item.startDate}</span>
                       )}
                     </td>
                     <td className="border p-2 sm:w-1/8">
@@ -2614,11 +2592,7 @@ useEffect(() => {
                           className="w-full p-1 border rounded text-xs"
                         />
                       ) : (
-                        <span
-                          
-                        >
-                          {item.endDate || ""}
-                        </span>
+                        <span>{item.endDate || ""}</span>
                       )}
                     </td>
                     {/* <td className="border p-2 sm:w-1/8">
@@ -2646,65 +2620,67 @@ useEffect(() => {
                       </div>
                     </td> */}
                     <td className="border p-2 sm:w-1/8">
-  <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-    {editingEmployeeRowId === item.id ? (
-      <>
-        <button
-          onClick={() =>
-            handleUpdateEmployee(item.id, {
-              ...item,
-              billRate: editEmployeeBillRate[item.id] || item.billRate,
-            })
-          }
-          className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-          disabled={loadingAction[item.id]}
-          title="Save"
-        >
-          {loadingAction[item.id] ? (
-            <span className="animate-spin">⌛</span>
-          ) : (
-            <FaSave className="text-sm" />
-          )}
-        </button>
-        <button
-          onClick={() => setEditingEmployeeRowId(null)}
-          className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-          disabled={loadingAction[item.id]}
-          title="Cancel"
-        >
-          <FaTimes className="text-sm" />
-        </button>
-      </>
-    ) : (
-      <>
-        <button
-          onClick={() => handleEditEmployeeRow(item.id)}
-          className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-          disabled={loadingAction[item.id]}
-          title="Edit"
-        >
-          {loadingAction[item.id] ? (
-            <span className="animate-spin">⌛</span>
-          ) : (
-            <FaEdit className="text-sm" />
-          )}
-        </button>
-        <button
-          onClick={() => handleDeleteEmployee(item.id)}
-          className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-          disabled={loadingAction[item.id]}
-          title="Delete"
-        >
-          {loadingAction[item.id] ? (
-            <span className="animate-spin">⌛</span>
-          ) : (
-            <FaTrash className="text-sm" />
-          )}
-        </button>
-      </>
-    )}
-  </div>
-</td>
+                      <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                        {editingEmployeeRowId === item.id ? (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleUpdateEmployee(item.id, {
+                                  ...item,
+                                  billRate:
+                                    editEmployeeBillRate[item.id] ||
+                                    item.billRate,
+                                })
+                              }
+                              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loadingAction[item.id]}
+                              title="Save"
+                            >
+                              {loadingAction[item.id] ? (
+                                <span className="animate-spin">⌛</span>
+                              ) : (
+                                <FaSave className="text-sm" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => setEditingEmployeeRowId(null)}
+                              className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loadingAction[item.id]}
+                              title="Cancel"
+                            >
+                              <FaTimes className="text-sm" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleEditEmployeeRow(item.id)}
+                              className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loadingAction[item.id]}
+                              title="Edit"
+                            >
+                              {loadingAction[item.id] ? (
+                                <span className="animate-spin">⌛</span>
+                              ) : (
+                                <FaEdit className="text-sm" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteEmployee(item.id)}
+                              className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loadingAction[item.id]}
+                              title="Delete"
+                            >
+                              {loadingAction[item.id] ? (
+                                <span className="animate-spin">⌛</span>
+                              ) : (
+                                <FaTrash className="text-sm" />
+                              )}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
@@ -2773,27 +2749,27 @@ useEffect(() => {
                     </datalist>
                   </td> */}
                   <td className="border p-2 sm:w-1/8">
-  <input
-    type="text"
-    value={newEmployeeRate.plc || ""}
-    onChange={(e) => {
-      handleNewEmployeeRateChange("plc", e.target.value);
-      setPlcSearch(e.target.value);
-    }}
-    className="w-full p-1 border rounded text-xs"
-    list="plc-list"
-  />
-  <datalist id="plc-list">
-    {plcs.map((plc) => (
-      <option
-        key={plc.laborCategoryCode}
-        value={plc.laborCategoryCode}
-      >
-        {plc.description}
-      </option>
-    ))}
-  </datalist>
-</td>
+                    <input
+                      type="text"
+                      value={newEmployeeRate.plc || ""}
+                      onChange={(e) => {
+                        handleNewEmployeeRateChange("plc", e.target.value);
+                        setPlcSearch(e.target.value);
+                      }}
+                      className="w-full p-1 border rounded text-xs"
+                      list="plc-list"
+                    />
+                    <datalist id="plc-list">
+                      {plcs.map((plc) => (
+                        <option
+                          key={plc.laborCategoryCode}
+                          value={plc.laborCategoryCode}
+                        >
+                          {plc.description}
+                        </option>
+                      ))}
+                    </datalist>
+                  </td>
                   <td className="border p-2 sm:w-1/8">
                     {plcs.find(
                       (plc) => plc.laborCategoryCode === newEmployeeRate.plc
@@ -2881,281 +2857,341 @@ useEffect(() => {
       </div>
 
       {/* Vendor Billing Rates Schedule */}
-      <div className="mb-4">
-      <h3 className="text-xs font-normal">Vendor Billing Rates Schedule</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2 font-normal sm:w-1/8">Lookup Type</th>
-              <th className="border p-2 font-normal sm:w-1/8">Vendor</th>
-              <th className="border p-2 font-normal sm:w-1/8">Vendor Name</th>
-              <th className="border p-2 font-normal sm:w-1/8">Vendor Employee ID</th>
-              <th className="border p-2 font-normal sm:w-1/8">Vendor Employee Name</th>
-              <th className="border p-2 font-normal sm:w-1/8">PLC</th>
-              <th className="border p-2 font-normal sm:w-1/8">PLC Description</th>
-              <th className="border p-2 font-normal sm:w-1/8">Bill Rate</th>
-              <th className="border p-2 font-normal">Rate Type</th>
-              <th className="border p-2 font-normal">Start Date</th>
-              <th className="border p-2 font-normal">End Date</th>
-              <th className="border p-2 font-normal sm:w-1/8">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loadingVendor ? (
-              <tr>
-                <td colSpan="12" className="border p-2 text-center">
-                  Loading...
-                </td>
+    <div className="mb-4">
+        <h3 className="text-xs font-normal">Vendor Billing Rates Schedule</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border p-2 font-normal sm:w-1/8">Lookup Type</th>
+                <th className="border p-2 font-normal sm:w-1/8">Vendor</th>
+                <th className="border p-2 font-normal sm:w-1/8">Vendor Name</th>
+                <th className="border p-2 font-normal sm:w-1/8">
+                  Vendor Employee ID
+                </th>
+                <th className="border p-2 font-normal sm:w-1/8">
+                  Vendor Employee Name
+                </th>
+                <th className="border p-2 font-normal sm:w-1/8">PLC</th>
+                <th className="border p-2 font-normal sm:w-1/8">
+                  PLC Description
+                </th>
+                <th className="border p-2 font-normal sm:w-1/8">Bill Rate</th>
+                <th className="border p-2 font-normal">Rate Type</th>
+                <th className="border p-2 font-normal">Start Date</th>
+                <th className="border p-2 font-normal">End Date</th>
+                <th className="border p-2 font-normal sm:w-1/8">Actions</th>
               </tr>
-            ) : vendorBillingRates.length === 0 && !newVendorRate ? (
-              <tr>
-                <td colSpan="12" className="border p-2 text-center">
-                  No data available
-                </td>
-              </tr>
-            ) : (
-              vendorBillingRates.map((item) => (
-                <tr
-                  key={item.id}
-                  className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
-                >
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <select
-                        value={editVendorFields[item.id]?.lookupType ?? item.lookupType}
-                        onChange={(e) =>
-                          handleVendorFieldChange(item.id, "lookupType", e.target.value)
-                        }
-                        className="w-full p-1 border rounded text-xs"
-                      >
-                        {vendorLookupTypeOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <span>{item.lookupType}</span>
-                    )}
+            </thead>
+            <tbody>
+              {loadingVendor ? (
+                <tr>
+                  <td colSpan="12" className="border p-2 text-center">
+                    Loading...
                   </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="text"
-                        value={editVendorFields[item.id]?.vendorId || item.vendorId}
-                        onChange={(e) =>
-                          handleVendorFieldChange(item.id, "vendorId", e.target.value)
-                        }
-                        className="w-full p-2 border rounded text-xs"
-                        list="vendor-list"
-                      />
-                    ) : (
-                      <span>{item.vendorId}</span>
-                    )}
-                    <datalist id="vendor-list">
-                      {vendorEmployees.map((v) => (
-                        <option key={`${v.vendId}-${v.empId}`} value={v.vendId}>
-                          {v.employeeName}
-                        </option>
-                      ))}
-                    </datalist>
+                </tr>
+              ) : vendorBillingRates.length === 0 && !newVendorRate ? (
+                <tr>
+                  <td colSpan="12" className="border p-2 text-center">
+                    No data available
                   </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="text"
-                        value={editVendorFields[item.id]?.vendorName || item.vendorName}
-                        readOnly
-                        className="w-full p-2 border rounded text-xs bg-gray-100"
-                      />
-                    ) : (
-                      <span>{item.vendorName}</span>
-                    )}
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="text"
-                        value={editVendorFields[item.id]?.vendorEmployee || item.vendorEmployee}
-                        readOnly
-                        className="w-full p-2 border rounded text-xs bg-gray-100"
-                      />
-                    ) : (
-                      <span>{item.vendorEmployee}</span>
-                    )}
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="text"
-                        value={editVendorFields[item.id]?.vendorEmployeeName || item.vendorEmployeeName}
-                        readOnly
-                        className="w-full p-2 border rounded text-xs bg-gray-100"
-                      />
-                    ) : (
-                      <span>{item.vendorEmployeeName}</span>
-                    )}
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="text"
-                        value={editVendorFields[item.id]?.plc || item.plc}
-                        onChange={(e) => {
-                          handleVendorFieldChange(item.id, "plc", e.target.value);
-                          setPlcSearch(e.target.value);
-                        }}
-                        className="w-full p-2 border rounded text-xs"
-                        list="plc-list"
-                      />
-                    ) : (
-                      <span>{item.plc}</span>
-                    )}
-                    <datalist id="plc-list">
-                      {plcs.map((plc) => (
-                        <option key={plc.laborCategoryCode} value={plc.laborCategoryCode}>
-                          {plc.description}
-                        </option>
-                      ))}
-                    </datalist>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="text"
-                        value={
-                          editVendorFields[item.id]?.plcDescription ||
-                          item.plcDescription ||
-                          plcs.find(
-                            (plc) =>
-                              plc.laborCategoryCode === (editVendorFields[item.id]?.plc || item.plc)
-                          )?.description ||
-                          ""
-                        }
-                        readOnly
-                        className="w-full p-2 border rounded text-xs bg-gray-100"
-                      />
-                    ) : (
-                      <span>{item.plcDescription}</span>
-                    )}
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="text"
-                        value={editVendorBillRate[item.id] ?? item.billRate ?? ""}
-                        onChange={(e) =>
-                          handleVendorBillRateChange(item.id, e.target.value)
-                        }
-                        className="w-full p-2 border rounded text-xs"
-                      />
-                    ) : (
-                      <span>{item.billRate}</span>
-                    )}
-                  </td>
-                  <td className="border p-2">
-                    {editingVendorRowId === item.id ? (
-                      <select
-                        value={editVendorFields[item.id]?.rateType ?? item.rateType}
-                        onChange={(e) =>
-                          handleVendorFieldChange(item.id, "rateType", e.target.value)
-                        }
-                        className="w-full p-2 border rounded text-xs"
-                      >
-                        {rateTypeOptions.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <span>{item.rateType}</span>
-                    )}
-                  </td>
-                  <td className="border p-2">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="date"
-                        value={editVendorFields[item.id]?.startDate ?? item.startDate}
-                        onChange={(e) =>
-                          handleVendorFieldChange(item.id, "startDate", e.target.value)
-                        }
-                        className="w-full p-2 border rounded text-xs"
-                      />
-                    ) : (
-                      <span>{item.startDate}</span>
-                    )}
-                  </td>
-                  <td className="border p-2">
-                    {editingVendorRowId === item.id ? (
-                      <input
-                        type="date"
-                        value={editVendorFields[item.id]?.endDate ?? item.endDate ?? ""}
-                        onChange={(e) =>
-                          handleVendorFieldChange(item.id, "endDate", e.target.value)
-                        }
-                        className="w-full p-2 border rounded text-xs"
-                      />
-                    ) : (
-                      <span>{item.endDate || ""}</span>
-                    )}
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                </tr>
+              ) : (
+                vendorBillingRates.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+                  >
+                    <td className="border p-2 sm:w-1/8">
                       {editingVendorRowId === item.id ? (
-                        <>
-                          <button
-                            onClick={() => handleUpdateVendor(item.id)}
-                            className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                            disabled={loading}
-                            title="Save"
-                          >
-                            
-                              <FaSave className="text-sm" />
-                            
-                          </button>
-                          <button
-                            onClick={() => setEditingVendorRowId(null)}
-                            className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                            disabled={loadingAction[item.id]}
-                            title="Cancel"
-                          >
-                            <FaTimes className="text-sm" />
-                          </button>
-                        </>
+                        <select
+                          value={
+                            editVendorFields[item.id]?.lookupType ??
+                            item.lookupType
+                          }
+                          onChange={(e) =>
+                            handleVendorFieldChange(
+                              item.id,
+                              "lookupType",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-1 border rounded text-xs"
+                        >
+                          {vendorLookupTypeOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
                       ) : (
-                        <>
-                          <button
-                            onClick={() => handleEditVendorRow(item.id)}
-                            className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                            disabled={loadingAction[item.id]}
-                            title="Edit"
+                        <span>{item.lookupType}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={
+                            editVendorFields[item.id]?.vendorId || item.vendorId
+                          }
+                          onChange={(e) =>
+                            handleVendorFieldChange(
+                              item.id,
+                              "vendorId",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-2 border rounded text-xs"
+                          list="vendor-list"
+                        />
+                      ) : (
+                        <span>{item.vendorId}</span>
+                      )}
+                      <datalist id="vendor-list">
+                        {vendorEmployees.map((v) => (
+                          <option
+                            key={`${v.vendId}-${v.empId}`}
+                            value={v.vendId}
                           >
-                            <FaEdit className="text-sm" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteVendor(item.id)}
-                            className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                            // disabled={loadingAction[item.id]}
-                            disabled={loading}
-                            title="Delete"
+                            {v.employeeName}
+                          </option>
+                        ))}
+                      </datalist>
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={
+                            editVendorFields[item.id]?.vendorName ||
+                            item.vendorName
+                          }
+                          readOnly
+                          className="w-full p-2 border rounded text-xs bg-gray-100"
+                        />
+                      ) : (
+                        <span>{item.vendorName}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={
+                            editVendorFields[item.id]?.vendorEmployee ||
+                            item.vendorEmployee
+                          }
+                          readOnly
+                          className="w-full p-2 border rounded text-xs bg-gray-100"
+                        />
+                      ) : (
+                        <span>{item.vendorEmployee}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={
+                            editVendorFields[item.id]?.vendorEmployeeName ||
+                            item.vendorEmployeeName
+                          }
+                          readOnly
+                          className="w-full p-2 border rounded text-xs bg-gray-100"
+                        />
+                      ) : (
+                        <span>{item.vendorEmployeeName}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={editVendorFields[item.id]?.plc || item.plc}
+                          onChange={(e) => {
+                            handleVendorFieldChange(
+                              item.id,
+                              "plc",
+                              e.target.value
+                            );
+                            setPlcSearch(e.target.value);
+                          }}
+                          className="w-full p-2 border rounded text-xs"
+                          list="plc-list"
+                        />
+                      ) : (
+                        <span>{item.plc}</span>
+                      )}
+                      <datalist id="plc-list">
+                        {plcs.map((plc) => (
+                          <option
+                            key={plc.laborCategoryCode}
+                            value={plc.laborCategoryCode}
                           >
-                            {/* {loadingAction[item.id] ? (
+                            {plc.description}
+                          </option>
+                        ))}
+                      </datalist>
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={
+                            editVendorFields[item.id]?.plcDescription ||
+                            item.plcDescription ||
+                            plcs.find(
+                              (plc) =>
+                                plc.laborCategoryCode ===
+                                (editVendorFields[item.id]?.plc || item.plc)
+                            )?.description ||
+                            ""
+                          }
+                          readOnly
+                          className="w-full p-2 border rounded text-xs bg-gray-100"
+                        />
+                      ) : (
+                        <span>{item.plcDescription}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={
+                            editVendorBillRate[item.id] ?? item.billRate ?? ""
+                          }
+                          onChange={(e) =>
+                            handleVendorBillRateChange(item.id, e.target.value)
+                          }
+                          className="w-full p-2 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.billRate}</span>
+                      )}
+                    </td>
+                    <td className="border p-2">
+                      {editingVendorRowId === item.id ? (
+                        <select
+                          value={
+                            editVendorFields[item.id]?.rateType ?? item.rateType
+                          }
+                          onChange={(e) =>
+                            handleVendorFieldChange(
+                              item.id,
+                              "rateType",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-2 border rounded text-xs"
+                        >
+                          {rateTypeOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span>{item.rateType}</span>
+                      )}
+                    </td>
+                    <td className="border p-2">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="date"
+                          value={
+                            editVendorFields[item.id]?.startDate ??
+                            item.startDate
+                          }
+                          onChange={(e) =>
+                            handleVendorFieldChange(
+                              item.id,
+                              "startDate",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-2 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.startDate}</span>
+                      )}
+                    </td>
+                    <td className="border p-2">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="date"
+                          value={
+                            editVendorFields[item.id]?.endDate ??
+                            item.endDate ??
+                            ""
+                          }
+                          onChange={(e) =>
+                            handleVendorFieldChange(
+                              item.id,
+                              "endDate",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-2 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.endDate || ""}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/8">
+                      <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                        {editingVendorRowId === item.id ? (
+                          <>
+                            <button
+                              onClick={() => handleUpdateVendor(item.id)}
+                              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loading}
+                              title="Save"
+                            >
+                              <FaSave className="text-sm" />
+                            </button>
+                            <button
+                              onClick={() => setEditingVendorRowId(null)}
+                              className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loadingAction[item.id]}
+                              title="Cancel"
+                            >
+                              <FaTimes className="text-sm" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleEditVendorRow(item.id)}
+                              className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loadingAction[item.id]}
+                              title="Edit"
+                            >
+                              <FaEdit className="text-sm" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteVendor(item.id)}
+                              className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              // disabled={loadingAction[item.id]}
+                              disabled={loading}
+                              title="Delete"
+                            >
+                              {/* {loadingAction[item.id] ? (
                               <span className="animate-spin">⌛</span>
                             ) : (
                               <FaTrash className="text-sm" />
                             )} */}
-                            <FaTrash className="text-sm" />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-            {newVendorRate && (
+                              <FaTrash className="text-sm" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+              {newVendorRate && (
                 <tr className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0">
                   <td className="border p-2 sm:w-1/8">
                     <select
@@ -3336,21 +3372,21 @@ useEffect(() => {
                   </td>
                 </tr>
               )}
-            <tr>
-              <td colSpan="12" className="border p-2">
-                <button
-                  onClick={handleAddVendorRow}
-                  className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition"
-                  disabled={loading || newVendorRate}
-                >
-                  Add
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+              <tr>
+                <td colSpan="12" className="border p-2">
+                  <button
+                    onClick={handleAddVendorRow}
+                    className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition"
+                    disabled={loading || newVendorRate}
+                  >
+                    Add
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> 
     </div>
   );
 };

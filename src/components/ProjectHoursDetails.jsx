@@ -706,7 +706,8 @@ const ProjectHoursDetails = ({
       orgId: newEntry.orgId,
       plc: newEntry.plcGlcCode || "",
       hrlyRate: Number(newEntry.perHourRate) || 0,
-      effectDt: new Date().toISOString(),
+      // effectDt: new Date().toISOString(),
+      effectDt: null,
       plEmployee: null,
     }));
 
@@ -1493,8 +1494,8 @@ const handleRowClick = (actualEmpIdx) => {
           No forecast data available for this plan.
         </div>
       ) : (
-        <div className="synchronized-tables-container">
-          <div className="synchronized-table-scroll first">
+        <div className="synchronized-tables-container flex">
+          <div className="synchronized-table-scroll first ">
             <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
               <thead className="sticky-thead">
                 <tr
@@ -2135,6 +2136,648 @@ const handleRowClick = (actualEmpIdx) => {
           </div>
         </div>
 
+        //  <div className="synchronized-tables-container max-h-[500px] overflow-y-auto flex">
+        //   <div className="synchronized-table-scroll first min-h-0 overflow-x-auto ">
+        //     <table className="table-fixed text-xs text-left min-w-[350px] border border-gray-300 rounded-lg">
+        //       <thead className="sticky-thead">
+        //         <tr
+        //           style={{
+        //             height: `${ROW_HEIGHT_DEFAULT}px`,
+        //             lineHeight: "normal",
+        //           }}
+        //         >
+        //           {EMPLOYEE_COLUMNS.map((col) => (
+        //             <th
+        //               key={col.key}
+        //               className="p-1.5 border border-gray-200 whitespace-nowrap text-xs text-gray-900 font-normal min-w-[70px]" // Reduced padding and min-width
+        //             >
+        //               {col.label}
+        //             </th>
+        //           ))}
+        //         </tr>
+        //       </thead>
+        //       <tbody>
+        //         {showNewForm && (
+        //           <tr
+        //             key="new-entry"
+        //             className="bg-gray-50"
+        //             style={{
+        //               height: `${ROW_HEIGHT_DEFAULT}px`,
+        //               lineHeight: "normal",
+        //             }}
+        //           >
+        //             {console.log("Rendering new entry form with:", {
+        //               employeeSuggestions,
+        //               laborAccounts,
+        //               plcOptions,
+        //               plcSearch,
+        //             })}
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <select
+        //                 name="idType"
+        //                 value={newEntry.idType || ""}
+        //                 onChange={(e) =>
+        //                   setNewEntry({ ...newEntry, idType: e.target.value })
+        //                 }
+        //                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+        //               >
+        //                 {ID_TYPE_OPTIONS.map((opt) => (
+        //                   <option key={opt.value} value={opt.value}>
+        //                     {opt.label}
+        //                   </option>
+        //                 ))}
+        //               </select>
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="text"
+        //                 name="id"
+        //                 value={newEntry.id}
+        //                 onChange={(e) => handleIdChange(e.target.value)}
+        //                 className="w-full rounded px-1 py-0.5 text-xs outline-none focus:ring-0 no-datalist-border"
+        //                 list="employee-id-list"
+        //                 placeholder="Enter ID"
+        //               />
+        //               <datalist id="employee-id-list">
+        //                 {employeeSuggestions
+        //                   .filter(
+        //                     (emp) =>
+        //                       emp.emplId && typeof emp.emplId === "string"
+        //                   )
+        //                   .map((emp, index) => (
+        //                     <option
+        //                       key={`${emp.emplId}-${index}`}
+        //                       value={emp.emplId}
+        //                     >
+        //                       {emp.lastName && emp.firstName
+        //                         ? `${emp.lastName}, ${emp.firstName}`
+        //                         : emp.lastName || emp.firstName || emp.emplId}
+        //                     </option>
+        //                   ))}
+        //               </datalist>
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="text"
+        //                 name="name"
+        //                 value={
+        //                   newEntry.idType === "Vendor"
+        //                     ? newEntry.lastName || newEntry.firstName || ""
+        //                     : newEntry.lastName && newEntry.firstName
+        //                     ? `${newEntry.lastName}, ${newEntry.firstName}`
+        //                     : newEntry.lastName || newEntry.firstName || ""
+        //                 }
+        //                 readOnly
+        //                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
+        //                 placeholder="Name (auto-filled)"
+        //               />
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="text"
+        //                 name="acctId"
+        //                 value={newEntry.acctId}
+        //                 onChange={(e) =>
+        //                   isBudPlan &&
+        //                   setNewEntry({ ...newEntry, acctId: e.target.value })
+        //                 }
+        //                 className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+        //                   !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+        //                 }`}
+        //                 list="account-list"
+        //                 placeholder="Enter Account"
+        //                 disabled={!isBudPlan}
+        //               />
+        //               <datalist id="account-list">
+        //                 {laborAccounts.map((account, index) => (
+        //                   <option
+        //                     key={`${account.id}-${index}`}
+        //                     value={account.id}
+        //                   >
+        //                     {account.id}
+        //                   </option>
+        //                 ))}
+        //               </datalist>
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="text"
+        //                 name="orgId"
+        //                 value={newEntry.orgId}
+        //                 onChange={(e) =>
+        //                   isBudPlan &&
+        //                   setNewEntry({ ...newEntry, orgId: e.target.value })
+        //                 }
+        //                 className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+        //                   !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+        //                 }`}
+        //                 placeholder="Enter Organization"
+        //                 disabled={!isBudPlan}
+        //               />
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="text"
+        //                 name="plcGlcCode"
+        //                 value={newEntry.plcGlcCode}
+        //                 onChange={(e) =>
+        //                   isBudPlan && handlePlcInputChange(e.target.value)
+        //                 }
+        //                 className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+        //                   !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+        //                 }`}
+        //                 list="plc-list"
+        //                 placeholder="Enter Plc"
+        //                 disabled={!isBudPlan}
+        //               />
+        //               <datalist id="plc-list">
+        //                 {plcOptions.map((plc, index) => (
+        //                   <option
+        //                     key={`${plc.value}-${index}`}
+        //                     value={plc.value}
+        //                   >
+        //                     {plc.label}
+        //                   </option>
+        //                 ))}
+        //               </datalist>
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="checkbox"
+        //                 name="isRev"
+        //                 checked={newEntry.isRev}
+        //                 onChange={(e) =>
+        //                   isBudPlan &&
+        //                   setNewEntry({ ...newEntry, isRev: e.target.checked })
+        //                 }
+        //                 className="w-4 h-4"
+        //                 disabled={!isBudPlan}
+        //               />
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="checkbox"
+        //                 name="isBrd"
+        //                 checked={newEntry.isBrd}
+        //                 onChange={(e) =>
+        //                   isBudPlan &&
+        //                   setNewEntry({ ...newEntry, isBrd: e.target.checked })
+        //                 }
+        //                 className="w-4 h-4"
+        //                 disabled={!isBudPlan}
+        //               />
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="text"
+        //                 name="status"
+        //                 value={newEntry.status}
+        //                 onChange={(e) =>
+        //                   setNewEntry({ ...newEntry, status: e.target.value })
+        //                 }
+        //                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+        //                 placeholder="Enter Status"
+        //               />
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               <input
+        //                 type="text"
+        //                 name="perHourRate"
+        //                 value={newEntry.perHourRate}
+        //                 onChange={(e) =>
+        //                   isBudPlan &&
+        //                   setNewEntry({
+        //                     ...newEntry,
+        //                     perHourRate: e.target.value.replace(/[^0-9.]/g, ""),
+        //                   })
+        //                 }
+        //                 className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+        //                   !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+        //                 }`}
+        //                 placeholder="Enter Hour Rate"
+        //                 disabled={!isBudPlan}
+        //               />
+        //             </td>
+        //             <td className="border border-gray-300 px-1.5 py-0.5">
+        //               {" "}
+        //               {/* Reduced padding */}
+        //               {Object.values(newEntryPeriodHours)
+        //                 .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
+        //                 .toFixed(2)}
+        //             </td>
+        //           </tr>
+        //         )}
+        //         {localEmployees
+        //           .filter((_, idx) => !hiddenRows[idx])
+        //           .map((emp, idx) => {
+        //             const actualEmpIdx = localEmployees.findIndex(
+        //               (e) => e === emp
+        //             );
+        //             const row = getEmployeeRow(emp, actualEmpIdx);
+        //             const editedData = editedEmployeeData[actualEmpIdx] || {};
+        //             return (
+        //               <tr
+        //                 key={`employee-${actualEmpIdx}`}
+        //                 className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+        //                   selectedRowIndex === actualEmpIdx
+        //                     ? "bg-yellow-100"
+        //                     : "even:bg-gray-50"
+        //                 }`}
+        //                 style={{
+        //                   height: `${ROW_HEIGHT_DEFAULT}px`,
+        //                   lineHeight: "normal",
+        //                   cursor: isEditable ? "pointer" : "default",
+        //                 }}
+        //                 onClick={() => handleRowClick(actualEmpIdx)}
+        //               >
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {row.idType}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {row.emplId}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {row.name}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {isBudPlan && isEditable ? (
+        //                     <input
+        //                       type="text"
+        //                       value={
+        //                         editedData.acctId !== undefined
+        //                           ? editedData.acctId
+        //                           : row.acctId
+        //                       }
+        //                       onChange={(e) =>
+        //                         handleEmployeeDataChange(
+        //                           actualEmpIdx,
+        //                           "acctId",
+        //                           e.target.value
+        //                         )
+        //                       }
+        //                       onBlur={() =>
+        //                         handleEmployeeDataBlur(actualEmpIdx, emp)
+        //                       }
+        //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+        //                       list="account-list"
+        //                     />
+        //                   ) : (
+        //                     row.acctId
+        //                   )}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {isBudPlan && isEditable ? (
+        //                     <input
+        //                       type="text"
+        //                       value={
+        //                         editedData.orgId !== undefined
+        //                           ? editedData.orgId
+        //                           : row.orgId
+        //                       }
+        //                       onChange={(e) =>
+        //                         handleEmployeeDataChange(
+        //                           actualEmpIdx,
+        //                           "orgId",
+        //                           e.target.value
+        //                         )
+        //                       }
+        //                       onBlur={() =>
+        //                         handleEmployeeDataBlur(actualEmpIdx, emp)
+        //                       }
+        //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+        //                     />
+        //                   ) : (
+        //                     row.orgId
+        //                   )}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {isBudPlan && isEditable ? (
+        //                     <input
+        //                       type="text"
+        //                       value={
+        //                         editedData.glcPlc !== undefined
+        //                           ? editedData.glcPlc
+        //                           : row.glcPlc
+        //                       }
+        //                       onChange={(e) =>
+        //                         handleEmployeeDataChange(
+        //                           actualEmpIdx,
+        //                           "glcPlc",
+        //                           e.target.value
+        //                         )
+        //                       }
+        //                       onBlur={() =>
+        //                         handleEmployeeDataBlur(actualEmpIdx, emp)
+        //                       }
+        //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+        //                       list="plc-list"
+        //                     />
+        //                   ) : (
+        //                     row.glcPlc
+        //                   )}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {isBudPlan && isEditable ? (
+        //                     <input
+        //                       type="checkbox"
+        //                       checked={
+        //                         editedData.isRev !== undefined
+        //                           ? editedData.isRev
+        //                           : emp.emple.isRev
+        //                       }
+        //                       onChange={(e) =>
+        //                         handleEmployeeDataChange(
+        //                           actualEmpIdx,
+        //                           "isRev",
+        //                           e.target.checked
+        //                         )
+        //                       }
+        //                       onBlur={() =>
+        //                         handleEmployeeDataBlur(actualEmpIdx, emp)
+        //                       }
+        //                       className="w-4 h-4"
+        //                     />
+        //                   ) : (
+        //                     row.isRev
+        //                   )}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {isBudPlan && isEditable ? (
+        //                     <input
+        //                       type="checkbox"
+        //                       checked={
+        //                         editedData.isBrd !== undefined
+        //                           ? editedData.isBrd
+        //                           : emp.emple.isBrd
+        //                       }
+        //                       onChange={(e) =>
+        //                         handleEmployeeDataChange(
+        //                           actualEmpIdx,
+        //                           "isBrd",
+        //                           e.target.checked
+        //                         )
+        //                       }
+        //                       onBlur={() =>
+        //                         handleEmployeeDataBlur(actualEmpIdx, emp)
+        //                       }
+        //                       className="w-4 h-4"
+        //                     />
+        //                   ) : (
+        //                     row.isBrd
+        //                   )}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {row.status}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {isBudPlan && isEditable ? (
+        //                     <input
+        //                       type="text"
+        //                       value={
+        //                         editedData.perHourRate !== undefined
+        //                           ? editedData.perHourRate
+        //                           : row.perHourRate
+        //                       }
+        //                       onChange={(e) =>
+        //                         handleEmployeeDataChange(
+        //                           actualEmpIdx,
+        //                           "perHourRate",
+        //                           e.target.value.replace(/[^0-9.]/g, "")
+        //                         )
+        //                       }
+        //                       onBlur={() =>
+        //                         handleEmployeeDataBlur(actualEmpIdx, emp)
+        //                       }
+        //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+        //                     />
+        //                   ) : (
+        //                     row.perHourRate
+        //                   )}
+        //                 </td>
+        //                 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+        //                   {" "}
+        //                   {/* Reduced padding and min-width */}
+        //                   {row.total}
+        //                 </td>
+        //               </tr>
+        //             );
+        //           })}
+        //       </tbody>
+        //     </table>
+        //   </div>
+
+
+        //   <div className="synchronized-table-scroll last min-h-0 overflow-x-auto">
+        //     <table className="min-w-[900px] text-xs text-center border-collapse border border-gray-300 rounded-lg">
+        //       <thead className="sticky-thead">
+        //         <tr
+        //           style={{
+        //             height: `${ROW_HEIGHT_DEFAULT}px`,
+        //             lineHeight: "normal",
+        //           }}
+        //         >
+        //           {sortedDurations.map((duration) => {
+        //             const uniqueKey = `${duration.monthNo}_${duration.year}`;
+        //             return (
+        //               <th
+        //                 key={uniqueKey}
+        //                 className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
+        //                   selectedColumnKey === uniqueKey ? "bg-yellow-100" : ""
+        //                 }`}
+        //                 style={{ cursor: isEditable ? "pointer" : "default" }}
+        //                 onClick={() => handleColumnHeaderClick(uniqueKey)}
+        //               >
+        //                 <div className="flex flex-col items-center justify-center h-full">
+        //                   <span className="whitespace-nowrap text-xs text-gray-900 font-normal">
+        //                     {duration.month}
+        //                   </span>
+        //                   <span className="text-xs text-gray-600 font-normal">
+        //                     {duration.workingHours || 0} hrs
+        //                   </span>
+        //                 </div>
+        //               </th>
+        //             );
+        //           })}
+        //         </tr>
+        //       </thead>
+        //       <tbody>
+        //         {showNewForm && (
+        //           <tr
+        //             key="new-entry"
+        //             className="bg-gray-50"
+        //             style={{
+        //               height: `${ROW_HEIGHT_DEFAULT}px`,
+        //               lineHeight: "normal",
+        //             }}
+        //           >
+        //             {sortedDurations.map((duration) => {
+        //               const uniqueKey = `${duration.monthNo}_${duration.year}`;
+        //               const isInputEditable =
+        //                 isEditable &&
+        //                 isMonthEditable(duration, closedPeriod, planType);
+        //               return (
+        //                 <td
+        //                   key={`new-${uniqueKey}`}
+        //                   className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+        //                     planType === "EAC"
+        //                       ? isInputEditable
+        //                         ? "bg-green-50"
+        //                         : "bg-gray-200"
+        //                       : ""
+        //                   }`}
+        //                 >
+        //                   <input
+        //                     type="text"
+        //                     inputMode="numeric"
+        //                     value={newEntryPeriodHours[uniqueKey] || ""}
+        //                     onChange={(e) =>
+        //                       isInputEditable &&
+        //                       setNewEntryPeriodHours((prev) => ({
+        //                         ...prev,
+        //                         [uniqueKey]: e.target.value.replace(
+        //                           /[^0-9.]/g,
+        //                           ""
+        //                         ),
+        //                       }))
+        //                     }
+        //                     className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+        //                       !isInputEditable
+        //                         ? "cursor-not-allowed text-gray-400"
+        //                         : "text-gray-700"
+        //                     }`}
+        //                     disabled={!isInputEditable}
+        //                     placeholder="Enter Hours"
+        //                   />
+        //                 </td>
+        //               );
+        //             })}
+        //           </tr>
+        //         )}
+        //         {localEmployees
+        //           .filter((_, idx) => !hiddenRows[idx])
+        //           .map((emp, idx) => {
+        //             const actualEmpIdx = localEmployees.findIndex(
+        //               (e) => e === emp
+        //             );
+        //             const monthHours = getMonthHours(emp);
+        //             return (
+        //               <tr
+        //                 key={`hours-${actualEmpIdx}`}
+        //                 className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+        //                   selectedRowIndex === actualEmpIdx
+        //                     ? "bg-yellow-100"
+        //                     : "even:bg-gray-50"
+        //                 }`}
+        //                 style={{
+        //                   height: `${ROW_HEIGHT_DEFAULT}px`,
+        //                   lineHeight: "normal",
+        //                   cursor: isEditable ? "pointer" : "default",
+        //                 }}
+        //                 onClick={() => handleRowClick(actualEmpIdx)}
+        //               >
+        //                 {sortedDurations.map((duration) => {
+        //                   const uniqueKey = `${duration.monthNo}_${duration.year}`;
+        //                   const forecast = monthHours[uniqueKey];
+        //                   const value =
+        //                     inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
+        //                     (forecast?.value !== undefined
+        //                       ? forecast.value
+        //                       : "0");
+        //                   const isInputEditable =
+        //                     isEditable &&
+        //                     isMonthEditable(duration, closedPeriod, planType);
+        //                   return (
+        //                     <td
+        //                       key={`hours-${actualEmpIdx}-${uniqueKey}`}
+        //                       className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+        //                         selectedColumnKey === uniqueKey
+        //                           ? "bg-yellow-100"
+        //                           : ""
+        //                       } ${
+        //                         planType === "EAC"
+        //                           ? isInputEditable
+        //                             ? "bg-green-50"
+        //                             : "bg-gray-200"
+        //                           : ""
+        //                       }`}
+        //                     >
+        //                       <input
+        //                         type="text"
+        //                         inputMode="numeric"
+        //                         className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+        //                           !isInputEditable
+        //                             ? "cursor-not-allowed text-gray-400"
+        //                             : "text-gray-700"
+        //                         }`}
+        //                         value={value}
+        //                         onChange={(e) =>
+        //                           handleInputChange(
+        //                             actualEmpIdx,
+        //                             uniqueKey,
+        //                             e.target.value.replace(/[^0-9.]/g, "")
+        //                           )
+        //                         }
+        //                         onBlur={(e) =>
+        //                           handleForecastHoursBlur(
+        //                             actualEmpIdx,
+        //                             uniqueKey,
+        //                             e.target.value
+        //                           )
+        //                         }
+        //                         disabled={!isInputEditable}
+        //                         placeholder="Enter Hours"
+        //                       />
+        //                     </td>
+        //                   );
+        //                 })}
+        //               </tr>
+        //             );
+        //           })}
+        //       </tbody>
+        //     </table>
+        //   </div>
+        // </div>
+
       )}
 
       {showFindReplace && (
@@ -2262,4 +2905,5 @@ const handleRowClick = (actualEmpIdx) => {
 };
 
 export default ProjectHoursDetails;
+
 

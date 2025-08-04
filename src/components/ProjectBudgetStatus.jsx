@@ -163,7 +163,7 @@ const ProjectBudgetStatus = () => {
     activeTab,
     EXTERNAL_API_BASE_URL,
     CALCULATE_COST_ENDPOINT,
-  ]);
+  ]);           
 
   useEffect(() => {
     if (filteredProjects.length > 0) {
@@ -314,18 +314,57 @@ const ProjectBudgetStatus = () => {
     setSelectedPlan(null);
   };
 
+  // const handlePlanSelect = (plan) => {
+  //   if (!plan || (selectedPlan && selectedPlan.plId === plan.plId)) {
+  //     setSelectedPlan(null);
+  //     localStorage.removeItem("selectedPlan");
+  //     setActiveTab(null);
+  //     setForecastData([]);
+  //     setIsForecastLoading(false);
+  //     setAnalysisApiData([]);
+  //     setIsAnalysisLoading(false);
+  //     setAnalysisError(null);
+  //     return;
+  //   }
+  //   const project = {
+  //     projId: plan.projId || "",
+  //     projName: plan.projName || "",
+  //     projStartDt: plan.projStartDt || "",
+  //     projEndDt: plan.projEndDt || "",
+  //     orgId: plan.orgId || "",
+  //     fundedCost: plan.fundedCost || "",
+  //     fundedFee: plan.fundedFee || "",
+  //     fundedRev: plan.fundedRev || "",
+  //   };
+  //   setFilteredProjects([project]);
+  //   setRevenueAccount(plan.revenueAccount || "");
+  //   setSelectedPlan(plan);
+  //   localStorage.setItem("selectedPlan", JSON.stringify(plan));
+  //   setForecastData([]);
+  //   setIsForecastLoading(false);
+  //   setAnalysisApiData([]);
+  //   setIsAnalysisLoading(false);
+  //   setAnalysisError(null);
+  // };
+
+  // Updated tab click handler: only open tab if not already open; do not toggle off.
+  
   const handlePlanSelect = (plan) => {
-    if (!plan || (selectedPlan && selectedPlan.plId === plan.plId)) {
-      setSelectedPlan(null);
-      localStorage.removeItem("selectedPlan");
-      setActiveTab(null);
-      setForecastData([]);
-      setIsForecastLoading(false);
-      setAnalysisApiData([]);
-      setIsAnalysisLoading(false);
-      setAnalysisError(null);
-      return;
-    }
+  // If no plan is selected (null/undefined), clear selection as usual
+  if (!plan) {
+    setSelectedPlan(null);
+    localStorage.removeItem("selectedPlan");
+    setActiveTab(null);
+    setForecastData([]);
+    setIsForecastLoading(false);
+    setAnalysisApiData([]);
+    setIsAnalysisLoading(false);
+    setAnalysisError(null);
+    return;
+  }
+
+  // If a different plan is selected, update state
+  if (!selectedPlan || selectedPlan.plId !== plan.plId) {
     const project = {
       projId: plan.projId || "",
       projName: plan.projName || "",
@@ -336,6 +375,7 @@ const ProjectBudgetStatus = () => {
       fundedFee: plan.fundedFee || "",
       fundedRev: plan.fundedRev || "",
     };
+
     setFilteredProjects([project]);
     setRevenueAccount(plan.revenueAccount || "");
     setSelectedPlan(plan);
@@ -345,9 +385,12 @@ const ProjectBudgetStatus = () => {
     setAnalysisApiData([]);
     setIsAnalysisLoading(false);
     setAnalysisError(null);
-  };
+  }
+  // If the same plan is clicked again, do nothing (don't deselect)
+};
 
-  // Updated tab click handler: only open tab if not already open; do not toggle off.
+
+  
   const handleTabClick = (tabName) => {
     if (!selectedPlan) {
       toast.info("Please select a plan first.", {
@@ -741,3 +784,6 @@ const ProjectBudgetStatus = () => {
 };
 
 export default ProjectBudgetStatus;
+
+
+
