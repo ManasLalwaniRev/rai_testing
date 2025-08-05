@@ -441,23 +441,40 @@ const transformApiDataToFinancialRows = useCallback((
   const profitOnCostData = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
   const profitOnRevenueData = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
   const totalStaffCostByMonth = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
-  const totalStaffHoursByMonth = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const totalNonLaborCostByMonth = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
   
   // Use the top-level 'revenue' field for the overall total, as confirmed by the user
   const totalRevenueOverall = apiResponse.revenue || 0;
 
-  // Process monthly revenue data from the new monthlyRevenueSummary array
+  // Process monthly data from the monthlyRevenueSummary array as requested
   const monthlyRevenueSummary = apiResponse.monthlyRevenueSummary || [];
   monthlyRevenueSummary.forEach(monthData => {
     const monthRange = getMonthRangeKey(monthData.month, monthData.year);
     if (monthRange && dynamicDateRanges.includes(monthRange)) {
+      // Populate Revenue data
       monthlyRevenueData[monthRange] = monthData.revenue || 0;
+      
+      // Populate Staff Cost and Non-Labor Cost data as requested
+      const staffCost = monthData.cost || 0;
+      const nonLaborCost = monthData.otherDifrectCost || 0;
+
+      totalStaffCostByMonth[monthRange] = staffCost;
+      totalNonLaborCostByMonth[monthRange] = nonLaborCost;
+      
+      // Calculate total expense for the month
+      totalExpenseData[monthRange] = staffCost + nonLaborCost;
     }
   });
 
-  const uniqueEmployeesMap = new Map();
-  const nonLaborAcctDetailsMap = new Map();
+  // Calculate overall totals from the monthly data
+  const totalStaffCostOverall = Object.values(totalStaffCostByMonth).reduce((sum, val) => sum + val, 0);
+  const totalNonLaborCostOverall = Object.values(totalNonLaborCostByMonth).reduce((sum, val) => sum + val, 0);
+  const totalExpenseOverall = Object.values(totalExpenseData).reduce((sum, val) => sum + val, 0);
+  const totalProfitOverall = totalRevenueOverall - totalExpenseOverall;
 
+  // The rest of the function remains the same, but the cost calculations are now based on monthlyRevenueSummary
+  
+  const uniqueEmployeesMap = new Map();
   const filteredEmployeeSummaries = (apiResponse.employeeForecastSummary || []).filter(empSummary => {
     const isOrgMatch = currentOrgId ? empSummary.orgID === currentOrgId : true;
     return isOrgMatch;
@@ -482,18 +499,12 @@ const transformApiDataToFinancialRows = useCallback((
       }
       const employee = uniqueEmployeesMap.get(empSummary.emplId);
 
-      // Populate monthly expense data
       const payrollSalaries = empSummary.emplSchedule?.payrollSalary || [];
       payrollSalaries.forEach(salaryEntry => {
         const monthRange = getMonthRangeKey(salaryEntry.month, salaryEntry.year);
 
         if (monthRange && dynamicDateRanges.includes(monthRange)) {
-          // Add to expense data, using the monthly 'totalBurdenCost' if available, or fall back to 'cost'
           const monthlyBurdenCost = salaryEntry.totalBurdenCost || salaryEntry.cost || 0;
-          totalExpenseData[monthRange] += monthlyBurdenCost;
-          totalStaffCostByMonth[monthRange] += monthlyBurdenCost;
-          totalStaffHoursByMonth[monthRange] += salaryEntry.hours || 0;
-
           employee.monthlyCost[monthRange] = (employee.monthlyCost[monthRange] || 0) + monthlyBurdenCost;
           employee.monthlyHours[monthRange] = (employee.monthlyHours[monthRange] || 0) + (salaryEntry.hours || 0);
 
@@ -514,12 +525,8 @@ const transformApiDataToFinancialRows = useCallback((
     });
   }
   
-  // Now, assign the monthly revenue data to both tnm and cpff views
-  const tnmRevenueData = monthlyRevenueData;
-  const cpffRevenueData = monthlyRevenueData;
-
-  let totalNonLaborCostOverall = 0;
-  const totalNonLaborCostByMonth = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  // The non-labor cost summary loop is no longer needed for monthly totals, but is kept to get detailed data
+  const nonLaborAcctDetailsMap = new Map();
   const allNonLaborSummariesFiltered = [
     ...(apiResponse.directCOstForecastSummary || []),
     ...(apiResponse.indirectCostForecastSummary || [])
@@ -585,8 +592,6 @@ const transformApiDataToFinancialRows = useCallback((
         employeeGroup.total += entryCost;
         acctGroup.monthlyData[monthRange] += entryCost;
         acctGroup.total += entryCost;
-        totalNonLaborCostByMonth[monthRange] = (totalNonLaborCostByMonth[monthRange] || 0) + entryCost;
-        totalExpenseData[monthRange] = (totalExpenseData[monthRange] || 0) + entryCost;
       }
     });
   });
@@ -599,13 +604,7 @@ const transformApiDataToFinancialRows = useCallback((
     acctGroup.employees = Array.from(acctGroup.employees.values());
   });
 
-  totalNonLaborCostOverall = Object.values(totalNonLaborCostByMonth).reduce((sum, val) => sum + val, 0);
-  const totalStaffCostOverall = Object.values(totalStaffCostByMonth).reduce((sum, val) => sum + val, 0);
-  const totalStaffHoursOverall = Object.values(totalStaffHoursByMonth).reduce((sum, val) => sum + val, 0);
-  
-  const selectedRevenueData = selectedRevenueView === 't&m' ? tnmRevenueData : cpffRevenueData;
-  const totalExpenseOverall = Object.values(totalExpenseData).reduce((sum, val) => sum + val, 0);
-  const totalProfitOverall = totalRevenueOverall - totalExpenseOverall;
+  const selectedRevenueData = selectedRevenueView === 't&m' ? monthlyRevenueData : monthlyRevenueData;
   
   dynamicDateRanges.forEach(range => {
     profitData[range] = (selectedRevenueData[range] || 0) - (totalExpenseData[range] || 0);
@@ -621,8 +620,8 @@ const transformApiDataToFinancialRows = useCallback((
     description: 'Revenue',
     total: totalRevenueOverall,
     data: selectedRevenueData,
-    tnmRevenueData: tnmRevenueData,
-    cpffRevenueData: cpffRevenueData,
+    tnmRevenueData: monthlyRevenueData,
+    cpffRevenueData: monthlyRevenueData,
     type: 'summary',
     orgId: currentOrgId,
   });
@@ -631,7 +630,6 @@ const transformApiDataToFinancialRows = useCallback((
     id: `total-staff-cost-${currentOrgId}`,
     description: 'Total Staff Cost',
     total: totalStaffCostOverall,
-    totalHours: totalStaffHoursOverall,
     data: totalStaffCostByMonth,
     type: 'expandable',
     employees: Array.from(uniqueEmployeesMap.values()),
