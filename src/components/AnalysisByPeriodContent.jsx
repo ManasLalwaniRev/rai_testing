@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import React from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
+import { data } from 'react-router-dom';
 
 const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialApiData, isLoading, error, fiscalYear }) => {
   // Added console.log for fiscalYear prop at the very top
@@ -27,353 +28,694 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
    * Helper to map month and year to a date range string (e.g., "05/01-05/31_2025")
    * Uses Date object to accurately determine the last day of the month, accounting for leap years.
    */
-  const getMonthRangeKey = (month, year) => {
-    // Month is 1-indexed for input, but 0-indexed for Date constructor (month - 1)
-    // Day 0 of the *next* month gives the last day of the *current* month
-    const lastDay = new Date(year, month, 0).getDate();
-    const monthString = month.toString().padStart(2, '0');
-    return `${monthString}/01-${monthString}/${lastDay}_${year}`;
-  };
+  // const getMonthRangeKey = (month, year) => {
+  //   // Month is 1-indexed for input, but 0-indexed for Date constructor (month - 1)
+  //   // Day 0 of the *next* month gives the last day of the *current* month
+  //   const lastDay = new Date(year, month, 0).getDate();
+  //   const monthString = month.toString().padStart(2, '0');
+  //   return `${monthString}/01-${monthString}/${lastDay}_${year}`;
+  // };
+
+  // Replace your existing getMonthRangeKey function with this one
+function getMonthRangeKey(period, year) {
+  // Add this check to prevent crashes if period or year are missing
+  if (period === undefined || year === undefined) {
+    return null;
+  }
+  const month = String(period).padStart(2, '0');
+  const monthRange = `${month}/${year}`;
+  return monthRange;
+}
 
   /**
    * Transforms the raw API response (which is now pre-filtered by fiscal year)
    * into the FinancialRow structure expected by the frontend.
    * This function filters the provided apiResponse based on currentOrgId.
    * It also dynamically calculates profit based on the selected revenue view.
+   * 
+   * 
+
    */
-  const transformApiDataToFinancialRows = useCallback((
-    apiResponse, // This apiResponse is now the pre-filtered allApiData
-    currentOrgId,
-    dynamicDateRanges,
-    selectedRevenueView,
-    planType // Added planType here
-    // selectedFiscalYear is implicitly handled by apiResponse being pre-filtered
-  ) => {
-    console.log("transformApiDataToFinancialRows: apiResponse (already fiscalYear-filtered)", apiResponse);
-    console.log("transformApiDataToFinancialRows: currentOrgId", currentOrgId);
-    console.log("transformApiDataToFinancialRows: dynamicDateRanges (columns)", dynamicDateRanges);
-    console.log("transformApiDataToFinancialRows: planType", planType);
+
+  // Old code //
+//   const transformApiDataToFinancialRows = useCallback((
+//     apiResponse, // This apiResponse is now the pre-filtered allApiData
+//     currentOrgId,
+//     dynamicDateRanges,
+//     selectedRevenueView,
+//     planType,
+//     apiTotalRevenue // Added planType here
+    
+//     // selectedFiscalYear is implicitly handled by apiResponse being pre-filtered
+//   ) => {
+//     console.log("transformApiDataToFinancialRows: apiResponse (already fiscalYear-filtered)", apiResponse);
+//     console.log("transformApiDataToFinancialRows: currentOrgId", currentOrgId);
+//     console.log("transformApiDataToFinancialRows: dynamicDateRanges (columns)", dynamicDateRanges);
+//     console.log("transformApiDataToFinancialRows: planType", planType);
 
 
-    const financialRows = [];
+//     const financialRows = [];
 
-    const revenueData = {};
-    const tnmRevenueData = {};
-    const cpffRevenueData = {};
-    const totalExpenseData = {};
-    const profitData = {};
-    const profitOnCostData = {};
-    const profitOnRevenueData = {};
+//     const revenueData = {};
+//     const tnmRevenueData = {};
+//     const cpffRevenueData = {};
+//     const totalExpenseData = {};
+//     const profitData = {};
+//     const profitOnCostData = {};
+//     const profitOnRevenueData = {};
 
-    // Initialize monthly data accumulators for all dynamicDateRanges
-    dynamicDateRanges.forEach(range => {
-      revenueData[range] = 0;
-      tnmRevenueData[range] = 0;
-      cpffRevenueData[range] = 0;
-      totalExpenseData[range] = 0;
-      profitData[range] = 0;
-      profitOnCostData[range] = 0;
-      profitOnRevenueData[range] = 0;
-    });
+//     // Initialize monthly data accumulators for all dynamicDateRanges
+//     dynamicDateRanges.forEach(range => {
+//       revenueData[range] = 0;
+//       tnmRevenueData[range] = 0;
+//       cpffRevenueData[range] = 0;
+//       totalExpenseData[range] = 0;
+//       profitData[range] = 0;
+//       profitOnCostData[range] = 0;
+//       profitOnRevenueData[range] = 0;
+//     });
 
-    const totalStaffCostByMonth = dynamicDateRanges.reduce((acc, range) => {
-      acc[range] = 0;
-      return acc;
-    }, {});
+//     const totalStaffCostByMonth = dynamicDateRanges.reduce((acc, range) => {
+//       acc[range] = 0;
+//       return acc;
+//     }, {});
 
-    const totalStaffHoursByMonth = dynamicDateRanges.reduce((acc, range) => {
-      acc[range] = 0;
-      return acc;
-    }, {});
+//     const totalStaffHoursByMonth = dynamicDateRanges.reduce((acc, range) => {
+//       acc[range] = 0;
+//       return acc;
+//     }, {});
 
-    const uniqueEmployeesMap = new Map();
-    const nonLaborAcctDetailsMap = new Map(); // Map to group non-labor details by account ID and then by month
+//     const uniqueEmployeesMap = new Map();
+//     const nonLaborAcctDetailsMap = new Map(); // Map to group non-labor details by account ID and then by month
 
-    // Filter employee summaries based on orgId (fiscal year already handled by parent useEffect)
-    const filteredEmployeeSummaries = (apiResponse.employeeForecastSummary || []).filter(empSummary => {
-      const isOrgMatch = currentOrgId ? empSummary.orgID === currentOrgId : true;
-      return isOrgMatch;
-    });
-    console.log("transformApiDataToFinancialRows: filteredEmployeeSummaries (after org filter, fiscal year already applied)", filteredEmployeeSummaries);
+//     // Filter employee summaries based on orgId (fiscal year already handled by parent useEffect)
+//     const filteredEmployeeSummaries = (apiResponse.employeeForecastSummary || []).filter(empSummary => {
+//       const isOrgMatch = currentOrgId ? empSummary.orgID === currentOrgId : true;
+//       return isOrgMatch;
+//     });
+//     console.log("transformApiDataToFinancialRows: filteredEmployeeSummaries (after org filter, fiscal year already applied)", filteredEmployeeSummaries);
+
+//     // const [totalRevenueFromApi, setTotalRevenueFromApi] = useState(0); //
+
+//    if (apiResponse && apiResponse.monthlyRevenueSummary) {
+//   apiResponse.monthlyRevenueSummary.forEach(monthSummary => {
+//     // Find the corresponding month range directly from the dynamicDateRanges array
+//     const matchingRange = dynamicDateRanges.find(
+//       (range) => range.period === monthSummary.period && range.year === monthSummary.year
+//     );
+
+//     if (matchingRange) {
+//       // Use the exact monthRange key from the dynamicDateRanges array to populate the data
+//       revenueData[matchingRange.monthRange] = monthSummary.revenue || 0;
+//     } else {
+//       console.warn(`No matching month range found for period ${monthSummary.period} and year ${monthSummary.year}`);
+//     }
+//   });
+// }
+//     if (filteredEmployeeSummaries.length > 0) {
+//       filteredEmployeeSummaries.forEach(empSummary => {
+//         // Use emplId as the unique key for the employee map
+//         if (!uniqueEmployeesMap.has(empSummary.emplId)) {
+//           uniqueEmployeesMap.set(empSummary.emplId, {
+//             id: empSummary.emplId,
+//             name: `${empSummary.name} (${empSummary.emplId})`, // Format name (EMPLID)
+//             cost: 0,
+//             accountId: empSummary.accID || '', // Use accID from empSummary
+//             orgId: empSummary.orgId || '',
+//             glcPlc: empSummary.plcCode || '',
+//             hrlyRate: empSummary.perHourRate || 0,
+//             monthlyHours: {},
+//             monthlyCost: {},
+//             detailSummary: {},
+//           });
+//         }
+//         const employee = uniqueEmployeesMap.get(empSummary.emplId);
+
+//         // New Lines to ADD before the forEach loop
+//         const totalEmployeeRevenue = empSummary.revenue || 0;
+//         const totalEmployeeBurdenCost = empSummary.totalBurdonCost || 0; 
 
 
-    if (filteredEmployeeSummaries.length > 0) {
-      filteredEmployeeSummaries.forEach(empSummary => {
-        // Use emplId as the unique key for the employee map
-        if (!uniqueEmployeesMap.has(empSummary.emplId)) {
-          uniqueEmployeesMap.set(empSummary.emplId, {
-            id: empSummary.emplId,
-            name: `${empSummary.name} (${empSummary.emplId})`, // Format name (EMPLID)
-            cost: 0,
-            accountId: empSummary.accID || '', // Use accID from empSummary
-            orgId: empSummary.orgId || '',
-            glcPlc: empSummary.plcCode || '',
-            hrlyRate: empSummary.perHourRate || 0,
-            monthlyHours: {},
-            monthlyCost: {},
-            detailSummary: {},
-          });
-        }
-        const employee = uniqueEmployeesMap.get(empSummary.emplId);
+//         if (empSummary.emplSchedule && Array.isArray(empSummary.emplSchedule.payrollSalary)) {
+//           empSummary.emplSchedule.payrollSalary.forEach(salaryEntry => {
+//             // No need for fiscalYear check here, as data is already pre-filtered
+//             const monthRange = getMonthRangeKey(salaryEntry.month, salaryEntry.year);
 
-        if (empSummary.emplSchedule && Array.isArray(empSummary.emplSchedule.payrollSalary)) {
-          empSummary.emplSchedule.payrollSalary.forEach(salaryEntry => {
-            // No need for fiscalYear check here, as data is already pre-filtered
-            const monthRange = getMonthRangeKey(salaryEntry.month, salaryEntry.year);
 
-            if (monthRange) {
-              tnmRevenueData[monthRange] = (tnmRevenueData[monthRange] || 0) + (salaryEntry.revenue || 0);
-              cpffRevenueData[monthRange] = (cpffRevenueData[monthRange] || 0) + (salaryEntry.cpffRevenue || 0); // Assuming cpffRevenue exists
-              revenueData[monthRange] = (revenueData[monthRange] || 0) + (salaryEntry.revenue || 0); // Total revenue for display
+//             if (monthRange) {
+//               tnmRevenueData[monthRange] = (tnmRevenueData[monthRange] || 0) + (salaryEntry.revenue || 0);
+//               cpffRevenueData[monthRange] = (cpffRevenueData[monthRange] || 0) + (salaryEntry.revenue || 0); // Assuming cpffRevenue exists  
+//               // revenueData[monthRange] = (revenueData[monthRange] || 0) + (salaryEntry.revenue || 0); // Total revenue for display
+            
+        
+//               totalExpenseData[monthRange] = (totalExpenseData[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
+//               totalStaffCostByMonth[monthRange] = (totalStaffCostByMonth[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
+//               totalStaffHoursByMonth[monthRange] = (totalStaffHoursByMonth[monthRange] || 0) + (salaryEntry.hours || 0);
 
-              totalExpenseData[monthRange] = (totalExpenseData[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
-              totalStaffCostByMonth[monthRange] = (totalStaffCostByMonth[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
-              totalStaffHoursByMonth[monthRange] = (totalStaffHoursByMonth[monthRange] || 0) + (salaryEntry.hours || 0);
+//               employee.monthlyCost[monthRange] = (employee.monthlyCost[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
+//               employee.monthlyHours[monthRange] = (employee.monthlyHours[monthRange] || 0) + (salaryEntry.hours || 0);
 
-              employee.monthlyCost[monthRange] = (employee.monthlyCost[monthRange] || 0) + (salaryEntry.totalBurdenCost || 0);
-              employee.monthlyHours[monthRange] = (employee.monthlyHours[monthRange] || 0) + (salaryEntry.hours || 0);
+//               if (!employee.detailSummary['Raw Cost']) employee.detailSummary['Raw Cost'] = {};
+//               employee.detailSummary['Raw Cost'][monthRange] = (employee.detailSummary['Raw Cost'][monthRange] || 0) + (salaryEntry.cost || 0);
 
-              if (!employee.detailSummary['Raw Cost']) employee.detailSummary['Raw Cost'] = {};
-              employee.detailSummary['Raw Cost'][monthRange] = (employee.detailSummary['Raw Cost'][monthRange] || 0) + (salaryEntry.cost || 0);
+//               if (!employee.detailSummary['Fringe Benefits']) employee.detailSummary['Fringe Benefits'] = {};
+//               employee.detailSummary['Fringe Benefits'][monthRange] = (employee.detailSummary['Fringe Benefits'][monthRange] || 0) + (salaryEntry.fringe || 0);
 
-              if (!employee.detailSummary['Fringe Benefits']) employee.detailSummary['Fringe Benefits'] = {};
-              employee.detailSummary['Fringe Benefits'][monthRange] = (employee.detailSummary['Fringe Benefits'][monthRange] || 0) + (salaryEntry.fringe || 0);
+//               if (!employee.detailSummary['Overhead']) employee.detailSummary['Overhead'] = {};
+//               employee.detailSummary['Overhead'][monthRange] = (employee.detailSummary['Overhead'][monthRange] || 0) + (salaryEntry.overhead || 0);
 
-              if (!employee.detailSummary['Overhead']) employee.detailSummary['Overhead'] = {};
-              employee.detailSummary['Overhead'][monthRange] = (employee.detailSummary['Overhead'][monthRange] || 0) + (salaryEntry.overhead || 0);
+//               if (!employee.detailSummary['General & Admin']) employee.detailSummary['General & Admin'] = {};
+//               employee.detailSummary['General & Admin'][monthRange] = (employee.detailSummary['General & Admin'][monthRange] || 0) + (salaryEntry.gna || 0);
+//             }
+//           });
+//         }
+//       });
+//     }
 
-              if (!employee.detailSummary['General & Admin']) employee.detailSummary['General & Admin'] = {};
-              employee.detailSummary['General & Admin'][monthRange] = (employee.detailSummary['General & Admin'][monthRange] || 0) + (salaryEntry.gna || 0);
-            }
-          });
+//     // Process direct and indirect cost data for Non-Labor Staff Cost
+//     let totalNonLaborCostOverall = 0;
+//     const totalNonLaborCostByMonth = dynamicDateRanges.reduce((acc, range) => {
+//       acc[range] = 0;
+//       return acc;
+//     }, {});
+
+//     // Filter non-labor summaries based on orgId (fiscal year already handled by parent useEffect)
+//     const allNonLaborSummariesFiltered = [
+//       ...(apiResponse.directCOstForecastSummary || []),
+//       ...(apiResponse.indirectCostForecastSummary || [])
+//     ].filter(nonLaborSummary => {
+//       const isOrgMatch = currentOrgId ? nonLaborSummary.orgID === currentOrgId : true;
+//       return isOrgMatch;
+//     });
+
+//       console.log("transformApiDataToFinancialRows: apiResponse", apiResponse);
+//     console.log("transformApiDataToFinancialRows: allNonLaborSummariesFiltered (after org filter, fiscal year already applied)", allNonLaborSummariesFiltered);
+
+
+//     allNonLaborSummariesFiltered.forEach(nonLaborSummary => { // Use the already filtered list
+//         const schedules = (nonLaborSummary.directCostSchedule?.forecasts) ||
+//                           (nonLaborSummary.indirectCostSchedule?.forecasts) || [];
+//         console.log(`Processing non-labor summary for accID: ${nonLaborSummary.accID}, orgID: ${nonLaborSummary.orgID}. Forecast schedules found:`, schedules);
+
+//         const accountId = nonLaborSummary.accID;
+//         const orgId = nonLaborSummary.orgID;
+//         const glcPlc = nonLaborSummary.plcCode || '';
+//         const accName = nonLaborSummary.accName || `Account: ${accountId}`;
+
+//         if (!nonLaborAcctDetailsMap.has(accountId)) {
+//             nonLaborAcctDetailsMap.set(accountId, {
+//                 id: accountId,
+//                 description: accName,
+//                 orgId: orgId,
+//                 glcPlc: glcPlc,
+//                 total: 0, // Total for this account across all periods
+//                 monthlyData: dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {}), // Total for this account per month
+//                 employees: new Map(), // Map to hold employee-level data within this account (even for non-labor, to group DCTs)
+//             });
+//             console.log(`  New non-labor account group created: ${accountId}`);
+//         }
+//         const acctGroup = nonLaborAcctDetailsMap.get(accountId);
+
+//         // Group schedules by employee within the account group (even if it's a single DCT entry, it needs a 'group')
+//         const employeeId = nonLaborSummary.emplId || 'N/A_Employee'; // Use a default if emplId is missing
+//         const employeeName = nonLaborSummary.name || ` ${accountId}`; // More generic name
+
+//         if (!acctGroup.employees.has(employeeId)) {
+//             acctGroup.employees.set(employeeId, {
+//                 id: employeeId,
+//                 name: `${employeeName} (${employeeId})`,
+//                 total: 0,
+//                 monthlyData: dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {}),
+//                 entries: [], // These are the original DCT-level entries for this specific employee/group
+//             });
+//         }
+//         const employeeGroup = acctGroup.employees.get(employeeId);
+
+
+//         schedules.forEach(scheduleEntry => {
+//             // No need for fiscalYear check here, as data is already pre-filtered
+//             const monthRange = getMonthRangeKey(scheduleEntry.month, scheduleEntry.year);
+//             if (monthRange) {
+//                 let entryCost = 0;
+//                 if (planType === 'EAC') {
+//                     entryCost = scheduleEntry.actualamt || 0;
+//                 } else if (planType === 'BUD') {
+//                     entryCost = scheduleEntry.forecastedamt || 0;
+//                 } else {
+//                     // Fallback to original calculation if planType is not EAC or BUD
+//                     entryCost = (scheduleEntry.cost || 0) + (scheduleEntry.fringe || 0) + (scheduleEntry.overhead || 0) + (scheduleEntry.gna || 0) + (scheduleEntry.materials || 0);
+//                 }
+
+//                 console.log(`  Schedule entry for ${monthRange}: planType=${planType}, actualamt=${scheduleEntry.actualamt}, forecastedamt=${scheduleEntry.forecastedamt}. Calculated entryCost: ${entryCost}`);
+
+//                 // Add the individual schedule entry to the employee's entries array
+//                 employeeGroup.entries.push({
+//                     id: `${scheduleEntry.dctId || scheduleEntry.forecastid}-${monthRange}`, // Unique ID for this specific monthly entry
+//                     dctId: scheduleEntry.dctId,
+//                     forecastid: scheduleEntry.forecastid,
+//                     monthLabel: `${String(scheduleEntry.month).padStart(2, '0')}/${scheduleEntry.year}`,
+//                     total: entryCost, // Total for this specific entry (for that month)
+//                     monthlyValues: { [monthRange]: entryCost } // This will populate the correct month column for this specific entry
+//                 });
+
+//                 // Aggregate totals for the employee group
+//                 employeeGroup.monthlyData[monthRange] += entryCost;
+//                 employeeGroup.total += entryCost;
+
+//                 // Aggregate totals for the account group (still at account level)
+//                 acctGroup.monthlyData[monthRange] += entryCost;
+//                 acctGroup.total += entryCost;
+
+//                 totalNonLaborCostByMonth[monthRange] = (totalNonLaborCostByMonth[monthRange] || 0) + entryCost;
+//                 totalExpenseData[monthRange] = (totalExpenseData[monthRange] || 0) + entryCost; // Ensure this is current month's totalExpenseData
+//             }
+//         });
+//     });
+
+//     Array.from(uniqueEmployeesMap.values()).forEach(employee => {
+//       employee.cost = Object.values(employee.monthlyCost).reduce((sum, val) => sum + val, 0);
+//     });
+
+//     Array.from(nonLaborAcctDetailsMap.values()).forEach(acctGroup => {
+//         // Recalculate total for acctGroup in case it wasn't fully accumulated (though it should be)
+//         acctGroup.total = Object.values(acctGroup.monthlyData).reduce((sum, val) => sum + val, 0);
+//         // Convert employee maps to arrays for rendering
+//         acctGroup.employees = Array.from(acctGroup.employees.values());
+//     });
+
+//     totalNonLaborCostOverall = Object.values(totalNonLaborCostByMonth).reduce((sum, val) => sum + val, 0);
+//     console.log("transformApiDataToFinancialRows: totalNonLaborCostOverall", totalNonLaborCostOverall);
+//     console.log("transformApiDataToFinancialRows: totalNonLaborCostByMonth", totalNonLaborCostByMonth);
+//     console.log("transformApiDataToFinancialRows: nonLaborAcctDetailsMap contents (after processing)", Array.from(nonLaborAcctDetailsMap.values()));
+
+//     // Recalculate overall totals AFTER all filtering and monthly aggregation
+//     // This ensures overall totals reflect only the selected fiscal year
+//     const totalStaffCostOverall = Object.values(totalStaffCostByMonth).reduce((sum, val) => sum + val, 0);
+//     const totalStaffHoursOverall = Object.values(totalStaffHoursByMonth).reduce((sum, val) => sum + val, 0);
+
+//     const totalRevenueOverall = Object.values(revenueData).reduce((sum, val) => sum + val, 0); // Calculate from aggregated monthly data
+//     const totalExpenseOverall = Object.values(totalExpenseData).reduce((sum, val) => sum + val, 0);
+//     const totalProfitOverall = totalRevenueOverall - totalExpenseOverall; // Calculate from newly aggregated revenue and expense
+
+//     // Populate profitData for each month based on monthly revenue and expense
+//     dynamicDateRanges.forEach(range => {
+//       profitData[range] = (revenueData[range] || 0) - (totalExpenseData[range] || 0);
+//     });
+    
+//     const overallProfitOnCost = totalExpenseOverall !== 0 ? (totalProfitOverall / totalExpenseOverall) : 0;
+//     const overallProfitOnRevenue = totalRevenueOverall !== 0 // Use totalRevenueOverall here
+//       ? (totalProfitOverall / totalRevenueOverall)
+//       : 0;
+
+//     financialRows.push({
+//       id: `revenue-${currentOrgId}`,
+//       description: 'Revenue',
+//       total: apiTotalRevenue,
+//       data: revenueData,
+//       tnmRevenueData: tnmRevenueData,
+//       cpffRevenueData: cpffRevenueData,
+//       type: 'summary',
+//       orgId: currentOrgId,
+//     });
+
+//     financialRows.push({
+//       id: `total-staff-cost-${currentOrgId}`,
+//       description: 'Total Staff Cost',
+//       total: totalStaffCostOverall,
+//       totalHours: totalStaffHoursOverall,
+//       data: totalStaffCostByMonth,
+//       type: 'expandable',
+//       employees: Array.from(uniqueEmployeesMap.values()),
+//       orgId: currentOrgId,
+//     });
+
+//     // New Non-Labor Staff Cost row
+//     financialRows.push({
+//         id: `non-labor-staff-cost-${currentOrgId}`,
+//         description: 'Non-Labor Staff Cost',
+//         total: totalNonLaborCostOverall,
+//         data: totalNonLaborCostByMonth,
+//         type: 'expandable',
+//         nonLaborAccts: Array.from(nonLaborAcctDetailsMap.values()), // Attach processed non-labor data
+//         orgId: currentOrgId,
+//     });
+
+
+//     financialRows.push({
+//       id: `total-expense-${currentOrgId}`,
+//       description: 'Total Expense',
+//       total: totalExpenseOverall,
+//       data: totalExpenseData,
+//       type: 'summary',
+//       orgId: currentOrgId,
+//     });
+
+//     financialRows.push({
+//       id: `profit-${currentOrgId}`,
+//       description: 'Profit',
+//       total: totalProfitOverall,
+//       data: profitData,
+//       type: 'summary',
+//       orgId: currentOrgId,
+//     });
+
+//     dynamicDateRanges.forEach(range => {
+//       const profit = (profitData[range] || 0);
+//       const expense = (totalExpenseData[range] || 0);
+//       profitOnCostData[range] = expense !== 0 ? (profit / expense) : 0;
+//     });
+
+//     financialRows.push({
+//       id: `profit-cost-${currentOrgId}`,
+//       description: 'Profit % on Cost',
+//       total: overallProfitOnCost, // Store as decimal, format for display
+//       data: profitOnCostData,
+//       type: 'summary',
+//       orgId: currentOrgId,
+//     });
+
+//     dynamicDateRanges.forEach(range => {
+//       const profit = (profitData[range] || 0);
+//       let revenueForPercentage = 0;
+//       if (selectedRevenueView === 't&m') {
+//         revenueForPercentage = (tnmRevenueData[range] || 0);
+//       } else if (selectedRevenueView === 'cpff') {
+//         revenueForPercentage = (cpffRevenueData[range] || 0);
+//       }
+//       profitOnRevenueData[range] = revenueForPercentage !== 0 ? (profit / revenueForPercentage) : 0;
+//     });
+
+//     financialRows.push({
+//       id: `profit-revenue-${currentOrgId}`,
+//       description: 'Profit % on Revenue',
+//       total: overallProfitOnRevenue, // Store as decimal, format for display
+//       data: profitOnRevenueData,
+//       type: 'summary',
+//       orgId: currentOrgId,
+//     });
+
+//     console.log("transformApiDataToFinancialRows: Final financialRows", financialRows);
+//     return financialRows;
+//   }, [selectedRevenueView]);
+
+// Old code ends //
+
+const transformApiDataToFinancialRows = useCallback((
+  apiResponse,
+  currentOrgId,
+  dynamicDateRanges,
+  selectedRevenueView,
+  planType
+) => {
+  console.log("transformApiDataToFinancialRows: RAW apiResponse", apiResponse);
+  console.log("transformApiDataToFinancialRows: currentOrgId", currentOrgId);
+  console.log("transformApiDataToFinancialRows: dynamicDateRanges (columns)", dynamicDateRanges);
+  console.log("transformApiDataToFinancialRows: planType", planType);
+
+  const financialRows = [];
+
+  // Initialize all data objects to ensure all date ranges are covered
+  const monthlyRevenueData = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const totalExpenseData = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const profitData = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const profitOnCostData = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const profitOnRevenueData = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const totalStaffCostByMonth = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const totalStaffHoursByMonth = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  
+  // Use the top-level 'revenue' field for the overall total, as confirmed by the user
+  const totalRevenueOverall = apiResponse.revenue || 0;
+
+  // Process monthly revenue data from the new monthlyRevenueSummary array
+  const monthlyRevenueSummary = apiResponse.monthlyRevenueSummary || [];
+  monthlyRevenueSummary.forEach(monthData => {
+    const monthRange = getMonthRangeKey(monthData.month, monthData.year);
+    if (monthRange && dynamicDateRanges.includes(monthRange)) {
+      monthlyRevenueData[monthRange] = monthData.revenue || 0;
+    }
+  });
+
+  const uniqueEmployeesMap = new Map();
+  const nonLaborAcctDetailsMap = new Map();
+
+  const filteredEmployeeSummaries = (apiResponse.employeeForecastSummary || []).filter(empSummary => {
+    const isOrgMatch = currentOrgId ? empSummary.orgID === currentOrgId : true;
+    return isOrgMatch;
+  });
+  
+  if (filteredEmployeeSummaries.length > 0) {
+    filteredEmployeeSummaries.forEach(empSummary => {
+      // Use emplId as the unique key for the employee map
+      if (!uniqueEmployeesMap.has(empSummary.emplId)) {
+        uniqueEmployeesMap.set(empSummary.emplId, {
+          id: empSummary.emplId,
+          name: `${empSummary.name} (${empSummary.emplId})`,
+          cost: 0,
+          accountId: empSummary.accID || '',
+          orgId: empSummary.orgId || '',
+          glcPlc: empSummary.plcCode || '',
+          hrlyRate: empSummary.perHourRate || 0,
+          monthlyHours: {},
+          monthlyCost: {},
+          detailSummary: {},
+        });
+      }
+      const employee = uniqueEmployeesMap.get(empSummary.emplId);
+
+      // Populate monthly expense data
+      const payrollSalaries = empSummary.emplSchedule?.payrollSalary || [];
+      payrollSalaries.forEach(salaryEntry => {
+        const monthRange = getMonthRangeKey(salaryEntry.month, salaryEntry.year);
+
+        if (monthRange && dynamicDateRanges.includes(monthRange)) {
+          // Add to expense data, using the monthly 'totalBurdenCost' if available, or fall back to 'cost'
+          const monthlyBurdenCost = salaryEntry.totalBurdenCost || salaryEntry.cost || 0;
+          totalExpenseData[monthRange] += monthlyBurdenCost;
+          totalStaffCostByMonth[monthRange] += monthlyBurdenCost;
+          totalStaffHoursByMonth[monthRange] += salaryEntry.hours || 0;
+
+          employee.monthlyCost[monthRange] = (employee.monthlyCost[monthRange] || 0) + monthlyBurdenCost;
+          employee.monthlyHours[monthRange] = (employee.monthlyHours[monthRange] || 0) + (salaryEntry.hours || 0);
+
+          // Populate employee details
+          if (!employee.detailSummary['Raw Cost']) employee.detailSummary['Raw Cost'] = {};
+          employee.detailSummary['Raw Cost'][monthRange] = (employee.detailSummary['Raw Cost'][monthRange] || 0) + (salaryEntry.cost || 0);
+
+          if (!employee.detailSummary['Fringe Benefits']) employee.detailSummary['Fringe Benefits'] = {};
+          employee.detailSummary['Fringe Benefits'][monthRange] = (employee.detailSummary['Fringe Benefits'][monthRange] || 0) + (salaryEntry.fringe || 0);
+
+          if (!employee.detailSummary['Overhead']) employee.detailSummary['Overhead'] = {};
+          employee.detailSummary['Overhead'][monthRange] = (employee.detailSummary['Overhead'][monthRange] || 0) + (salaryEntry.overhead || 0);
+
+          if (!employee.detailSummary['General & Admin']) employee.detailSummary['General & Admin'] = {};
+          employee.detailSummary['General & Admin'][monthRange] = (employee.detailSummary['General & Admin'][monthRange] || 0) + (salaryEntry.gna || 0);
         }
       });
+    });
+  }
+  
+  // Now, assign the monthly revenue data to both tnm and cpff views
+  const tnmRevenueData = monthlyRevenueData;
+  const cpffRevenueData = monthlyRevenueData;
+
+  let totalNonLaborCostOverall = 0;
+  const totalNonLaborCostByMonth = dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {});
+  const allNonLaborSummariesFiltered = [
+    ...(apiResponse.directCOstForecastSummary || []),
+    ...(apiResponse.indirectCostForecastSummary || [])
+  ].filter(nonLaborSummary => {
+    const isOrgMatch = currentOrgId ? nonLaborSummary.orgID === currentOrgId : true;
+    return isOrgMatch;
+  });
+
+  allNonLaborSummariesFiltered.forEach(nonLaborSummary => {
+    const schedules = (nonLaborSummary.directCostSchedule?.forecasts) ||
+                      (nonLaborSummary.indirectCostSchedule?.forecasts) || [];
+    const accountId = nonLaborSummary.accID;
+    const orgId = nonLaborSummary.orgID;
+    const glcPlc = nonLaborSummary.plcCode || '';
+    const accName = nonLaborSummary.accName || `Account: ${accountId}`;
+
+    if (!nonLaborAcctDetailsMap.has(accountId)) {
+      nonLaborAcctDetailsMap.set(accountId, {
+        id: accountId,
+        description: accName,
+        orgId: orgId,
+        glcPlc: glcPlc,
+        total: 0,
+        monthlyData: dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {}),
+        employees: new Map(),
+      });
     }
+    const acctGroup = nonLaborAcctDetailsMap.get(accountId);
+    const employeeId = nonLaborSummary.emplId || 'N/A_Employee';
+    const employeeName = nonLaborSummary.name || ` ${accountId}`;
 
-    // Process direct and indirect cost data for Non-Labor Staff Cost
-    let totalNonLaborCostOverall = 0;
-    const totalNonLaborCostByMonth = dynamicDateRanges.reduce((acc, range) => {
-      acc[range] = 0;
-      return acc;
-    }, {});
+    if (!acctGroup.employees.has(employeeId)) {
+      acctGroup.employees.set(employeeId, {
+        id: employeeId,
+        name: `${employeeName} (${employeeId})`,
+        total: 0,
+        monthlyData: dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {}),
+        entries: [],
+      });
+    }
+    const employeeGroup = acctGroup.employees.get(employeeId);
 
-    // Filter non-labor summaries based on orgId (fiscal year already handled by parent useEffect)
-    const allNonLaborSummariesFiltered = [
-      ...(apiResponse.directCOstForecastSummary || []),
-      ...(apiResponse.indirectCostForecastSummary || [])
-    ].filter(nonLaborSummary => {
-      const isOrgMatch = currentOrgId ? nonLaborSummary.orgID === currentOrgId : true;
-      return isOrgMatch;
-    });
-
-    console.log("transformApiDataToFinancialRows: allNonLaborSummariesFiltered (after org filter, fiscal year already applied)", allNonLaborSummariesFiltered);
-
-
-    allNonLaborSummariesFiltered.forEach(nonLaborSummary => { // Use the already filtered list
-        const schedules = (nonLaborSummary.directCostSchedule?.forecasts) ||
-                          (nonLaborSummary.indirectCostSchedule?.forecasts) || [];
-        console.log(`Processing non-labor summary for accID: ${nonLaborSummary.accID}, orgID: ${nonLaborSummary.orgID}. Forecast schedules found:`, schedules);
-
-        const accountId = nonLaborSummary.accID;
-        const orgId = nonLaborSummary.orgID;
-        const glcPlc = nonLaborSummary.plcCode || '';
-        const accName = nonLaborSummary.accName || `Account: ${accountId}`;
-
-        if (!nonLaborAcctDetailsMap.has(accountId)) {
-            nonLaborAcctDetailsMap.set(accountId, {
-                id: accountId,
-                description: accName,
-                orgId: orgId,
-                glcPlc: glcPlc,
-                total: 0, // Total for this account across all periods
-                monthlyData: dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {}), // Total for this account per month
-                employees: new Map(), // Map to hold employee-level data within this account (even for non-labor, to group DCTs)
-            });
-            console.log(`  New non-labor account group created: ${accountId}`);
+    schedules.forEach(scheduleEntry => {
+      const monthRange = getMonthRangeKey(scheduleEntry.month, scheduleEntry.year);
+      if (monthRange && dynamicDateRanges.includes(monthRange)) {
+        let entryCost = 0;
+        if (planType === 'EAC') {
+          entryCost = scheduleEntry.actualamt || 0;
+        } else if (planType === 'BUD') {
+          entryCost = scheduleEntry.forecastedamt || 0;
+        } else {
+          entryCost = (scheduleEntry.cost || 0) + (scheduleEntry.fringe || 0) + (scheduleEntry.overhead || 0) + (scheduleEntry.gna || 0) + (scheduleEntry.materials || 0);
         }
-        const acctGroup = nonLaborAcctDetailsMap.get(accountId);
-
-        // Group schedules by employee within the account group (even if it's a single DCT entry, it needs a 'group')
-        const employeeId = nonLaborSummary.emplId || 'N/A_Employee'; // Use a default if emplId is missing
-        const employeeName = nonLaborSummary.name || ` ${accountId}`; // More generic name
-
-        if (!acctGroup.employees.has(employeeId)) {
-            acctGroup.employees.set(employeeId, {
-                id: employeeId,
-                name: `${employeeName} (${employeeId})`,
-                total: 0,
-                monthlyData: dynamicDateRanges.reduce((acc, range) => ({ ...acc, [range]: 0 }), {}),
-                entries: [], // These are the original DCT-level entries for this specific employee/group
-            });
-        }
-        const employeeGroup = acctGroup.employees.get(employeeId);
-
-
-        schedules.forEach(scheduleEntry => {
-            // No need for fiscalYear check here, as data is already pre-filtered
-            const monthRange = getMonthRangeKey(scheduleEntry.month, scheduleEntry.year);
-            if (monthRange) {
-                let entryCost = 0;
-                if (planType === 'EAC') {
-                    entryCost = scheduleEntry.actualamt || 0;
-                } else if (planType === 'BUD') {
-                    entryCost = scheduleEntry.forecastedamt || 0;
-                } else {
-                    // Fallback to original calculation if planType is not EAC or BUD
-                    entryCost = (scheduleEntry.cost || 0) + (scheduleEntry.fringe || 0) + (scheduleEntry.overhead || 0) + (scheduleEntry.gna || 0) + (scheduleEntry.materials || 0);
-                }
-
-                console.log(`  Schedule entry for ${monthRange}: planType=${planType}, actualamt=${scheduleEntry.actualamt}, forecastedamt=${scheduleEntry.forecastedamt}. Calculated entryCost: ${entryCost}`);
-
-                // Add the individual schedule entry to the employee's entries array
-                employeeGroup.entries.push({
-                    id: `${scheduleEntry.dctId || scheduleEntry.forecastid}-${monthRange}`, // Unique ID for this specific monthly entry
-                    dctId: scheduleEntry.dctId,
-                    forecastid: scheduleEntry.forecastid,
-                    monthLabel: `${String(scheduleEntry.month).padStart(2, '0')}/${scheduleEntry.year}`,
-                    total: entryCost, // Total for this specific entry (for that month)
-                    monthlyValues: { [monthRange]: entryCost } // This will populate the correct month column for this specific entry
-                });
-
-                // Aggregate totals for the employee group
-                employeeGroup.monthlyData[monthRange] += entryCost;
-                employeeGroup.total += entryCost;
-
-                // Aggregate totals for the account group (still at account level)
-                acctGroup.monthlyData[monthRange] += entryCost;
-                acctGroup.total += entryCost;
-
-                totalNonLaborCostByMonth[monthRange] = (totalNonLaborCostByMonth[monthRange] || 0) + entryCost;
-                totalExpenseData[monthRange] = (totalExpenseData[monthRange] || 0) + entryCost; // Ensure this is current month's totalExpenseData
-            }
+        employeeGroup.entries.push({
+          id: `${scheduleEntry.dctId || scheduleEntry.forecastid}-${monthRange}`,
+          dctId: scheduleEntry.dctId,
+          forecastid: scheduleEntry.forecastid,
+          monthLabel: `${String(scheduleEntry.month).padStart(2, '0')}/${scheduleEntry.year}`,
+          total: entryCost,
+          monthlyValues: { [monthRange]: entryCost }
         });
-    });
-
-    Array.from(uniqueEmployeesMap.values()).forEach(employee => {
-      employee.cost = Object.values(employee.monthlyCost).reduce((sum, val) => sum + val, 0);
-    });
-
-    Array.from(nonLaborAcctDetailsMap.values()).forEach(acctGroup => {
-        // Recalculate total for acctGroup in case it wasn't fully accumulated (though it should be)
-        acctGroup.total = Object.values(acctGroup.monthlyData).reduce((sum, val) => sum + val, 0);
-        // Convert employee maps to arrays for rendering
-        acctGroup.employees = Array.from(acctGroup.employees.values());
-    });
-
-    totalNonLaborCostOverall = Object.values(totalNonLaborCostByMonth).reduce((sum, val) => sum + val, 0);
-    console.log("transformApiDataToFinancialRows: totalNonLaborCostOverall", totalNonLaborCostOverall);
-    console.log("transformApiDataToFinancialRows: totalNonLaborCostByMonth", totalNonLaborCostByMonth);
-    console.log("transformApiDataToFinancialRows: nonLaborAcctDetailsMap contents (after processing)", Array.from(nonLaborAcctDetailsMap.values()));
-
-    // Recalculate overall totals AFTER all filtering and monthly aggregation
-    // This ensures overall totals reflect only the selected fiscal year
-    const totalStaffCostOverall = Object.values(totalStaffCostByMonth).reduce((sum, val) => sum + val, 0);
-    const totalStaffHoursOverall = Object.values(totalStaffHoursByMonth).reduce((sum, val) => sum + val, 0);
-
-    const totalRevenueOverall = Object.values(revenueData).reduce((sum, val) => sum + val, 0); // Calculate from aggregated monthly data
-    const totalExpenseOverall = Object.values(totalExpenseData).reduce((sum, val) => sum + val, 0);
-    const totalProfitOverall = totalRevenueOverall - totalExpenseOverall; // Calculate from newly aggregated revenue and expense
-
-    // Populate profitData for each month based on monthly revenue and expense
-    dynamicDateRanges.forEach(range => {
-      profitData[range] = (revenueData[range] || 0) - (totalExpenseData[range] || 0);
-    });
-    
-    const overallProfitOnCost = totalExpenseOverall !== 0 ? (totalProfitOverall / totalExpenseOverall) : 0;
-    const overallProfitOnRevenue = totalRevenueOverall !== 0 // Use totalRevenueOverall here
-      ? (totalProfitOverall / totalRevenueOverall)
-      : 0;
-
-    financialRows.push({
-      id: `revenue-${currentOrgId}`,
-      description: 'Revenue',
-      total: totalRevenueOverall,
-      data: revenueData,
-      tnmRevenueData: tnmRevenueData,
-      cpffRevenueData: cpffRevenueData,
-      type: 'summary',
-      orgId: currentOrgId,
-    });
-
-    financialRows.push({
-      id: `total-staff-cost-${currentOrgId}`,
-      description: 'Total Staff Cost',
-      total: totalStaffCostOverall,
-      totalHours: totalStaffHoursOverall,
-      data: totalStaffCostByMonth,
-      type: 'expandable',
-      employees: Array.from(uniqueEmployeesMap.values()),
-      orgId: currentOrgId,
-    });
-
-    // New Non-Labor Staff Cost row
-    financialRows.push({
-        id: `non-labor-staff-cost-${currentOrgId}`,
-        description: 'Non-Labor Staff Cost',
-        total: totalNonLaborCostOverall,
-        data: totalNonLaborCostByMonth,
-        type: 'expandable',
-        nonLaborAccts: Array.from(nonLaborAcctDetailsMap.values()), // Attach processed non-labor data
-        orgId: currentOrgId,
-    });
-
-
-    financialRows.push({
-      id: `total-expense-${currentOrgId}`,
-      description: 'Total Expense',
-      total: totalExpenseOverall,
-      data: totalExpenseData,
-      type: 'summary',
-      orgId: currentOrgId,
-    });
-
-    financialRows.push({
-      id: `profit-${currentOrgId}`,
-      description: 'Profit',
-      total: totalProfitOverall,
-      data: profitData,
-      type: 'summary',
-      orgId: currentOrgId,
-    });
-
-    dynamicDateRanges.forEach(range => {
-      const profit = (profitData[range] || 0);
-      const expense = (totalExpenseData[range] || 0);
-      profitOnCostData[range] = expense !== 0 ? (profit / expense) : 0;
-    });
-
-    financialRows.push({
-      id: `profit-cost-${currentOrgId}`,
-      description: 'Profit % on Cost',
-      total: overallProfitOnCost, // Store as decimal, format for display
-      data: profitOnCostData,
-      type: 'summary',
-      orgId: currentOrgId,
-    });
-
-    dynamicDateRanges.forEach(range => {
-      const profit = (profitData[range] || 0);
-      let revenueForPercentage = 0;
-      if (selectedRevenueView === 't&m') {
-        revenueForPercentage = (tnmRevenueData[range] || 0);
-      } else if (selectedRevenueView === 'cpff') {
-        revenueForPercentage = (cpffRevenueData[range] || 0);
+        employeeGroup.monthlyData[monthRange] += entryCost;
+        employeeGroup.total += entryCost;
+        acctGroup.monthlyData[monthRange] += entryCost;
+        acctGroup.total += entryCost;
+        totalNonLaborCostByMonth[monthRange] = (totalNonLaborCostByMonth[monthRange] || 0) + entryCost;
+        totalExpenseData[monthRange] = (totalExpenseData[monthRange] || 0) + entryCost;
       }
-      profitOnRevenueData[range] = revenueForPercentage !== 0 ? (profit / revenueForPercentage) : 0;
     });
+  });
 
-    financialRows.push({
-      id: `profit-revenue-${currentOrgId}`,
-      description: 'Profit % on Revenue',
-      total: overallProfitOnRevenue, // Store as decimal, format for display
-      data: profitOnRevenueData,
-      type: 'summary',
-      orgId: currentOrgId,
-    });
+  Array.from(uniqueEmployeesMap.values()).forEach(employee => {
+    employee.cost = Object.values(employee.monthlyCost).reduce((sum, val) => sum + val, 0);
+  });
+  Array.from(nonLaborAcctDetailsMap.values()).forEach(acctGroup => {
+    acctGroup.total = Object.values(acctGroup.monthlyData).reduce((sum, val) => sum + val, 0);
+    acctGroup.employees = Array.from(acctGroup.employees.values());
+  });
 
-    console.log("transformApiDataToFinancialRows: Final financialRows", financialRows);
-    return financialRows;
-  }, [selectedRevenueView]);
+  totalNonLaborCostOverall = Object.values(totalNonLaborCostByMonth).reduce((sum, val) => sum + val, 0);
+  const totalStaffCostOverall = Object.values(totalStaffCostByMonth).reduce((sum, val) => sum + val, 0);
+  const totalStaffHoursOverall = Object.values(totalStaffHoursByMonth).reduce((sum, val) => sum + val, 0);
+  
+  const selectedRevenueData = selectedRevenueView === 't&m' ? tnmRevenueData : cpffRevenueData;
+  const totalExpenseOverall = Object.values(totalExpenseData).reduce((sum, val) => sum + val, 0);
+  const totalProfitOverall = totalRevenueOverall - totalExpenseOverall;
+  
+  dynamicDateRanges.forEach(range => {
+    profitData[range] = (selectedRevenueData[range] || 0) - (totalExpenseData[range] || 0);
+  });
+  
+  const overallProfitOnCost = totalExpenseOverall !== 0 ? (totalProfitOverall / totalExpenseOverall) : 0;
+  const overallProfitOnRevenue = totalRevenueOverall !== 0
+    ? (totalProfitOverall / totalRevenueOverall)
+    : 0;
+
+  financialRows.push({
+    id: `revenue-${currentOrgId}`,
+    description: 'Revenue',
+    total: totalRevenueOverall,
+    data: selectedRevenueData,
+    tnmRevenueData: tnmRevenueData,
+    cpffRevenueData: cpffRevenueData,
+    type: 'summary',
+    orgId: currentOrgId,
+  });
+
+  financialRows.push({
+    id: `total-staff-cost-${currentOrgId}`,
+    description: 'Total Staff Cost',
+    total: totalStaffCostOverall,
+    totalHours: totalStaffHoursOverall,
+    data: totalStaffCostByMonth,
+    type: 'expandable',
+    employees: Array.from(uniqueEmployeesMap.values()),
+    orgId: currentOrgId,
+  });
+
+  financialRows.push({
+    id: `non-labor-staff-cost-${currentOrgId}`,
+    description: 'Non-Labor Staff Cost',
+    total: totalNonLaborCostOverall,
+    data: totalNonLaborCostByMonth,
+    type: 'expandable',
+    nonLaborAccts: Array.from(nonLaborAcctDetailsMap.values()),
+    orgId: currentOrgId,
+  });
+
+  financialRows.push({
+    id: `total-expense-${currentOrgId}`,
+    description: 'Total Expense',
+    total: totalExpenseOverall,
+    data: totalExpenseData,
+    type: 'summary',
+    orgId: currentOrgId,
+  });
+
+  financialRows.push({
+    id: `profit-${currentOrgId}`,
+    description: 'Profit',
+    total: totalProfitOverall,
+    data: profitData,
+    type: 'summary',
+    orgId: currentOrgId,
+  });
+
+  dynamicDateRanges.forEach(range => {
+    const profit = (profitData[range] || 0);
+    const expense = (totalExpenseData[range] || 0);
+    profitOnCostData[range] = expense !== 0 ? (profit / expense) : 0;
+  });
+
+  financialRows.push({
+    id: `profit-cost-${currentOrgId}`,
+    description: 'Profit % on Cost',
+    total: overallProfitOnCost,
+    data: profitOnCostData,
+    type: 'summary',
+    orgId: currentOrgId,
+  });
+
+  dynamicDateRanges.forEach(range => {
+    const profit = (profitData[range] || 0);
+    let revenueForPercentage = (selectedRevenueData[range] || 0);
+    profitOnRevenueData[range] = revenueForPercentage !== 0 ? (profit / revenueForPercentage) : 0;
+  });
+
+  financialRows.push({
+    id: `profit-revenue-${currentOrgId}`,
+    description: 'Profit % on Revenue',
+    total: overallProfitOnRevenue,
+    data: profitOnRevenueData,
+    type: 'summary',
+    orgId: currentOrgId,
+  });
+
+  console.log("transformApiDataToFinancialRows: Final financialRows", financialRows);
+  return financialRows;
+}, [selectedRevenueView]);
+
+function getMonthRangeKey(period, year) {
+  if (period === undefined || year === undefined) {
+    return null;
+  }
+  const month = String(period).padStart(2, '0');
+  return `${month}/${year}`;
+}
+// You will still need to ensure your existing `getMonthRangeKey` helper function is correctly defined elsewhere in the file.
+// Note: The getMonthRangeKey function is assumed to be defined elsewhere in your file.
+// function getMonthRangeKey(period, year) {
+//   // This helper function must also be updated to match the format from getMonthlyDateRanges
+//   const month = String(period).padStart(2, '0');
+//   const monthRange = `${month}/${year}`;
+//   return monthRange;
+// }
+
 
 
   // This useEffect now processes the initialApiData received from props
@@ -559,7 +901,8 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
         selectedOrgId,
         dynamicDateRanges,
         selectedRevenueView,
-        type // Pass the 'type' prop (which is plType)
+        type,
+        initialApiData.revenue // Pass the 'type' prop (which is plType)
       );
       console.log("Transformed Data (after filter & transform):", transformedData);
       setFinancialData(transformedData);
@@ -769,7 +1112,7 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-300 divide-opacity-30">
             {/* Table Header */}
-            <thead>
+            {/* <thead>
               <tr className="bg-gray-100 bg-opacity-50">
                 <th className="py-3 px-4 text-left text-sm font-semibold text-blue-700 uppercase tracking-wider sticky left-0 z-10 bg-inherit">Description</th>
                 <th className="py-3 px-4 text-left text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">Account ID</th>
@@ -788,7 +1131,28 @@ const AnalysisByPeriodContent = ({ onCancel, planID, templateId, type, initialAp
                   );
                 })}
               </tr>
-            </thead>
+            </thead> */}
+            <thead>
+  <tr className="bg-gray-100 bg-opacity-50">
+    <th className="py-3 px-4 text-left text-sm font-semibold text-blue-700 uppercase tracking-wider sticky left-0 z-10 bg-inherit">Description</th>
+    <th className="py-3 px-4 text-left text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">Account ID</th>
+    <th className="py-3 px-4 text-left text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">Org ID</th>
+    <th className="py-3 px-4 text-left text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">GLC/PLC</th>
+    <th className="py-3 px-4 text-right text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">Hrly Rate</th>
+    <th className="py-3 px-4 text-right text-sm font-semibold text-blue-700 uppercase tracking-wider">Total</th>
+    {dynamicDateRanges.length > 0 && dynamicDateRanges.map((range) => {
+      // The `range` variable is a string like "01/2025"
+      // Split the string into two parts: month and year
+      const [monthPart, yearPart] = range.split('/');
+      
+      return (
+        <th key={range} className="py-3 px-4 text-right text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">
+          {`${monthPart}/${yearPart}`}
+        </th>
+      );
+    })}
+  </tr>
+</thead>
             {/* Table Body */}
             <tbody className="divide-y divide-gray-300 divide-opacity-10">
               {financialData.length === 0 ? (
