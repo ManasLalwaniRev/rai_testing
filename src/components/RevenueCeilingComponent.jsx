@@ -47,7 +47,9 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
         return [...updatedPeriods, ...additionalPeriods];
       });
       
-      setAcctId(revenueAccount || (newData.length > 0 ? newData[0].acctId || '' : ''));
+      // setAcctId(revenueAccount || (newData.length > 0 ? newData[0].acctId || '' : ''));
+      
+
     } catch (error) {
       toast.error('Failed to fetch revenue data.');
       console.error("Fetch error:", error);
@@ -97,7 +99,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
         setUseFixedRevenue(!!data.overrideRevAmtFl);
         setOverrideAdjustments(!!data.useBillBurdenRates);
         setSetupData(data);
-        setAcctId(data.revAcctId);
+         setAcctId(data.revAcctId || '');
       }
     } catch (error) {
       // Optionally show a toast or just log

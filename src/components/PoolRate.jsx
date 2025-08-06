@@ -404,7 +404,7 @@ const PoolRate = ({ userName = 'User' }) => {
 
   return (
     <ErrorBoundary>
-      <div className="p-4 max-w-6xl mx-auto font-roboto">
+      <div className="p-4 sm:p-5 max-w-6xl mx-auto font-roboto bg-gray-50 rounded-xl shadow-md">
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} closeOnClick />
         <h1 className="w-full  bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4">Pool Rate</h1>
         {loading && <p className="text-gray-600 text-sm mb-2">Loading...</p>}
