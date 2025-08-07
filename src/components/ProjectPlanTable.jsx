@@ -2996,12 +2996,24 @@ const ProjectPlanTable = ({
       }
     }
     if (field === "finalVersion" && updated.finalVersion) {
-      newPlans = plans.map((p, i) =>
-        i === idx ? updated : { ...p, finalVersion: false }
-      );
-    } else {
-      newPlans = plans.map((p, i) => (i === idx ? updated : p));
-    }
+  newPlans = plans.map((p, i) =>
+    i === idx
+      ? updated
+      : p.plType === updated.plType
+      ? { ...p, finalVersion: false }
+      : p
+  );
+} else {
+  newPlans = plans.map((p, i) => (i === idx ? updated : p));
+}
+
+    // if (field === "finalVersion" && updated.finalVersion) {
+    //   newPlans = plans.map((p, i) =>
+    //     i === idx ? updated : { ...p, finalVersion: false }
+    //   );
+    // } else {
+    //   newPlans = plans.map((p, i) => (i === idx ? updated : p));
+    // }
     // "In Progress" handling for exclusivity
     if (updated.status === "In Progress") {
       newPlans = newPlans.map((p, i) =>
@@ -3187,20 +3199,44 @@ const ProjectPlanTable = ({
 
   const checkedFinalVersionIdx = plans.findIndex((plan) => plan.finalVersion);
 
+  // const getCheckboxProps = (plan, col, idx) => {
+  //   if (!plan.plType || !plan.version)
+  //     return { checked: false, disabled: true };
+  //   if (col === "isCompleted")
+  //     return { checked: plan.isCompleted, disabled: !!plan.isApproved };
+  //   if (col === "isApproved")
+  //     return { checked: plan.isApproved, disabled: !plan.isCompleted };
+  //   if (col === "finalVersion") {
+  //     if (checkedFinalVersionIdx !== -1 && checkedFinalVersionIdx !== idx)
+  //       return { checked: false, disabled: true };
+  //     return { checked: plan.finalVersion, disabled: !plan.isApproved };
+  //   }
+  //   return { checked: plan[col], disabled: false };
+  // };
   const getCheckboxProps = (plan, col, idx) => {
-    if (!plan.plType || !plan.version)
-      return { checked: false, disabled: true };
-    if (col === "isCompleted")
-      return { checked: plan.isCompleted, disabled: !!plan.isApproved };
-    if (col === "isApproved")
-      return { checked: plan.isApproved, disabled: !plan.isCompleted };
-    if (col === "finalVersion") {
-      if (checkedFinalVersionIdx !== -1 && checkedFinalVersionIdx !== idx)
-        return { checked: false, disabled: true };
-      return { checked: plan.finalVersion, disabled: !plan.isApproved };
-    }
-    return { checked: plan[col], disabled: false };
-  };
+  if (!plan.plType || !plan.version) return { checked: false, disabled: true };
+
+  if (col === "isCompleted")
+    return { checked: plan.isCompleted, disabled: !!plan.isApproved };
+
+  if (col === "isApproved")
+    return { checked: plan.isApproved, disabled: !plan.isCompleted };
+
+  if (col === "finalVersion") {
+    // Find if any other plan with same plType has finalVersion checked
+    const anotherFinalVersionIdx = plans.findIndex(
+      (p, i) => i !== idx && p.plType === plan.plType && p.finalVersion
+    );
+
+    // Disable finalVersion checkbox for this row only if another finalVersion in the same plType is checked
+    return {
+      checked: plan.finalVersion,
+      disabled: anotherFinalVersionIdx !== -1, // disable if any other finalVersion for same plType
+    };
+  }
+
+  return { checked: plan[col], disabled: false };
+};
 
   const handleTopButtonToggle = async (field) => {
     if (!selectedPlan) {
