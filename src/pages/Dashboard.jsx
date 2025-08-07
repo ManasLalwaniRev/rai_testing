@@ -70,7 +70,7 @@ const Dashboard = () => {
             <Route path="/pool-configuration" element={<PoolConfigurationTable />} />
             <Route path="/template-pool-mapping" element={<TemplatePoolMapping />} />
             <Route path="/template" element={<Template />} />
-            {/* <Route path="/ceiling-configuration" element={<CeilingConfiguration />} /> */}
+            <Route path="/ceiling-configuration" element={<CeilingConfiguration />} />
             <Route path="/global-configuration" element={<GlobalConfiguration />} />
             <Route path="/prospective-id-setup" element={<ProspectiveIdSetup />} />
             <Route path="/display-settings" element={<DisplaySettings />} />

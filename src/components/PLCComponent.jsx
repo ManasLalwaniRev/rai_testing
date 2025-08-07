@@ -743,6 +743,9 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   }, [fetchVendorEmployees]);
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this billing rate?")) {
+    return; // User cancelled, do nothing
+  }
     setLoading(true);
     try {
       await axios.delete(
@@ -1187,6 +1190,9 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   };
 
   const handleDeleteEmployee = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this employee billing rate?")) {
+    return;
+  }
     if (!id) {
       console.error("Invalid ID for deletion");
       return;
@@ -1850,6 +1856,9 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   //  };
 
   const handleDeleteVendor = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this vendor billing rate?")) {
+    return;
+  }
     const rate = vendorBillingRates.find((rate) => rate.id === id);
     const deleteId = rate?.projVendRtKey || id; // Use projVendRtKey if available
     setLoadingAction((prev) => ({ ...prev, [id]: true }));

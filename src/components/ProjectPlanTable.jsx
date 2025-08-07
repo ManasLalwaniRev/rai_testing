@@ -50,11 +50,11 @@
 //   try {
 //     const date = new Date(dateStr);
 //     if (isNaN(date.getTime())) return dateStr;
-    
+
 //     // Format: MM/DD/YYYY HH:MM:SS AM/PM
 //     return date.toLocaleString("en-US", {
 //       month: "2-digit",
-//       day: "2-digit", 
+//       day: "2-digit",
 //       year: "numeric",
 //       hour: "2-digit",
 //       minute: "2-digit",
@@ -94,13 +94,12 @@
 //     if (a.plType < b.plType) return -1;
 //     if (a.plType > b.plType) return 1;
 
-//     // Explicit numeric compare for version  
+//     // Explicit numeric compare for version
 //     const aVersion = Number(a.version) || 0;
 //     const bVersion = Number(b.version) || 0;
 //     return aVersion - bVersion;
 //   });
 // };
-
 
 //   // const fetchPlans = async () => {
 //   //   if (!projectId) {
@@ -170,7 +169,7 @@
 //   //     setLoading(false);
 //   //   }
 //   // };
-  
+
 //   const fetchPlans = async () => {
 //   if (!projectId) {
 //     setPlans([]);
@@ -261,7 +260,7 @@
 //   //     onPlanSelect(plan); // Select the new plan
 //   //   }
 //   // };
-  
+
 // //   const handleRowClick = (plan) => {
 // //   // Only allow selection if clicking on a different plan
 // //   if (selectedPlan && selectedPlan.plId === plan.plId) {
@@ -276,7 +275,6 @@
 //     onPlanSelect(plan);
 //   }
 // };
-
 
 //   const handleExportPlan = async (plan) => {
 //     if (!plan.projId || !plan.version || !plan.plType) {
@@ -452,16 +450,16 @@
 //   //     }
 //   //   }
 //   // };
-  
+
 //   const handleVersionCodeChange = async (idx, value) => {
 //   const prevPlans = [...plans];
 //   const planId = plans[idx].plId;
 //   let updated = { ...plans[idx], versionCode: value };
-  
+
 //   // DON'T SORT - Keep original order
 //   const newPlans = plans.map(plan => (plan.plId === planId ? updated : plan));
 //   setPlans(newPlans); // REMOVE sortPlansByVersion()
-  
+
 //   if (planId && Number(planId) > 0) {
 //     const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
 //     toast.info('Updating version code...', { toastId: 'version-code-info' });
@@ -724,7 +722,6 @@
 //     setIsActionLoading(false);
 //   }
 // };
-
 
 //   const getActionOptions = (plan) => {
 //     let options = ['None'];
@@ -1173,11 +1170,11 @@
 //                   key={`plan-${plan.plId || idx}-${plan.projId || 'unknown'}`}
 //                   // ref={el => { rowRefs.current[plan.plId] = el; }}
 //                   className={`even:bg-gray-50 hover:bg-blue-50 transition-all duration-200 cursor-pointer ${
-//   selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId 
+//   selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
 //     ? 'bg-blue-100 border-l-4 border-l-blue-600' : ''
 // }`}
 //                    onClick={() => handleRowClick(plan)}
-                 
+
 //                 >
 //                   <td className="p-2 border text-center">
 //                     <button
@@ -1367,11 +1364,11 @@
 //   try {
 //     const date = new Date(dateStr);
 //     if (isNaN(date.getTime())) return dateStr;
-    
+
 //     // Format: MM/DD/YYYY HH:MM:SS AM/PM
 //     return date.toLocaleString("en-US", {
 //       month: "2-digit",
-//       day: "2-digit", 
+//       day: "2-digit",
 //       year: "numeric",
 //       hour: "2-digit",
 //       minute: "2-digit",
@@ -1411,13 +1408,12 @@
 //     if (a.plType < b.plType) return -1;
 //     if (a.plType > b.plType) return 1;
 
-//     // Explicit numeric compare for version  
+//     // Explicit numeric compare for version
 //     const aVersion = Number(a.version) || 0;
 //     const bVersion = Number(b.version) || 0;
 //     return aVersion - bVersion;
 //   });
 // };
-
 
 //   // const fetchPlans = async () => {
 //   //   if (!projectId) {
@@ -1487,7 +1483,7 @@
 //   //     setLoading(false);
 //   //   }
 //   // };
-  
+
 //   const fetchPlans = async () => {
 //   if (!projectId) {
 //     setPlans([]);
@@ -1571,7 +1567,6 @@
 //   }
 // }, [plans]);
 
-
 //   // useEffect(() => {
 //   //   if (selectedPlan && rowRefs.current[selectedPlan.plId]) {
 //   //     rowRefs.current[selectedPlan.plId].scrollIntoView({
@@ -1589,7 +1584,7 @@
 //   //     onPlanSelect(plan); // Select the new plan
 //   //   }
 //   // };
-  
+
 // //   const handleRowClick = (plan) => {
 // //   // Only allow selection if clicking on a different plan
 // //   if (selectedPlan && selectedPlan.plId === plan.plId) {
@@ -1604,7 +1599,6 @@
 //     onPlanSelect(plan);
 //   }
 // };
-
 
 //   const handleExportPlan = async (plan) => {
 //     if (!plan.projId || !plan.version || !plan.plType) {
@@ -1780,16 +1774,16 @@
 //   //     }
 //   //   }
 //   // };
-  
+
 //   const handleVersionCodeChange = async (idx, value) => {
 //   const prevPlans = [...plans];
 //   const planId = plans[idx].plId;
 //   let updated = { ...plans[idx], versionCode: value };
-  
+
 //   // DON'T SORT - Keep original order
 //   const newPlans = plans.map(plan => (plan.plId === planId ? updated : plan));
 //   setPlans(newPlans); // REMOVE sortPlansByVersion()
-  
+
 //   if (planId && Number(planId) > 0) {
 //     const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
 //     toast.info('Updating version code...', { toastId: 'version-code-info' });
@@ -2052,7 +2046,6 @@
 //     setIsActionLoading(false);
 //   }
 // };
-
 
 //   const getActionOptions = (plan) => {
 //     let options = ['None'];
@@ -2372,7 +2365,7 @@
 //           }`}
 //           title="Create EAC"
 //         >
-//           Create EAC 
+//           Create EAC
 //         </button>
 //         <button
 //   onClick={() => {
@@ -2389,7 +2382,6 @@
 // >
 //   Delete
 // </button>
-
 
 //         <button
 //           onClick={() => handleTopButtonToggle('isCompleted')}
@@ -2518,11 +2510,11 @@
 //                   key={`plan-${plan.plId || idx}-${plan.projId || 'unknown'}`}
 //                   // ref={el => { rowRefs.current[plan.plId] = el; }}
 //                   className={`even:bg-gray-50 hover:bg-blue-50 transition-all duration-200 cursor-pointer ${
-//   selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId 
+//   selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
 //     ? 'bg-blue-100 border-l-4 border-l-blue-600' : ''
 // }`}
 //                    onClick={() => handleRowClick(plan)}
-                 
+
 //                 >
 //                   <td className="p-2 border text-center">
 //                     <button
@@ -2663,29 +2655,29 @@
 
 // export default ProjectPlanTable;
 
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import ProjectPlanForm from './ProjectPlanForm';
-import { formatDate } from './utils';
+import React, { useEffect, useState, useRef } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ProjectPlanForm from "./ProjectPlanForm";
+import { formatDate } from "./utils";
 
-const BOOLEAN_FIELDS = ['finalVersion', 'isCompleted', 'isApproved'];
+const BOOLEAN_FIELDS = ["finalVersion", "isCompleted", "isApproved"];
 
 const COLUMN_LABELS = {
-  projId: 'Project ID',
-  plType: 'Plan Type',
-  version: 'Version',
-  versionCode: 'Version Code',
-  source: 'Source',
-  type: 'Type',
-  finalVersion: 'Conclude',
-  isCompleted: 'Submitted',
-  isApproved: 'Approved',
-  status: 'Status',
-  closedPeriod: 'Closed Period',
-  createdAt: 'Created At',
-  updatedAt: 'Updated At',
+  projId: "Project ID",
+  plType: "Plan Type",
+  version: "Version",
+  versionCode: "Version Code",
+  source: "Source",
+  type: "Type",
+  finalVersion: "Conclude",
+  isCompleted: "Submitted",
+  isApproved: "Approved",
+  status: "Status",
+  closedPeriod: "Closed Period",
+  createdAt: "Created At",
+  updatedAt: "Updated At",
 };
 
 const ProjectPlanTable = ({
@@ -2707,10 +2699,10 @@ const ProjectPlanTable = ({
   const [lastImportedVersion, setLastImportedVersion] = useState(null);
   const [lastImportTime, setLastImportTime] = useState(null);
   const [editingVersionCodeIdx, setEditingVersionCodeIdx] = useState(null);
-  const [editingVersionCodeValue, setEditingVersionCodeValue] = useState('');
+  const [editingVersionCodeValue, setEditingVersionCodeValue] = useState("");
 
   const isChildProjectId = (projId) => {
-    return projId && typeof projId === 'string' && projId.includes('.');
+    return projId && typeof projId === "string" && projId.includes(".");
   };
 
   const formatDateWithTime = (dateStr) => {
@@ -2725,9 +2717,11 @@ const ProjectPlanTable = ({
         hour: "2-digit",
         minute: "2-digit",
         second: "2-digit",
-        hour12: true
+        hour12: true,
       });
-    } catch (e) { return dateStr; }
+    } catch (e) {
+      return dateStr;
+    }
   };
 
   const sortPlansByProjIdPlTypeVersion = (plansArray) => {
@@ -2757,53 +2751,59 @@ const ProjectPlanTable = ({
       const transformedPlans = response.data.map((plan, idx) => ({
         plId: plan.plId || plan.id || 0,
         projId: plan.projId || projectId,
-        plType: plan.plType === 'Budget' ? 'BUD' : plan.plType === 'EAC' ? 'EAC' : plan.plType || '',
-        source: plan.source || '',
-        type: plan.type || '',
+        plType:
+          plan.plType === "Budget"
+            ? "BUD"
+            : plan.plType === "EAC"
+            ? "EAC"
+            : plan.plType || "",
+        source: plan.source || "",
+        type: plan.type || "",
         version: plan.version || 0,
-        versionCode: plan.versionCode || '',
+        versionCode: plan.versionCode || "",
         finalVersion: !!plan.finalVersion,
         isCompleted: !!plan.isCompleted,
         isApproved: !!plan.isApproved,
-        status: plan.plType && plan.version
-          ? (plan.status || 'In Progress')
-            .replace('Working', 'In Progress')
-            .replace('Completed', 'Submitted')
-          : '',
-        closedPeriod: plan.closedPeriod || '',
-        createdAt: plan.createdAt || '',
-        updatedAt: plan.updatedAt || '',
-        modifiedBy: plan.modifiedBy || '',
-        approvedBy: plan.approvedBy || '',
-        createdBy: plan.createdBy || '',
+        status:
+          plan.plType && plan.version
+            ? (plan.status || "In Progress")
+                .replace("Working", "In Progress")
+                .replace("Completed", "Submitted")
+            : "",
+        closedPeriod: plan.closedPeriod || "",
+        createdAt: plan.createdAt || "",
+        updatedAt: plan.updatedAt || "",
+        modifiedBy: plan.modifiedBy || "",
+        approvedBy: plan.approvedBy || "",
+        createdBy: plan.createdBy || "",
         templateId: plan.templateId || 0,
-        projName: plan.projName || '',
-        projStartDt: plan.projStartDt || '',
-        projEndDt: plan.projEndDt || '',
-        orgId: plan.orgId || '',
-        fundedCost: plan.proj_f_cst_amt || '',
-        fundedFee: plan.proj_f_fee_amt || '',
-        fundedRev: plan.proj_f_tot_amt || '',
-        revenueAccount: plan.revenueAccount || '',
+        projName: plan.projName || "",
+        projStartDt: plan.projStartDt || "",
+        projEndDt: plan.projEndDt || "",
+        orgId: plan.orgId || "",
+        fundedCost: plan.proj_f_cst_amt || "",
+        fundedFee: plan.proj_f_fee_amt || "",
+        fundedRev: plan.proj_f_tot_amt || "",
+        revenueAccount: plan.revenueAccount || "",
       }));
       const sortedPlans = sortPlansByProjIdPlTypeVersion(transformedPlans);
       setPlans(sortedPlans);
       setColumns([
-        'projId',
-        'plType',
-        'version',
-        'versionCode',
-        'source',
-        'type',
-        'isCompleted',
-        'isApproved',
-        'finalVersion',
-        'status',
-        'closedPeriod',
+        "projId",
+        "plType",
+        "version",
+        "versionCode",
+        "source",
+        "type",
+        "isCompleted",
+        "isApproved",
+        "finalVersion",
+        "status",
+        "closedPeriod",
       ]);
     } catch (error) {
       setPlans([]);
-      toast.error('Failed to fetch plans.');
+      toast.error("Failed to fetch plans.");
     } finally {
       setLoading(false);
     }
@@ -2815,7 +2815,9 @@ const ProjectPlanTable = ({
 
   useEffect(() => {
     if (selectedPlan && plans.length > 0) {
-      const latest = plans.find(p => p.plId === selectedPlan.plId && p.projId === selectedPlan.projId);
+      const latest = plans.find(
+        (p) => p.plId === selectedPlan.plId && p.projId === selectedPlan.projId
+      );
       if (
         latest &&
         (latest.status !== selectedPlan.status ||
@@ -2836,12 +2838,12 @@ const ProjectPlanTable = ({
 
   const handleExportPlan = async (plan) => {
     if (!plan.projId || !plan.version || !plan.plType) {
-      toast.error('Missing required parameters for export');
+      toast.error("Missing required parameters for export");
       return;
     }
     try {
       setIsActionLoading(true);
-      toast.info('Exporting plan...');
+      toast.info("Exporting plan...");
       const response = await axios.get(
         `https://test-api-3tmq.onrender.com/Forecast/ExportPlanDirectCost`,
         {
@@ -2850,20 +2852,25 @@ const ProjectPlanTable = ({
             version: plan.version,
             type: plan.plType,
           },
-          responseType: 'blob',
+          responseType: "blob",
         }
       );
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', `Plan_${plan.projId}_${plan.version}_${plan.plType}.xlsx`);
+      link.setAttribute(
+        "download",
+        `Plan_${plan.projId}_${plan.version}_${plan.plType}.xlsx`
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-      toast.success('Plan exported successfully!');
+      toast.success("Plan exported successfully!");
     } catch (err) {
-      toast.error('Error exporting plan: ' + (err.response?.data?.message || err.message));
+      toast.error(
+        "Error exporting plan: " + (err.response?.data?.message || err.message)
+      );
     } finally {
       setIsActionLoading(false);
     }
@@ -2872,28 +2879,32 @@ const ProjectPlanTable = ({
   const handleImportPlan = async (event) => {
     const file = event.target.files[0];
     if (!file) {
-      toast.error('No file selected');
+      toast.error("No file selected");
       return;
     }
-    const validExtensions = ['.xlsx', '.xls'];
-    const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+    const validExtensions = [".xlsx", ".xls"];
+    const fileExtension = file.name
+      .slice(file.name.lastIndexOf("."))
+      .toLowerCase();
     if (!validExtensions.includes(fileExtension)) {
-      toast.error('Invalid file format. Please upload an Excel file (.xlsx or .xls)');
+      toast.error(
+        "Invalid file format. Please upload an Excel file (.xlsx or .xls)"
+      );
       return;
     }
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('projId', projectId);
+    formData.append("file", file);
+    formData.append("projId", projectId);
     try {
       setIsActionLoading(true);
-      toast.info('Importing plan...');
+      toast.info("Importing plan...");
       const response = await axios.post(
-        'https://test-api-3tmq.onrender.com/Forecast/ImportDirectCostPlan',
+        "https://test-api-3tmq.onrender.com/Forecast/ImportDirectCostPlan",
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
       let extractedVersion = null;
-      if (typeof response.data === 'string') {
+      if (typeof response.data === "string") {
         const versionMatch = response.data.match(/version\s*-\s*'([^']+)'/i);
         if (versionMatch) extractedVersion = versionMatch[1];
       } else if (response.data?.version) {
@@ -2902,24 +2913,30 @@ const ProjectPlanTable = ({
       if (extractedVersion) setLastImportedVersion(extractedVersion);
       setLastImportTime(Date.now());
       toast.success(
-        response.data && typeof response.data === 'string'
+        response.data && typeof response.data === "string"
           ? response.data
           : JSON.stringify(response.data),
-        { toastId: 'import-success-' + Date.now(), autoClose: 5000 }
+        { toastId: "import-success-" + Date.now(), autoClose: 5000 }
       );
       await fetchPlans();
     } catch (err) {
-      let errorMessage = 'Failed to import plan. Please check the file and project ID, or contact support.';
+      let errorMessage =
+        "Failed to import plan. Please check the file and project ID, or contact support.";
       if (err.response) {
-        if (typeof err.response.data === 'string' && err.response.data) errorMessage = err.response.data;
-        else if (err.response.data?.message) errorMessage = err.response.data.message;
-        else if (err.response.data) errorMessage = JSON.stringify(err.response.data);
-        else if (err.response.status === 500) errorMessage = 'Server error occurred. Please verify the file format, project ID, and ensure type is EXCEL.';
+        if (typeof err.response.data === "string" && err.response.data)
+          errorMessage = err.response.data;
+        else if (err.response.data?.message)
+          errorMessage = err.response.data.message;
+        else if (err.response.data)
+          errorMessage = JSON.stringify(err.response.data);
+        else if (err.response.status === 500)
+          errorMessage =
+            "Server error occurred. Please verify the file format, project ID, and ensure type is EXCEL.";
       } else errorMessage = err.message || errorMessage;
-      toast.error(errorMessage, { toastId: 'import-error', autoClose: 5000 });
+      toast.error(errorMessage, { toastId: "import-error", autoClose: 5000 });
     } finally {
       setIsActionLoading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -2928,63 +2945,88 @@ const ProjectPlanTable = ({
     const plan = plans[idx];
     const planId = plan.plId;
     if (!plan.plType || !plan.version) {
-      toast.error(`Cannot update ${field}: Plan Type and Version are required.`, { toastId: 'checkbox-error' });
+      toast.error(
+        `Cannot update ${field}: Plan Type and Version are required.`,
+        { toastId: "checkbox-error" }
+      );
       return;
     }
-    if (field === 'isApproved' && !plan.isCompleted) {
-      toast.error("You can't approve this row until Submitted is checked", { toastId: 'checkbox-error' });
+    if (field === "isApproved" && !plan.isCompleted) {
+      toast.error("You can't approve this row until Submitted is checked", {
+        toastId: "checkbox-error",
+      });
       return;
     }
-    if (field === 'finalVersion' && !plan.isApproved) {
-      toast.error("You can't set Conclude until Approved is checked", { toastId: 'checkbox-error' });
+    if (field === "finalVersion" && !plan.isApproved) {
+      toast.error("You can't set Conclude until Approved is checked", {
+        toastId: "checkbox-error",
+      });
       return;
     }
     let updated = { ...plan };
     updated[field] = !plan[field];
-    if (field === 'isCompleted') {
-      updated.status = updated.isCompleted ? 'Submitted' : 'In Progress';
+    if (field === "isCompleted") {
+      updated.status = updated.isCompleted ? "Submitted" : "In Progress";
       if (!updated.isCompleted) {
         updated.isApproved = false;
         updated.finalVersion = false;
       }
     }
-    if (field === 'isApproved') {
-      updated.status = updated.isApproved ? 'Approved' : 'Submitted';
+    if (field === "isApproved") {
+      updated.status = updated.isApproved ? "Approved" : "Submitted";
       if (!updated.isApproved) updated.finalVersion = false;
     }
-    if (field === 'finalVersion') updated.status = updated.finalVersion ? 'Submitted' : 'Approved';
+    if (field === "finalVersion")
+      updated.status = updated.finalVersion ? "Submitted" : "Approved";
     let newPlans;
     // Your referenced line, but updated from "Working" to "In Progress" and "Completed" to "Submitted"
-    if (field === 'isCompleted' && !updated.isCompleted) {
-      const isEAC = updated.plType === 'EAC';
-      const inProgressCount = plans.filter(p => p.status === 'In Progress' && p.plType === updated.plType).length;
-      if (inProgressCount > 0 && updated.status === 'In Progress') {
-        toast.error(`Only one ${isEAC ? 'EAC' : 'BUD'} plan can have In Progress status at a time.`, { toastId: 'checkbox-error' });
+    if (field === "isCompleted" && !updated.isCompleted) {
+      const isEAC = updated.plType === "EAC";
+      const inProgressCount = plans.filter(
+        (p) => p.status === "In Progress" && p.plType === updated.plType
+      ).length;
+      if (inProgressCount > 0 && updated.status === "In Progress") {
+        toast.error(
+          `Only one ${
+            isEAC ? "EAC" : "BUD"
+          } plan can have In Progress status at a time.`,
+          { toastId: "checkbox-error" }
+        );
         return;
       }
     }
-    if (field === 'finalVersion' && updated.finalVersion) {
-      newPlans = plans.map((p, i) => (i === idx ? updated : { ...p, finalVersion: false }));
+    if (field === "finalVersion" && updated.finalVersion) {
+      newPlans = plans.map((p, i) =>
+        i === idx ? updated : { ...p, finalVersion: false }
+      );
     } else {
       newPlans = plans.map((p, i) => (i === idx ? updated : p));
     }
     // "In Progress" handling for exclusivity
-    if (updated.status === 'In Progress') {
+    if (updated.status === "In Progress") {
       newPlans = newPlans.map((p, i) =>
-        i !== idx && p.status === 'In Progress' && p.plType === updated.plType
-          ? { ...p, status: 'Submitted', isCompleted: true }
+        i !== idx && p.status === "In Progress" && p.plType === updated.plType
+          ? { ...p, status: "Submitted", isCompleted: true }
           : p
       );
     }
     setPlans(newPlans);
     onPlanSelect(updated);
-    if ((BOOLEAN_FIELDS.includes(field) || field === 'status') && planId && Number(planId) > 0) {
+    if (
+      (BOOLEAN_FIELDS.includes(field) || field === "status") &&
+      planId &&
+      Number(planId) > 0
+    ) {
       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
       try {
         await axios.put(updateUrl, updated);
       } catch (err) {
         setPlans(prevPlans);
-        toast.error('Error updating plan: ' + (err.response?.data?.message || err.message), { toastId: 'checkbox-error' });
+        toast.error(
+          "Error updating plan: " +
+            (err.response?.data?.message || err.message),
+          { toastId: "checkbox-error" }
+        );
       }
     }
   };
@@ -2993,17 +3035,23 @@ const ProjectPlanTable = ({
     const prevPlans = [...plans];
     const planId = plans[idx].plId;
     let updated = { ...plans[idx], versionCode: value };
-    const newPlans = plans.map(plan => (plan.plId === planId ? updated : plan));
+    const newPlans = plans.map((plan) =>
+      plan.plId === planId ? updated : plan
+    );
     setPlans(newPlans);
     if (planId && Number(planId) > 0) {
       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
-      toast.info('Updating version code...', { toastId: 'version-code-info' });
+      toast.info("Updating version code...", { toastId: "version-code-info" });
       try {
         setIsActionLoading(true);
         await axios.put(updateUrl, updated);
       } catch (err) {
         setPlans(prevPlans);
-        toast.error('Error updating version code: ' + (err.response?.data?.message || err.message), { toastId: 'version-code-error' });
+        toast.error(
+          "Error updating version code: " +
+            (err.response?.data?.message || err.message),
+          { toastId: "version-code-error" }
+        );
       } finally {
         setIsActionLoading(false);
       }
@@ -3012,91 +3060,123 @@ const ProjectPlanTable = ({
 
   const handleActionSelect = async (idx, action) => {
     const plan = plans[idx];
-    if (action === 'None') return;
+    if (action === "None") return;
     try {
       setIsActionLoading(true);
-      if (action === 'Delete') {
+      if (action === "Delete") {
         if (!plan.plId || Number(plan.plId) <= 0) {
-          toast.error('Cannot delete: Invalid plan ID.');
+          toast.error("Cannot delete: Invalid plan ID.");
           setIsActionLoading(false);
           return;
         }
-        toast.info('Deleting plan...');
+        const confirmed = window.confirm(
+          `Are you sure you want to delete this plan`
+        );
+        if (!confirmed) {
+          setIsActionLoading(false);
+          return;
+        }
+        toast.info("Deleting plan...");
         try {
-          await axios.delete(`https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`);
-          toast.success('Plan deleted successfully!');
+          await axios.delete(
+            `https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`
+          );
+          toast.success("Plan deleted successfully!");
         } catch (err) {
           if (err.response && err.response.status === 404) {
-            toast.error('Plan not found on server. It may have already been deleted.');
+            toast.error(
+              "Plan not found on server. It may have already been deleted."
+            );
           } else {
-            toast.error('Error deleting plan: ' + (err.response?.data?.message || err.message));
+            toast.error(
+              "Error deleting plan: " +
+                (err.response?.data?.message || err.message)
+            );
           }
           setIsActionLoading(false);
           return;
         }
         await fetchPlans();
       } else if (
-        action === 'Create Budget' ||
-        action === 'Create Blank Budget' ||
-        action === 'Create EAC'
+        action === "Create Budget" ||
+        action === "Create Blank Budget" ||
+        action === "Create EAC"
       ) {
         const payloadTemplate = {
           projId: plan.projId,
           plId: plan.plId || 0,
-          plType: (action === 'Create Budget' || action === 'Create Blank Budget') ? 'BUD' : 'EAC',
-          source: plan.source || '',
-          type: isChildProjectId(plan.projId) ? 'SYSTEM' : plan.type || '',
+          plType:
+            action === "Create Budget" || action === "Create Blank Budget"
+              ? "BUD"
+              : "EAC",
+          source: plan.source || "",
+          type: isChildProjectId(plan.projId) ? "SYSTEM" : plan.type || "",
           version: plan.version,
-          versionCode: plan.versionCode || '',
+          versionCode: plan.versionCode || "",
           finalVersion: false,
           isCompleted: false,
           isApproved: false,
-          status: 'In Progress',
-          createdBy: plan.createdBy || 'User',
-          modifiedBy: plan.modifiedBy || 'User',
-          approvedBy: '',
+          status: "In Progress",
+          createdBy: plan.createdBy || "User",
+          modifiedBy: plan.modifiedBy || "User",
+          approvedBy: "",
           templateId: plan.templateId || 1,
         };
         toast.info(
           `Creating ${
-            action === 'Create Budget'
-              ? 'Budget'
-              : action === 'Create Blank Budget'
-              ? 'Blank Budget'
-              : 'EAC'
+            action === "Create Budget"
+              ? "Budget"
+              : action === "Create Blank Budget"
+              ? "Blank Budget"
+              : "EAC"
           }...`
         );
         await axios.post(
-          `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${action === 'Create Blank Budget' ? 'blank' : 'actual'}`,
+          `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${
+            action === "Create Blank Budget" ? "blank" : "actual"
+          }`,
           payloadTemplate
         );
         await fetchPlans();
         toast.success(
-          `${action === 'Create Budget'
-            ? 'Budget'
-            : action === 'Create Blank Budget'
-            ? 'Blank Budget'
-            : 'EAC'} created successfully!`
+          `${
+            action === "Create Budget"
+              ? "Budget"
+              : action === "Create Blank Budget"
+              ? "Blank Budget"
+              : "EAC"
+          } created successfully!`
         );
       } else {
         toast.info(`Action "${action}" selected (API call not implemented)`);
       }
     } catch (err) {
-      toast.error('Error performing action: ' + (err.response?.data?.message || err.message));
+      toast.error(
+        "Error performing action: " +
+          (err.response?.data?.message || err.message)
+      );
     } finally {
       setIsActionLoading(false);
     }
   };
 
   const getActionOptions = (plan) => {
-    let options = ['None'];
+    let options = ["None"];
     if (isChildProjectId(plan.projId) && !plan.plType && !plan.version) {
-      return ['None', 'Create Budget', 'Create Blank Budget'];
+      return ["None", "Create Budget", "Create Blank Budget"];
     }
     if (!plan.plType || !plan.version) return options;
-    if (plan.status === 'In Progress') options = ['None', 'Delete'];
-    else if (plan.status === 'Submitted') options = ['None', 'Create Budget', 'Create Blank Budget'];
-    else if (plan.status === 'Approved') options = ['None', 'Create Budget', 'Create Blank Budget', 'Create EAC', 'Delete'];
+    if (plan.status === "In Progress") options = ["None", "Delete"];
+    else if (plan.status === "Submitted")
+      options = ["None", "Create Budget", "Create Blank Budget"];
+    else if (plan.status === "Approved")
+      options = [
+        "None",
+        "Create Budget",
+        "Create Blank Budget",
+        "Create EAC",
+        "Delete",
+      ];
     return options;
   };
 
@@ -3105,14 +3185,18 @@ const ProjectPlanTable = ({
     return options.includes(action);
   };
 
-  const checkedFinalVersionIdx = plans.findIndex(plan => plan.finalVersion);
+  const checkedFinalVersionIdx = plans.findIndex((plan) => plan.finalVersion);
 
   const getCheckboxProps = (plan, col, idx) => {
-    if (!plan.plType || !plan.version) return { checked: false, disabled: true };
-    if (col === 'isCompleted') return { checked: plan.isCompleted, disabled: !!plan.isApproved };
-    if (col === 'isApproved') return { checked: plan.isApproved, disabled: !plan.isCompleted };
-    if (col === 'finalVersion') {
-      if (checkedFinalVersionIdx !== -1 && checkedFinalVersionIdx !== idx) return { checked: false, disabled: true };
+    if (!plan.plType || !plan.version)
+      return { checked: false, disabled: true };
+    if (col === "isCompleted")
+      return { checked: plan.isCompleted, disabled: !!plan.isApproved };
+    if (col === "isApproved")
+      return { checked: plan.isApproved, disabled: !plan.isCompleted };
+    if (col === "finalVersion") {
+      if (checkedFinalVersionIdx !== -1 && checkedFinalVersionIdx !== idx)
+        return { checked: false, disabled: true };
       return { checked: plan.finalVersion, disabled: !plan.isApproved };
     }
     return { checked: plan[col], disabled: false };
@@ -3120,12 +3204,14 @@ const ProjectPlanTable = ({
 
   const handleTopButtonToggle = async (field) => {
     if (!selectedPlan) {
-      toast.error(`No plan selected to update ${field}.`, { toastId: 'no-plan-selected' });
+      toast.error(`No plan selected to update ${field}.`, {
+        toastId: "no-plan-selected",
+      });
       return;
     }
-    const idx = plans.findIndex(p => p.plId === selectedPlan.plId);
+    const idx = plans.findIndex((p) => p.plId === selectedPlan.plId);
     if (idx === -1) {
-      toast.error(`Selected plan not found.`, { toastId: 'plan-not-found' });
+      toast.error(`Selected plan not found.`, { toastId: "plan-not-found" });
       return;
     }
     setIsActionLoading(true);
@@ -3134,11 +3220,16 @@ const ProjectPlanTable = ({
   };
 
   const getTopButtonDisabled = (field) => {
-    if (!selectedPlan || !selectedPlan.plType || !selectedPlan.version) return true;
-    if (field === 'isCompleted') return !!selectedPlan.isApproved;
-    if (field === 'isApproved') return !selectedPlan.isCompleted;
-    if (field === 'finalVersion') {
-      if (checkedFinalVersionIdx !== -1 && plans[checkedFinalVersionIdx].plId !== selectedPlan.plId) return true;
+    if (!selectedPlan || !selectedPlan.plType || !selectedPlan.version)
+      return true;
+    if (field === "isCompleted") return !!selectedPlan.isApproved;
+    if (field === "isApproved") return !selectedPlan.isCompleted;
+    if (field === "finalVersion") {
+      if (
+        checkedFinalVersionIdx !== -1 &&
+        plans[checkedFinalVersionIdx].plId !== selectedPlan.plId
+      )
+        return true;
       return !selectedPlan.isApproved;
     }
     return false;
@@ -3184,13 +3275,20 @@ const ProjectPlanTable = ({
               <button
                 onClick={() => {
                   setIsActionLoading(true);
-                  handleActionSelect(plans.findIndex(p => p.plId === selectedPlan?.plId), 'Create Budget');
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Create Budget"
+                  );
                 }}
-                disabled={!selectedPlan || !getButtonAvailability(selectedPlan, 'Create Budget')}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Budget")
+                }
                 className={`px-3 py-1 rounded text-xs flex items-center ${
-                  !selectedPlan || !getButtonAvailability(selectedPlan, 'Create Budget')
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Budget")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Create Budget"
               >
@@ -3199,13 +3297,20 @@ const ProjectPlanTable = ({
               <button
                 onClick={() => {
                   setIsActionLoading(true);
-                  handleActionSelect(plans.findIndex(p => p.plId === selectedPlan?.plId), 'Create Blank Budget');
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Create Blank Budget"
+                  );
                 }}
-                disabled={!selectedPlan || !getButtonAvailability(selectedPlan, 'Create Blank Budget')}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Blank Budget")
+                }
                 className={`px-3 py-1 rounded text-xs flex items-center ${
-                  !selectedPlan || !getButtonAvailability(selectedPlan, 'Create Blank Budget')
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Blank Budget")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Create Blank Budget"
               >
@@ -3214,13 +3319,20 @@ const ProjectPlanTable = ({
               <button
                 onClick={() => {
                   setIsActionLoading(true);
-                  handleActionSelect(plans.findIndex(p => p.plId === selectedPlan?.plId), 'Create EAC');
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Create EAC"
+                  );
                 }}
-                disabled={!selectedPlan || !getButtonAvailability(selectedPlan, 'Create EAC')}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create EAC")
+                }
                 className={`px-3 py-1 rounded text-xs flex items-center ${
-                  !selectedPlan || !getButtonAvailability(selectedPlan, 'Create EAC')
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create EAC")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Create EAC"
               >
@@ -3229,49 +3341,56 @@ const ProjectPlanTable = ({
               <button
                 onClick={() => {
                   setIsActionLoading(true);
-                  handleActionSelect(plans.findIndex(p => p.plId === selectedPlan?.plId), 'Delete');
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Delete"
+                  );
                 }}
-                disabled={!selectedPlan || !getButtonAvailability(selectedPlan, 'Delete')}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Delete")
+                }
                 className={`px-3 py-1 rounded text-xs flex items-center ${
-                  !selectedPlan || !getButtonAvailability(selectedPlan, 'Delete')
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-red-600 text-white hover:bg-red-700 cursor-pointer'
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Delete")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
                 }`}
                 title="Delete Selected Plan"
               >
                 Delete
               </button>
               <button
-                onClick={() => handleTopButtonToggle('isCompleted')}
-                disabled={getTopButtonDisabled('isCompleted')}
+                onClick={() => handleTopButtonToggle("isCompleted")}
+                disabled={getTopButtonDisabled("isCompleted")}
                 className={`px-3 py-1 rounded text-xs flex items-center ${
-                  getTopButtonDisabled('isCompleted')
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  getTopButtonDisabled("isCompleted")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Toggle Submitted"
               >
                 Submitted
               </button>
               <button
-                onClick={() => handleTopButtonToggle('isApproved')}
-                disabled={getTopButtonDisabled('isApproved')}
+                onClick={() => handleTopButtonToggle("isApproved")}
+                disabled={getTopButtonDisabled("isApproved")}
                 className={`px-3 py-1 rounded text-xs flex items-center ${
-                  getTopButtonDisabled('isApproved')
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  getTopButtonDisabled("isApproved")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Toggle Approved"
               >
                 Approved
               </button>
               <button
-                onClick={() => handleTopButtonToggle('finalVersion')}
-                disabled={getTopButtonDisabled('finalVersion')}
+                onClick={() => handleTopButtonToggle("finalVersion")}
+                disabled={getTopButtonDisabled("finalVersion")}
                 className={`px-3 py-1 rounded text-xs flex items-center ${
-                  getTopButtonDisabled('finalVersion')
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
+                  getTopButtonDisabled("finalVersion")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Toggle Conclude"
               >
@@ -3346,7 +3465,16 @@ const ProjectPlanTable = ({
           No project plans found for project ID: {projectId}
         </div>
       ) : (
-        <div className="overflow-auto" style={{ maxHeight: '400px', minHeight: '100px', border: '1px solid #e5e7eb', borderRadius: '0.5rem', background: '#fff' }}>
+        <div
+          className="overflow-auto"
+          style={{
+            maxHeight: "400px",
+            minHeight: "100px",
+            border: "1px solid #e5e7eb",
+            borderRadius: "0.5rem",
+            background: "#fff",
+          }}
+        >
           <table className="min-w-full text-xs text-left border-collapse border">
             <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
               <tr>
@@ -3361,11 +3489,13 @@ const ProjectPlanTable = ({
             <tbody>
               {plans.map((plan, idx) => (
                 <tr
-                  key={`plan-${plan.plId || idx}-${plan.projId || 'unknown'}`}
+                  key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
                   className={`even:bg-gray-50 hover:bg-blue-50 transition-all duration-200 cursor-pointer ${
-                    selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
-                      ? 'bg-blue-100 border-l-4 border-l-blue-600'
-                      : ''
+                    selectedPlan &&
+                    selectedPlan.plId === plan.plId &&
+                    selectedPlan.projId === plan.projId
+                      ? "bg-blue-100 border-l-4 border-l-blue-600"
+                      : ""
                   }`}
                   onClick={() => handleRowClick(plan)}
                 >
@@ -3472,83 +3602,105 @@ const ProjectPlanTable = ({
                     //     : plan[col] || ''}
                     // </td>
                     <td
-  key={col}
-  className={`p-2 border font-normal ${
-    col === 'status' && plan.status === 'Submitted'
-      ? 'bg-yellow-100 text-black font-bold'
-      : col === 'status' && plan.status === 'In Progress'
-      ? 'bg-red-100 text-black font-bold'
-      : col === 'status' && plan.status === 'Approved'
-      ? 'bg-green-100 text-black font-bold'
-      : ''
-  }
-  ${col === 'status' ? 'whitespace-nowrap text-center' : ''}
-  ${col === 'projId' ? 'break-words' : ''}
+                      key={col}
+                      className={`p-2 border font-normal ${
+                        col === "status" && plan.status === "Submitted"
+                          ? "bg-yellow-100 text-black font-bold"
+                          : col === "status" && plan.status === "In Progress"
+                          ? "bg-red-100 text-black font-bold"
+                          : col === "status" && plan.status === "Approved"
+                          ? "bg-green-100 text-black font-bold"
+                          : ""
+                      }
+  ${col === "status" ? "whitespace-nowrap text-center" : ""}
+  ${col === "projId" ? "break-words" : ""}
   ${
-    col === 'createdAt' || col === 'updatedAt' || col === 'closedPeriod'
-      ? 'whitespace-nowrap'
-      : ''
+    col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
+      ? "whitespace-nowrap"
+      : ""
   }`}
-  style={
-    col === 'status'
-      ? { minWidth: '120px', maxWidth: '170px' }
-      : col === 'projId'
-      ? { minWidth: '100px', maxWidth: '150px' }
-      : col === 'closedPeriod' || col === 'createdAt' || col === 'updatedAt'
-      ? { minWidth: '180px', maxWidth: '220px' }
-      : {}
-  }
->
-  {col === 'closedPeriod' || col === 'createdAt' || col === 'updatedAt'
-    ? formatDateWithTime(plan[col])
-    : col === 'versionCode' ? (
-      <input
-        type="text"
-        value={editingVersionCodeIdx === idx ? editingVersionCodeValue : plan.versionCode || ''}
-        autoFocus={editingVersionCodeIdx === idx}
-        onClick={e => {
-          e.stopPropagation();
-          setEditingVersionCodeIdx(idx);
-          setEditingVersionCodeValue(plan.versionCode || '');
-        }}
-        onChange={e => setEditingVersionCodeValue(e.target.value)}
-        onBlur={() => {
-          if (editingVersionCodeIdx === idx) {
-            setIsActionLoading(true);
-            handleVersionCodeChange(idx, editingVersionCodeValue);
-            setEditingVersionCodeIdx(null);
-          }
-        }}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            setIsActionLoading(true);
-            handleVersionCodeChange(idx, editingVersionCodeValue);
-            setEditingVersionCodeIdx(null);
-          } else if (e.key === 'Escape') {
-            setEditingVersionCodeIdx(null);
-          }
-        }}
-        className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
-          !plan.plType || !plan.version ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-        }`}
-        style={{ minWidth: 60, maxWidth: 120 }}
-        disabled={!plan.plType || !plan.version}
-      />
-    ) : typeof plan[col] === 'boolean' ? (
-      <input
-        type="checkbox"
-        checked={getCheckboxProps(plan, col, idx).checked}
-        disabled={getCheckboxProps(plan, col, idx).disabled}
-        onClick={(e) => e.stopPropagation()}
-        onMouseDown={(e) => e.stopPropagation()}
-        onDoubleClick={(e) => e.stopPropagation()}
-        onKeyDown={(e) => e.stopPropagation()}
-        onChange={() => handleCheckboxChange(idx, col)}
-        className="cursor-pointer"
-      />
-    ) : plan[col] || ''}
-</td>
-
+                      style={
+                        col === "status"
+                          ? { minWidth: "120px", maxWidth: "170px" }
+                          : col === "projId"
+                          ? { minWidth: "100px", maxWidth: "150px" }
+                          : col === "closedPeriod" ||
+                            col === "createdAt" ||
+                            col === "updatedAt"
+                          ? { minWidth: "180px", maxWidth: "220px" }
+                          : {}
+                      }
+                    >
+                      {col === "closedPeriod" ||
+                      col === "createdAt" ||
+                      col === "updatedAt" ? (
+                        formatDateWithTime(plan[col])
+                      ) : col === "versionCode" ? (
+                        <input
+                          type="text"
+                          value={
+                            editingVersionCodeIdx === idx
+                              ? editingVersionCodeValue
+                              : plan.versionCode || ""
+                          }
+                          autoFocus={editingVersionCodeIdx === idx}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingVersionCodeIdx(idx);
+                            setEditingVersionCodeValue(plan.versionCode || "");
+                          }}
+                          onChange={(e) =>
+                            setEditingVersionCodeValue(e.target.value)
+                          }
+                          onBlur={() => {
+                            if (editingVersionCodeIdx === idx) {
+                              setIsActionLoading(true);
+                              handleVersionCodeChange(
+                                idx,
+                                editingVersionCodeValue
+                              );
+                              setEditingVersionCodeIdx(null);
+                            }
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              setIsActionLoading(true);
+                              handleVersionCodeChange(
+                                idx,
+                                editingVersionCodeValue
+                              );
+                              setEditingVersionCodeIdx(null);
+                            } else if (e.key === "Escape") {
+                              setEditingVersionCodeIdx(null);
+                            }
+                          }}
+                          className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+                            !plan.plType || !plan.version
+                              ? "bg-gray-100 cursor-not-allowed"
+                              : "bg-white"
+                          }`}
+                          style={{ minWidth: 60, maxWidth: 120 }}
+                          disabled={!plan.plType || !plan.version}
+                        />
+                      ) : typeof plan[col] === "boolean" ? (
+                        <input
+    type="checkbox"
+    checked={getCheckboxProps(plan, col, idx).checked}
+    disabled={getCheckboxProps(plan, col, idx).disabled}
+    onClick={(e) => e.stopPropagation()}
+    onMouseDown={(e) => e.stopPropagation()}
+    onDoubleClick={(e) => e.stopPropagation()}
+    onKeyDown={(e) => e.stopPropagation()}
+    onChange={(e) => {
+      e.stopPropagation();
+      handleCheckboxChange(idx, col);
+    }}
+    className="cursor-pointer"
+  />
+                      ) : (
+                        plan[col] || ""
+                      )}
+                    </td>
                   ))}
                 </tr>
               ))}

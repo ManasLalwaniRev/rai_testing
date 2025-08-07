@@ -85,7 +85,7 @@ const ProjectAmountsTable = ({
   const [sourceRowIndex, setSourceRowIndex] = useState(null);
   const [editedRowData, setEditedRowData] = useState({});
 
-  const isEditable = initialData.status === "Working";
+  const isEditable = initialData.status === "In Progress";
   const planId = initialData.plId;
   const projectId = initialData.projId;
   const closedPeriod = initialData.closedPeriod;
