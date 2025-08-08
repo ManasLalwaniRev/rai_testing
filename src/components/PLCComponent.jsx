@@ -272,10 +272,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
           id: item.id,
           lookupType: item.type || "Select",
           empId: item.emplId,
-          employeeName:
-            item.employeeName ||
-            employees.find((emp) => emp.empId === item.emplId)?.employeeName ||
-            "",
+          employeeName: item.emplName || employees.find((emp) => emp.empId === item.emplId)?.employeeName || "",
           plc: item.billLabCatCd,
           plcDescription: item.plcDescription || "",
           billRate: item.billRtAmt,
@@ -2024,12 +2021,12 @@ const handlePlcSelect = (value) => {
       /> */}
       {/* Project Labor Categories Billing Rates Schedule */}
       <div className="mb-4">
-        <h3 className="text-xs font-normal">
+        <h3 className="text-sm font-semibold">
           Project Labor Categories Billing Rates Schedule
         </h3>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto overflow-y-auto max-h-64">
           <table className="w-full text-xs border-collapse">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-gray-100">
               <tr className="bg-gray-100">
                 <th className="border p-2 font-normal">Plc</th>
                 <th className="border p-2 font-normal">Bill Rate</th>
@@ -2363,10 +2360,10 @@ const handlePlcSelect = (value) => {
 
       {/* Employee Billing Rates Schedule */}
       <div className="mb-4">
-        <h3 className="text-xs font-normal">Employee Billing Rates Schedule</h3>
-        <div className="overflow-x-auto">
+        <h3 className="text-sm font-semibold">Employee Billing Rates Schedule</h3>
+        <div className="overflow-x-auto overflow-y-auto max-h-64">
           <table className="w-full text-xs border-collapse">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-gray-100">
               <tr className="bg-gray-100">
                 <th className="border p-2 font-normal">Lookup Type</th>
                 <th className="border p-2 font-normal">Employee</th>
@@ -2867,10 +2864,10 @@ const handlePlcSelect = (value) => {
 
       {/* Vendor Billing Rates Schedule */}
     <div className="mb-4">
-        <h3 className="text-xs font-normal">Vendor Billing Rates Schedule</h3>
-        <div className="overflow-x-auto">
+        <h3 className="text-sm font-semibold">Vendor Billing Rates Schedule</h3>
+        <div className="overflow-x-auto overflow-y-auto max-h-64">
           <table className="w-full text-xs border-collapse">
-            <thead>
+            <thead className="sticky top-0 z-10 bg-gray-100">
               <tr className="bg-gray-100">
                 <th className="border p-2 font-normal sm:w-1/8">Lookup Type</th>
                 <th className="border p-2 font-normal sm:w-1/8">Vendor</th>
