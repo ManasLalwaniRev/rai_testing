@@ -679,7 +679,8 @@ const ProjectAmountsTable = ({
       acctId: newEntry.acctId,
       orgId: newEntry.orgId,
       hrlyRate: Number(newEntry.perHourRate) || 0,
-      effectDt: new Date().toISOString(),
+      // effectDt: new Date().toISOString(),
+      effectDt: null,
     }));
 
     const payload = {
