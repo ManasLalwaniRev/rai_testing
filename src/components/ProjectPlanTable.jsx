@@ -3940,11 +3940,17 @@ const ProjectPlanTable = ({
     }
   }, [plans]);
 
+  // const handleRowClick = (plan) => {
+  //   if (!selectedPlan || selectedPlan.plId !== plan.plId) {
+  //     onPlanSelect(plan);
+  //   }
+  // };
+  
   const handleRowClick = (plan) => {
-    if (!selectedPlan || selectedPlan.plId !== plan.plId) {
-      onPlanSelect(plan);
-    }
-  };
+  if (!selectedPlan || selectedPlan.plId !== plan.plId || selectedPlan.projId !== plan.projId) {
+    onPlanSelect(plan);
+  }
+};
 
   const handleExportPlan = async (plan) => {
     if (!plan.projId || !plan.version || !plan.plType) {
@@ -4682,13 +4688,11 @@ const ProjectPlanTable = ({
               {plans.map((plan, idx) => (
                 <tr
                   key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
-                  className={`even:bg-gray-50 hover:bg-blue-50 transition-all duration-200 cursor-pointer ${
-                    selectedPlan &&
-                    selectedPlan.plId === plan.plId &&
-                    selectedPlan.projId === plan.projId
-                      ? "bg-blue-100 border-l-4 border-l-blue-600"
-                      : ""
-                  }`}
+                  className={`transition-all duration-200 cursor-pointer ${
+  selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
+    ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
+    : "even:bg-gray-50 hover:bg-blue-50"  
+}`}
                   onClick={() => handleRowClick(plan)}
                 >
                   <td className="p-2 border text-center">
