@@ -2021,309 +2021,142 @@ const handlePlcSelect = (value) => {
       /> */}
       {/* Project Labor Categories Billing Rates Schedule */}
       <div className="mb-4">
-        <h3 className="text-sm font-semibold">
-          Project Labor Categories Billing Rates Schedule
-        </h3>
-        <div className="overflow-x-auto overflow-y-auto max-h-64">
-          <table className="w-full text-xs border-collapse">
-            <thead className="sticky top-0 z-10 bg-gray-100">
-              <tr className="bg-gray-100">
-                <th className="border p-2 font-normal">Plc</th>
-                <th className="border p-2 font-normal">Bill Rate</th>
-                <th className="border p-2 font-normal">Rate Type</th>
-                <th className="border p-2 font-normal">Start Date</th>
-                <th className="border p-2 font-normal">End Date</th>
-                <th className="border p-2 font-normal">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loadingPLC ? (
-                <tr key="loading">
-                  <td colSpan="6" className="border p-2 text-center">
-                    Loading...
-                  </td>
-                </tr>
-              ) : billingRatesSchedule.length === 0 ? (
-                <tr key="no-data">
-                  <td colSpan="6" className="border p-2 text-center">
-                    No data available
-                  </td>
-                </tr>
-              ) : (
-                billingRatesSchedule.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+  <div className="flex justify-between items-center mb-2 ">
+    <h3 className="text-sm font-semibold">
+      Project Labor Categories Billing Rates Schedule
+    </h3>
+    <div className="w-1/5"></div>
+    <button
+      onClick={handleAddRow}
+      className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition mr-4"
+      disabled={loading || newRate}
+    >
+      Add
+    </button>
+  </div>
+  <div className="overflow-x-auto overflow-y-auto max-h-64 border-b border-gray-300">
+    <table className="w-full text-xs border-collapse">
+      <thead className="sticky top-0 z-10 bg-gray-100">
+        <tr className="bg-gray-100">
+          <th className="border p-2 font-normal">Plc</th>
+          <th className="border p-2 font-normal">Bill Rate</th>
+          <th className="border p-2 font-normal">Rate Type</th>
+          <th className="border p-2 font-normal">Start Date</th>
+          <th className="border p-2 font-normal">End Date</th>
+          <th className="border p-2 font-normal">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {loadingPLC ? (
+          <tr key="loading">
+            <td colSpan="6" className="border p-2 text-center">
+              Loading...
+            </td>
+          </tr>
+        ) : billingRatesSchedule.length === 0 ? (
+          <tr key="no-data">
+            <td colSpan="6" className="border p-2 text-center">
+              No data available
+            </td>
+          </tr>
+        ) : (
+          billingRatesSchedule.map((item) => (
+            <tr
+              key={item.id}
+              className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+            >
+              <td className="border p-2 sm:w-1/8">
+                <span>{item.plc}</span>
+              </td>
+              <td className="border p-2 sm:w-1/5">
+                {editingProjectPlcRowId === item.id ? (
+                  <input
+                    type="text"
+                    value={editBillRate[item.id] ?? item.billRate}
+                    onChange={(e) =>
+                      handleBillRateChange(item.id, e.target.value)
+                    }
+                    className="w-full p-1 border rounded text-xs"
+                  />
+                ) : (
+                  <span>{item.billRate}</span>
+                )}
+              </td>
+              <td className="border p-2 sm:w-1/5">
+                {editingProjectPlcRowId === item.id ? (
+                  <select
+                    value={
+                      editProjectPlcFields[item.id]?.rateType ??
+                      item.rateType
+                    }
+                    onChange={(e) =>
+                      handleProjectPlcFieldChange(
+                        item.id,
+                        "rateType",
+                        e.target.value
+                      )
+                    }
+                    className="w-full p-1 border rounded text-xs"
                   >
-                    <td className="border p-2 sm:w-1/8">
-                      <span>{item.plc}</span>
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <input
-                          type="text"
-                          value={editBillRate[item.id] ?? item.billRate}
-                          onChange={(e) =>
-                            handleBillRateChange(item.id, e.target.value)
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        />
-                      ) : (
-                        <span>{item.billRate}</span>
-                      )}
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <select
-                          value={
-                            editProjectPlcFields[item.id]?.rateType ??
-                            item.rateType
-                          }
-                          onChange={(e) =>
-                            handleProjectPlcFieldChange(
-                              item.id,
-                              "rateType",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        >
-                          {rateTypeOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span>{item.rateType}</span>
-                      )}
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <input
-                          type="date"
-                          value={
-                            editProjectPlcFields[item.id]?.startDate ??
-                            item.startDate
-                          }
-                          onChange={(e) =>
-                            handleProjectPlcFieldChange(
-                              item.id,
-                              "startDate",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        />
-                      ) : (
-                        <span>{item.startDate}</span>
-                      )}
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <input
-                          type="date"
-                          value={
-                            editProjectPlcFields[item.id]?.endDate ??
-                            item.endDate ??
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleProjectPlcFieldChange(
-                              item.id,
-                              "endDate",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        />
-                      ) : (
-                        <span>{item.endDate || ""}</span>
-                      )}
-                    </td>
-                    {/* <td className="border p-2 sm:w-1/5">
-                      <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-                        {editingProjectPlcRowId === item.id ? (
-                          <>
-                            <button
-                              onClick={() => handleUpdate(item.id)}
-                              className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
-                              disabled={loading}
-                            >
-                              <FaSave className="inline-block mr-1" /> Save
-                            </button>
-                            <button
-                              onClick={() => setEditingProjectPlcRowId(null)}
-                              className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
-                              disabled={loading}
-                            >
-                              <FaTimes className="inline-block mr-1" /> Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => handleEditProjectPlcRow(item.id)}
-                              className="bg-blue-200 text-blue-800 px-3 py-1 rounded text-xs font-normal hover:bg-blue-300 transition w-full sm:w-auto"
-                              disabled={loading}
-                            >
-                              <FaEdit className="inline-block mr-1" /> Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-normal hover:bg-gray-300 transition w-full sm:w-auto"
-                              disabled={loading}
-                            >
-                              <FaTrash className="inline-block mr-1" /> Delete
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td> */}
-                    <td className="border p-2 sm:w-1/5">
-                      <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-                        {editingProjectPlcRowId === item.id ? (
-                          <>
-                            <button
-                              onClick={() => handleUpdate(item.id)}
-                              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Save"
-                            >
-                              <FaSave className="text-sm" />
-                            </button>
-                            <button
-                              onClick={() => setEditingProjectPlcRowId(null)}
-                              className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Cancel"
-                            >
-                              <FaTimes className="text-sm" />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => handleEditProjectPlcRow(item.id)}
-                              className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Edit"
-                            >
-                              <FaEdit className="text-sm" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Delete"
-                            >
-                              <FaTrash className="text-sm" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-              {newRate && (
-                <tr
-                  key="new-rate"
-                  className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
-                >
-                  <td className="border p-2 sm:w-1/5">
-                    <input
-                      type="text"
-                      value={newRate.plc || ""}
-                      onChange={(e) => {
-                        handleNewRateChange("plc", e.target.value);
-                        setPlcSearch(e.target.value);
-                      }}
-                      className="w-full p-1 border rounded text-xs"
-                      list="plc-list"
-                    />
-                    <datalist
-                      id="plc-list"
-                      style={dropdownStyles.noBorderDropdown}
-                    >
-                      {plcs.map((plc) => (
-                        <option
-                          key={plc.laborCategoryCode}
-                          value={plc.laborCategoryCode}
-                          style={dropdownStyles.noBorderDropdown}
-                        >
-                          {plc.description}
-                        </option>
-                      ))}
-                    </datalist>
-                  </td>
-                  <td className="border p-2 sm:w-1/5">
-                    <input
-                      type="text"
-                      value={newRate.billRate || ""}
-                      onChange={(e) =>
-                        handleNewRateChange("billRate", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/5">
-                    <select
-                      value={newRate.rateType}
-                      onChange={(e) =>
-                        handleNewRateChange("rateType", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    >
-                      {rateTypeOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="border p-2 sm:w-1/5">
-                    <input
-                      type="date"
-                      value={newRate.startDate || ""}
-                      onChange={(e) =>
-                        handleNewRateChange("startDate", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/5">
-                    <input
-                      type="date"
-                      value={newRate.endDate || ""}
-                      onChange={(e) =>
-                        handleNewRateChange("endDate", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    />
-                  </td>
-                  {/* <td className="border p-2 sm:w-1/5">
-                    <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                    {rateTypeOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span>{item.rateType}</span>
+                )}
+              </td>
+              <td className="border p-2 sm:w-1/5">
+                {editingProjectPlcRowId === item.id ? (
+                  <input
+                    type="date"
+                    value={
+                      editProjectPlcFields[item.id]?.startDate ??
+                      item.startDate
+                    }
+                    onChange={(e) =>
+                      handleProjectPlcFieldChange(
+                        item.id,
+                        "startDate",
+                        e.target.value
+                      )
+                    }
+                    className="w-full p-1 border rounded text-xs"
+                  />
+                ) : (
+                  <span>{item.startDate}</span>
+                )}
+              </td>
+              <td className="border p-2 sm:w-1/5">
+                {editingProjectPlcRowId === item.id ? (
+                  <input
+                    type="date"
+                    value={
+                      editProjectPlcFields[item.id]?.endDate ??
+                      item.endDate ??
+                      ""
+                    }
+                    onChange={(e) =>
+                      handleProjectPlcFieldChange(
+                        item.id,
+                        "endDate",
+                        e.target.value
+                      )
+                    }
+                    className="w-full p-1 border rounded text-xs"
+                  />
+                ) : (
+                  <span>{item.endDate || ""}</span>
+                )}
+              </td>
+              <td className="border p-2 sm:w-1/5">
+                <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                  {editingProjectPlcRowId === item.id ? (
+                    <>
                       <button
-                        onClick={handleSaveNewRate}
-                        className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
-                        disabled={loading}
-                      >
-                        <FaSave className="inline-block mr-1" /> Save
-                      </button>
-                      <button
-                        onClick={() => setNewRate(null)}
-                        className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
-                        disabled={loading}
-                      >
-                        <FaTimes className="inline-block mr-1" /> Cancel
-                      </button>
-                    </div>
-                  </td> */}
-                  <td className="border p-2 sm:w-1/5">
-                    <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-                      <button
-                        onClick={handleSaveNewRate}
+                        onClick={() => handleUpdate(item.id)}
                         className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
                         disabled={loading}
                         title="Save"
@@ -2331,32 +2164,141 @@ const handlePlcSelect = (value) => {
                         <FaSave className="text-sm" />
                       </button>
                       <button
-                        onClick={() => setNewRate(null)}
+                        onClick={() => setEditingProjectPlcRowId(null)}
                         className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
                         disabled={loading}
                         title="Cancel"
                       >
                         <FaTimes className="text-sm" />
                       </button>
-                    </div>
-                  </td>
-                </tr>
-              )}
-              <tr key="add-button">
-                <td colSpan="6" className="border p-2">
-                  <button
-                    onClick={handleAddRow}
-                    className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition"
-                    disabled={loading || newRate}
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => handleEditProjectPlcRow(item.id)}
+                        className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                        disabled={loading}
+                        title="Edit"
+                      >
+                        <FaEdit className="text-sm" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                        disabled={loading}
+                        title="Delete"
+                      >
+                        <FaTrash className="text-sm" />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))
+        )}
+        {newRate && (
+          <tr
+            key="new-rate"
+            className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+          >
+            <td className="border p-2 sm:w-1/5">
+              <input
+                type="text"
+                value={newRate.plc || ""}
+                onChange={(e) => {
+                  handleNewRateChange("plc", e.target.value);
+                  setPlcSearch(e.target.value);
+                }}
+                className="w-full p-1 border rounded text-xs"
+                list="plc-list"
+              />
+              <datalist
+                id="plc-list"
+                style={dropdownStyles.noBorderDropdown}
+              >
+                {plcs.map((plc) => (
+                  <option
+                    key={plc.laborCategoryCode}
+                    value={plc.laborCategoryCode}
+                    style={dropdownStyles.noBorderDropdown}
                   >
-                    Add
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+                    {plc.description}
+                  </option>
+                ))}
+              </datalist>
+            </td>
+            <td className="border p-2 sm:w-1/5">
+              <input
+                type="text"
+                value={newRate.billRate || ""}
+                onChange={(e) =>
+                  handleNewRateChange("billRate", e.target.value)
+                }
+                className="w-full p-1 border rounded text-xs"
+              />
+            </td>
+            <td className="border p-2 sm:w-1/5">
+              <select
+                value={newRate.rateType}
+                onChange={(e) =>
+                  handleNewRateChange("rateType", e.target.value)
+                }
+                className="w-full p-1 border rounded text-xs"
+              >
+                {rateTypeOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </td>
+            <td className="border p-2 sm:w-1/5">
+              <input
+                type="date"
+                value={newRate.startDate || ""}
+                onChange={(e) =>
+                  handleNewRateChange("startDate", e.target.value)
+                }
+                className="w-full p-1 border rounded text-xs"
+              />
+            </td>
+            <td className="border p-2 sm:w-1/5">
+              <input
+                type="date"
+                value={newRate.endDate || ""}
+                onChange={(e) =>
+                  handleNewRateChange("endDate", e.target.value)
+                }
+                className="w-full p-1 border rounded text-xs"
+              />
+            </td>
+            <td className="border p-2 sm:w-1/5">
+              <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                <button
+                  onClick={handleSaveNewRate}
+                  className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                  disabled={loading}
+                  title="Save"
+                >
+                  <FaSave className="text-sm" />
+                </button>
+                <button
+                  onClick={() => setNewRate(null)}
+                  className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                  disabled={loading}
+                  title="Cancel"
+                >
+                  <FaTimes className="text-sm" />
+                </button>
+              </div>
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+</div>
 
       {/* Employee Billing Rates Schedule */}
       <div className="mb-4">
