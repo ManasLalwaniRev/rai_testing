@@ -5140,7 +5140,7 @@ const ProjectHoursDetails = ({
               Show Hidden Rows
             </button>
           )}
-          {isEditable && (
+          {/* {isEditable && (
             <>
               <button
                 onClick={() => setShowNewForm((prev) => !prev)}
@@ -5163,7 +5163,34 @@ const ProjectHoursDetails = ({
                 </button>
               )}
             </>
-          )}
+          )} */}
+          {isEditable && (
+  <>
+    <button
+      onClick={() => setShowNewForm((prev) => !prev)}
+      className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+    >
+      {showNewForm ? "Cancel" : "New"}
+    </button>
+    {!showNewForm && (  // <-- Add this condition to hide when showNewForm is true
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+        onClick={() => isEditable && setShowFindReplace(true)}
+      >
+        Find / Replace
+      </button>
+    )}
+    {showNewForm && (
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+        onClick={() => isEditable && setShowFillValues(true)}
+      >
+        Fill Values
+      </button>
+    )}
+  </>
+)}
+
           {showNewForm && (
             <button
               onClick={handleSaveNewEntry}

@@ -4663,11 +4663,21 @@ const ProjectPlanTable = ({
           No project plans found for project ID: {projectId}
         </div>
       ) : (
+        // <div
+        //   className="overflow-auto"
+        //   style={{
+        //     maxHeight: "400px",
+        //     minHeight: "100px",
+        //     border: "1px solid #e5e7eb",
+        //     borderRadius: "0.5rem",
+        //     background: "#fff",
+        //   }}
+        // >
         <div
           className="overflow-auto"
           style={{
-            maxHeight: "400px",
-            minHeight: "100px",
+            maxHeight: "250px",
+            minHeight: "60px",
             border: "1px solid #e5e7eb",
             borderRadius: "0.5rem",
             background: "#fff",
@@ -4676,9 +4686,9 @@ const ProjectPlanTable = ({
           <table className="min-w-full text-xs text-left border-collapse border">
             <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
               <tr>
-                <th className="p-2 border font-normal">Export Plan</th>
+                <th className="p-1 border font-normal">Export Plan</th>
                 {columns.map((col) => (
-                  <th key={col} className="p-2 border font-normal text-center">
+                  <th key={col} className="p-1 border font-normal text-center">
                     {COLUMN_LABELS[col] || col}
                   </th>
                 ))}
@@ -4695,7 +4705,7 @@ const ProjectPlanTable = ({
 }`}
                   onClick={() => handleRowClick(plan)}
                 >
-                  <td className="p-2 border text-center">
+                  <td className="p-1 border text-center">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -4798,7 +4808,7 @@ const ProjectPlanTable = ({
                     // </td>
                     <td
                       key={col}
-                      className={`p-2 border font-normal ${
+                      className={`p-1 border font-normal ${
                         col === "status" && plan.status === "Submitted"
                           ? "bg-yellow-100 text-black font-bold"
                           : col === "status" && plan.status === "In Progress"
