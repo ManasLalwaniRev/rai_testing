@@ -3765,6 +3765,2286 @@
 // export default ProjectPlanTable;
 
 
+// import React, { useEffect, useState, useRef } from "react";
+// import axios from "axios";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+// import ProjectPlanForm from "./ProjectPlanForm";
+// import { formatDate } from "./utils";
+
+// const BOOLEAN_FIELDS = ["finalVersion", "isCompleted", "isApproved"];
+
+// const COLUMN_LABELS = {
+//   projId: "Project ID",
+//   plType: "Plan Type",
+//   version: "Version",
+//   versionCode: "Version Code",
+//   source: "Source",
+//   type: "Type",
+//   finalVersion: "Conclude",
+//   isCompleted: "Submitted",
+//   isApproved: "Approved",
+//   status: "Status",
+//   closedPeriod: "Closed Period",
+//   createdAt: "Created At",
+//   updatedAt: "Updated At",
+// };
+
+// const ProjectPlanTable = ({
+//   onPlanSelect,
+//   selectedPlan,
+//   projectId,
+//   fiscalYear,
+//   setFiscalYear,
+//   fiscalYearOptions,
+// }) => {
+//   const [plans, setPlans] = useState([]);
+//   const [columns, setColumns] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [isActionLoading, setIsActionLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [showForm, setShowForm] = useState(false);
+//   const [refreshKey, setRefreshKey] = useState(0);
+//   const fileInputRef = useRef(null);
+//   const [lastImportedVersion, setLastImportedVersion] = useState(null);
+//   const [lastImportTime, setLastImportTime] = useState(null);
+//   const [editingVersionCodeIdx, setEditingVersionCodeIdx] = useState(null);
+//   const [editingVersionCodeValue, setEditingVersionCodeValue] = useState("");
+
+//   const isChildProjectId = (projId) => {
+//     return projId && typeof projId === "string" && projId.includes(".");
+//   };
+
+//   const formatDateWithTime = (dateStr) => {
+//     if (!dateStr) return "";
+//     try {
+//       const date = new Date(dateStr);
+//       if (isNaN(date.getTime())) return dateStr;
+//       return date.toLocaleString("en-US", {
+//         month: "2-digit",
+//         day: "2-digit",
+//         year: "numeric",
+//         hour: "2-digit",
+//         minute: "2-digit",
+//         second: "2-digit",
+//         hour12: true,
+//       });
+//     } catch (e) {
+//       return dateStr;
+//     }
+//   };
+
+//   const sortPlansByProjIdPlTypeVersion = (plansArray) => {
+//     return [...plansArray].sort((a, b) => {
+//       if (a.projId < b.projId) return -1;
+//       if (a.projId > b.projId) return 1;
+//       if (a.plType < b.plType) return -1;
+//       if (a.plType > b.plType) return 1;
+//       // Explicit numeric compare for version
+//       const aVersion = Number(a.version) || 0;
+//       const bVersion = Number(b.version) || 0;
+//       return aVersion - bVersion;
+//     });
+//   };
+
+//   const fetchPlans = async () => {
+//     if (!projectId) {
+//       setPlans([]);
+//       setLoading(false);
+//       return;
+//     }
+//     setLoading(true);
+//     try {
+//       const response = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
+//       );
+
+//       // Add this debug line
+//       console.log('API response:', response.data);
+      
+
+//       const transformedPlans = response.data.map((plan, idx) => ({
+        
+//         // // Add this debug line too
+//         //     console.log('Raw plan from API:', plan);
+//         plId: plan.plId || plan.id || 0,
+//         // projId: plan.projId || projectId,
+//         projId: plan.projId || plan.fullProjectId || plan.project_id || plan.projectId || projectId,
+//         plType:
+//           plan.plType === "Budget"
+//             ? "BUD"
+//             : plan.plType === "EAC"
+//             ? "EAC"
+//             : plan.plType || "",
+//         source: plan.source || "",
+//         type: plan.type || "",
+//         version: plan.version || 0,
+//         versionCode: plan.versionCode || "",
+//         finalVersion: !!plan.finalVersion,
+//         isCompleted: !!plan.isCompleted,
+//         isApproved: !!plan.isApproved,
+//         status:
+//           plan.plType && plan.version
+//             ? (plan.status || "In Progress")
+//                 .replace("Working", "In Progress")
+//                 .replace("Completed", "Submitted")
+//             : "",
+//         closedPeriod: plan.closedPeriod || "",
+//         createdAt: plan.createdAt || "",
+//         updatedAt: plan.updatedAt || "",
+//         modifiedBy: plan.modifiedBy || "",
+//         approvedBy: plan.approvedBy || "",
+//         createdBy: plan.createdBy || "",
+//         templateId: plan.templateId || 0,
+//         projName: plan.projName || "",
+//         projStartDt: plan.projStartDt || "",
+//         projEndDt: plan.projEndDt || "",
+//         orgId: plan.orgId || "",
+//         fundedCost: plan.proj_f_cst_amt || "",
+//         fundedFee: plan.proj_f_fee_amt || "",
+//         fundedRev: plan.proj_f_tot_amt || "",
+//         revenueAccount: plan.revenueAccount || "",
+//       }));
+//       console.log(transformedPlans);
+//       const sortedPlans = sortPlansByProjIdPlTypeVersion(transformedPlans);
+//       setPlans(sortedPlans);
+//       setColumns([
+//         "projId",
+//         "plType",
+//         "version",
+//         "versionCode",
+//         "source",
+//         "type",
+//         "isCompleted",
+//         "isApproved",
+//         "finalVersion",
+//         "status",
+//         "closedPeriod",
+//       ]);
+//     } catch (error) {
+//       setPlans([]);
+//       toast.error("Failed to fetch plans.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchPlans();
+//   }, [projectId]);
+
+//   useEffect(() => {
+//     if (selectedPlan && plans.length > 0) {
+//       const latest = plans.find(
+//         (p) => p.plId === selectedPlan.plId && p.projId === selectedPlan.projId
+//       );
+//       if (
+//         latest &&
+//         (latest.status !== selectedPlan.status ||
+//           latest.isCompleted !== selectedPlan.isCompleted ||
+//           latest.isApproved !== selectedPlan.isApproved ||
+//           latest.finalVersion !== selectedPlan.finalVersion)
+//       ) {
+//         onPlanSelect(latest);
+//       }
+//     }
+//   }, [plans]);
+
+//   // const handleRowClick = (plan) => {
+//   //   if (!selectedPlan || selectedPlan.plId !== plan.plId) {
+//   //     onPlanSelect(plan);
+//   //   }
+//   // };
+  
+//   const handleRowClick = (plan) => {
+//   if (!selectedPlan || selectedPlan.plId !== plan.plId || selectedPlan.projId !== plan.projId) {
+//     onPlanSelect(plan);
+//   }
+// };
+
+//   const handleExportPlan = async (plan) => {
+//     if (!plan.projId || !plan.version || !plan.plType) {
+//       toast.error("Missing required parameters for export");
+//       return;
+//     }
+//     try {
+//       setIsActionLoading(true);
+//       toast.info("Exporting plan...");
+//       const response = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Forecast/ExportPlanDirectCost`,
+//         {
+//           params: {
+//             projId: plan.projId,
+//             version: plan.version,
+//             type: plan.plType,
+//           },
+//           responseType: "blob",
+//         }
+//       );
+//       const url = window.URL.createObjectURL(new Blob([response.data]));
+//       const link = document.createElement("a");
+//       link.href = url;
+//       link.setAttribute(
+//         "download",
+//         `Plan_${plan.projId}_${plan.version}_${plan.plType}.xlsx`
+//       );
+//       document.body.appendChild(link);
+//       link.click();
+//       link.remove();
+//       window.URL.revokeObjectURL(url);
+//       toast.success("Plan exported successfully!");
+//     } catch (err) {
+//       toast.error(
+//         "Error exporting plan: " + (err.response?.data?.message || err.message)
+//       );
+//     } finally {
+//       setIsActionLoading(false);
+//     }
+//   };
+
+//   const handleImportPlan = async (event) => {
+//     const file = event.target.files[0];
+//     if (!file) {
+//       toast.error("No file selected");
+//       return;
+//     }
+//     const validExtensions = [".xlsx", ".xls"];
+//     const fileExtension = file.name
+//       .slice(file.name.lastIndexOf("."))
+//       .toLowerCase();
+//     if (!validExtensions.includes(fileExtension)) {
+//       toast.error(
+//         "Invalid file format. Please upload an Excel file (.xlsx or .xls)"
+//       );
+//       return;
+//     }
+//     const formData = new FormData();
+//     formData.append("file", file);
+//     formData.append("projId", projectId);
+//     try {
+//       setIsActionLoading(true);
+//       toast.info("Importing plan...");
+//       const response = await axios.post(
+//         "https://test-api-3tmq.onrender.com/Forecast/ImportDirectCostPlan",
+//         formData,
+//         { headers: { "Content-Type": "multipart/form-data" } }
+//       );
+//       let extractedVersion = null;
+//       if (typeof response.data === "string") {
+//         const versionMatch = response.data.match(/version\s*-\s*'([^']+)'/i);
+//         if (versionMatch) extractedVersion = versionMatch[1];
+//       } else if (response.data?.version) {
+//         extractedVersion = response.data.version;
+//       }
+//       if (extractedVersion) setLastImportedVersion(extractedVersion);
+//       setLastImportTime(Date.now());
+//       toast.success(
+//         response.data && typeof response.data === "string"
+//           ? response.data
+//           : JSON.stringify(response.data),
+//         { toastId: "import-success-" + Date.now(), autoClose: 5000 }
+//       );
+//       await fetchPlans();
+//     } catch (err) {
+//       let errorMessage =
+//         "Failed to import plan. Please check the file and project ID, or contact support.";
+//       if (err.response) {
+//         if (typeof err.response.data === "string" && err.response.data)
+//           errorMessage = err.response.data;
+//         else if (err.response.data?.message)
+//           errorMessage = err.response.data.message;
+//         else if (err.response.data)
+//           errorMessage = JSON.stringify(err.response.data);
+//         else if (err.response.status === 500)
+//           errorMessage =
+//             "Server error occurred. Please verify the file format, project ID, and ensure type is EXCEL.";
+//       } else errorMessage = err.message || errorMessage;
+//       toast.error(errorMessage, { toastId: "import-error", autoClose: 5000 });
+//     } finally {
+//       setIsActionLoading(false);
+//       if (fileInputRef.current) fileInputRef.current.value = "";
+//     }
+//   };
+
+//   const handleCheckboxChange = async (idx, field) => {
+//     const prevPlans = [...plans];
+//     const plan = plans[idx];
+//     const planId = plan.plId;
+//     if (!plan.plType || !plan.version) {
+//       toast.error(
+//         `Cannot update ${field}: Plan Type and Version are required.`,
+//         { toastId: "checkbox-error" }
+//       );
+//       return;
+//     }
+//     if (field === "isApproved" && !plan.isCompleted) {
+//       toast.error("You can't approve this row until Submitted is checked", {
+//         toastId: "checkbox-error",
+//       });
+//       return;
+//     }
+//     if (field === "finalVersion" && !plan.isApproved) {
+//       toast.error("You can't set Conclude until Approved is checked", {
+//         toastId: "checkbox-error",
+//       });
+//       return;
+//     }
+//     let updated = { ...plan };
+//     updated[field] = !plan[field];
+//     if (field === "isCompleted") {
+//       updated.status = updated.isCompleted ? "Submitted" : "In Progress";
+//       if (!updated.isCompleted) {
+//         updated.isApproved = false;
+//         updated.finalVersion = false;
+//       }
+//     }
+//     if (field === "isApproved") {
+//       updated.status = updated.isApproved ? "Approved" : "Submitted";
+//       if (!updated.isApproved) updated.finalVersion = false;
+//     }
+//     if (field === "finalVersion")
+//       updated.status = updated.finalVersion ? "Submitted" : "Approved";
+//     let newPlans;
+//     // Your referenced line, but updated from "Working" to "In Progress" and "Completed" to "Submitted"
+//     if (field === "isCompleted" && !updated.isCompleted) {
+//       const isEAC = updated.plType === "EAC";
+//       const inProgressCount = plans.filter(
+//         (p) => p.status === "In Progress" && p.plType === updated.plType
+//       ).length;
+//       if (inProgressCount > 0 && updated.status === "In Progress") {
+//         toast.error(
+//           `Only one ${
+//             isEAC ? "EAC" : "BUD"
+//           } plan can have In Progress status at a time.`,
+//           { toastId: "checkbox-error" }
+//         );
+//         return;
+//       }
+//     }
+//     if (field === "finalVersion" && updated.finalVersion) {
+//   newPlans = plans.map((p, i) =>
+//     i === idx
+//       ? updated
+//       : p.plType === updated.plType
+//       ? { ...p, finalVersion: false }
+//       : p
+//   );
+// } else {
+//   newPlans = plans.map((p, i) => (i === idx ? updated : p));
+// }
+
+//     // if (field === "finalVersion" && updated.finalVersion) {
+//     //   newPlans = plans.map((p, i) =>
+//     //     i === idx ? updated : { ...p, finalVersion: false }
+//     //   );
+//     // } else {
+//     //   newPlans = plans.map((p, i) => (i === idx ? updated : p));
+//     // }
+//     // "In Progress" handling for exclusivity
+//     if (updated.status === "In Progress") {
+//       newPlans = newPlans.map((p, i) =>
+//         i !== idx && p.status === "In Progress" && p.plType === updated.plType
+//           ? { ...p, status: "Submitted", isCompleted: true }
+//           : p
+//       );
+//     }
+//     setPlans(newPlans);
+//     onPlanSelect(updated);
+//     if (
+//       (BOOLEAN_FIELDS.includes(field) || field === "status") &&
+//       planId &&
+//       Number(planId) > 0
+//     ) {
+//       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+//       try {
+//         await axios.put(updateUrl, updated);
+//       } catch (err) {
+//         setPlans(prevPlans);
+//         toast.error(
+//           "Error updating plan: " +
+//             (err.response?.data?.message || err.message),
+//           { toastId: "checkbox-error" }
+//         );
+//       }
+//     }
+//   };
+
+//   const handleVersionCodeChange = async (idx, value) => {
+//     const prevPlans = [...plans];
+//     const planId = plans[idx].plId;
+//     let updated = { ...plans[idx], versionCode: value };
+//     const newPlans = plans.map((plan) =>
+//       plan.plId === planId ? updated : plan
+//     );
+//     setPlans(newPlans);
+//     if (planId && Number(planId) > 0) {
+//       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+//       toast.info("Updating version code...", { toastId: "version-code-info" });
+//       try {
+//         setIsActionLoading(true);
+//         await axios.put(updateUrl, updated);
+//       } catch (err) {
+//         setPlans(prevPlans);
+//         toast.error(
+//           "Error updating version code: " +
+//             (err.response?.data?.message || err.message),
+//           { toastId: "version-code-error" }
+//         );
+//       } finally {
+//         setIsActionLoading(false);
+//       }
+//     }
+//   };
+
+//   const handleActionSelect = async (idx, action) => {
+//     const plan = plans[idx];
+
+//     console.log('Selected plan object:', plan);
+//     // console.log('Plan projId:', JSON.stringify(plan));
+
+//     if (action === "None") return;
+//     try {
+//       setIsActionLoading(true);
+//       if (action === "Delete") {
+//         if (!plan.plId || Number(plan.plId) <= 0) {
+//           toast.error("Cannot delete: Invalid plan ID.");
+//           setIsActionLoading(false);
+//           return;
+//         }
+//         const confirmed = window.confirm(
+//           `Are you sure you want to delete this plan`
+//         );
+//         if (!confirmed) {
+//           setIsActionLoading(false);
+//           return;
+//         }
+//         toast.info("Deleting plan...");
+//         try {
+//           await axios.delete(
+//             `https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`
+//           );
+//           toast.success("Plan deleted successfully!");
+//         } catch (err) {
+//           if (err.response && err.response.status === 404) {
+//             toast.error(
+//               "Plan not found on server. It may have already been deleted."
+//             );
+//           } else {
+//             toast.error(
+//               "Error deleting plan: " +
+//                 (err.response?.data?.message || err.message)
+//             );
+//           }
+//           setIsActionLoading(false);
+//           return;
+//         }
+//         await fetchPlans();
+//       } else if (
+//         action === "Create Budget" ||
+//         action === "Create Blank Budget" ||
+//         action === "Create EAC"
+//       ) {
+//         const payloadTemplate = {
+//           projId: plan.projId,
+//           plId: plan.plId || 0,
+//           plType:
+//             action === "Create Budget" || action === "Create Blank Budget"
+//               ? "BUD"
+//               : "EAC",
+//           source: plan.source || "",
+//           type: isChildProjectId(plan.projId) ? "SYSTEM" : plan.type || "",
+//           version: plan.version,
+//           versionCode: plan.versionCode || "",
+//           finalVersion: false,
+//           isCompleted: false,
+//           isApproved: false,
+//           status: "In Progress",
+//           createdBy: plan.createdBy || "User",
+//           modifiedBy: plan.modifiedBy || "User",
+//           approvedBy: "",
+//           templateId: plan.templateId || 1,
+//         };
+//         toast.info(
+//           `Creating ${
+//             action === "Create Budget"
+//               ? "Budget"
+//               : action === "Create Blank Budget"
+//               ? "Blank Budget"
+//               : "EAC"
+//           }...`
+//         );
+//         await axios.post(
+//           `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${
+//             action === "Create Blank Budget" ? "blank" : "actual"
+//           }`,
+//           payloadTemplate
+//         );
+//         await fetchPlans();
+//         toast.success(
+//           `${
+//             action === "Create Budget"
+//               ? "Budget"
+//               : action === "Create Blank Budget"
+//               ? "Blank Budget"
+//               : "EAC"
+//           } created successfully!`
+//         );
+//       } else {
+//         toast.info(`Action "${action}" selected (API call not implemented)`);
+//       }
+//     } catch (err) {
+//       toast.error(
+//         "Error performing action: " +
+//           (err.response?.data?.message || err.message)
+//       );
+//     } finally {
+//       setIsActionLoading(false);
+//     }
+//   };
+
+//   const getActionOptions = (plan) => {
+//     let options = ["None"];
+//     if (isChildProjectId(plan.projId) && !plan.plType && !plan.version) {
+//       return ["None", "Create Budget", "Create Blank Budget"];
+//     }
+//     if (!plan.plType || !plan.version) return options;
+//     if (plan.status === "In Progress") options = ["None", "Delete"];
+//     else if (plan.status === "Submitted")
+//       options = ["None", "Create Budget", "Create Blank Budget"];
+//     else if (plan.status === "Approved")
+//       options = [
+//         "None",
+//         "Create Budget",
+//         "Create Blank Budget",
+//         "Create EAC",
+//         "Delete",
+//       ];
+//     return options;
+//   };
+
+//   const getButtonAvailability = (plan, action) => {
+//     const options = getActionOptions(plan);
+//     return options.includes(action);
+//   };
+
+//   const checkedFinalVersionIdx = plans.findIndex((plan) => plan.finalVersion);
+
+//   // const getCheckboxProps = (plan, col, idx) => {
+//   //   if (!plan.plType || !plan.version)
+//   //     return { checked: false, disabled: true };
+//   //   if (col === "isCompleted")
+//   //     return { checked: plan.isCompleted, disabled: !!plan.isApproved };
+//   //   if (col === "isApproved")
+//   //     return { checked: plan.isApproved, disabled: !plan.isCompleted };
+//   //   if (col === "finalVersion") {
+//   //     if (checkedFinalVersionIdx !== -1 && checkedFinalVersionIdx !== idx)
+//   //       return { checked: false, disabled: true };
+//   //     return { checked: plan.finalVersion, disabled: !plan.isApproved };
+//   //   }
+//   //   return { checked: plan[col], disabled: false };
+//   // };
+//   const getCheckboxProps = (plan, col, idx) => {
+//   if (!plan.plType || !plan.version) return { checked: false, disabled: true };
+
+//   if (col === "isCompleted")
+//     return { checked: plan.isCompleted, disabled: !!plan.isApproved };
+
+//   if (col === "isApproved")
+//     return { checked: plan.isApproved, disabled: !plan.isCompleted };
+
+//   if (col === "finalVersion") {
+//     // Find if any other plan with same plType has finalVersion checked
+//     const anotherFinalVersionIdx = plans.findIndex(
+//       (p, i) => i !== idx && p.plType === plan.plType && p.finalVersion
+//     );
+
+//     // Disable finalVersion checkbox for this row only if another finalVersion in the same plType is checked
+//     return {
+//       checked: plan.finalVersion,
+//       disabled: anotherFinalVersionIdx !== -1, // disable if any other finalVersion for same plType
+//     };
+//   }
+
+//   return { checked: plan[col], disabled: false };
+// };
+
+//   const handleTopButtonToggle = async (field) => {
+//     if (!selectedPlan) {
+//       toast.error(`No plan selected to update ${field}.`, {
+//         toastId: "no-plan-selected",
+//       });
+//       return;
+//     }
+//     const idx = plans.findIndex((p) => p.plId === selectedPlan.plId);
+//     if (idx === -1) {
+//       toast.error(`Selected plan not found.`, { toastId: "plan-not-found" });
+//       return;
+//     }
+//     setIsActionLoading(true);
+//     await handleCheckboxChange(idx, field);
+//     setIsActionLoading(false);
+//   };
+
+//   const handleCalc = async () => {
+//     if (!selectedPlan) {
+//       toast.error("No plan selected for calculation.", {
+//         toastId: "no-plan-selected",
+//       });
+//       return;
+//     }
+//     if (!selectedPlan.plId || !selectedPlan.templateId) {
+//       toast.error("Cannot calculate: Missing required parameters (planID or templateId).", {
+//         toastId: "missing-params",
+//       });
+//       return;
+//     }
+//     setIsActionLoading(true);
+//     try {
+//       const response = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Forecast/CalculateRevenueCost?planID=${selectedPlan.plId}&templateId=${selectedPlan.templateId}&type=actual`
+//       );
+//       // Assuming the response body is a message or has a 'message' field
+//       const message = typeof response.data === 'string' ? response.data : response.data?.message || "Revenue Calculation successful!";
+//       toast.success(message);
+//     } catch (err) {
+//       const errorMessage = err.response?.data?.message || err.message || "Error during calculation.";
+//       toast.error(errorMessage);
+//     } finally {
+//       setIsActionLoading(false);
+//     }
+//   };
+
+//   const getTopButtonDisabled = (field) => {
+//     if (!selectedPlan || !selectedPlan.plType || !selectedPlan.version)
+//       return true;
+//     if (field === "isCompleted") return !!selectedPlan.isApproved;
+//     if (field === "isApproved") return !selectedPlan.isCompleted;
+//     if (field === "finalVersion") {
+//       if (
+//         checkedFinalVersionIdx !== -1 &&
+//         plans[checkedFinalVersionIdx].plId !== selectedPlan.plId
+//       )
+//         return true;
+//       return !selectedPlan.isApproved;
+//     }
+//     return false;
+//   };
+
+//   const getCalcButtonDisabled = () => {
+//     return !selectedPlan || !selectedPlan.plId || !selectedPlan.templateId;
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="p-4">
+//         <div className="flex items-center justify-center">
+//           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+//           <span className="ml-2">Loading project plans...</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="p-4">
+//         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+//           <strong className="font-bold">Error: </strong>
+//           <span className="block sm:inline">{error}</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="p-4 relative z-10" key={refreshKey}>
+//       {isActionLoading && (
+//         <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-20">
+//           <div className="flex items-center">
+//             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+//             <span className="ml-2 text-sm text-gray-700">Processing...</span>
+//           </div>
+//         </div>
+//       )}
+//       <div className="flex justify-between items-center mb-2">
+//         <div className="flex gap-1 flex-wrap">
+//           {plans.length > 0 && (
+//             <>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Budget"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Budget")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Budget")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Budget"
+//               >
+//                 Create Budget
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Blank Budget"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Blank Budget"
+//               >
+//                 Create Blank Budget
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create EAC"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create EAC")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create EAC")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create EAC"
+//               >
+//                 Create EAC
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Delete"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Delete")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Delete")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+//                 }`}
+//                 title="Delete Selected Plan"
+//               >
+//                 Delete
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("isCompleted")}
+//                 disabled={getTopButtonDisabled("isCompleted")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isCompleted")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Toggle Submitted"
+//               >
+//                 Submitted
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("isApproved")}
+//                 disabled={getTopButtonDisabled("isApproved")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isApproved")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Toggle Approved"
+//               >
+//                 Approved
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("finalVersion")}
+//                 disabled={getTopButtonDisabled("finalVersion")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("finalVersion")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Toggle Conclude"
+//               >
+//                 Conclude
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleCalc();
+//                 }}
+//                 disabled={getCalcButtonDisabled()}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getCalcButtonDisabled()
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Calculate"
+//               >
+//                 Calc
+//               </button>
+//             </>
+//           )}
+//         </div>
+
+//         <div className="flex items-center gap-4">
+//           <button
+//             onClick={() => {
+//               setIsActionLoading(true);
+//               fileInputRef.current.click();
+//             }}
+//             className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer whitespace-nowrap"
+//             title="Import Plan"
+//           >
+//             <svg
+//               xmlns="http://www.w3.org/2000/svg"
+//               className="h-4 w-4 mr-1"
+//               fill="none"
+//               viewBox="0 0 24 24"
+//               stroke="currentColor"
+//             >
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth={2}
+//                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+//               />
+//             </svg>
+//             Import
+//           </button>
+//           <input
+//             type="file"
+//             ref={fileInputRef}
+//             onChange={(e) => {
+//               setIsActionLoading(true);
+//               handleImportPlan(e);
+//             }}
+//             accept=".xlsx,.xls"
+//             className="hidden"
+//           />
+
+//           <div className="flex items-center gap-2">
+//             <label
+//               htmlFor="fiscalYear"
+//               className="font-semibold text-xs sm:text-sm whitespace-nowrap"
+//             >
+//               Fiscal Year:
+//             </label>
+//             <select
+//               id="fiscalYear"
+//               value={fiscalYear}
+//               onChange={(e) => setFiscalYear(e.target.value)}
+//               className="border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               disabled={fiscalYearOptions?.length === 0}
+//             >
+//               {fiscalYearOptions?.map((year) => (
+//                 <option key={year} value={year}>
+//                   {year}
+//                 </option>
+//               ))}
+//             </select>
+//           </div>
+//         </div>
+//       </div>
+//       {plans.length === 0 ? (
+//         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+//           No project plans found for project ID: {projectId}
+//         </div>
+//       ) : (
+//         // <div
+//         //   className="overflow-auto"
+//         //   style={{
+//         //     maxHeight: "400px",
+//         //     minHeight: "100px",
+//         //     border: "1px solid #e5e7eb",
+//         //     borderRadius: "0.5rem",
+//         //     background: "#fff",
+//         //   }}
+//         // >
+//         <div
+//           className="overflow-auto"
+//           style={{
+//             maxHeight: "250px",
+//             minHeight: "60px",
+//             border: "1px solid #e5e7eb",
+//             borderRadius: "0.5rem",
+//             background: "#fff",
+//           }}
+//         >
+//           <table className="min-w-full text-xs text-left border-collapse border">
+//             <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
+//               <tr>
+//                 <th className="p-1 border font-normal">Export Plan</th>
+//                 {columns.map((col) => (
+//                   <th key={col} className="p-1 border font-normal text-center">
+//                     {COLUMN_LABELS[col] || col}
+//                   </th>
+//                 ))}
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {plans.map((plan, idx) => (
+//                 <tr
+//                   key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
+//                   className={`transition-all duration-200 cursor-pointer ${
+//   selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
+//     ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
+//     : "even:bg-gray-50 hover:bg-blue-50"  
+// }`}
+//                   onClick={() => handleRowClick(plan)}
+//                 >
+//                   <td className="p-1 border text-center">
+//                     <button
+//                       onClick={(e) => {
+//                         e.stopPropagation();
+//                         setIsActionLoading(true);
+//                         handleExportPlan(plan);
+//                       }}
+//                       className="text-blue-600 hover:text-blue-800"
+//                       title="Export Plan"
+//                       disabled={!plan.projId || !plan.version || !plan.plType}
+//                     >
+//                       <svg
+//                         xmlns="http://www.w3.org/2000/svg"
+//                         className="h-4 w-4 cursor-pointer"
+//                         fill="none"
+//                         viewBox="0 0 24 24"
+//                         stroke="currentColor"
+//                       >
+//                         <path
+//                           strokeLinecap="round"
+//                           strokeLinejoin="round"
+//                           strokeWidth={2}
+//                           d="M12 4v12m0 0l-3-3m3 3l3-3m-2 8H5a2 2 0 01-2-2V3a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2z"
+//                         />
+//                       </svg>
+//                     </button>
+//                   </td>
+//                   {columns.map((col) => (
+//                     // <td
+//                     //   key={col}
+//                     //   className={`p-2 border font-normal ${
+//                     //     col === 'status' && plan.status === 'Submitted'
+//                     //       ? 'bg-yellow-100 text-black font-bold'
+//                     //       : col === 'status' && plan.status === 'In Progress'
+//                     //       ? 'bg-red-100 text-black font-bold'
+//                     //       : col === 'status' && plan.status === 'Approved'
+//                     //       ? 'bg-green-100 text-black font-bold'
+//                     //       : ''
+//                     //   } ${col === 'projId' ? 'break-words' : ''} ${
+//                     //     col === 'createdAt' || col === 'updatedAt' || col === 'closedPeriod' ? 'whitespace-nowrap' : ''
+//                     //   }`}
+//                     //   style={
+//                     //     col === 'projId'
+//                     //       ? { minWidth: '100px', maxWidth: '150px' }
+//                     //       : col === 'closedPeriod' || col === 'createdAt' || col === 'updatedAt'
+//                     //       ? { minWidth: '180px', maxWidth: '220px' }
+//                     //       : {}
+//                     //   }
+//                     // >
+//                     //   {col === 'closedPeriod' || col === 'createdAt' || col === 'updatedAt'
+//                     //     ? formatDateWithTime(plan[col])
+//                     //     : col === 'versionCode'
+//                     //     ? (
+//                     //       <input
+//                     //         type="text"
+//                     //         value={editingVersionCodeIdx === idx ? editingVersionCodeValue : plan.versionCode || ''}
+//                     //         autoFocus={editingVersionCodeIdx === idx}
+//                     //         onClick={e => {
+//                     //           e.stopPropagation();
+//                     //           setEditingVersionCodeIdx(idx);... //           setEditingVersionCodeValue(plan.versionCode || '');
+//                     //         }}
+//                     //         onChange={e => setEditingVersionCodeValue(e.target.value)}
+//                     //         onBlur={() => {
+//                     //           if (editingVersionCodeIdx === idx) {
+//                     //             setIsActionLoading(true);
+//                     //             handleVersionCodeChange(idx, editingVersionCodeValue);
+//                     //             setEditingVersionCodeIdx(null);
+//                     //           }
+//                     //         }}
+//                     //         onKeyDown={e => {
+//                     //           if (e.key === 'Enter') {
+//                     //             setIsActionLoading(true);
+//                     //             handleVersionCodeChange(idx, editingVersionCodeValue);
+//                     //             setEditingVersionCodeIdx(null);
+//                     //           } else if (e.key === 'Escape') {
+//                     //             setEditingVersionCodeIdx(null);
+//                     //           }
+//                     //         }}
+//                     //         className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+//                     //           !plan.plType || !plan.version ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
+//                     //         }`}
+//                     //         style={{ minWidth: 60, maxWidth: 120 }}
+//                     //         disabled={!plan.plType || !plan.version}
+//                     //       />
+//                     //     )
+//                     //     : typeof plan[col] === 'boolean'
+//                     //     ? (
+//                     //       <input
+//                     //         type="checkbox"
+//                     //         checked={getCheckboxProps(plan, col, idx).checked}
+//                     //         disabled={getCheckboxProps(plan, col, idx).disabled}
+//                     //         onClick={(e) => e.stopPropagation()}
+//                     //         onMouseDown={(e) => e.stopPropagation()}
+//                     //         onDoubleClick={(e) => e.stopPropagation()}
+//                     //         onKeyDown={(e) => e.stopPropagation()}
+//                     //         onChange={() => handleCheckboxChange(idx, col)}
+//                     //         className="cursor-pointer"
+//                     //       />
+//                     //     )
+//                     //     : plan[col] || ''}
+//                     // </td>
+//                     <td
+//                       key={col}
+//                       className={`p-1 border font-normal ${
+//                         col === "status" && plan.status === "Submitted"
+//                           ? "bg-yellow-100 text-black font-bold"
+//                           : col === "status" && plan.status === "In Progress"
+//                           ? "bg-red-100 text-black font-bold"
+//                           : col === "status" && plan.status === "Approved"
+//                           ? "bg-green-100 text-black font-bold"
+//                           : ""
+//                       }
+//   ${col === "status" ? "whitespace-nowrap text-center" : ""}
+//   ${col === "projId" ? "break-words" : ""}
+//   ${
+//     col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
+//       ? "whitespace-nowrap"
+//       : ""
+//   }`}
+//                       style={
+//                         col === "status"
+//                           ? { minWidth: "120px", maxWidth: "170px" }
+//                           : col === "projId"
+//                           ? { minWidth: "100px", maxWidth: "150px" }
+//                           : col === "closedPeriod" ||
+//                             col === "createdAt" ||
+//                             col === "updatedAt"
+//                           ? { minWidth: "180px", maxWidth: "220px" }
+//                           : {}
+//                       }
+//                     >
+//                       {col === "closedPeriod" ||
+//                       col === "createdAt" ||
+//                       col === "updatedAt" ? (
+//                         formatDateWithTime(plan[col])
+//                       ) : col === "versionCode" ? (
+//                         <input
+//                           type="text"
+//                           value={
+//                             editingVersionCodeIdx === idx
+//                               ? editingVersionCodeValue
+//                               : plan.versionCode || ""
+//                           }
+//                           autoFocus={editingVersionCodeIdx === idx}
+//                           onClick={(e) => {
+//                             e.stopPropagation();
+//                             setEditingVersionCodeIdx(idx);
+//                             setEditingVersionCodeValue(plan.versionCode || "");
+//                           }}
+//                           onChange={(e) =>
+//                             setEditingVersionCodeValue(e.target.value)
+//                           }
+//                           onBlur={() => {
+//                             if (editingVersionCodeIdx === idx) {
+//                               setIsActionLoading(true);
+//                               handleVersionCodeChange(
+//                                 idx,
+//                                 editingVersionCodeValue
+//                               );
+//                               setEditingVersionCodeIdx(null);
+//                             }
+//                           }}
+//                           onKeyDown={(e) => {
+//                             if (e.key === "Enter") {
+//                               setIsActionLoading(true);
+//                               handleVersionCodeChange(
+//                                 idx,
+//                                 editingVersionCodeValue
+//                               );
+//                               setEditingVersionCodeIdx(null);
+//                             } else if (e.key === "Escape") {
+//                               setEditingVersionCodeIdx(null);
+//                             }
+//                           }}
+//                           className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+//                             !plan.plType || !plan.version
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : "bg-white"
+//                           }`}
+//                           style={{ minWidth: 60, maxWidth: 120 }}
+//                           disabled={!plan.plType || !plan.version}
+//                         />
+//                       ) : typeof plan[col] === "boolean" ? (
+//                         <input
+//     type="checkbox"
+//     checked={getCheckboxProps(plan, col, idx).checked}
+//     disabled={getCheckboxProps(plan, col, idx).disabled}
+//     onClick={(e) => e.stopPropagation()}
+//     onMouseDown={(e) => e.stopPropagation()}
+//     onDoubleClick={(e) => e.stopPropagation()}
+//     onKeyDown={(e) => e.stopPropagation()}
+//     onChange={(e) => {
+//       e.stopPropagation();
+//       handleCheckboxChange(idx, col);
+//     }}
+//     className="cursor-pointer"
+//   />
+//                       ) : (
+//                         plan[col] || ""
+//                       )}
+//                     </td>
+//                   ))}
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       )}
+//       {showForm && (
+//         <ProjectPlanForm
+//           projectId={projectId}
+//           onClose={() => {
+//             setShowForm(false);
+//             setIsActionLoading(false);
+//           }}
+//           onPlanCreated={() => {
+//             fetchPlans();
+//             setShowForm(false);
+//             setIsActionLoading(false);
+//           }}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ProjectPlanTable;
+
+
+// import React, { useEffect, useState, useRef } from "react";
+// import axios from "axios";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
+// import ProjectPlanForm from "./ProjectPlanForm";
+// import { formatDate } from "./utils";
+
+// const BOOLEAN_FIELDS = ["finalVersion", "isCompleted", "isApproved"];
+
+// const COLUMN_LABELS = {
+//   projId: "Project ID",
+//   plType: "Plan Type",
+//   version: "Version",
+//   versionCode: "Version Code",
+//   source: "Source",
+//   type: "Type",
+//   finalVersion: "Conclude",
+//   isCompleted: "Submitted",
+//   isApproved: "Approved",
+//   status: "Status",
+//   closedPeriod: "Closed Period",
+//   createdAt: "Created At",
+//   updatedAt: "Updated At",
+// };
+
+// const ProjectPlanTable = ({
+//   onPlanSelect,
+//   selectedPlan,
+//   projectId,
+//   fiscalYear,
+//   setFiscalYear,
+//   fiscalYearOptions,
+// }) => {
+//   const [plans, setPlans] = useState([]);
+//   const [columns, setColumns] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [isActionLoading, setIsActionLoading] = useState(false);
+//   const [error, setError] = useState(null);
+//   const [showForm, setShowForm] = useState(false);
+//   const [refreshKey, setRefreshKey] = useState(0);
+//   const fileInputRef = useRef(null);
+//   const [lastImportedVersion, setLastImportedVersion] = useState(null);
+//   const [lastImportTime, setLastImportTime] = useState(null);
+//   const [editingVersionCodeIdx, setEditingVersionCodeIdx] = useState(null);
+//   const [editingVersionCodeValue, setEditingVersionCodeValue] = useState("");
+  
+//   // Add a ref to track the last fetched project ID to prevent unnecessary API calls
+//   const lastFetchedProjectId = useRef(null);
+
+//   const isChildProjectId = (projId) => {
+//     return projId && typeof projId === "string" && projId.includes(".");
+//   };
+
+//   const formatDateWithTime = (dateStr) => {
+//     if (!dateStr) return "";
+//     try {
+//       const date = new Date(dateStr);
+//       if (isNaN(date.getTime())) return dateStr;
+//       return date.toLocaleString("en-US", {
+//         month: "2-digit",
+//         day: "2-digit",
+//         year: "numeric",
+//         hour: "2-digit",
+//         minute: "2-digit",
+//         second: "2-digit",
+//         hour12: true,
+//       });
+//     } catch (e) {
+//       return dateStr;
+//     }
+//   };
+
+//   const sortPlansByProjIdPlTypeVersion = (plansArray) => {
+//     return [...plansArray].sort((a, b) => {
+//       if (a.projId < b.projId) return -1;
+//       if (a.projId > b.projId) return 1;
+//       if (a.plType < b.plType) return -1;
+//       if (a.plType > b.plType) return 1;
+//       // Explicit numeric compare for version
+//       const aVersion = Number(a.version) || 0;
+//       const bVersion = Number(b.version) || 0;
+//       return aVersion - bVersion;
+//     });
+//   };
+
+//   const fetchPlans = async () => {
+//     if (!projectId) {
+//       setPlans([]);
+//       setLoading(false);
+//       lastFetchedProjectId.current = null;
+//       return;
+//     }
+
+//     // Prevent unnecessary API calls for the same project
+//     if (lastFetchedProjectId.current === projectId) {
+//       setLoading(false);
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       const response = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
+//       );
+
+//       // Add this debug line
+//       console.log('API response:', response.data);
+
+//       const transformedPlans = response.data.map((plan, idx) => ({
+//         plId: plan.plId || plan.id || 0,
+//         projId: plan.projId || plan.fullProjectId || plan.project_id || plan.projectId || projectId,
+//         plType:
+//           plan.plType === "Budget"
+//             ? "BUD"
+//             : plan.plType === "EAC"
+//             ? "EAC"
+//             : plan.plType || "",
+//         source: plan.source || "",
+//         type: plan.type || "",
+//         version: plan.version || 0,
+//         versionCode: plan.versionCode || "",
+//         finalVersion: !!plan.finalVersion,
+//         isCompleted: !!plan.isCompleted,
+//         isApproved: !!plan.isApproved,
+//         status:
+//           plan.plType && plan.version
+//             ? (plan.status || "In Progress")
+//                 .replace("Working", "In Progress")
+//                 .replace("Completed", "Submitted")
+//             : "",
+//         closedPeriod: plan.closedPeriod || "",
+//         createdAt: plan.createdAt || "",
+//         updatedAt: plan.updatedAt || "",
+//         modifiedBy: plan.modifiedBy || "",
+//         approvedBy: plan.approvedBy || "",
+//         createdBy: plan.createdBy || "",
+//         templateId: plan.templateId || 0,
+//         projName: plan.projName || "",
+//         projStartDt: plan.projStartDt || "",
+//         projEndDt: plan.projEndDt || "",
+//         orgId: plan.orgId || "",
+//         fundedCost: plan.proj_f_cst_amt || "",
+//         fundedFee: plan.proj_f_fee_amt || "",
+//         fundedRev: plan.proj_f_tot_amt || "",
+//         revenueAccount: plan.revenueAccount || "",
+//       }));
+      
+//       console.log(transformedPlans);
+//       const sortedPlans = sortPlansByProjIdPlTypeVersion(transformedPlans);
+//       setPlans(sortedPlans);
+//       setColumns([
+//         "projId",
+//         "plType",
+//         "version",
+//         "versionCode",
+//         "source",
+//         "type",
+//         "isCompleted",
+//         "isApproved",
+//         "finalVersion",
+//         "status",
+//         "closedPeriod",
+//       ]);
+      
+//       // Update the last fetched project ID
+//       lastFetchedProjectId.current = projectId;
+      
+//     } catch (error) {
+//       setPlans([]);
+//       toast.error("Failed to fetch plans.");
+//       lastFetchedProjectId.current = null;
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Modified useEffect to only fetch when projectId actually changes
+//   useEffect(() => {
+//     // Only fetch if projectId has actually changed
+//     if (projectId !== lastFetchedProjectId.current) {
+//       fetchPlans();
+//     }
+//   }, [projectId]);
+
+//   useEffect(() => {
+//     if (selectedPlan && plans.length > 0) {
+//       const latest = plans.find(
+//         (p) => p.plId === selectedPlan.plId && p.projId === selectedPlan.projId
+//       );
+//       if (
+//         latest &&
+//         (latest.status !== selectedPlan.status ||
+//           latest.isCompleted !== selectedPlan.isCompleted ||
+//           latest.isApproved !== selectedPlan.isApproved ||
+//           latest.finalVersion !== selectedPlan.finalVersion)
+//       ) {
+//         onPlanSelect(latest);
+//       }
+//     }
+//   }, [plans]);
+
+//   // Updated handleRowClick to prevent any side effects that might trigger re-fetching
+//   const handleRowClick = (plan) => {
+//     if (!selectedPlan || selectedPlan.plId !== plan.plId || selectedPlan.projId !== plan.projId) {
+//       // Use a callback to prevent any potential re-renders that might trigger useEffect
+//       onPlanSelect(plan);
+//     }
+//   };
+
+//   // Add a method to manually refresh plans when needed (for actions that modify data)
+//   const refreshPlans = async () => {
+//     lastFetchedProjectId.current = null; // Reset to force refetch
+//     await fetchPlans();
+//   };
+
+//   const handleExportPlan = async (plan) => {
+//     if (!plan.projId || !plan.version || !plan.plType) {
+//       toast.error("Missing required parameters for export");
+//       return;
+//     }
+//     try {
+//       setIsActionLoading(true);
+//       toast.info("Exporting plan...");
+//       const response = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Forecast/ExportPlanDirectCost`,
+//         {
+//           params: {
+//             projId: plan.projId,
+//             version: plan.version,
+//             type: plan.plType,
+//           },
+//           responseType: "blob",
+//         }
+//       );
+//       const url = window.URL.createObjectURL(new Blob([response.data]));
+//       const link = document.createElement("a");
+//       link.href = url;
+//       link.setAttribute(
+//         "download",
+//         `Plan_${plan.projId}_${plan.version}_${plan.plType}.xlsx`
+//       );
+//       document.body.appendChild(link);
+//       link.click();
+//       link.remove();
+//       window.URL.revokeObjectURL(url);
+//       toast.success("Plan exported successfully!");
+//     } catch (err) {
+//       toast.error(
+//         "Error exporting plan: " + (err.response?.data?.message || err.message)
+//       );
+//     } finally {
+//       setIsActionLoading(false);
+//     }
+//   };
+
+//   const handleImportPlan = async (event) => {
+//     const file = event.target.files[0];
+//     if (!file) {
+//       toast.error("No file selected");
+//       return;
+//     }
+//     const validExtensions = [".xlsx", ".xls"];
+//     const fileExtension = file.name
+//       .slice(file.name.lastIndexOf("."))
+//       .toLowerCase();
+//     if (!validExtensions.includes(fileExtension)) {
+//       toast.error(
+//         "Invalid file format. Please upload an Excel file (.xlsx or .xls)"
+//       );
+//       return;
+//     }
+//     const formData = new FormData();
+//     formData.append("file", file);
+//     formData.append("projId", projectId);
+//     try {
+//       setIsActionLoading(true);
+//       toast.info("Importing plan...");
+//       const response = await axios.post(
+//         "https://test-api-3tmq.onrender.com/Forecast/ImportDirectCostPlan",
+//         formData,
+//         { headers: { "Content-Type": "multipart/form-data" } }
+//       );
+//       let extractedVersion = null;
+//       if (typeof response.data === "string") {
+//         const versionMatch = response.data.match(/version\s*-\s*'([^']+)'/i);
+//         if (versionMatch) extractedVersion = versionMatch[1];
+//       } else if (response.data?.version) {
+//         extractedVersion = response.data.version;
+//       }
+//       if (extractedVersion) setLastImportedVersion(extractedVersion);
+//       setLastImportTime(Date.now());
+//       toast.success(
+//         response.data && typeof response.data === "string"
+//           ? response.data
+//           : JSON.stringify(response.data),
+//         { toastId: "import-success-" + Date.now(), autoClose: 5000 }
+//       );
+//       await refreshPlans(); // Use refreshPlans instead of fetchPlans
+//     } catch (err) {
+//       let errorMessage =
+//         "Failed to import plan. Please check the file and project ID, or contact support.";
+//       if (err.response) {
+//         if (typeof err.response.data === "string" && err.response.data)
+//           errorMessage = err.response.data;
+//         else if (err.response.data?.message)
+//           errorMessage = err.response.data.message;
+//         else if (err.response.data)
+//           errorMessage = JSON.stringify(err.response.data);
+//         else if (err.response.status === 500)
+//           errorMessage =
+//             "Server error occurred. Please verify the file format, project ID, and ensure type is EXCEL.";
+//       } else errorMessage = err.message || errorMessage;
+//       toast.error(errorMessage, { toastId: "import-error", autoClose: 5000 });
+//     } finally {
+//       setIsActionLoading(false);
+//       if (fileInputRef.current) fileInputRef.current.value = "";
+//     }
+//   };
+
+//   const handleCheckboxChange = async (idx, field) => {
+//     const prevPlans = [...plans];
+//     const plan = plans[idx];
+//     const planId = plan.plId;
+//     if (!plan.plType || !plan.version) {
+//       toast.error(
+//         `Cannot update ${field}: Plan Type and Version are required.`,
+//         { toastId: "checkbox-error" }
+//       );
+//       return;
+//     }
+//     if (field === "isApproved" && !plan.isCompleted) {
+//       toast.error("You can't approve this row until Submitted is checked", {
+//         toastId: "checkbox-error",
+//       });
+//       return;
+//     }
+//     if (field === "finalVersion" && !plan.isApproved) {
+//       toast.error("You can't set Conclude until Approved is checked", {
+//         toastId: "checkbox-error",
+//       });
+//       return;
+//     }
+//     let updated = { ...plan };
+//     updated[field] = !plan[field];
+//     if (field === "isCompleted") {
+//       updated.status = updated.isCompleted ? "Submitted" : "In Progress";
+//       if (!updated.isCompleted) {
+//         updated.isApproved = false;
+//         updated.finalVersion = false;
+//       }
+//     }
+//     if (field === "isApproved") {
+//       updated.status = updated.isApproved ? "Approved" : "Submitted";
+//       if (!updated.isApproved) updated.finalVersion = false;
+//     }
+//     if (field === "finalVersion")
+//       updated.status = updated.finalVersion ? "Submitted" : "Approved";
+//     let newPlans;
+//     // Your referenced line, but updated from "Working" to "In Progress" and "Completed" to "Submitted"
+//     if (field === "isCompleted" && !updated.isCompleted) {
+//       const isEAC = updated.plType === "EAC";
+//       const inProgressCount = plans.filter(
+//         (p) => p.status === "In Progress" && p.plType === updated.plType
+//       ).length;
+//       if (inProgressCount > 0 && updated.status === "In Progress") {
+//         toast.error(
+//           `Only one ${
+//             isEAC ? "EAC" : "BUD"
+//           } plan can have In Progress status at a time.`,
+//           { toastId: "checkbox-error" }
+//         );
+//         return;
+//       }
+//     }
+//     if (field === "finalVersion" && updated.finalVersion) {
+//       newPlans = plans.map((p, i) =>
+//         i === idx
+//           ? updated
+//           : p.plType === updated.plType
+//           ? { ...p, finalVersion: false }
+//           : p
+//       );
+//     } else {
+//       newPlans = plans.map((p, i) => (i === idx ? updated : p));
+//     }
+
+//     // "In Progress" handling for exclusivity
+//     if (updated.status === "In Progress") {
+//       newPlans = newPlans.map((p, i) =>
+//         i !== idx && p.status === "In Progress" && p.plType === updated.plType
+//           ? { ...p, status: "Submitted", isCompleted: true }
+//           : p
+//       );
+//     }
+//     setPlans(newPlans);
+//     onPlanSelect(updated);
+//     if (
+//       (BOOLEAN_FIELDS.includes(field) || field === "status") &&
+//       planId &&
+//       Number(planId) > 0
+//     ) {
+//       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+//       try {
+//         await axios.put(updateUrl, updated);
+//       } catch (err) {
+//         setPlans(prevPlans);
+//         toast.error(
+//           "Error updating plan: " +
+//             (err.response?.data?.message || err.message),
+//           { toastId: "checkbox-error" }
+//         );
+//       }
+//     }
+//   };
+
+//   const handleVersionCodeChange = async (idx, value) => {
+//     const prevPlans = [...plans];
+//     const planId = plans[idx].plId;
+//     let updated = { ...plans[idx], versionCode: value };
+//     const newPlans = plans.map((plan) =>
+//       plan.plId === planId ? updated : plan
+//     );
+//     setPlans(newPlans);
+//     if (planId && Number(planId) > 0) {
+//       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+//       toast.info("Updating version code...", { toastId: "version-code-info" });
+//       try {
+//         setIsActionLoading(true);
+//         await axios.put(updateUrl, updated);
+//       } catch (err) {
+//         setPlans(prevPlans);
+//         toast.error(
+//           "Error updating version code: " +
+//             (err.response?.data?.message || err.message),
+//           { toastId: "version-code-error" }
+//         );
+//       } finally {
+//         setIsActionLoading(false);
+//       }
+//     }
+//   };
+
+//   const handleActionSelect = async (idx, action) => {
+//     const plan = plans[idx];
+
+//     console.log('Selected plan object:', plan);
+
+//     if (action === "None") return;
+//     try {
+//       setIsActionLoading(true);
+//       if (action === "Delete") {
+//         if (!plan.plId || Number(plan.plId) <= 0) {
+//           toast.error("Cannot delete: Invalid plan ID.");
+//           setIsActionLoading(false);
+//           return;
+//         }
+//         const confirmed = window.confirm(
+//           `Are you sure you want to delete this plan`
+//         );
+//         if (!confirmed) {
+//           setIsActionLoading(false);
+//           return;
+//         }
+//         toast.info("Deleting plan...");
+//         try {
+//           await axios.delete(
+//             `https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`
+//           );
+//           toast.success("Plan deleted successfully!");
+//         } catch (err) {
+//           if (err.response && err.response.status === 404) {
+//             toast.error(
+//               "Plan not found on server. It may have already been deleted."
+//             );
+//           } else {
+//             toast.error(
+//               "Error deleting plan: " +
+//                 (err.response?.data?.message || err.message)
+//             );
+//           }
+//           setIsActionLoading(false);
+//           return;
+//         }
+//         await refreshPlans(); // Use refreshPlans instead of fetchPlans
+//       } else if (
+//         action === "Create Budget" ||
+//         action === "Create Blank Budget" ||
+//         action === "Create EAC"
+//       ) {
+//         const payloadTemplate = {
+//           projId: plan.projId,
+//           plId: plan.plId || 0,
+//           plType:
+//             action === "Create Budget" || action === "Create Blank Budget"
+//               ? "BUD"
+//               : "EAC",
+//           source: plan.source || "",
+//           type: isChildProjectId(plan.projId) ? "SYSTEM" : plan.type || "",
+//           version: plan.version,
+//           versionCode: plan.versionCode || "",
+//           finalVersion: false,
+//           isCompleted: false,
+//           isApproved: false,
+//           status: "In Progress",
+//           createdBy: plan.createdBy || "User",
+//           modifiedBy: plan.modifiedBy || "User",
+//           approvedBy: "",
+//           templateId: plan.templateId || 1,
+//         };
+//         toast.info(
+//           `Creating ${
+//             action === "Create Budget"
+//               ? "Budget"
+//               : action === "Create Blank Budget"
+//               ? "Blank Budget"
+//               : "EAC"
+//           }...`
+//         );
+//         await axios.post(
+//           `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${
+//             action === "Create Blank Budget" ? "blank" : "actual"
+//           }`,
+//           payloadTemplate
+//         );
+//         await refreshPlans(); // Use refreshPlans instead of fetchPlans
+//         toast.success(
+//           `${
+//             action === "Create Budget"
+//               ? "Budget"
+//               : action === "Create Blank Budget"
+//               ? "Blank Budget"
+//               : "EAC"
+//           } created successfully!`
+//         );
+//       } else {
+//         toast.info(`Action "${action}" selected (API call not implemented)`);
+//       }
+//     } catch (err) {
+//       toast.error(
+//         "Error performing action: " +
+//           (err.response?.data?.message || err.message)
+//       );
+//     } finally {
+//       setIsActionLoading(false);
+//     }
+//   };
+
+//   const getActionOptions = (plan) => {
+//     let options = ["None"];
+//     if (isChildProjectId(plan.projId) && !plan.plType && !plan.version) {
+//       return ["None", "Create Budget", "Create Blank Budget"];
+//     }
+//     if (!plan.plType || !plan.version) return options;
+//     if (plan.status === "In Progress") options = ["None", "Delete"];
+//     else if (plan.status === "Submitted")
+//       options = ["None", "Create Budget", "Create Blank Budget"];
+//     else if (plan.status === "Approved")
+//       options = [
+//         "None",
+//         "Create Budget",
+//         "Create Blank Budget",
+//         "Create EAC",
+//         "Delete",
+//       ];
+//     return options;
+//   };
+
+//   const getButtonAvailability = (plan, action) => {
+//     const options = getActionOptions(plan);
+//     return options.includes(action);
+//   };
+
+//   const checkedFinalVersionIdx = plans.findIndex((plan) => plan.finalVersion);
+
+//   const getCheckboxProps = (plan, col, idx) => {
+//     if (!plan.plType || !plan.version) return { checked: false, disabled: true };
+
+//     if (col === "isCompleted")
+//       return { checked: plan.isCompleted, disabled: !!plan.isApproved };
+
+//     if (col === "isApproved")
+//       return { checked: plan.isApproved, disabled: !plan.isCompleted };
+
+//     if (col === "finalVersion") {
+//       // Find if any other plan with same plType has finalVersion checked
+//       const anotherFinalVersionIdx = plans.findIndex(
+//         (p, i) => i !== idx && p.plType === plan.plType && p.finalVersion
+//       );
+
+//       // Disable finalVersion checkbox for this row only if another finalVersion in the same plType is checked
+//       return {
+//         checked: plan.finalVersion,
+//         disabled: anotherFinalVersionIdx !== -1, // disable if any other finalVersion for same plType
+//       };
+//     }
+
+//     return { checked: plan[col], disabled: false };
+//   };
+
+//   const handleTopButtonToggle = async (field) => {
+//     if (!selectedPlan) {
+//       toast.error(`No plan selected to update ${field}.`, {
+//         toastId: "no-plan-selected",
+//       });
+//       return;
+//     }
+//     const idx = plans.findIndex((p) => p.plId === selectedPlan.plId);
+//     if (idx === -1) {
+//       toast.error(`Selected plan not found.`, { toastId: "plan-not-found" });
+//       return;
+//     }
+//     setIsActionLoading(true);
+//     await handleCheckboxChange(idx, field);
+//     setIsActionLoading(false);
+//   };
+
+//   const handleCalc = async () => {
+//     if (!selectedPlan) {
+//       toast.error("No plan selected for calculation.", {
+//         toastId: "no-plan-selected",
+//       });
+//       return;
+//     }
+//     if (!selectedPlan.plId || !selectedPlan.templateId) {
+//       toast.error("Cannot calculate: Missing required parameters (planID or templateId).", {
+//         toastId: "missing-params",
+//       });
+//       return;
+//     }
+//     setIsActionLoading(true);
+//     try {
+//       const response = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Forecast/CalculateRevenueCost?planID=${selectedPlan.plId}&templateId=${selectedPlan.templateId}&type=actual`
+//       );
+//       // Assuming the response body is a message or has a 'message' field
+//       const message = typeof response.data === 'string' ? response.data : response.data?.message || "Revenue Calculation successful!";
+//       toast.success(message);
+//     } catch (err) {
+//       const errorMessage = err.response?.data?.message || err.message || "Error during calculation.";
+//       toast.error(errorMessage);
+//     } finally {
+//       setIsActionLoading(false);
+//     }
+//   };
+
+//   const getTopButtonDisabled = (field) => {
+//     if (!selectedPlan || !selectedPlan.plType || !selectedPlan.version)
+//       return true;
+//     if (field === "isCompleted") return !!selectedPlan.isApproved;
+//     if (field === "isApproved") return !selectedPlan.isCompleted;
+//     if (field === "finalVersion") {
+//       if (
+//         checkedFinalVersionIdx !== -1 &&
+//         plans[checkedFinalVersionIdx].plId !== selectedPlan.plId
+//       )
+//         return true;
+//       return !selectedPlan.isApproved;
+//     }
+//     return false;
+//   };
+
+//   const getCalcButtonDisabled = () => {
+//     return !selectedPlan || !selectedPlan.plId || !selectedPlan.templateId;
+//   };
+
+//   if (loading) {
+//     return (
+//       <div className="p-4">
+//         <div className="flex items-center justify-center">
+//           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+//           <span className="ml-2">Loading project plans...</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (error) {
+//     return (
+//       <div className="p-4">
+//         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+//           <strong className="font-bold">Error: </strong>
+//           <span className="block sm:inline">{error}</span>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="p-4 relative z-10" key={refreshKey}>
+//       {isActionLoading && (
+//         <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-20">
+//           <div className="flex items-center">
+//             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+//             <span className="ml-2 text-sm text-gray-700">Processing...</span>
+//           </div>
+//         </div>
+//       )}
+//       <div className="flex justify-between items-center mb-2">
+//         <div className="flex gap-1 flex-wrap">
+//           {plans.length > 0 && (
+//             <>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Budget"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Budget")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Budget")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Budget"
+//               >
+//                 Create Budget
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Blank Budget"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Blank Budget"
+//               >
+//                 Create Blank Budget
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create EAC"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create EAC")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create EAC")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create EAC"
+//               >
+//                 Create EAC
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Delete"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Delete")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Delete")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+//                 }`}
+//                 title="Delete Selected Plan"
+//               >
+//                 Delete
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("isCompleted")}
+//                 disabled={getTopButtonDisabled("isCompleted")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isCompleted")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Toggle Submitted"
+//               >
+//                 Submitted
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("isApproved")}
+//                 disabled={getTopButtonDisabled("isApproved")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isApproved")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Toggle Approved"
+//               >
+//                 Approved
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("finalVersion")}
+//                 disabled={getTopButtonDisabled("finalVersion")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("finalVersion")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Toggle Conclude"
+//               >
+//                 Conclude
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleCalc();
+//                 }}
+//                 disabled={getCalcButtonDisabled()}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getCalcButtonDisabled()
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Calculate"
+//               >
+//                 Calc
+//               </button>
+//             </>
+//           )}
+//         </div>
+
+//         <div className="flex items-center gap-4">
+//           <button
+//             onClick={() => {
+//               setIsActionLoading(true);
+//               fileInputRef.current.click();
+//             }}
+//             className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer whitespace-nowrap"
+//             title="Import Plan"
+//           >
+//             <svg
+//               xmlns="http://www.w3.org/2000/svg"
+//               className="h-4 w-4 mr-1"
+//               fill="none"
+//               viewBox="0 0 24 24"
+//               stroke="currentColor"
+//             >
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth={2}
+//                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+//               />
+//             </svg>
+//             Import
+//           </button>
+//           <input
+//             type="file"
+//             ref={fileInputRef}
+//             onChange={(e) => {
+//               setIsActionLoading(true);
+//               handleImportPlan(e);
+//             }}
+//             accept=".xlsx,.xls"
+//             className="hidden"
+//           />
+
+//           <div className="flex items-center gap-2">
+//             <label
+//               htmlFor="fiscalYear"
+//               className="font-semibold text-xs sm:text-sm whitespace-nowrap"
+//             >
+//               Fiscal Year:
+//             </label>
+//             <select
+//               id="fiscalYear"
+//               value={fiscalYear}
+//               onChange={(e) => setFiscalYear(e.target.value)}
+//               className="border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               disabled={fiscalYearOptions?.length === 0}
+//             >
+//               {fiscalYearOptions?.map((year) => (
+//                 <option key={year} value={year}>
+//                   {year}
+//                 </option>
+//               ))}
+//             </select>
+//           </div>
+//         </div>
+//       </div>
+//       {plans.length === 0 ? (
+//         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+//           No project plans found for project ID: {projectId}
+//         </div>
+//       ) : (
+//         <div
+//           className="overflow-auto"
+//           style={{
+//             maxHeight: "250px",
+//             minHeight: "60px",
+//             border: "1px solid #e5e7eb",
+//             borderRadius: "0.5rem",
+//             background: "#fff",
+//           }}
+//         >
+//           <table className="min-w-full text-xs text-left border-collapse border">
+//             <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
+//               <tr>
+//                 <th className="p-1 border font-normal">Export Plan</th>
+//                 {columns.map((col) => (
+//                   <th key={col} className="p-1 border font-normal text-center">
+//                     {COLUMN_LABELS[col] || col}
+//                   </th>
+//                 ))}
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {plans.map((plan, idx) => (
+//                 <tr
+//                   key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
+//                   className={`transition-all duration-200 cursor-pointer ${
+//                     selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
+//                       ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
+//                       : "even:bg-gray-50 hover:bg-blue-50"  
+//                   }`}
+//                   onClick={() => handleRowClick(plan)}
+//                 >
+//                   <td className="p-1 border text-center">
+//                     <button
+//                       onClick={(e) => {
+//                         e.stopPropagation();
+//                         setIsActionLoading(true);
+//                         handleExportPlan(plan);
+//                       }}
+//                       className="text-blue-600 hover:text-blue-800"
+//                       title="Export Plan"
+//                       disabled={!plan.projId || !plan.version || !plan.plType}
+//                     >
+//                       <svg
+//                         xmlns="http://www.w3.org/2000/svg"
+//                         className="h-4 w-4 cursor-pointer"
+//                         fill="none"
+//                         viewBox="0 0 24 24"
+//                         stroke="currentColor"
+//                       >
+//                         <path
+//                           strokeLinecap="round"
+//                           strokeLinejoin="round"
+//                           strokeWidth={2}
+//                           d="M12 4v12m0 0l-3-3m3 3l3-3m-2 8H5a2 2 0 01-2-2V3a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2z"
+//                         />
+//                       </svg>
+//                     </button>
+//                   </td>
+//                   {columns.map((col) => (
+//                     <td
+//                       key={col}
+//                       className={`p-1 border font-normal ${
+//                         col === "status" && plan.status === "Submitted"
+//                           ? "bg-yellow-100 text-black font-bold"
+//                           : col === "status" && plan.status === "In Progress"
+//                           ? "bg-red-100 text-black font-bold"
+//                           : col === "status" && plan.status === "Approved"
+//                           ? "bg-green-100 text-black font-bold"
+//                           : ""
+//                       }
+//                         ${col === "status" ? "whitespace-nowrap text-center" : ""}
+//                         ${col === "projId" ? "break-words" : ""}
+//                         ${
+//                           col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
+//                             ? "whitespace-nowrap"
+//                             : ""
+//                         }`}
+//                       style={
+//                         col === "status"
+//                           ? { minWidth: "120px", maxWidth: "170px" }
+//                           : col === "projId"
+//                           ? { minWidth: "100px", maxWidth: "150px" }
+//                           : col === "closedPeriod" ||
+//                             col === "createdAt" ||
+//                             col === "updatedAt"
+//                           ? { minWidth: "180px", maxWidth: "220px" }
+//                           : {}
+//                       }
+//                     >
+//                       {col === "closedPeriod" ||
+//                       col === "createdAt" ||
+//                       col === "updatedAt" ? (
+//                         formatDateWithTime(plan[col])
+//                       ) : col === "versionCode" ? (
+//                         <input
+//                           type="text"
+//                           value={
+//                             editingVersionCodeIdx === idx
+//                               ? editingVersionCodeValue
+//                               : plan.versionCode || ""
+//                           }
+//                           autoFocus={editingVersionCodeIdx === idx}
+//                           onClick={(e) => {
+//                             e.stopPropagation();
+//                             setEditingVersionCodeIdx(idx);
+//                             setEditingVersionCodeValue(plan.versionCode || "");
+//                           }}
+//                           onChange={(e) =>
+//                             setEditingVersionCodeValue(e.target.value)
+//                           }
+//                           onBlur={() => {
+//                             if (editingVersionCodeIdx === idx) {
+//                               setIsActionLoading(true);
+//                               handleVersionCodeChange(
+//                                 idx,
+//                                 editingVersionCodeValue
+//                               );
+//                               setEditingVersionCodeIdx(null);
+//                             }
+//                           }}
+//                           onKeyDown={(e) => {
+//                             if (e.key === "Enter") {
+//                               setIsActionLoading(true);
+//                               handleVersionCodeChange(
+//                                 idx,
+//                                 editingVersionCodeValue
+//                               );
+//                               setEditingVersionCodeIdx(null);
+//                             } else if (e.key === "Escape") {
+//                               setEditingVersionCodeIdx(null);
+//                             }
+//                           }}
+//                           className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+//                             !plan.plType || !plan.version
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : "bg-white"
+//                           }`}
+//                           style={{ minWidth: 60, maxWidth: 120 }}
+//                           disabled={!plan.plType || !plan.version}
+//                         />
+//                       ) : typeof plan[col] === "boolean" ? (
+//                         <input
+//                           type="checkbox"
+//                           checked={getCheckboxProps(plan, col, idx).checked}
+//                           disabled={getCheckboxProps(plan, col, idx).disabled}
+//                           onClick={(e) => e.stopPropagation()}
+//                           onMouseDown={(e) => e.stopPropagation()}
+//                           onDoubleClick={(e) => e.stopPropagation()}
+//                           onKeyDown={(e) => e.stopPropagation()}
+//                           onChange={(e) => {
+//                             e.stopPropagation();
+//                             handleCheckboxChange(idx, col);
+//                           }}
+//                           className="cursor-pointer"
+//                         />
+//                       ) : (
+//                         plan[col] || ""
+//                       )}
+//                     </td>
+//                   ))}
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       )}
+//       {showForm && (
+//         <ProjectPlanForm
+//           projectId={projectId}
+//           onClose={() => {
+//             setShowForm(false);
+//             setIsActionLoading(false);
+//           }}
+//           onPlanCreated={() => {
+//             refreshPlans(); // Use refreshPlans instead of fetchPlans
+//             setShowForm(false);
+//             setIsActionLoading(false);
+//           }}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ProjectPlanTable;
+
+
+
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -3810,6 +6090,11 @@ const ProjectPlanTable = ({
   const [lastImportTime, setLastImportTime] = useState(null);
   const [editingVersionCodeIdx, setEditingVersionCodeIdx] = useState(null);
   const [editingVersionCodeValue, setEditingVersionCodeValue] = useState("");
+  
+  // Add a ref to track the last fetched project ID to prevent unnecessary API calls
+  const lastFetchedProjectId = useRef(null);
+  // Add a ref to store the original full project ID for actions
+  const fullProjectId = useRef(null);
 
   const isChildProjectId = (projId) => {
     return projId && typeof projId === "string" && projId.includes(".");
@@ -3834,6 +6119,15 @@ const ProjectPlanTable = ({
     }
   };
 
+  const formatDateOnly = (value) => {
+    if (!value) return "";
+    return new Date(value).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   const sortPlansByProjIdPlTypeVersion = (plansArray) => {
     return [...plansArray].sort((a, b) => {
       if (a.projId < b.projId) return -1;
@@ -3851,16 +6145,31 @@ const ProjectPlanTable = ({
     if (!projectId) {
       setPlans([]);
       setLoading(false);
+      lastFetchedProjectId.current = null;
+      fullProjectId.current = null;
       return;
     }
+
+    // Prevent unnecessary API calls for the same project
+    if (lastFetchedProjectId.current === projectId) {
+      setLoading(false);
+      return;
+    }
+
+    // Store the full project ID for use in actions
+    fullProjectId.current = projectId;
+
     setLoading(true);
     try {
       const response = await axios.get(
         `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
       );
+
+      console.log('API response:', response.data);
+
       const transformedPlans = response.data.map((plan, idx) => ({
         plId: plan.plId || plan.id || 0,
-        projId: plan.projId || projectId,
+        projId: plan.projId || plan.fullProjectId || plan.project_id || plan.projectId || projectId,
         plType:
           plan.plType === "Budget"
             ? "BUD"
@@ -3896,6 +6205,8 @@ const ProjectPlanTable = ({
         fundedRev: plan.proj_f_tot_amt || "",
         revenueAccount: plan.revenueAccount || "",
       }));
+      
+      console.log(transformedPlans);
       const sortedPlans = sortPlansByProjIdPlTypeVersion(transformedPlans);
       setPlans(sortedPlans);
       setColumns([
@@ -3911,16 +6222,26 @@ const ProjectPlanTable = ({
         "status",
         "closedPeriod",
       ]);
+      
+      // Update the last fetched project ID
+      lastFetchedProjectId.current = projectId;
+      
     } catch (error) {
       setPlans([]);
       toast.error("Failed to fetch plans.");
+      lastFetchedProjectId.current = null;
+      fullProjectId.current = null;
     } finally {
       setLoading(false);
     }
   };
 
+  // Modified useEffect to only fetch when projectId actually changes
   useEffect(() => {
-    fetchPlans();
+    // Only fetch if projectId has actually changed
+    if (projectId !== lastFetchedProjectId.current) {
+      fetchPlans();
+    }
   }, [projectId]);
 
   useEffect(() => {
@@ -3940,17 +6261,70 @@ const ProjectPlanTable = ({
     }
   }, [plans]);
 
-  // const handleRowClick = (plan) => {
-  //   if (!selectedPlan || selectedPlan.plId !== plan.plId) {
-  //     onPlanSelect(plan);
-  //   }
+  // Add a method to manually refresh plans when needed (for actions that modify data)
+  // const refreshPlans = async () => {
+  //   lastFetchedProjectId.current = null; // Reset to force refetch
+  //   await fetchPlans();
   // };
-  
-  const handleRowClick = (plan) => {
-  if (!selectedPlan || selectedPlan.plId !== plan.plId || selectedPlan.projId !== plan.projId) {
-    onPlanSelect(plan);
+
+  const refreshPlans = async () => {
+  if (!projectId) {
+    setPlans([]);
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
+    );
+
+    const transformedPlans = response.data.map((plan) => ({
+      plId: plan.plId || plan.id || 0,
+      projId: plan.projId || plan.fullProjectId || plan.project_id || plan.projectId || projectId,
+      plType: plan.plType === "Budget" ? "BUD" : plan.plType === "EAC" ? "EAC" : plan.plType || "",
+      source: plan.source || "",
+      type: plan.type || "",
+      version: plan.version || 0,
+      versionCode: plan.versionCode || "",
+      finalVersion: !!plan.finalVersion,
+      isCompleted: !!plan.isCompleted,
+      isApproved: !!plan.isApproved,
+      status: plan.plType && plan.version
+        ? (plan.status || "In Progress").replace("Working", "In Progress").replace("Completed", "Submitted")
+        : "",
+      closedPeriod: plan.closedPeriod || "",
+      createdAt: plan.createdAt || "",
+      updatedAt: plan.updatedAt || "",
+      modifiedBy: plan.modifiedBy || "",
+      approvedBy: plan.approvedBy || "",
+      createdBy: plan.createdBy || "",
+      templateId: plan.templateId || 0,
+      projName: plan.projName || "",
+      projStartDt: plan.projStartDt || "",
+      projEndDt: plan.projEndDt || "",
+      orgId: plan.orgId || "",
+      fundedCost: plan.proj_f_cst_amt || "",
+      fundedFee: plan.proj_f_fee_amt || "",
+      fundedRev: plan.proj_f_tot_amt || "",
+      revenueAccount: plan.revenueAccount || "",
+    }));
+
+    const sortedPlans = sortPlansByProjIdPlTypeVersion(transformedPlans);
+    setPlans(sortedPlans);
+    
+  } catch (error) {
+    console.error('Error refreshing plans:', error);
+    toast.error("Failed to refresh plans.");
   }
 };
+
+
+  // Updated handleRowClick to prevent any side effects that might trigger re-fetching
+  const handleRowClick = (plan) => {
+    if (!selectedPlan || selectedPlan.plId !== plan.plId || selectedPlan.projId !== plan.projId) {
+      onPlanSelect(plan);
+    }
+  };
 
   const handleExportPlan = async (plan) => {
     if (!plan.projId || !plan.version || !plan.plType) {
@@ -3960,11 +6334,15 @@ const ProjectPlanTable = ({
     try {
       setIsActionLoading(true);
       toast.info("Exporting plan...");
+      
+      // Use the full project ID for export
+      const exportProjId = fullProjectId.current || plan.projId;
+      
       const response = await axios.get(
         `https://test-api-3tmq.onrender.com/Forecast/ExportPlanDirectCost`,
         {
           params: {
-            projId: plan.projId,
+            projId: exportProjId,
             version: plan.version,
             type: plan.plType,
           },
@@ -3976,7 +6354,7 @@ const ProjectPlanTable = ({
       link.href = url;
       link.setAttribute(
         "download",
-        `Plan_${plan.projId}_${plan.version}_${plan.plType}.xlsx`
+        `Plan_${exportProjId}_${plan.version}_${plan.plType}.xlsx`
       );
       document.body.appendChild(link);
       link.click();
@@ -4010,7 +6388,11 @@ const ProjectPlanTable = ({
     }
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("projId", projectId);
+    
+    // Use the full project ID for import
+    const importProjId = fullProjectId.current || projectId;
+    formData.append("projId", importProjId);
+    
     try {
       setIsActionLoading(true);
       toast.info("Importing plan...");
@@ -4034,7 +6416,7 @@ const ProjectPlanTable = ({
           : JSON.stringify(response.data),
         { toastId: "import-success-" + Date.now(), autoClose: 5000 }
       );
-      await fetchPlans();
+      await refreshPlans(); // Use refreshPlans instead of fetchPlans
     } catch (err) {
       let errorMessage =
         "Failed to import plan. Please check the file and project ID, or contact support.";
@@ -4095,7 +6477,7 @@ const ProjectPlanTable = ({
     if (field === "finalVersion")
       updated.status = updated.finalVersion ? "Submitted" : "Approved";
     let newPlans;
-    // Your referenced line, but updated from "Working" to "In Progress" and "Completed" to "Submitted"
+    
     if (field === "isCompleted" && !updated.isCompleted) {
       const isEAC = updated.plType === "EAC";
       const inProgressCount = plans.filter(
@@ -4112,24 +6494,17 @@ const ProjectPlanTable = ({
       }
     }
     if (field === "finalVersion" && updated.finalVersion) {
-  newPlans = plans.map((p, i) =>
-    i === idx
-      ? updated
-      : p.plType === updated.plType
-      ? { ...p, finalVersion: false }
-      : p
-  );
-} else {
-  newPlans = plans.map((p, i) => (i === idx ? updated : p));
-}
+      newPlans = plans.map((p, i) =>
+        i === idx
+          ? updated
+          : p.plType === updated.plType
+          ? { ...p, finalVersion: false }
+          : p
+      );
+    } else {
+      newPlans = plans.map((p, i) => (i === idx ? updated : p));
+    }
 
-    // if (field === "finalVersion" && updated.finalVersion) {
-    //   newPlans = plans.map((p, i) =>
-    //     i === idx ? updated : { ...p, finalVersion: false }
-    //   );
-    // } else {
-    //   newPlans = plans.map((p, i) => (i === idx ? updated : p));
-    // }
     // "In Progress" handling for exclusivity
     if (updated.status === "In Progress") {
       newPlans = newPlans.map((p, i) =>
@@ -4186,8 +6561,13 @@ const ProjectPlanTable = ({
     }
   };
 
+  // FIXED: Updated handleActionSelect to use the full project ID
   const handleActionSelect = async (idx, action) => {
     const plan = plans[idx];
+
+    console.log('Selected plan object:', plan);
+    console.log('Full project ID from ref:', fullProjectId.current);
+
     if (action === "None") return;
     try {
       setIsActionLoading(true);
@@ -4224,21 +6604,25 @@ const ProjectPlanTable = ({
           setIsActionLoading(false);
           return;
         }
-        await fetchPlans();
+        await refreshPlans(); // Use refreshPlans instead of fetchPlans
       } else if (
         action === "Create Budget" ||
         action === "Create Blank Budget" ||
         action === "Create EAC"
       ) {
+        // Use the full project ID from the ref, fallback to plan.projId if not available
+        const actionProjId = fullProjectId.current || plan.projId;
+        
         const payloadTemplate = {
-          projId: plan.projId,
+          projId: selectedPlan.projId,
+          // projId: actionProjId, // Use the full project ID here
           plId: plan.plId || 0,
           plType:
             action === "Create Budget" || action === "Create Blank Budget"
               ? "BUD"
               : "EAC",
           source: plan.source || "",
-          type: isChildProjectId(plan.projId) ? "SYSTEM" : plan.type || "",
+          type: isChildProjectId(actionProjId) ? "SYSTEM" : plan.type || "",
           version: plan.version,
           versionCode: plan.versionCode || "",
           finalVersion: false,
@@ -4250,6 +6634,9 @@ const ProjectPlanTable = ({
           approvedBy: "",
           templateId: plan.templateId || 1,
         };
+        
+        console.log('Payload for action:', payloadTemplate);
+        
         toast.info(
           `Creating ${
             action === "Create Budget"
@@ -4265,7 +6652,7 @@ const ProjectPlanTable = ({
           }`,
           payloadTemplate
         );
-        await fetchPlans();
+        await refreshPlans(); // Use refreshPlans instead of fetchPlans
         toast.success(
           `${
             action === "Create Budget"
@@ -4288,6 +6675,128 @@ const ProjectPlanTable = ({
     }
   };
 
+//   const handleActionSelect = async (idx, action) => {
+//   const plan = plans[idx];
+
+//   console.log('Selected plan object:', plan);
+//   console.log('Full project ID from ref:', fullProjectId.current);
+
+//   if (action === "None") return;
+  
+//   try {
+//     setIsActionLoading(true);
+    
+//     if (action === "Delete") {
+//       if (!plan.plId || Number(plan.plId) <= 0) {
+//         toast.error("Cannot delete: Invalid plan ID.");
+//         setIsActionLoading(false);
+//         return;
+//       }
+      
+//       const confirmed = window.confirm(
+//         `Are you sure you want to delete this plan`
+//       );
+//       if (!confirmed) {
+//         setIsActionLoading(false);
+//         return;
+//       }
+      
+//       toast.info("Deleting plan...");
+      
+//       try {
+//         await axios.delete(
+//           `https://test-api-3tmq.onrender.com/Project/DeleteProjectPlan/${plan.plId}`
+//         );
+        
+//         // Update local state instead of refetching
+//         setPlans(prevPlans => prevPlans.filter((_, index) => index !== idx));
+        
+//         // Clear selected plan if it was the deleted one
+//         if (selectedPlan && selectedPlan.plId === plan.plId) {
+//           setSelectedPlan(null);
+//           localStorage.removeItem("selectedPlan");
+//         }
+        
+//         toast.success("Plan deleted successfully!");
+//       } catch (err) {
+//         if (err.response && err.response.status === 404) {
+//           toast.error("Plan not found on server. It may have already been deleted.");
+//         } else {
+//           toast.error("Error deleting plan: " + (err.response?.data?.message || err.message));
+//         }
+//         setIsActionLoading(false);
+//         return;
+//       }
+      
+//     } else if (
+//       action === "Create Budget" || 
+//       action === "Create Blank Budget" || 
+//       action === "Create EAC"
+//     ) {
+//       const actionProjId = fullProjectId.current || plan.projId;
+      
+//       const payloadTemplate = {
+//         projId: selectedPlan.projId,
+//         plId: plan.plId || 0,
+//         plType: action === "Create Budget" || action === "Create Blank Budget" ? "BUD" : "EAC",
+//         source: plan.source || "",
+//         type: isChildProjectId(actionProjId) ? "SYSTEM" : plan.type || "",
+//         version: plan.version,
+//         versionCode: plan.versionCode || "",
+//         finalVersion: false,
+//         isCompleted: false,
+//         isApproved: false,
+//         status: "In Progress",
+//         createdBy: plan.createdBy || "User",
+//         modifiedBy: plan.modifiedBy || "User",
+//         approvedBy: "",
+//         templateId: plan.templateId || 1,
+//       };
+      
+//       console.log('Payload for action:', payloadTemplate);
+      
+//       const actionType = action === "Create Budget" ? "Budget" : 
+//                         action === "Create Blank Budget" ? "Blank Budget" : "EAC";
+      
+//       toast.info(`Creating ${actionType}...`);
+      
+//       const response = await axios.post(
+//         `https://test-api-3tmq.onrender.com/Project/AddProjectPlan?type=${
+//           action === "Create Blank Budget" ? "blank" : "actual"
+//         }`,
+//         payloadTemplate
+//       );
+      
+//       // Add the new plan to local state instead of refetching
+//       if (response.data) {
+//         const newPlan = response.data;
+//         setPlans(prevPlans => [...prevPlans, newPlan]);
+//       } else {
+//         // If response doesn't contain the new plan, create it locally
+//         const newPlan = {
+//           ...payloadTemplate,
+//           plId: Date.now(), // Temporary ID until next full refresh
+//           createdDate: new Date().toISOString(),
+//           modifiedDate: new Date().toISOString()
+//         };
+//         setPlans(prevPlans => [...prevPlans, newPlan]);
+//       }
+      
+//       toast.success(`${actionType} created successfully!`);
+      
+//     } else {
+//       toast.info(`Action "${action}" selected (API call not implemented)`);
+//     }
+    
+//   } catch (err) {
+//     toast.error("Error performing action: " + (err.response?.data?.message || err.message));
+//   } finally {
+//     setIsActionLoading(false);
+//   }
+// };
+
+
+  // Rest of your existing code remains the same...
   const getActionOptions = (plan) => {
     let options = ["None"];
     if (isChildProjectId(plan.projId) && !plan.plType && !plan.version) {
@@ -4315,44 +6824,30 @@ const ProjectPlanTable = ({
 
   const checkedFinalVersionIdx = plans.findIndex((plan) => plan.finalVersion);
 
-  // const getCheckboxProps = (plan, col, idx) => {
-  //   if (!plan.plType || !plan.version)
-  //     return { checked: false, disabled: true };
-  //   if (col === "isCompleted")
-  //     return { checked: plan.isCompleted, disabled: !!plan.isApproved };
-  //   if (col === "isApproved")
-  //     return { checked: plan.isApproved, disabled: !plan.isCompleted };
-  //   if (col === "finalVersion") {
-  //     if (checkedFinalVersionIdx !== -1 && checkedFinalVersionIdx !== idx)
-  //       return { checked: false, disabled: true };
-  //     return { checked: plan.finalVersion, disabled: !plan.isApproved };
-  //   }
-  //   return { checked: plan[col], disabled: false };
-  // };
   const getCheckboxProps = (plan, col, idx) => {
-  if (!plan.plType || !plan.version) return { checked: false, disabled: true };
+    if (!plan.plType || !plan.version) return { checked: false, disabled: true };
 
-  if (col === "isCompleted")
-    return { checked: plan.isCompleted, disabled: !!plan.isApproved };
+    if (col === "isCompleted")
+      return { checked: plan.isCompleted, disabled: !!plan.isApproved };
 
-  if (col === "isApproved")
-    return { checked: plan.isApproved, disabled: !plan.isCompleted };
+    if (col === "isApproved")
+      return { checked: plan.isApproved, disabled: !plan.isCompleted };
 
-  if (col === "finalVersion") {
-    // Find if any other plan with same plType has finalVersion checked
-    const anotherFinalVersionIdx = plans.findIndex(
-      (p, i) => i !== idx && p.plType === plan.plType && p.finalVersion
-    );
+    if (col === "finalVersion") {
+      // Find if any other plan with same plType has finalVersion checked
+      const anotherFinalVersionIdx = plans.findIndex(
+        (p, i) => i !== idx && p.plType === plan.plType && p.finalVersion
+      );
 
-    // Disable finalVersion checkbox for this row only if another finalVersion in the same plType is checked
-    return {
-      checked: plan.finalVersion,
-      disabled: anotherFinalVersionIdx !== -1, // disable if any other finalVersion for same plType
-    };
-  }
+      // Disable finalVersion checkbox for this row only if another finalVersion in the same plType is checked
+      return {
+        checked: plan.finalVersion,
+        disabled: anotherFinalVersionIdx !== -1, // disable if any other finalVersion for same plType
+      };
+    }
 
-  return { checked: plan[col], disabled: false };
-};
+    return { checked: plan[col], disabled: false };
+  };
 
   const handleTopButtonToggle = async (field) => {
     if (!selectedPlan) {
@@ -4389,7 +6884,6 @@ const ProjectPlanTable = ({
       const response = await axios.get(
         `https://test-api-3tmq.onrender.com/Forecast/CalculateRevenueCost?planID=${selectedPlan.plId}&templateId=${selectedPlan.templateId}&type=actual`
       );
-      // Assuming the response body is a message or has a 'message' field
       const message = typeof response.data === 'string' ? response.data : response.data?.message || "Revenue Calculation successful!";
       toast.success(message);
     } catch (err) {
@@ -4458,7 +6952,7 @@ const ProjectPlanTable = ({
             <>
               <button
                 onClick={() => {
-                  setIsActionLoading(true);
+                  // setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Create Budget"
@@ -4480,7 +6974,7 @@ const ProjectPlanTable = ({
               </button>
               <button
                 onClick={() => {
-                  setIsActionLoading(true);
+                  // setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Create Blank Budget"
@@ -4502,7 +6996,7 @@ const ProjectPlanTable = ({
               </button>
               <button
                 onClick={() => {
-                  setIsActionLoading(true);
+                  // setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Create EAC"
@@ -4524,7 +7018,7 @@ const ProjectPlanTable = ({
               </button>
               <button
                 onClick={() => {
-                  setIsActionLoading(true);
+                  // setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Delete"
@@ -4663,16 +7157,6 @@ const ProjectPlanTable = ({
           No project plans found for project ID: {projectId}
         </div>
       ) : (
-        // <div
-        //   className="overflow-auto"
-        //   style={{
-        //     maxHeight: "400px",
-        //     minHeight: "100px",
-        //     border: "1px solid #e5e7eb",
-        //     borderRadius: "0.5rem",
-        //     background: "#fff",
-        //   }}
-        // >
         <div
           className="overflow-auto"
           style={{
@@ -4699,10 +7183,10 @@ const ProjectPlanTable = ({
                 <tr
                   key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
                   className={`transition-all duration-200 cursor-pointer ${
-  selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
-    ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
-    : "even:bg-gray-50 hover:bg-blue-50"  
-}`}
+                    selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
+                      ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
+                      : "even:bg-gray-50 hover:bg-blue-50"  
+                  }`}
                   onClick={() => handleRowClick(plan)}
                 >
                   <td className="p-1 border text-center">
@@ -4733,79 +7217,6 @@ const ProjectPlanTable = ({
                     </button>
                   </td>
                   {columns.map((col) => (
-                    // <td
-                    //   key={col}
-                    //   className={`p-2 border font-normal ${
-                    //     col === 'status' && plan.status === 'Submitted'
-                    //       ? 'bg-yellow-100 text-black font-bold'
-                    //       : col === 'status' && plan.status === 'In Progress'
-                    //       ? 'bg-red-100 text-black font-bold'
-                    //       : col === 'status' && plan.status === 'Approved'
-                    //       ? 'bg-green-100 text-black font-bold'
-                    //       : ''
-                    //   } ${col === 'projId' ? 'break-words' : ''} ${
-                    //     col === 'createdAt' || col === 'updatedAt' || col === 'closedPeriod' ? 'whitespace-nowrap' : ''
-                    //   }`}
-                    //   style={
-                    //     col === 'projId'
-                    //       ? { minWidth: '100px', maxWidth: '150px' }
-                    //       : col === 'closedPeriod' || col === 'createdAt' || col === 'updatedAt'
-                    //       ? { minWidth: '180px', maxWidth: '220px' }
-                    //       : {}
-                    //   }
-                    // >
-                    //   {col === 'closedPeriod' || col === 'createdAt' || col === 'updatedAt'
-                    //     ? formatDateWithTime(plan[col])
-                    //     : col === 'versionCode'
-                    //     ? (
-                    //       <input
-                    //         type="text"
-                    //         value={editingVersionCodeIdx === idx ? editingVersionCodeValue : plan.versionCode || ''}
-                    //         autoFocus={editingVersionCodeIdx === idx}
-                    //         onClick={e => {
-                    //           e.stopPropagation();
-                    //           setEditingVersionCodeIdx(idx);... //           setEditingVersionCodeValue(plan.versionCode || '');
-                    //         }}
-                    //         onChange={e => setEditingVersionCodeValue(e.target.value)}
-                    //         onBlur={() => {
-                    //           if (editingVersionCodeIdx === idx) {
-                    //             setIsActionLoading(true);
-                    //             handleVersionCodeChange(idx, editingVersionCodeValue);
-                    //             setEditingVersionCodeIdx(null);
-                    //           }
-                    //         }}
-                    //         onKeyDown={e => {
-                    //           if (e.key === 'Enter') {
-                    //             setIsActionLoading(true);
-                    //             handleVersionCodeChange(idx, editingVersionCodeValue);
-                    //             setEditingVersionCodeIdx(null);
-                    //           } else if (e.key === 'Escape') {
-                    //             setEditingVersionCodeIdx(null);
-                    //           }
-                    //         }}
-                    //         className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
-                    //           !plan.plType || !plan.version ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'
-                    //         }`}
-                    //         style={{ minWidth: 60, maxWidth: 120 }}
-                    //         disabled={!plan.plType || !plan.version}
-                    //       />
-                    //     )
-                    //     : typeof plan[col] === 'boolean'
-                    //     ? (
-                    //       <input
-                    //         type="checkbox"
-                    //         checked={getCheckboxProps(plan, col, idx).checked}
-                    //         disabled={getCheckboxProps(plan, col, idx).disabled}
-                    //         onClick={(e) => e.stopPropagation()}
-                    //         onMouseDown={(e) => e.stopPropagation()}
-                    //         onDoubleClick={(e) => e.stopPropagation()}
-                    //         onKeyDown={(e) => e.stopPropagation()}
-                    //         onChange={() => handleCheckboxChange(idx, col)}
-                    //         className="cursor-pointer"
-                    //       />
-                    //     )
-                    //     : plan[col] || ''}
-                    // </td>
                     <td
                       key={col}
                       className={`p-1 border font-normal ${
@@ -4817,28 +7228,28 @@ const ProjectPlanTable = ({
                           ? "bg-green-100 text-black font-bold"
                           : ""
                       }
-  ${col === "status" ? "whitespace-nowrap text-center" : ""}
-  ${col === "projId" ? "break-words" : ""}
-  ${
-    col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
-      ? "whitespace-nowrap"
-      : ""
-  }`}
+                        ${col === "status" ? "whitespace-nowrap text-center" : ""}
+                        ${col === "projId" ? "break-words" : ""}
+                        ${
+                          col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
+                            ? "whitespace-nowrap"
+                            : ""
+                        }`}
                       style={
                         col === "status"
-                          ? { minWidth: "120px", maxWidth: "170px" }
+                          ? { minWidth: "80px", maxWidth: "100px" } //size of status
                           : col === "projId"
                           ? { minWidth: "100px", maxWidth: "150px" }
-                          : col === "closedPeriod" ||
-                            col === "createdAt" ||
-                            col === "updatedAt"
-                          ? { minWidth: "180px", maxWidth: "220px" }
+                          : col === "closedPeriod"
+                          ? { minWidth: "80px", maxWidth: "100px" } //size of date
+                          : col === "createdAt" || col === "updatedAt"
+                          ? { minWidth: "160px", maxWidth: "200px" } // keep slightly wider (date+time)
                           : {}
                       }
                     >
-                      {col === "closedPeriod" ||
-                      col === "createdAt" ||
-                      col === "updatedAt" ? (
+                      {col === "closedPeriod" ? (
+                        formatDateOnly(plan[col]) // only DATE
+                      ) : col === "createdAt" || col === "updatedAt" ? (
                         formatDateWithTime(plan[col])
                       ) : col === "versionCode" ? (
                         <input
@@ -4889,19 +7300,19 @@ const ProjectPlanTable = ({
                         />
                       ) : typeof plan[col] === "boolean" ? (
                         <input
-    type="checkbox"
-    checked={getCheckboxProps(plan, col, idx).checked}
-    disabled={getCheckboxProps(plan, col, idx).disabled}
-    onClick={(e) => e.stopPropagation()}
-    onMouseDown={(e) => e.stopPropagation()}
-    onDoubleClick={(e) => e.stopPropagation()}
-    onKeyDown={(e) => e.stopPropagation()}
-    onChange={(e) => {
-      e.stopPropagation();
-      handleCheckboxChange(idx, col);
-    }}
-    className="cursor-pointer"
-  />
+                          type="checkbox"
+                          checked={getCheckboxProps(plan, col, idx).checked}
+                          disabled={getCheckboxProps(plan, col, idx).disabled}
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onDoubleClick={(e) => e.stopPropagation()}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleCheckboxChange(idx, col);
+                          }}
+                          className="cursor-pointer"
+                        />
                       ) : (
                         plan[col] || ""
                       )}
@@ -4915,13 +7326,13 @@ const ProjectPlanTable = ({
       )}
       {showForm && (
         <ProjectPlanForm
-          projectId={projectId}
+          projectId={fullProjectId.current || projectId} // Use full project ID here too
           onClose={() => {
             setShowForm(false);
             setIsActionLoading(false);
           }}
           onPlanCreated={() => {
-            fetchPlans();
+            refreshPlans(); // Use refreshPlans instead of fetchPlans
             setShowForm(false);
             setIsActionLoading(false);
           }}

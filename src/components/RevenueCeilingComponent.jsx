@@ -263,7 +263,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="max-h-[400px] overflow-x-auto overflow-y-auto">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-gray-100">

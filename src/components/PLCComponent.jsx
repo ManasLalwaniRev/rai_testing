@@ -2301,9 +2301,23 @@ const handlePlcSelect = (value) => {
 </div>
 
       {/* Employee Billing Rates Schedule */}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <h3 className="text-sm font-semibold">Employee Billing Rates Schedule</h3>
-        <div className="overflow-x-auto overflow-y-auto max-h-64">
+        <div className="overflow-x-auto overflow-y-auto max-h-64"> */}
+        <div className="mb-4">
+  <div className="flex justify-between items-center mb-2">
+    <h3 className="text-sm font-semibold">Employee Billing Rates Schedule</h3>
+    <div className="w-1/5"></div>
+    <button
+      onClick={handleAddEmployeeRow}
+      className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition mr-4"
+      disabled={loading || newEmployeeRate}
+    >
+      Add
+    </button>
+  </div>
+  <div className="overflow-x-auto overflow-y-auto max-h-64 border-b border-gray-300">
+
           <table className="w-full text-xs border-collapse">
             <thead className="sticky top-0 z-10 bg-gray-100">
               <tr className="bg-gray-100">
@@ -2788,26 +2802,30 @@ const handlePlcSelect = (value) => {
                   </td>
                 </tr>
               )}
-              <tr>
-                <td colSpan="10" className="border p-2">
-                  <button
-                    onClick={handleAddEmployeeRow}
-                    className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition"
-                    disabled={loading || newEmployeeRate}
-                  >
-                    Add
-                  </button>
-                </td>
-              </tr>
+             
             </tbody>
           </table>
         </div>
       </div>
 
       {/* Vendor Billing Rates Schedule */}
-    <div className="mb-4">
+    {/* <div className="mb-4">
         <h3 className="text-sm font-semibold">Vendor Billing Rates Schedule</h3>
-        <div className="overflow-x-auto overflow-y-auto max-h-64">
+        <div className="overflow-x-auto overflow-y-auto max-h-64"> */}
+        <div className="mb-4">
+  <div className="flex justify-between items-center mb-2">
+    <h3 className="text-sm font-semibold">Vendor Billing Rates Schedule</h3>
+    <div className="w-1/5"></div>
+    <button
+      onClick={handleAddVendorRow}
+      className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition mr-4"
+      disabled={loading || newVendorRate}
+    >
+      Add
+    </button>
+  </div>
+  <div className="overflow-x-auto overflow-y-auto max-h-64 border-b border-gray-300">
+
           <table className="w-full text-xs border-collapse">
             <thead className="sticky top-0 z-10 bg-gray-100">
               <tr className="bg-gray-100">
@@ -3320,7 +3338,7 @@ const handlePlcSelect = (value) => {
                   </td>
                 </tr>
               )}
-              <tr>
+              {/* <tr>
                 <td colSpan="12" className="border p-2">
                   <button
                     onClick={handleAddVendorRow}
@@ -3330,7 +3348,8 @@ const handlePlcSelect = (value) => {
                     Add
                   </button>
                 </td>
-              </tr>
+              </tr> */}
+              
             </tbody>
           </table>
         </div>
