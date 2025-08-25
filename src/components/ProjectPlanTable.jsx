@@ -6326,49 +6326,127 @@ const ProjectPlanTable = ({
     }
   };
 
+  // const handleExportPlan = async (plan) => {
+  //   if (!plan.projId || !plan.version || !plan.plType) {
+  //     toast.error("Missing required parameters for export");
+  //     return;
+  //   }
+  //   try {
+  //     setIsActionLoading(true);
+  //     toast.info("Exporting plan...");
+      
+  //     // Use the full project ID for export
+  //     // const exportProjId = fullProjectId.current || plan.projId;
+      
+  //     const response = await axios.get(
+  //       `https://test-api-3tmq.onrender.com/Forecast/ExportPlanDirectCost`,
+  //       {
+  //         params: {
+  //           projId: selectedPlan.projId,
+  //           version: plan.version,
+  //           type: plan.plType,
+  //         },
+  //         responseType: "blob",
+  //       }
+  //     );
+  //     const url = window.URL.createObjectURL(new Blob([response.data]));
+  //     const link = document.createElement("a");
+  //     link.href = url;
+  //     link.setAttribute(
+  //       "download",
+  //       `Plan_${exportProjId}_${plan.version}_${plan.plType}.xlsx`
+  //     );
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  //     window.URL.revokeObjectURL(url);
+  //     toast.success("Plan exported successfully!");
+  //   } catch (err) {
+  //     toast.error(
+  //       "Error exporting plan: " + (err.response?.data?.message || err.message)
+  //     );
+  //   } finally {
+  //     setIsActionLoading(false);
+  //   }
+  // };
   const handleExportPlan = async (plan) => {
-    if (!plan.projId || !plan.version || !plan.plType) {
-      toast.error("Missing required parameters for export");
+  if (!selectedPlan?.projId || !plan.version || !plan.plType) {
+    toast.error("Missing required parameters for export");
+    return;
+  }
+  
+  try {
+    setIsActionLoading(true);
+    toast.info("Exporting plan...");
+    
+    const response = await axios.get(
+      `https://test-api-3tmq.onrender.com/Forecast/ExportPlanDirectCost`,
+      {
+        params: {
+          projId: selectedPlan.projId, // Using selectedPlan.projId as requested
+          version: plan.version,
+          type: plan.plType,
+        },
+        responseType: "blob",
+      }
+    );
+
+    // Check if response is valid
+    if (!response.data || response.data.size === 0) {
+      toast.error("No data received from server");
       return;
     }
-    try {
-      setIsActionLoading(true);
-      toast.info("Exporting plan...");
-      
-      // Use the full project ID for export
-      const exportProjId = fullProjectId.current || plan.projId;
-      
-      const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Forecast/ExportPlanDirectCost`,
-        {
-          params: {
-            projId: exportProjId,
-            version: plan.version,
-            type: plan.plType,
-          },
-          responseType: "blob",
-        }
-      );
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `Plan_${exportProjId}_${plan.version}_${plan.plType}.xlsx`
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+
+    // Create blob with proper content type
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+    
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    
+    // Using selectedPlan.projId for filename
+    link.setAttribute(
+      "download",
+      `Plan_${selectedPlan.projId}_${plan.version}_${plan.plType}.xlsx`
+    );
+    
+    document.body.appendChild(link);
+    link.click();
+    
+    // Cleanup
+    setTimeout(() => {
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      toast.success("Plan exported successfully!");
-    } catch (err) {
-      toast.error(
-        "Error exporting plan: " + (err.response?.data?.message || err.message)
-      );
-    } finally {
-      setIsActionLoading(false);
+    }, 100);
+    
+    toast.success("Plan exported successfully!");
+    
+  } catch (err) {
+    console.error("Export error:", err);
+    
+    // Better error handling
+    if (err.response) {
+      // Server responded with error status
+      if (err.response.status === 404) {
+        toast.error("Export endpoint not found or data not available");
+      } else if (err.response.status === 500) {
+        toast.error("Server error occurred during export");
+      } else {
+        toast.error(`Export failed: ${err.response.status} - ${err.response.statusText}`);
+      }
+    } else if (err.request) {
+      // Network error
+      toast.error("Network error: Unable to reach server");
+    } else {
+      // Other error
+      toast.error("Error exporting plan: " + err.message);
     }
-  };
+  } finally {
+    setIsActionLoading(false);
+  }
+};
 
   const handleImportPlan = async (event) => {
     const file = event.target.files[0];
@@ -6390,8 +6468,8 @@ const ProjectPlanTable = ({
     formData.append("file", file);
     
     // Use the full project ID for import
-    const importProjId = fullProjectId.current || projectId;
-    formData.append("projId", importProjId);
+    // const importProjId = fullProjectId.current || projectId;
+    formData.append("projId", selectedPlan.projId);
     
     try {
       setIsActionLoading(true);
@@ -7096,7 +7174,7 @@ const ProjectPlanTable = ({
         <div className="flex items-center gap-4">
           <button
             onClick={() => {
-              setIsActionLoading(true);
+              // setIsActionLoading(true);
               fileInputRef.current.click();
             }}
             className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer whitespace-nowrap"
@@ -7122,7 +7200,7 @@ const ProjectPlanTable = ({
             type="file"
             ref={fileInputRef}
             onChange={(e) => {
-              setIsActionLoading(true);
+              // setIsActionLoading(true);
               handleImportPlan(e);
             }}
             accept=".xlsx,.xls"
@@ -7160,8 +7238,8 @@ const ProjectPlanTable = ({
         <div
           className="overflow-auto"
           style={{
-            maxHeight: "250px",
-            minHeight: "60px",
+            maxHeight: "280px",
+            minHeight: "280px",
             border: "1px solid #e5e7eb",
             borderRadius: "0.5rem",
             background: "#fff",
@@ -7193,7 +7271,7 @@ const ProjectPlanTable = ({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setIsActionLoading(true);
+                        // setIsActionLoading(true);
                         handleExportPlan(plan);
                       }}
                       className="text-blue-600 hover:text-blue-800"
@@ -7270,7 +7348,7 @@ const ProjectPlanTable = ({
                           }
                           onBlur={() => {
                             if (editingVersionCodeIdx === idx) {
-                              setIsActionLoading(true);
+                              // setIsActionLoading(true);
                               handleVersionCodeChange(
                                 idx,
                                 editingVersionCodeValue
@@ -7280,7 +7358,7 @@ const ProjectPlanTable = ({
                           }}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
-                              setIsActionLoading(true);
+                              // setIsActionLoading(true);
                               handleVersionCodeChange(
                                 idx,
                                 editingVersionCodeValue
