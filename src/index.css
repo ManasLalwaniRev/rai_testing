@@ -35,3 +35,85 @@
   max-height: 400px; /* Or any desired height */
   overflow-y: auto;
 }
+
+/* Global styles for the table */
+.project-plan-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-height: 100%; /* Fill the container height */
+}
+.project-plan-table th,
+.project-plan-table td {
+  padding: 4px;
+  border: 1px solid #ddd;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.project-plan-table th {
+  background-color: #f5f5f5;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.project-plan-table td.status {
+  min-width: 80px;
+  max-width: 10%;
+  text-align: center;
+}
+.project-plan-table td.project-id {
+  min-width: 100px;
+  max-width: 15%;
+}
+.project-plan-table td.closed-period {
+  min-width: 80px;
+  max-width: 10%;
+}
+.project-plan-table td.version-code input {
+  width: 100%;
+  min-width: 60px;
+  max-width: 120px;
+  box-sizing: border-box;
+}
+ 
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .project-plan-table td,
+  .project-plan-table th {
+    font-size: 12px;
+    padding: 2px;
+  }
+  .project-plan-table td.status {
+    max-width: 12%;
+  }
+  .project-plan-table td.project-id {
+    max-width: 18%;
+  }
+}
+@media (max-width: 768px) {
+  .flex-row {
+    flex-direction: column;
+    height: auto;
+  }
+  .flex-col {
+    width: 100%;
+    min-width: 0;
+  }
+  .flex-1 {
+    width: 100%;
+    min-height: 0;
+  }
+  .project-plan-table {
+    font-size: 10px;
+  }
+  .project-plan-table td.status,
+  .project-plan-table td.closed-period {
+    max-width: 15%;
+  }
+  .project-plan-table td.project-id {
+    max-width: 20%;
+  }
+}
+ 
+ 
