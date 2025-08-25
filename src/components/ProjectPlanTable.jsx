@@ -8192,6 +8192,48 @@ const ProjectPlanTable = ({
     return !selectedPlan || !selectedPlan.plId || !selectedPlan.templateId;
   };
 
+  const getMasterProjects = (plans) => {
+    return plans.filter((plan) => {
+      const projId = plan.projId?.trim();
+      if (!projId) return false;
+ 
+      // Master = no dots at all
+      return !projId.includes(".");
+    });
+  };
+ 
+  const getMasterAndRelatedProjects = (plans, clickedProjId) => {
+    if (!clickedProjId)
+      return { master: null, related: [], sameLevelBud: false };
+ 
+    const parts = clickedProjId.split(".");
+    const masterId = parts[0];
+    const selectedLevel = parts.length; // ✅ selected row level
+ 
+    // Filter only bud plans that start with masterId
+    const filtered = plans.filter(
+      (p) => p.projId?.startsWith(masterId) && p.plType === "BUD"
+    );
+ 
+    // Deduplicate by projId
+    const seen = new Set();
+    const related = filtered
+      .filter((p) => {
+        if (seen.has(p.projId)) return false;
+        seen.add(p.projId);
+        return true;
+      })
+      .map((p) => ({
+        ...p,
+        level: p.projId.split(".").length, // each BUD plan's level
+      }));
+ 
+    // ✅ Check if any bud is created at same level as selected row
+    const sameLevelBud = related.some((r) => r.level === selectedLevel);
+ 
+    return { master: masterId, related, selectedLevel, sameLevelBud };
+  };
+
   if (loading) {
     return (
       <div className="p-4">
@@ -8227,9 +8269,148 @@ const ProjectPlanTable = ({
       <div className="flex justify-between items-center mb-2">
         <div className="flex gap-1 flex-wrap">
           {plans.length > 0 && (
-            <>
+            // <>
+            //   <button
+            //     onClick={() => {
+            //       handleActionSelect(
+            //         plans.findIndex((p) => p.plId === selectedPlan?.plId),
+            //         "Create Budget"
+            //       );
+            //     }}
+            //     disabled={
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Create Budget")
+            //     }
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Create Budget")
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            //     }`}
+            //     title="Create Budget"
+            //   >
+            //     Create Budget
+            //   </button>
+            //   <button
+            //     onClick={() => {
+            //       handleActionSelect(
+            //         plans.findIndex((p) => p.plId === selectedPlan?.plId),
+            //         "Create Blank Budget"
+            //       );
+            //     }}
+            //     disabled={
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Create Blank Budget")
+            //     }
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Create Blank Budget")
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            //     }`}
+            //     title="Create Blank Budget"
+            //   >
+            //     Create Blank Budget
+            //   </button>
+            //   <button
+            //     onClick={() => {
+            //       handleActionSelect(
+            //         plans.findIndex((p) => p.plId === selectedPlan?.plId),
+            //         "Create EAC"
+            //       );
+            //     }}
+            //     disabled={
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Create EAC")
+            //     }
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Create EAC")
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            //     }`}
+            //     title="Create EAC"
+            //   >
+            //     Create EAC
+            //   </button>
+            //   <button
+            //     onClick={() => {
+            //       handleActionSelect(
+            //         plans.findIndex((p) => p.plId === selectedPlan?.plId),
+            //         "Delete"
+            //       );
+            //     }}
+            //     disabled={
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Delete")
+            //     }
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       !selectedPlan ||
+            //       !getButtonAvailability(selectedPlan, "Delete")
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+            //     }`}
+            //     title="Delete Selected Plan"
+            //   >
+            //     Delete
+            //   </button>
+            //   <button
+            //     onClick={() => handleTopButtonToggle("isCompleted")}
+            //     disabled={getTopButtonDisabled("isCompleted")}
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       getTopButtonDisabled("isCompleted")
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            //     }`}
+            //     title="Toggle Submitted"
+            //   >
+            //     Submitted
+            //   </button>
+            //   <button
+            //     onClick={() => handleTopButtonToggle("isApproved")}
+            //     disabled={getTopButtonDisabled("isApproved")}
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       getTopButtonDisabled("isApproved")
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            //     }`}
+            //     title="Toggle Approved"
+            //   >
+            //     Approved
+            //   </button>
+            //   <button
+            //     onClick={() => handleTopButtonToggle("finalVersion")}
+            //     disabled={getTopButtonDisabled("finalVersion")}
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       getTopButtonDisabled("finalVersion")
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            //     }`}
+            //     title="Toggle Conclude"
+            //   >
+            //     Conclude
+            //   </button>
+            //   <button
+            //     onClick={() => {
+            //       setIsActionLoading(true);
+            //       handleCalc();
+            //     }}
+            //     disabled={getCalcButtonDisabled()}
+            //     className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+            //       getCalcButtonDisabled()
+            //         ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            //         : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+            //     }`}
+            //     title="Calculate"
+            //   >
+            //     Calc
+            //   </button>
+            // </>
+
+              <>
               <button
                 onClick={() => {
+                  setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Create Budget"
@@ -8237,20 +8418,25 @@ const ProjectPlanTable = ({
                 }}
                 disabled={
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Budget")
+                  !getButtonAvailability(selectedPlan, "Create Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                 }
                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Budget")
+                  !getButtonAvailability(selectedPlan, "Create Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Create Budget"
               >
-                Create Budget
+                New Budget
               </button>
               <button
                 onClick={() => {
+                  setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Create Blank Budget"
@@ -8258,20 +8444,24 @@ const ProjectPlanTable = ({
                 }}
                 disabled={
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Blank Budget")
+                  !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
                 }
                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Blank Budget")
+                  !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Create Blank Budget"
               >
-                Create Blank Budget
+                New Blank Budget
               </button>
               <button
                 onClick={() => {
+                  setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Create EAC"
@@ -8279,20 +8469,25 @@ const ProjectPlanTable = ({
                 }}
                 disabled={
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create EAC")
+                  !getButtonAvailability(selectedPlan, "Create EAC") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                 }
                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create EAC")
+                  !getButtonAvailability(selectedPlan, "Create EAC") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
                 title="Create EAC"
               >
-                Create EAC
+                New EAC
               </button>
               <button
                 onClick={() => {
+                  setIsActionLoading(true);
                   handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
                     "Delete"
@@ -8300,11 +8495,15 @@ const ProjectPlanTable = ({
                 }}
                 disabled={
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Delete")
+                  !getButtonAvailability(selectedPlan, "Delete") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                 }
                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
                   !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Delete")
+                  !getButtonAvailability(selectedPlan, "Delete") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
                 }`}
@@ -8459,7 +8658,13 @@ const ProjectPlanTable = ({
                       ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
                       : "even:bg-gray-50 hover:bg-blue-50"  
                   }`}
-                  onClick={() => handleRowClick(plan)}
+                  onClick={() =>{
+
+                    handleRowClick(plan);
+                    getMasterAndRelatedProjects(plans, plan.projId);
+
+                  } 
+                  }
                 >
                   <td className="p-1 border text-center">
                     <button
