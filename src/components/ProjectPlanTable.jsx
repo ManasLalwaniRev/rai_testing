@@ -10164,10 +10164,15 @@ const ProjectPlanTable = ({
   // Add a ref to store the original full project ID for actions
   const fullProjectId = useRef(null);
 
+  const isParentProject = (projId) => {
+  return projId && typeof projId === "string" && !projId.includes(".");
+};
+
+
   const isChildProjectId = (projId) => {
     return projId && typeof projId === "string" && projId.includes(".");
   };
-
+  
   const formatDateWithTime = (dateStr) => {
     if (!dateStr) return "";
     try {
@@ -10798,6 +10803,29 @@ const ProjectPlanTable = ({
     return options;
   };
 
+//   const getActionOptions = (plan) => {
+//   let options = ["None"];
+  
+//   // Enable actions for BOTH parent and child projects that haven't had actions yet
+//   if ((isParentProject(plan.projId) || isChildProjectId(plan.projId)) && !plan.plType && !plan.version) {
+//     return ["None", "Create Budget", "Create Blank Budget"];
+//   }
+  
+//   // If no plType or version, return default options
+//   if (!plan.plType || !plan.version) return options;
+  
+//   // For plans that have plType and version (both parent and child)
+//   if (plan.status === "In Progress") {
+//     options = ["None", "Delete"];
+//   } else if (plan.status === "Submitted") {
+//     options = ["None", "Create Budget", "Create Blank Budget"];
+//   } else if (plan.status === "Approved") {
+//     options = ["None", "Create Budget", "Create Blank Budget", "Create EAC", "Delete"];
+//   }
+  
+//   return options;
+// };
+
   const getButtonAvailability = (plan, action) => {
     const options = getActionOptions(plan);
     return options.includes(action);
@@ -10912,8 +10940,8 @@ const ProjectPlanTable = ({
       return !projId.includes(".");
     });
   };
- 
-  const getMasterAndRelatedProjects = (plans, clickedProjId) => {
+
+   const getMasterAndRelatedProjects = (plans, clickedProjId) => {
     if (!clickedProjId)
       return { master: null, related: [], sameLevelBud: false };
  
@@ -10939,11 +10967,47 @@ const ProjectPlanTable = ({
         level: p.projId.split(".").length, // each BUD plan's level
       }));
  
+    if (related.length === 0) {
+      return { master: masterId, related, selectedLevel, sameLevelBud: true };
+    }
     // ✅ Check if any bud is created at same level as selected row
     const sameLevelBud = related.some((r) => r.level === selectedLevel);
  
     return { master: masterId, related, selectedLevel, sameLevelBud };
   };
+ 
+ 
+  // const getMasterAndRelatedProjects = (plans, clickedProjId) => {
+  //   if (!clickedProjId)
+  //     return { master: null, related: [], sameLevelBud: false };
+ 
+  //   const parts = clickedProjId.split(".");
+  //   const masterId = parts[0];
+  //   const selectedLevel = parts.length; // ✅ selected row level
+ 
+  //   // Filter only bud plans that start with masterId
+  //   const filtered = plans.filter(
+  //     (p) => p.projId?.startsWith(masterId) && p.plType === "BUD"
+  //   );
+ 
+  //   // Deduplicate by projId
+  //   const seen = new Set();
+  //   const related = filtered
+  //     .filter((p) => {
+  //       if (seen.has(p.projId)) return false;
+  //       seen.add(p.projId);
+  //       return true;
+  //     })
+  //     .map((p) => ({
+  //       ...p,
+  //       level: p.projId.split(".").length, // each BUD plan's level
+  //     }));
+ 
+  //   // ✅ Check if any bud is created at same level as selected row
+  //   const sameLevelBud = related.some((r) => r.level === selectedLevel);
+ 
+  //   return { master: masterId, related, selectedLevel, sameLevelBud };
+  // };
 
   // // Enable actions if plType and version are both empty
   //  const isPlanWithoutActions = plan => !plan.plType && !plan.version;
@@ -10986,8 +11050,164 @@ const ProjectPlanTable = ({
           {plans.length > 0 && (
             <>
 
+            <button
+                onClick={() => {
+                  setIsActionLoading(true);
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Create Budget"
+                  );
+                }}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
+                }
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title="Create Budget"
+              >
+                New Budget
+              </button>
+ 
+              <button
+                onClick={() => {
+                  setIsActionLoading(true);
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Create Blank Budget"
+                  );
+                }}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                }
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title="Create Blank Budget"
+              >
+                New Blank Budget
+              </button>
+              <button
+                onClick={() => {
+                  setIsActionLoading(true);
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Create EAC"
+                  );
+                }}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create EAC") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
+                }
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Create EAC") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title="Create EAC"
+              >
+                New EAC
+              </button>
+              <button
+                onClick={() => {
+                  setIsActionLoading(true);
+                  handleActionSelect(
+                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
+                    "Delete"
+                  );
+                }}
+                disabled={
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Delete") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
+                }
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  !selectedPlan ||
+                  !getButtonAvailability(selectedPlan, "Delete") ||
+                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+                }`}
+                title="Delete Selected Plan"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => handleTopButtonToggle("isCompleted")}
+                disabled={getTopButtonDisabled("isCompleted")}
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  getTopButtonDisabled("isCompleted")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title="Toggle Submitted"
+              >
+                Submitted
+              </button>
+              <button
+                onClick={() => handleTopButtonToggle("isApproved")}
+                disabled={getTopButtonDisabled("isApproved")}
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  getTopButtonDisabled("isApproved")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title="Toggle Approved"
+              >
+                Approved
+              </button>
+              <button
+                onClick={() => handleTopButtonToggle("finalVersion")}
+                disabled={getTopButtonDisabled("finalVersion")}
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  getTopButtonDisabled("finalVersion")
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title="Toggle Conclude"
+              >
+                Conclude
+              </button>
+              <button
+                onClick={() => {
+                  setIsActionLoading(true);
+                  handleCalc();
+                }}
+                disabled={getCalcButtonDisabled()}
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  getCalcButtonDisabled()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title="Calculate"
+              >
+                Calc
+              </button>
+
             
-             <button
+             {/* <button
                  onClick={() => {
                    handleActionSelect(
                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
@@ -11006,7 +11226,7 @@ const ProjectPlanTable = ({
                 }`}
                 title="Create Budget"
               >
-                Create Budget
+                New Budget
               </button>
               <button
                 onClick={() => {
@@ -11027,7 +11247,7 @@ const ProjectPlanTable = ({
                 }`}
                 title="Create Blank Budget"
               >
-                Create Blank Budget
+                New Blank Budget
               </button>
               <button
                 onClick={() => {
@@ -11048,7 +11268,7 @@ const ProjectPlanTable = ({
                  }`}
                  title="Create EAC"
                >
-                 Create EAC
+                 New EAC
                </button>
                <button
                  onClick={() => {
@@ -11121,15 +11341,11 @@ const ProjectPlanTable = ({
                 title="Calculate"
               >
                 Calc
-               </button>
+               </button> */}
 
                 <button
                  onClick={() => setBudEacFilter(!budEacFilter)}
-                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                   budEacFilter
-                     ? "bg-green-600 text-white hover:bg-green-700 cursor-pointer"
-                     : "bg-gray-400 text-white hover:bg-gray-500 cursor-pointer"
-                 }`}
+                 className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap "
                  title="Filter BUD/EAC Plans"
                >
                  BUD/EAC
