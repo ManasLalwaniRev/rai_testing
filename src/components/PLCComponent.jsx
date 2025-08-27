@@ -788,7 +788,14 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
         "Please fill all required fields (PLC, Bill Rate, Start Date)."
       );
       return;
+
     }
+
+    if (isNaN(newRate.billRate) || Number(newRate.billRate) <= 0) {
+      toast.error("Bill Rate must be a valid number greater than 0.");
+      return;
+    }
+
     if (
       newRate.startDate &&
       newRate.endDate &&
@@ -864,6 +871,12 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   };
 
   const handleNewRateChange = (field, value) => {
+    if (field === "billRate") {
+      // Allow only numbers (with decimals)
+      if (!/^\d*\.?\d*$/.test(value)) {
+        return; // ignore invalid input
+      }
+    }
     setNewRate((prev) => ({ ...prev, [field]: value }));
   };
 

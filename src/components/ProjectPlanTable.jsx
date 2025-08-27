@@ -11162,9 +11162,9 @@ const ProjectPlanTable = ({
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
-                title="Toggle Submitted"
+                title="Submit"
               >
-                Submitted
+                Submit
               </button>
               <button
                 onClick={() => handleTopButtonToggle("isApproved")}
@@ -11174,9 +11174,9 @@ const ProjectPlanTable = ({
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
-                title="Toggle Approved"
+                title="Approve"
               >
-                Approved
+                Approve
               </button>
               <button
                 onClick={() => handleTopButtonToggle("finalVersion")}
@@ -11186,7 +11186,7 @@ const ProjectPlanTable = ({
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
                 }`}
-                title="Toggle Conclude"
+                title="Conclude"
               >
                 Conclude
               </button>

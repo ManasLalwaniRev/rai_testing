@@ -7978,7 +7978,7 @@ const ProjectBudgetStatus = () => {
   }
 
   return (
-    <div className="p-2 sm:p-4 space-y-6 text-sm sm:text-base text-gray-800 font-inter">
+    <div className="p-2 sm:p-4  space-y-6 text-sm sm:text-base text-gray-800 font-inter">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 relative w-full sm:w-auto">
           <label className="font-semibold text-xs sm:text-sm">

@@ -5649,6 +5649,8 @@ const ProjectAmountsTable = ({
   const [fillMethod, setFillMethod] = useState("None");
   const [sourceRowIndex, setSourceRowIndex] = useState(null);
   const [editedRowData, setEditedRowData] = useState({});
+  const [idError, setIdError] = useState("");
+
 
   const isEditable = initialData.status === "In Progress";
   const planId = initialData.plId;
@@ -5782,6 +5784,7 @@ const ProjectAmountsTable = ({
                   emplId: emp.empId,
                   firstName: firstName || "",
                   lastName: lastName || "",
+                  orgId: emp.orgId,
                 };
               }
             })
@@ -5865,20 +5868,146 @@ const ProjectAmountsTable = ({
     }
   }, [projectId, showNewForm, newEntry.idType]);
 
-  const handleIdChange = (value) => {
-    console.log("handleIdChange called with value:", value);
-    const selectedEmployee = employeeSuggestions.find(
-      (emp) => emp.emplId === value
+  
+
+// const handleIdChange = (value) => {
+//   console.log("handleIdChange called with value:", value);
+  
+//   // **FIRST CHECK: Duplicate ID check (highest priority)**
+//   if (value.trim() !== "") {
+//     const isDuplicateId = employees.some(
+//       (emp) => emp.emple.emplId === value
+//     );
+    
+//     if (isDuplicateId) {
+//       toast.error("ID is already present in table so can't save.", {
+//         toastId: "duplicate-id-error",
+//         autoClose: 3000,
+//       });
+//       // Still update the input but show the error
+//       setNewEntry((prev) => ({
+//         ...prev,
+//         id: value,
+//         firstName: "",
+//         lastName: "",
+//         acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
+//         orgId: "",
+//       }));
+//       return; // Exit early to prevent other validations
+//     }
+//   }
+  
+//   // **SECOND CHECK: Invalid Employee ID validation (only if not duplicate)**
+//   if (newEntry.idType !== "Other" && value.length >= 3) {
+//     // Check if any employee ID starts with typed value
+//     const partialMatch = employeeSuggestions.some((emp) =>
+//       emp.emplId.startsWith(value)
+//     );
+
+//     if (!partialMatch) {
+//       toast.error("Invalid Employee ID, please select a valid one!", {
+//         toastId: "invalid-employee-id",
+//         autoClose: 3000,
+//       });
+//       // Still update the input but show the error
+//       setNewEntry((prev) => ({
+//         ...prev,
+//         id: value,
+//         firstName: "",
+//         lastName: "",
+//         acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
+//         orgId: "",
+//       }));
+//       return; // Exit early
+//     }
+//   }
+  
+//   // **NORMAL PROCESSING: If no errors, proceed with employee selection**
+//   const selectedEmployee = employeeSuggestions.find(
+//     (emp) => emp.emplId === value
+//   );
+//   console.log("Selected employee:", selectedEmployee);
+  
+//   setNewEntry((prev) => ({
+//     ...prev,
+//     id: value,
+//     firstName: selectedEmployee ? selectedEmployee.firstName || "" : "",
+//     lastName: selectedEmployee ? selectedEmployee.lastName || "" : "",
+//     acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
+//     orgId: selectedEmployee?.orgId ? String(selectedEmployee.orgId) : "",
+//   }));
+//   console.log("Selected employee orgId:", selectedEmployee?.orgId);
+// };
+
+const handleIdChange = (value) => {
+  console.log("handleIdChange called with value:", value);
+  
+  // **FIRST CHECK: Duplicate ID check (highest priority)**
+  if (value.trim() !== "") {
+    const isDuplicateId = employees.some(
+      (emp) => emp.emple.emplId === value  // ✅ This is correct
     );
-    console.log("Selected employee:", selectedEmployee);
-    setNewEntry((prev) => ({
-      ...prev,
-      id: value,
-      firstName: selectedEmployee ? selectedEmployee.firstName || "" : "",
-      lastName: selectedEmployee ? selectedEmployee.lastName || "" : "",
-      acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
-    }));
-  };
+    
+    if (isDuplicateId) {
+      toast.error("ID is already present in table so can't save.", {
+        toastId: "duplicate-id-error",
+        autoClose: 3000,
+      });
+      // Still update the input but show the error
+      setNewEntry((prev) => ({
+        ...prev,
+        id: value,
+        firstName: "",
+        lastName: "",
+        acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
+        orgId: "",
+      }));
+      return; // Exit early to prevent other validations
+    }
+  }
+  
+  // **SECOND CHECK: Invalid Employee ID validation (only if not duplicate)**
+  if (newEntry.idType !== "Other" && value.length >= 3) {
+    // Check if any employee ID starts with typed value
+    const partialMatch = employeeSuggestions.some((emp) =>
+      emp.emplId.startsWith(value)
+    );
+
+    if (!partialMatch) {
+      toast.error("Invalid Employee ID, please select a valid one!", {
+        toastId: "invalid-employee-id",
+        autoClose: 3000,
+      });
+      // Still update the input but show the error
+      setNewEntry((prev) => ({
+        ...prev,
+        id: value,
+        firstName: "",
+        lastName: "",
+        acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
+        orgId: "",
+      }));
+      return; // Exit early
+    }
+  }
+  
+  // **NORMAL PROCESSING: If no errors, proceed with employee selection**
+  const selectedEmployee = employeeSuggestions.find(
+    (emp) => emp.emplId === value
+  );
+  console.log("Selected employee:", selectedEmployee);
+  
+  setNewEntry((prev) => ({
+    ...prev,
+    id: value,
+    firstName: selectedEmployee ? selectedEmployee.firstName || "" : "",
+    lastName: selectedEmployee ? selectedEmployee.lastName || "" : "",
+    acctId: nonLaborAccounts.length > 0 ? nonLaborAccounts[0].id : "",
+    orgId: selectedEmployee?.orgId ? String(selectedEmployee.orgId) : "",
+  }));
+  console.log("Selected employee orgId:", selectedEmployee?.orgId);
+};
+
 
   const handleRowFieldChange = (rowIdx, field, value) => {
     if (!isBudPlan || !isEditable) return;
@@ -6195,158 +6324,332 @@ const ProjectAmountsTable = ({
     setSourceRowIndex(null);
   };
 
-  const handleSaveNewEntry = async () => {
-    if (!planId) {
-      toast.error("Plan ID is required to save a new entry.", {
-        toastId: "no-plan-id",
-        autoClose: 3000,
-      });
-      return;
-    }
+  // const handleSaveNewEntry = async () => {
+  //   if (!planId) {
+  //     toast.error("Plan ID is required to save a new entry.", {
+  //       toastId: "no-plan-id",
+  //       autoClose: 3000,
+  //     });
+  //     return;
+  //   }
 
-    setIsLoading(true);
+  //   setIsLoading(true);
 
-    const payloadForecasts = durations.map((duration) => ({
-      forecastedamt:
-        Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) ||
-        0,
-      forecastid: 0,
-      projId: projectId,
-      plId: planId,
-      emplId: newEntry.id,
-      dctId: 0,
-      month: duration.monthNo,
-      year: duration.year,
-      totalBurdenCost: 0,
-      fees: 0,
-      burden: 0,
-      ccffRevenue: 0,
-      tnmRevenue: 0,
-      revenue: 0,
-      cost: 0,
-      fringe: 0,
-      overhead: 0,
-      gna: 0,
-      forecastedhours: 0,
-      updatedat: new Date().toISOString().split("T")[0],
-      displayText: "",
-      acctId: newEntry.acctId,
-      orgId: newEntry.orgId,
-      hrlyRate: Number(newEntry.perHourRate) || 0,
-      // effectDt: new Date().toISOString(),
-      effectDt: null,
-    }));
+  //   const payloadForecasts = durations.map((duration) => ({
+  //     forecastedamt:
+  //       Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) ||
+  //       0,
+  //     forecastid: 0,
+  //     projId: projectId,
+  //     plId: planId,
+  //     emplId: newEntry.id,
+  //     dctId: 0,
+  //     month: duration.monthNo,
+  //     year: duration.year,
+  //     totalBurdenCost: 0,
+  //     fees: 0,
+  //     burden: 0,
+  //     ccffRevenue: 0,
+  //     tnmRevenue: 0,
+  //     revenue: 0,
+  //     cost: 0,
+  //     fringe: 0,
+  //     overhead: 0,
+  //     gna: 0,
+  //     forecastedhours: 0,
+  //     updatedat: new Date().toISOString().split("T")[0],
+  //     displayText: "",
+  //     acctId: newEntry.acctId,
+  //     orgId: newEntry.orgId,
+  //     hrlyRate: Number(newEntry.perHourRate) || 0,
+  //     // effectDt: new Date().toISOString(),
+  //     effectDt: null,
+  //   }));
 
-    const payload = {
-      dctId: 0,
-      plId: planId,
-      acctId: newEntry.acctId || "",
-      orgId: newEntry.orgId || "",
-      notes: "",
-      category: newEntry.name || "Test",
-      amountType: "",
-      id: newEntry.id,
-      type: newEntry.idType || "Employee",
-      isRev: newEntry.isRev || false,
-      isBrd: newEntry.isBrd || false,
-      status: newEntry.status || "Act",
-      createdBy: "System",
-      lastModifiedBy: "System",
-      plForecasts: payloadForecasts,
-      plDct: {},
+  //   const payload = {
+  //     dctId: 0,
+  //     plId: planId,
+  //     acctId: newEntry.acctId || "",
+  //     orgId: newEntry.orgId || "",
+  //     notes: "",
+  //     category: newEntry.name || "Test",
+  //     amountType: "",
+  //     id: newEntry.id,
+  //     type: newEntry.idType || "Employee",
+  //     isRev: newEntry.isRev || false,
+  //     isBrd: newEntry.isBrd || false,
+  //     status: newEntry.status || "Act",
+  //     createdBy: "System",
+  //     lastModifiedBy: "System",
+  //     plForecasts: payloadForecasts,
+  //     plDct: {},
+  //   };
+
+  //   console.log("AddNewDirectCost payload for new entry:", payload);
+
+  //   try {
+  //     const response = await axios.post(
+  //       "https://test-api-3tmq.onrender.com/DirectCost/AddNewDirectCost",
+  //       payload,
+  //       { headers: { "Content-Type": "application/json" } }
+  //     );
+
+  //     console.log("Save response:", response.status, response.data);
+
+  //     const newEmployee = {
+  //       emple: {
+  //         empleId: newEntry.id,
+  //         emplId: newEntry.id,
+  //         firstName: newEntry.firstName || "",
+  //         lastName: newEntry.lastName || "",
+  //         accId: newEntry.acctId || "",
+  //         orgId: newEntry.orgId || "",
+  //         perHourRate: Number(newEntry.perHourRate) || 0,
+  //         isRev: newEntry.isRev || false,
+  //         isBrd: newEntry.isBrd || false,
+  //         status: newEntry.status || "Act",
+  //         type: newEntry.idType || "Employee",
+  //         plForecasts: payloadForecasts.map((forecast) => ({
+  //           ...forecast,
+  //           forecastid:
+  //             response.data?.plForecasts?.find(
+  //               (f) => f.month === forecast.month && f.year === forecast.year
+  //             )?.forecastid || 0,
+  //           createdat: new Date().toISOString(),
+  //         })),
+  //       },
+  //     };
+
+  //     setEmployees((prevEmployees) => {
+  //       const employeeMap = new Map();
+  //       prevEmployees.forEach((emp) => {
+  //         const emplId = emp.emple.emplId || `auto-${Math.random()}`;
+  //         employeeMap.set(emplId, emp);
+  //       });
+  //       employeeMap.set(newEntry.id, newEmployee);
+  //       return Array.from(employeeMap.values());
+  //     });
+
+  //     setSuccessMessageText("Entry saved successfully!");
+  //     setShowSuccessMessage(true);
+  //     setShowNewForm(false);
+  //     setNewEntry({
+  //       id: "",
+  //       firstName: "",
+  //       lastName: "",
+  //       isRev: false,
+  //       isBrd: false,
+  //       idType: "",
+  //       acctId: "",
+  //       orgId: "",
+  //       perHourRate: "",
+  //       status: "Act",
+  //     });
+  //     // setNewEntryPeriodAmounts({});
+  //     setEmployeeSuggestions([]);
+  //     setNonLaborAccounts([]);
+
+  //     if (onSaveSuccess) {
+  //       console.log("Calling onSaveSuccess");
+  //       onSaveSuccess();
+  //     }
+
+  //     toast.success("New entry saved and added to table!", {
+  //       toastId: "save-entry-success",
+  //       autoClose: 3000,
+  //     });
+  //   } catch (err) {
+  //     const errorMessage = err.response?.data?.errors
+  //       ? Object.entries(err.response.data.errors)
+  //           .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+  //           .join("; ")
+  //       : err.response?.data?.message || err.message;
+  //     console.error("Save error:", err.response?.data || err);
+  //     setSuccessMessageText("Failed to save entry.");
+  //     setShowSuccessMessage(true);
+  //     toast.error(`Failed to save new entry: ${errorMessage}`, {
+  //       toastId: "save-entry-error",
+  //       autoClose: 5000,
+  //     });
+  //   } finally {
+  //     setIsLoading(false);
+  //     setTimeout(() => setShowSuccessMessage(false), 2000);
+  //   }
+  // };
+  
+const handleSaveNewEntry = async () => {
+   
+  if (!planId) {
+    toast.error("Plan ID is required to save a new entry.", {
+      toastId: "no-plan-id",
+      autoClose: 3000,
+    });
+    return;
+  }
+
+  // Check for empty ID
+  if (!newEntry.id || newEntry.id.trim() === "") {
+    toast.error("ID is required to save a new entry.", {
+      toastId: "empty-id-error",
+      autoClose: 3000,
+    });
+    return;
+  }
+
+  // Check for duplicate ID
+  const isDuplicateId = employees.some(
+    (emp) => emp.emple.emplId === newEntry.id
+  );
+  
+  if (isDuplicateId) {
+    toast.error("ID is already present in table so can't save.", {
+      toastId: "duplicate-id-error",
+      autoClose: 3000,
+    });
+    return;
+  }
+
+  setIsLoading(true);
+
+  const payloadForecasts = durations.map((duration) => ({
+    forecastedamt:
+      Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) ||
+      0,
+    forecastid: 0,
+    projId: projectId,
+    plId: planId,
+    emplId: newEntry.id,
+    dctId: 0,
+    month: duration.monthNo,
+    year: duration.year,
+    totalBurdenCost: 0,
+    fees: 0,
+    burden: 0,
+    ccffRevenue: 0,
+    tnmRevenue: 0,
+    revenue: 0,
+    cost: 0,
+    fringe: 0,
+    overhead: 0,
+    gna: 0,
+    forecastedhours: 0,
+    updatedat: new Date().toISOString().split("T")[0],
+    displayText: "",
+    acctId: newEntry.acctId,
+    orgId: newEntry.orgId,
+    hrlyRate: Number(newEntry.perHourRate) || 0,
+    effectDt: null,
+  }));
+
+  const payload = {
+    dctId: 0,
+    plId: planId,
+    acctId: newEntry.acctId || "",
+    orgId: newEntry.orgId || "",
+    notes: "",
+    category: newEntry.name || "Test",
+    amountType: "",
+    id: newEntry.id,
+    type: newEntry.idType || "Employee",
+    isRev: newEntry.isRev || false,
+    isBrd: newEntry.isBrd || false,
+    status: newEntry.status || "Act",
+    createdBy: "System",
+    lastModifiedBy: "System",
+    plForecasts: payloadForecasts,
+    plDct: {},
+  };
+
+  console.log("AddNewDirectCost payload for new entry:", payload);
+
+  try {
+    const response = await axios.post(
+      "https://test-api-3tmq.onrender.com/DirectCost/AddNewDirectCost",
+      payload,
+      { headers: { "Content-Type": "application/json" } }
+    );
+
+    console.log("Save response:", response.status, response.data);
+
+    const newEmployee = {
+      emple: {
+        empleId: newEntry.id,
+        emplId: newEntry.id,
+        firstName: newEntry.firstName || "",
+        lastName: newEntry.lastName || "",
+        accId: newEntry.acctId || "",
+        orgId: newEntry.orgId || "",
+        perHourRate: Number(newEntry.perHourRate) || 0,
+        isRev: newEntry.isRev || false,
+        isBrd: newEntry.isBrd || false,
+        status: newEntry.status || "Act",
+        type: newEntry.idType || "Employee",
+        plForecasts: payloadForecasts.map((forecast) => ({
+          ...forecast,
+          forecastid:
+            response.data?.plForecasts?.find(
+              (f) => f.month === forecast.month && f.year === forecast.year
+            )?.forecastid || 0,
+          createdat: new Date().toISOString(),
+        })),
+      },
     };
 
-    console.log("AddNewDirectCost payload for new entry:", payload);
-
-    try {
-      const response = await axios.post(
-        "https://test-api-3tmq.onrender.com/DirectCost/AddNewDirectCost",
-        payload,
-        { headers: { "Content-Type": "application/json" } }
-      );
-
-      console.log("Save response:", response.status, response.data);
-
-      const newEmployee = {
-        emple: {
-          empleId: newEntry.id,
-          emplId: newEntry.id,
-          firstName: newEntry.firstName || "",
-          lastName: newEntry.lastName || "",
-          accId: newEntry.acctId || "",
-          orgId: newEntry.orgId || "",
-          perHourRate: Number(newEntry.perHourRate) || 0,
-          isRev: newEntry.isRev || false,
-          isBrd: newEntry.isBrd || false,
-          status: newEntry.status || "Act",
-          type: newEntry.idType || "Employee",
-          plForecasts: payloadForecasts.map((forecast) => ({
-            ...forecast,
-            forecastid:
-              response.data?.plForecasts?.find(
-                (f) => f.month === forecast.month && f.year === forecast.year
-              )?.forecastid || 0,
-            createdat: new Date().toISOString(),
-          })),
-        },
-      };
-
-      setEmployees((prevEmployees) => {
-        const employeeMap = new Map();
-        prevEmployees.forEach((emp) => {
-          const emplId = emp.emple.emplId || `auto-${Math.random()}`;
-          employeeMap.set(emplId, emp);
-        });
-        employeeMap.set(newEntry.id, newEmployee);
-        return Array.from(employeeMap.values());
+    setEmployees((prevEmployees) => {
+      const employeeMap = new Map();
+      prevEmployees.forEach((emp) => {
+        const emplId = emp.emple.emplId || `auto-${Math.random()}`;
+        employeeMap.set(emplId, emp);
       });
+      employeeMap.set(newEntry.id, newEmployee);
+      return Array.from(employeeMap.values());
+    });
 
-      setSuccessMessageText("Entry saved successfully!");
-      setShowSuccessMessage(true);
-      setShowNewForm(false);
-      setNewEntry({
-        id: "",
-        firstName: "",
-        lastName: "",
-        isRev: false,
-        isBrd: false,
-        idType: "",
-        acctId: "",
-        orgId: "",
-        perHourRate: "",
-        status: "Act",
-      });
-      // setNewEntryPeriodAmounts({});
-      setEmployeeSuggestions([]);
-      setNonLaborAccounts([]);
+    setSuccessMessageText("Entry saved successfully!");
+    setShowSuccessMessage(true);
+    setShowNewForm(false);
+    setNewEntry({
+      id: "",
+      firstName: "",
+      lastName: "",
+      isRev: false,
+      isBrd: false,
+      idType: "",
+      acctId: "",
+      orgId: "",
+      perHourRate: "",
+      status: "Act",
+    });
+    setEmployeeSuggestions([]);
+    setNonLaborAccounts([]);
 
-      if (onSaveSuccess) {
-        console.log("Calling onSaveSuccess");
-        onSaveSuccess();
-      }
-
-      toast.success("New entry saved and added to table!", {
-        toastId: "save-entry-success",
-        autoClose: 3000,
-      });
-    } catch (err) {
-      const errorMessage = err.response?.data?.errors
-        ? Object.entries(err.response.data.errors)
-            .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
-            .join("; ")
-        : err.response?.data?.message || err.message;
-      console.error("Save error:", err.response?.data || err);
-      setSuccessMessageText("Failed to save entry.");
-      setShowSuccessMessage(true);
-      toast.error(`Failed to save new entry: ${errorMessage}`, {
-        toastId: "save-entry-error",
-        autoClose: 5000,
-      });
-    } finally {
-      setIsLoading(false);
-      setTimeout(() => setShowSuccessMessage(false), 2000);
+    if (onSaveSuccess) {
+      console.log("Calling onSaveSuccess");
+      onSaveSuccess();
     }
-  };
+
+    toast.success("New entry saved and added to table!", {
+      toastId: "save-entry-success",
+      autoClose: 3000,
+    });
+  } catch (err) {
+    const errorMessage = err.response?.data?.errors
+      ? Object.entries(err.response.data.errors)
+          .map(([field, messages]) => `${field}: ${messages.join(", ")}`)
+          .join("; ")
+      : err.response?.data?.message || err.message;
+    console.error("Save error:", err.response?.data || err);
+    setSuccessMessageText("Failed to save entry.");
+    setShowSuccessMessage(true);
+    toast.error(`Failed to save new entry: ${errorMessage}`, {
+      toastId: "save-entry-error",
+      autoClose: 5000,
+    });
+  } finally {
+    setIsLoading(false);
+    setTimeout(() => setShowSuccessMessage(false), 2000);
+  }
+};
 
   const handleRowClick = (actualEmpIdx) => {
     if (!isEditable) return;
