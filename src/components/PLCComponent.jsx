@@ -5556,6 +5556,1466 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     setPlcSearch(value);
   };
 
+  // return (
+  //   <div className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16 text-xs">
+  //     {/* <ToastContainer
+  //       position="top-right"
+  //       autoClose={3000}
+  //       hideProgressBar={false}
+  //       newestOnTop={false}
+  //       closeOnClick
+  //       rtl={false}
+  //       pauseOnFocusLoss
+  //       draggable
+  //       pauseOnHover
+  //     /> */}
+  //     {/* Project Labor Categories Billing Rates Schedule */}
+  //     <div className="mb-4">
+  //       <div className="flex justify-between items-center mb-2 ">
+  //         <h3 className="text-sm font-semibold">
+  //           Project Labor Categories Billing Rates Schedule
+  //         </h3>
+  //         <div className="w-1/5"></div>
+  //         <button
+  //           onClick={handleAddRow}
+  //           className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition mr-4"
+  //           disabled={loading || newRate}
+  //         >
+  //           Add
+  //         </button>
+  //       </div>
+  //       <div className="overflow-x-auto overflow-y-auto max-h-64 border-b border-gray-300">
+  //         <table className="w-full text-xs border-collapse">
+  //           <thead className="sticky top-0 z-10 bg-gray-100">
+  //             <tr className="bg-gray-100">
+  //               <th className="border p-2 font-normal">Plc</th>
+  //               <th className="border p-2 font-normal">Bill Rate</th>
+  //               <th className="border p-2 font-normal">Rate Type</th>
+  //               <th className="border p-2 font-normal">Start Date</th>
+  //               <th className="border p-2 font-normal">End Date</th>
+  //               <th className="border p-2 font-normal">Actions</th>
+  //             </tr>
+  //           </thead>
+  //           <tbody>
+  //             {loadingPLC ? (
+  //               <tr key="loading">
+  //                 <td colSpan="6" className="border p-2 text-center">
+  //                   Loading...
+  //                 </td>
+  //               </tr>
+  //             ) : billingRatesSchedule.length === 0 ? (
+  //               <tr key="no-data">
+  //                 <td colSpan="6" className="border p-2 text-center">
+  //                   No data available
+  //                 </td>
+  //               </tr>
+  //             ) : (
+  //               billingRatesSchedule.map((item) => (
+  //                 <tr
+  //                   key={item.id}
+  //                   className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+  //                 >
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     <span>{item.plc}</span>
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/5">
+  //                     {editingProjectPlcRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={editBillRate[item.id] ?? item.billRate}
+  //                         onChange={(e) =>
+  //                           handleBillRateChange(item.id, e.target.value)
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.billRate}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/5">
+  //                     {editingProjectPlcRowId === item.id ? (
+  //                       <select
+  //                         value={
+  //                           editProjectPlcFields[item.id]?.rateType ??
+  //                           item.rateType
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleProjectPlcFieldChange(
+  //                             item.id,
+  //                             "rateType",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       >
+  //                         {rateTypeOptions.map((option) => (
+  //                           <option key={option} value={option}>
+  //                             {option}
+  //                           </option>
+  //                         ))}
+  //                       </select>
+  //                     ) : (
+  //                       <span>{item.rateType}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/5">
+  //                     {editingProjectPlcRowId === item.id ? (
+  //                       <input
+  //                         type="date"
+  //                         value={
+  //                           editProjectPlcFields[item.id]?.startDate ??
+  //                           item.startDate
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleProjectPlcFieldChange(
+  //                             item.id,
+  //                             "startDate",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.startDate}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/5">
+  //                     {editingProjectPlcRowId === item.id ? (
+  //                       <input
+  //                         type="date"
+  //                         value={
+  //                           editProjectPlcFields[item.id]?.endDate ??
+  //                           item.endDate ??
+  //                           ""
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleProjectPlcFieldChange(
+  //                             item.id,
+  //                             "endDate",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.endDate || ""}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/5">
+  //                     <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+  //                       {editingProjectPlcRowId === item.id ? (
+  //                         <>
+  //                           <button
+  //                             onClick={() => handleUpdate(item.id)}
+  //                             className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loading}
+  //                             title="Save"
+  //                           >
+  //                             <FaSave className="text-sm" />
+  //                           </button>
+  //                           <button
+  //                             onClick={() => setEditingProjectPlcRowId(null)}
+  //                             className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loading}
+  //                             title="Cancel"
+  //                           >
+  //                             <FaTimes className="text-sm" />
+  //                           </button>
+  //                         </>
+  //                       ) : (
+  //                         <>
+  //                           <button
+  //                             onClick={() => handleEditProjectPlcRow(item.id)}
+  //                             className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loading}
+  //                             title="Edit"
+  //                           >
+  //                             <FaEdit className="text-sm" />
+  //                           </button>
+  //                           <button
+  //                             onClick={() => handleDelete(item.id)}
+  //                             className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loading}
+  //                             title="Delete"
+  //                           >
+  //                             <FaTrash className="text-sm" />
+  //                           </button>
+  //                         </>
+  //                       )}
+  //                     </div>
+  //                   </td>
+  //                 </tr>
+  //               ))
+  //             )}
+  //             {newRate && (
+  //               <tr
+  //                 key="new-rate"
+  //                 className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+  //               >
+  //                 <td className="border p-2 sm:w-1/5">
+  //                   <input
+  //                     type="text"
+  //                     value={newRate.plc || ""}
+  //                     onChange={(e) => {
+  //                       handleNewRateChange("plc", e.target.value);
+  //                       setPlcSearch(e.target.value);
+  //                     }}
+  //                     className="w-full p-1 border rounded text-xs"
+  //                     list="plc-list"
+  //                   />
+  //                   <datalist
+  //                     id="plc-list"
+  //                     style={dropdownStyles.noBorderDropdown}
+  //                   >
+  //                     {plcs.map((plc) => (
+  //                       <option
+  //                         key={plc.laborCategoryCode}
+  //                         value={plc.laborCategoryCode}
+  //                         style={dropdownStyles.noBorderDropdown}
+  //                       >
+  //                         {plc.description}
+  //                       </option>
+  //                     ))}
+  //                   </datalist>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/5">
+  //                   <input
+  //                     type="text"
+  //                     value={newRate.billRate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewRateChange("billRate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/5">
+  //                   <select
+  //                     value={newRate.rateType}
+  //                     onChange={(e) =>
+  //                       handleNewRateChange("rateType", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   >
+  //                     {rateTypeOptions.map((option) => (
+  //                       <option key={option} value={option}>
+  //                         {option}
+  //                       </option>
+  //                     ))}
+  //                   </select>
+  //                 </td>
+  //                 {/* <td className="border p-2 sm:w-1/5">
+  //                   <input
+  //                     type="date"
+  //                     value={newRate.startDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewRateChange("startDate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/5">
+  //                   <input
+  //                     type="date"
+  //                     value={newRate.endDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewRateChange("endDate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   />
+  //                 </td> */}
+  //                 <td className="border p-2 sm:w-1/5">
+  //                   <input
+  //                     type="date"
+  //                     value={newRate.startDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewRateChange("startDate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                     min={selectedPlan.projStartDt} // ✅ cannot pick before project start
+  //                     max={selectedPlan.projEndDt} // ✅ cannot pick after project end
+  //                   />
+  //                 </td>
+
+  //                 <td className="border p-2 sm:w-1/5">
+  //                   <input
+  //                     type="date"
+  //                     value={newRate.endDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewRateChange("endDate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                     min={newRate.startDate || selectedPlan.projStartDt} // ✅ end date cannot be before start date
+  //                     max={selectedPlan.projEndDt} // ✅ cannot pick after project end
+  //                   />
+  //                 </td>
+
+  //                 <td className="border p-2 sm:w-1/5">
+  //                   <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+  //                     <button
+  //                       onClick={handleSaveNewRate}
+  //                       className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                       disabled={loading}
+  //                       title="Save"
+  //                     >
+  //                       <FaSave className="text-sm" />
+  //                     </button>
+  //                     <button
+  //                       onClick={() => setNewRate(null)}
+  //                       className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                       disabled={loading}
+  //                       title="Cancel"
+  //                     >
+  //                       <FaTimes className="text-sm" />
+  //                     </button>
+  //                   </div>
+  //                 </td>
+  //               </tr>
+  //             )}
+  //           </tbody>
+  //         </table>
+  //       </div>
+  //     </div>
+
+  //     {/* Employee Billing Rates Schedule */}
+  //     {/* <div className="mb-4">
+  //       <h3 className="text-sm font-semibold">Employee Billing Rates Schedule</h3>
+  //       <div className="overflow-x-auto overflow-y-auto max-h-64"> */}
+  //     <div className="mb-4">
+  //       <div className="flex justify-between items-center mb-2">
+  //         <h3 className="text-sm font-semibold">
+  //           Employee Billing Rates Schedule
+  //         </h3>
+  //         <div className="w-1/5"></div>
+  //         <button
+  //           onClick={handleAddEmployeeRow}
+  //           className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition mr-4"
+  //           disabled={loading || newEmployeeRate}
+  //         >
+  //           Add
+  //         </button>
+  //       </div>
+  //       <div className="overflow-x-auto overflow-y-auto max-h-64 border-b border-gray-300">
+  //         <table className="w-full text-xs border-collapse">
+  //           <thead className="sticky top-0 z-10 bg-gray-100">
+  //             <tr className="bg-gray-100">
+  //               <th className="border p-2 font-normal">Lookup Type</th>
+  //               <th className="border p-2 font-normal">Employee</th>
+  //               <th className="border p-2 font-normal">Employee Name</th>
+  //               <th className="border p-2 font-normal">PLC</th>
+  //               <th className="border p-2 font-normal">PLC Description</th>
+  //               <th className="border p-2 font-normal">Bill Rate</th>
+  //               <th className="border p-2 font-normal">Rate Type</th>
+  //               <th className="border p-2 font-normal">Start Date</th>
+  //               <th className="border p-2 font-normal">End Date</th>
+  //               <th className="border p-2 font-normal">Actions</th>
+  //             </tr>
+  //           </thead>
+  //           <tbody>
+  //             {loadingEmployee ? (
+  //               <tr>
+  //                 <td colSpan="10" className="border p-2 text-center">
+  //                   Loading...
+  //                 </td>
+  //               </tr>
+  //             ) : employeeBillingRates.length === 0 && !newEmployeeRate ? (
+  //               <tr>
+  //                 <td colSpan="10" className="border p-2 text-center">
+  //                   No data available
+  //                 </td>
+  //               </tr>
+  //             ) : (
+  //               employeeBillingRates.map((item) => (
+  //                 <tr
+  //                   key={item.id}
+  //                   className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+  //                 >
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingEmployeeRowId === item.id ? (
+  //                       <select
+  //                         value={
+  //                           editEmployeeFields[item.id]?.lookupType ??
+  //                           item.lookupType
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleNewEmployeeRateChange(
+  //                             "lookupType",
+  //                             e.target.value,
+  //                             item.id
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       >
+  //                         {lookupTypeOptions.map((option) => (
+  //                           <option key={option} value={option}>
+  //                             {option}
+  //                           </option>
+  //                         ))}
+  //                       </select>
+  //                     ) : (
+  //                       <span>{item.lookupType}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingEmployeeRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={item.empId}
+  //                         onChange={(e) =>
+  //                           handleNewEmployeeRateChange(
+  //                             "empId",
+  //                             e.target.value,
+  //                             item.id
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                         list="employee-list"
+  //                         disabled={employees.length === 0}
+  //                       />
+  //                     ) : (
+  //                       <span>{item.empId}</span>
+  //                     )}
+  //                     <datalist id="employee-list">
+  //                       {employees.map((emp) => (
+  //                         <option key={emp.empId} value={emp.empId}>
+  //                           {emp.employeeName}
+  //                         </option>
+  //                       ))}
+  //                     </datalist>
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     <span>{item.employeeName}</span>
+  //                   </td>
+  //                   {/* <td className="border p-2 sm:w-1/8">
+  //                     <input
+  //                       type="text"
+  //                       value={item.plc}
+  //                       onChange={(e) => {
+  //                         handleNewEmployeeRateChange(
+  //                           "plc",
+  //                           e.target.value,
+  //                           item.id
+  //                         );
+  //                         setPlcSearch(e.target.value);
+  //                       }}
+  //                       className="w-full p-1 border rounded text-xs"
+  //                       list="plc-list"
+  //                       disabled
+  //                     />
+  //                     <datalist id="plc-list">
+  //                       {plcs.map((plc) => (
+  //                         <option
+  //                           key={plc.laborCategoryCode}
+  //                           value={plc.laborCategoryCode}
+  //                         >
+  //                           {plc.description}
+  //                         </option>
+  //                       ))}
+  //                     </datalist>
+  //                   </td> */}
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingEmployeeRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={editEmployeeFields[item.id]?.plc || item.plc}
+  //                         onChange={(e) => {
+  //                           handleNewEmployeeRateChange(
+  //                             "plc",
+  //                             e.target.value,
+  //                             item.id
+  //                           );
+  //                           setPlcSearch(e.target.value);
+  //                         }}
+  //                         className="w-full p-1 border rounded text-xs"
+  //                         list="plc-list"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.plc}</span>
+  //                     )}
+  //                     <datalist id="plc-list">
+  //                       {plcs.map((plc) => (
+  //                         <option
+  //                           key={plc.laborCategoryCode}
+  //                           value={plc.laborCategoryCode}
+  //                         >
+  //                           {plc.description}
+  //                         </option>
+  //                       ))}
+  //                     </datalist>
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     <span>
+  //                       {plcs.find((plc) => plc.laborCategoryCode === item.plc)
+  //                         ?.description || item.plcDescription}
+  //                     </span>
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingEmployeeRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={editEmployeeBillRate[item.id] ?? item.billRate}
+  //                         onChange={(e) =>
+  //                           handleEmployeeBillRateChange(
+  //                             item.id,
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.billRate}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingEmployeeRowId === item.id ? (
+  //                       <select
+  //                         value={
+  //                           editEmployeeFields[item.id]?.rateType ??
+  //                           item.rateType
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleNewEmployeeRateChange(
+  //                             "rateType",
+  //                             e.target.value,
+  //                             item.id
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       >
+  //                         {rateTypeOptions.map((option) => (
+  //                           <option key={option} value={option}>
+  //                             {option}
+  //                           </option>
+  //                         ))}
+  //                       </select>
+  //                     ) : (
+  //                       <span>{item.rateType}</span>
+  //                     )}
+  //                   </td>
+  //                   {/* <td className="border p-2 sm:w-1/8">
+  //                     {editingEmployeeRowId === item.id ? (
+  //                       <input
+  //                         type="date"
+  //                         value={
+  //                           editEmployeeFields[item.id]?.startDate ??
+  //                           item.startDate
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleNewEmployeeRateChange(
+  //                             "startDate",
+  //                             e.target.value,
+  //                             item.id
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.startDate}</span>
+  //                     )}
+  //                   </td> */}
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     <input
+  //                       type="date"
+  //                       value={editEmployeeFields[item.id]?.startDate || ""}
+  //                       onChange={(e) =>
+  //                         handleNewEmployeeRateChange(
+  //                           "startDate",
+  //                           e.target.value,
+  //                           item.id
+  //                         )
+  //                       }
+  //                       className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                       min={selectedPlan.projStartDt} // ✅ cannot go before project start
+  //                       max={selectedPlan.projEndDt} // ✅ cannot go after project end
+  //                     />
+  //                   </td>
+
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     <input
+  //                       type="date"
+  //                       value={editEmployeeFields[item.id]?.endDate || ""}
+  //                       onChange={(e) =>
+  //                         handleNewEmployeeRateChange(
+  //                           "endDate",
+  //                           e.target.value,
+  //                           item.id
+  //                         )
+  //                       }
+  //                       className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                       min={
+  //                         editEmployeeFields[item.id]?.startDate ||
+  //                         selectedPlan.projStartDt
+  //                       }
+  //                       max={selectedPlan.projEndDt} // ✅ must be ≤ project end
+  //                     />
+  //                   </td>
+
+  //                   {/* <td className="border p-2 sm:w-1/8">
+  //                     {editingEmployeeRowId === item.id ? (
+  //                       <input
+  //                         type="date"
+  //                         value={
+  //                           editEmployeeFields[item.id]?.endDate ??
+  //                           item.endDate ??
+  //                           ""
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleNewEmployeeRateChange(
+  //                             "endDate",
+  //                             e.target.value,
+  //                             item.id
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.endDate || ""}</span>
+  //                     )}
+  //                   </td> */}
+  //                   {/* <td className="border p-2 sm:w-1/8">
+  //                     <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+  //                       <button
+  //                         onClick={() =>
+  //                           handleUpdateEmployee(item.id, {
+  //                             ...item,
+  //                             billRate:
+  //                               editEmployeeBillRate[item.id] || item.billRate,
+  //                           })
+  //                         }
+  //                         className="bg-blue-200 text-blue-800 px-3 py-1 rounded text-xs font-normal hover:bg-blue-300 transition w-full sm:w-auto"
+  //                         disabled={loading || !item.id}
+  //                       >
+  //                         {editingEmployeeRowId === item.id ? "Save" : "Edit"}
+  //                       </button>
+  //                       <button
+  //                         onClick={() => handleDeleteEmployee(item.id)}
+  //                         className="bg-gray-200 text-gray-800 px-3 py-1 rounded text-xs font-normal hover:bg-gray-300 transition w-full sm:w-auto"
+  //                         disabled={loading || !item.id}
+  //                       >
+  //                         Delete
+  //                       </button>
+  //                     </div>
+  //                   </td> */}
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+  //                       {editingEmployeeRowId === item.id ? (
+  //                         <>
+  //                           <button
+  //                             onClick={() =>
+  //                               handleUpdateEmployee(item.id, {
+  //                                 ...item,
+  //                                 billRate:
+  //                                   editEmployeeBillRate[item.id] ||
+  //                                   item.billRate,
+  //                               })
+  //                             }
+  //                             className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loadingAction[item.id]}
+  //                             title="Save"
+  //                           >
+  //                             {loadingAction[item.id] ? (
+  //                               <span className="animate-spin">⌛</span>
+  //                             ) : (
+  //                               <FaSave className="text-sm" />
+  //                             )}
+  //                           </button>
+  //                           <button
+  //                             onClick={() => setEditingEmployeeRowId(null)}
+  //                             className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loadingAction[item.id]}
+  //                             title="Cancel"
+  //                           >
+  //                             <FaTimes className="text-sm" />
+  //                           </button>
+  //                         </>
+  //                       ) : (
+  //                         <>
+  //                           <button
+  //                             onClick={() => handleEditEmployeeRow(item.id)}
+  //                             className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loadingAction[item.id]}
+  //                             title="Edit"
+  //                           >
+  //                             {loadingAction[item.id] ? (
+  //                               <span className="animate-spin">⌛</span>
+  //                             ) : (
+  //                               <FaEdit className="text-sm" />
+  //                             )}
+  //                           </button>
+  //                           <button
+  //                             onClick={() => handleDeleteEmployee(item.id)}
+  //                             className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loadingAction[item.id]}
+  //                             title="Delete"
+  //                           >
+  //                             {loadingAction[item.id] ? (
+  //                               <span className="animate-spin">⌛</span>
+  //                             ) : (
+  //                               <FaTrash className="text-sm" />
+  //                             )}
+  //                           </button>
+  //                         </>
+  //                       )}
+  //                     </div>
+  //                   </td>
+  //                 </tr>
+  //               ))
+  //             )}
+  //             {newEmployeeRate && (
+  //               <tr className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0">
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <select
+  //                     value={newEmployeeRate.lookupType}
+  //                     onChange={(e) =>
+  //                       handleNewEmployeeRateChange(
+  //                         "lookupType",
+  //                         e.target.value
+  //                       )
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   >
+  //                     {lookupTypeOptions.map((option) => (
+  //                       <option key={option} value={option}>
+  //                         {option}
+  //                       </option>
+  //                     ))}
+  //                   </select>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="text"
+  //                     value={newEmployeeRate.empId || ""}
+  //                     onChange={(e) =>
+  //                       handleNewEmployeeRateChange("empId", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                     list="employee-list"
+  //                     disabled={employees.length === 0}
+  //                   />
+  //                   <datalist id="employee-list">
+  //                     {employees.map((emp) => (
+  //                       <option key={emp.empId} value={emp.empId}>
+  //                         {emp.employeeName}
+  //                       </option>
+  //                     ))}
+  //                   </datalist>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   {newEmployeeRate.employeeName || ""}
+  //                 </td>
+  //                 {/* <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="text"
+  //                     value={newEmployeeRate.plc || ""}
+  //                     onChange={(e) => {
+  //                       handleNewEmployeeRateChange("plc", e.target.value);
+  //                       setPlcSearch(e.target.value);
+  //                     }}
+  //                     className="w-full p-1 border rounded text-xs"
+  //                     list="plc-list"
+  //                   />
+  //                   <datalist id="plc-list">
+  //                     {plcs.map((plc) => (
+  //                       <option
+  //                         key={plc.laborCategoryCode}
+  //                         value={plc.laborCategoryCode}
+  //                       >
+  //                         {plc.description}
+  //                       </option>
+  //                     ))}
+  //                   </datalist>
+  //                 </td> */}
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="text"
+  //                     value={newEmployeeRate.plc || ""}
+  //                     onChange={(e) => {
+  //                       handleNewEmployeeRateChange("plc", e.target.value);
+  //                       setPlcSearch(e.target.value);
+  //                     }}
+  //                     className="w-full p-1 border rounded text-xs"
+  //                     list="plc-list"
+  //                   />
+  //                   <datalist id="plc-list">
+  //                     {plcs.map((plc) => (
+  //                       <option
+  //                         key={plc.laborCategoryCode}
+  //                         value={plc.laborCategoryCode}
+  //                       >
+  //                         {plc.description}
+  //                       </option>
+  //                     ))}
+  //                   </datalist>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   {plcs.find(
+  //                     (plc) => plc.laborCategoryCode === newEmployeeRate.plc
+  //                   )?.description || ""}
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="number"
+  //                     value={newEmployeeRate.billRate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewEmployeeRateChange("billRate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <select
+  //                     value={newEmployeeRate.rateType}
+  //                     onChange={(e) =>
+  //                       handleNewEmployeeRateChange("rateType", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   >
+  //                     {rateTypeOptions.map((option) => (
+  //                       <option key={option} value={option}>
+  //                         {option}
+  //                       </option>
+  //                     ))}
+  //                   </select>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="date"
+  //                     value={newEmployeeRate.startDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewEmployeeRateChange("startDate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="date"
+  //                     value={newEmployeeRate.endDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewEmployeeRateChange("endDate", e.target.value)
+  //                     }
+  //                     className="w-full p-1 border rounded text-xs"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+  //                     <button
+  //                       onClick={handleSaveNewEmployeeRate}
+  //                       className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
+  //                       disabled={loading}
+  //                     >
+  //                       Save
+  //                     </button>
+  //                     <button
+  //                       onClick={() => setNewEmployeeRate(null)}
+  //                       className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
+  //                       disabled={loading}
+  //                     >
+  //                       Cancel
+  //                     </button>
+  //                   </div>
+  //                 </td>
+  //               </tr>
+  //             )}
+  //           </tbody>
+  //         </table>
+  //       </div>
+  //     </div>
+  //     {/* Vendor Billing Rates Schedule */}
+  //     {/* <div className="mb-4">
+  //       <h3 className="text-sm font-semibold">Vendor Billing Rates Schedule</h3>
+  //       <div className="overflow-x-auto overflow-y-auto max-h-64"> */}
+  //     <div className="mb-4">
+  //       <div className="flex justify-between items-center mb-2">
+  //         <h3 className="text-sm font-semibold">
+  //           Vendor Billing Rates Schedule
+  //         </h3>
+  //         <div className="w-1/5"></div>
+  //         <button
+  //           onClick={handleAddVendorRow}
+  //           className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition mr-4"
+  //           disabled={loading || newVendorRate}
+  //         >
+  //           Add
+  //         </button>
+  //       </div>
+  //       <div className="overflow-x-auto overflow-y-auto max-h-64 border-b border-gray-300">
+  //         <table className="w-full text-xs border-collapse">
+  //           <thead className="sticky top-0 z-10 bg-gray-100">
+  //             <tr className="bg-gray-100">
+  //               <th className="border p-2 font-normal sm:w-1/8">Lookup Type</th>
+  //               <th className="border p-2 font-normal sm:w-1/8">Vendor</th>
+  //               <th className="border p-2 font-normal sm:w-1/8">Vendor Name</th>
+  //               <th className="border p-2 font-normal sm:w-1/8">
+  //                 Vendor Employee ID
+  //               </th>
+  //               <th className="border p-2 font-normal sm:w-1/8">
+  //                 Vendor Employee Name
+  //               </th>
+  //               <th className="border p-2 font-normal sm:w-1/8">PLC</th>
+  //               <th className="border p-2 font-normal sm:w-1/8">
+  //                 PLC Description
+  //               </th>
+  //               <th className="border p-2 font-normal sm:w-1/8">Bill Rate</th>
+  //               <th className="border p-2 font-normal">Rate Type</th>
+  //               <th className="border p-2 font-normal">Start Date</th>
+  //               <th className="border p-2 font-normal">End Date</th>
+  //               <th className="border p-2 font-normal sm:w-1/8">Actions</th>
+  //             </tr>
+  //           </thead>
+  //           <tbody>
+  //             {loadingVendor ? (
+  //               <tr>
+  //                 <td colSpan="12" className="border p-2 text-center">
+  //                   Loading...
+  //                 </td>
+  //               </tr>
+  //             ) : vendorBillingRates.length === 0 && !newVendorRate ? (
+  //               <tr>
+  //                 <td colSpan="12" className="border p-2 text-center">
+  //                   No data available
+  //                 </td>
+  //               </tr>
+  //             ) : (
+  //               vendorBillingRates.map((item) => (
+  //                 <tr
+  //                   key={item.id}
+  //                   className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+  //                 >
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <select
+  //                         value={
+  //                           editVendorFields[item.id]?.lookupType ??
+  //                           item.lookupType
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleVendorFieldChange(
+  //                             item.id,
+  //                             "lookupType",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-1 border rounded text-xs"
+  //                       >
+  //                         {vendorLookupTypeOptions.map((option) => (
+  //                           <option key={option} value={option}>
+  //                             {option}
+  //                           </option>
+  //                         ))}
+  //                       </select>
+  //                     ) : (
+  //                       <span>{item.lookupType}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={
+  //                           editVendorFields[item.id]?.vendorId || item.vendorId
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleVendorFieldChange(
+  //                             item.id,
+  //                             "vendorId",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-2 border rounded text-xs"
+  //                         list="vendor-list"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.vendorId}</span>
+  //                     )}
+  //                     <datalist id="vendor-list">
+  //                       {vendorEmployees.map((v) => (
+  //                         <option
+  //                           key={`${v.vendId}-${v.empId}`}
+  //                           value={v.vendId}
+  //                         >
+  //                           {v.employeeName}
+  //                         </option>
+  //                       ))}
+  //                     </datalist>
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={
+  //                           editVendorFields[item.id]?.vendorName ||
+  //                           item.vendorName
+  //                         }
+  //                         readOnly
+  //                         className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.vendorName}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={
+  //                           editVendorFields[item.id]?.vendorEmployee ||
+  //                           item.vendorEmployee
+  //                         }
+  //                         readOnly
+  //                         className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.vendorEmployee}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={
+  //                           editVendorFields[item.id]?.vendorEmployeeName ||
+  //                           item.vendorEmployeeName
+  //                         }
+  //                         readOnly
+  //                         className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.vendorEmployeeName}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={editVendorFields[item.id]?.plc || item.plc}
+  //                         onChange={(e) => {
+  //                           handleVendorFieldChange(
+  //                             item.id,
+  //                             "plc",
+  //                             e.target.value
+  //                           );
+  //                           setPlcSearch(e.target.value);
+  //                         }}
+  //                         className="w-full p-2 border rounded text-xs"
+  //                         list="plc-list"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.plc}</span>
+  //                     )}
+  //                     <datalist id="plc-list">
+  //                       {plcs.map((plc) => (
+  //                         <option
+  //                           key={plc.laborCategoryCode}
+  //                           value={plc.laborCategoryCode}
+  //                         >
+  //                           {plc.description}
+  //                         </option>
+  //                       ))}
+  //                     </datalist>
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={
+  //                           editVendorFields[item.id]?.plcDescription ||
+  //                           item.plcDescription ||
+  //                           plcs.find(
+  //                             (plc) =>
+  //                               plc.laborCategoryCode ===
+  //                               (editVendorFields[item.id]?.plc || item.plc)
+  //                           )?.description ||
+  //                           ""
+  //                         }
+  //                         readOnly
+  //                         className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.plcDescription}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="text"
+  //                         value={
+  //                           editVendorBillRate[item.id] ?? item.billRate ?? ""
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleVendorBillRateChange(item.id, e.target.value)
+  //                         }
+  //                         className="w-full p-2 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.billRate}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <select
+  //                         value={
+  //                           editVendorFields[item.id]?.rateType ?? item.rateType
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleVendorFieldChange(
+  //                             item.id,
+  //                             "rateType",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-2 border rounded text-xs"
+  //                       >
+  //                         {rateTypeOptions.map((option) => (
+  //                           <option key={option} value={option}>
+  //                             {option}
+  //                           </option>
+  //                         ))}
+  //                       </select>
+  //                     ) : (
+  //                       <span>{item.rateType}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="date"
+  //                         value={
+  //                           editVendorFields[item.id]?.startDate ??
+  //                           item.startDate
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleVendorFieldChange(
+  //                             item.id,
+  //                             "startDate",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-2 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.startDate}</span>
+  //                     )}
+  //                   </td>
+  //                   <td className="border p-2">
+  //                     {editingVendorRowId === item.id ? (
+  //                       <input
+  //                         type="date"
+  //                         value={
+  //                           editVendorFields[item.id]?.endDate ??
+  //                           item.endDate ??
+  //                           ""
+  //                         }
+  //                         onChange={(e) =>
+  //                           handleVendorFieldChange(
+  //                             item.id,
+  //                             "endDate",
+  //                             e.target.value
+  //                           )
+  //                         }
+  //                         className="w-full p-2 border rounded text-xs"
+  //                       />
+  //                     ) : (
+  //                       <span>{item.endDate || ""}</span>
+  //                     )}
+  //                   </td>
+
+  //                   <td className="border p-2 sm:w-1/8">
+  //                     <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+  //                       {editingVendorRowId === item.id ? (
+  //                         <>
+  //                           <button
+  //                             onClick={() => handleUpdateVendor(item.id)}
+  //                             className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loading}
+  //                             title="Save"
+  //                           >
+  //                             <FaSave className="text-sm" />
+  //                           </button>
+  //                           <button
+  //                             onClick={() => setEditingVendorRowId(null)}
+  //                             className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loadingAction[item.id]}
+  //                             title="Cancel"
+  //                           >
+  //                             <FaTimes className="text-sm" />
+  //                           </button>
+  //                         </>
+  //                       ) : (
+  //                         <>
+  //                           <button
+  //                             onClick={() => handleEditVendorRow(item.id)}
+  //                             className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             disabled={loadingAction[item.id]}
+  //                             title="Edit"
+  //                           >
+  //                             <FaEdit className="text-sm" />
+  //                           </button>
+  //                           <button
+  //                             onClick={() => handleDeleteVendor(item.id)}
+  //                             className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+  //                             // disabled={loadingAction[item.id]}
+  //                             disabled={loading}
+  //                             title="Delete"
+  //                           >
+  //                             {/* {loadingAction[item.id] ? (
+  //                             <span className="animate-spin">⌛</span>
+  //                           ) : (
+  //                             <FaTrash className="text-sm" />
+  //                           )} */}
+  //                             <FaTrash className="text-sm" />
+  //                           </button>
+  //                         </>
+  //                       )}
+  //                     </div>
+  //                   </td>
+  //                 </tr>
+  //               ))
+  //             )}
+  //             {newVendorRate && (
+  //               <tr className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0">
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <select
+  //                     value={newVendorRate.lookupType}
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("lookupType", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs"
+  //                   >
+  //                     {vendorLookupTypeOptions.map((option) => (
+  //                       <option key={option} value={option}>
+  //                         {option}
+  //                       </option>
+  //                     ))}
+  //                   </select>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="text"
+  //                     value={newVendorRate.vendorId || ""}
+  //                     onChange={(e) => {
+  //                       const selectedVend = vendorEmployees.find(
+  //                         (v) => v.vendId === e.target.value
+  //                       );
+  //                       setNewVendorRate((prev) => ({
+  //                         ...prev,
+  //                         vendorId: e.target.value,
+  //                         vendorName: selectedVend
+  //                           ? selectedVend.employeeName
+  //                           : prev.vendorName,
+  //                         vendorEmployee: selectedVend
+  //                           ? selectedVend.empId
+  //                           : prev.vendorEmployee,
+  //                         vendorEmployeeName: selectedVend
+  //                           ? selectedVend.employeeName
+  //                           : prev.vendorEmployeeName,
+  //                       }));
+  //                     }}
+  //                     className="w-full p-1 border rounded text-xs"
+  //                     list="vendor-list"
+  //                   />
+  //                   <datalist id="vendor-list">
+  //                     {vendorEmployees.map((v, index) => (
+  //                       // <option key={`${v.vendId}-${v.empId}`} value={v.vendId}>
+  //                       <option
+  //                         key={`${v.vendId}-${v.empId}-${index}`}
+  //                         value={v.vendId}
+  //                       >
+  //                         {v.employeeName}
+  //                       </option>
+  //                     ))}
+  //                   </datalist>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="text"
+  //                     value={newVendorRate.vendorName || ""}
+  //                     readOnly
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("vendorName", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="text"
+  //                     value={newVendorRate.vendorEmployee || ""}
+  //                     readOnly
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange(
+  //                         "vendorEmployee",
+  //                         e.target.value
+  //                       )
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/80">
+  //                   <input
+  //                     type="text"
+  //                     value={newVendorRate.vendorEmployeeName || ""}
+  //                     readOnly
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange(
+  //                         "vendorEmployeeName",
+  //                         e.target.value
+  //                       )
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/18">
+  //                   <input
+  //                     type="text"
+  //                     value={newVendorRate.plc || ""}
+  //                     onChange={(e) => {
+  //                       handleNewVendorRateChange("plc", e.target.value);
+  //                       setPlcSearch(e.target.value);
+  //                     }}
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                     list="plc-list"
+  //                   />
+  //                   <datalist id="plc-list">
+  //                     {plcs.map((plc) => (
+  //                       <option
+  //                         key={plc.laborCategoryCode}
+  //                         value={plc.laborCategoryCode}
+  //                       >
+  //                         {plc.description}
+  //                       </option>
+  //                     ))}
+  //                   </datalist>
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   {plcs.find(
+  //                     (plc) => plc.laborCategoryCode === newVendorRate.plc
+  //                   )?.description || ""}
+  //                 </td>
+  //                 {/* <td className="border p-2 sm:w-1/18">
+  //                   <input
+  //                     type="text"
+  //                     value={newVendorRate.billRate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("billRate", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                   />
+  //                 </td> */}
+  //                 <td>
+  //                   <input
+  //                     type="number"
+  //                     value={newVendorRate.billRate || ""}
+  //                     onChange={(e) => {
+  //                       const val = e.target.value;
+  //                       if (/^\d*\.?\d*$/.test(val)) {
+  //                         // allows only numbers + decimal
+  //                         handleNewVendorRateChange("billRate", val);
+  //                       }
+  //                     }}
+  //                     className="w-full p-2 border rounded text-xs"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/18">
+  //                   <select
+  //                     value={newVendorRate.rateType}
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("rateType", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                   >
+  //                     {rateTypeOptions.map((option) => (
+  //                       <option key={option} value={option}>
+  //                         {option}
+  //                       </option>
+  //                     ))}
+  //                   </select>
+  //                 </td>
+
+  //                 {/* <td className="border p-2 sm:w-1/18">
+  //                   <input
+  //                     type="date"
+  //                     value={newVendorRate.startDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("startDate", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                   />
+  //                 </td>
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="date"
+  //                     value={newVendorRate.endDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("endDate", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                   />
+  //                 </td> */}
+
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="date"
+  //                     value={newVendorRate.startDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("startDate", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                     min={selectedPlan.projStartDt} // cannot be before project start
+  //                     max={selectedPlan.projEndDt} // cannot be after project end
+  //                   />
+  //                 </td>
+
+  //                 <td className="border p-2 sm:w-1/8">
+  //                   <input
+  //                     type="date"
+  //                     value={newVendorRate.endDate || ""}
+  //                     onChange={(e) =>
+  //                       handleNewVendorRateChange("endDate", e.target.value)
+  //                     }
+  //                     className="w-full p-2 border rounded text-xs bg-gray-100"
+  //                     min={newVendorRate.startDate || selectedPlan.projStartDt} // must be >= startDate
+  //                     max={selectedPlan.projEndDt} // cannot be after project end
+  //                   />
+  //                 </td>
+
+  //                 <td className="border p-2 sm:w-1/10">
+  //                   <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+  //                     <button
+  //                       onClick={handleSaveNewVendorRate}
+  //                       className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
+  //                       disabled={loading}
+  //                     >
+  //                       Save
+  //                     </button>
+  //                     <button
+  //                       onClick={() => setNewVendorRate(null)}
+  //                       className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
+  //                       disabled={loading}
+  //                     >
+  //                       Cancel
+  //                     </button>
+  //                   </div>
+  //                 </td>
+  //               </tr>
+  //             )}
+  //             {/* <tr>
+  //               <td colSpan="12" className="border p-2">
+  //                 <button
+  //                   onClick={handleAddVendorRow}
+  //                   className="bg-blue-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-blue-600 transition"
+  //                   disabled={loading || newVendorRate}
+  //                 >
+  //                   Add
+  //                 </button>
+  //               </td>
+  //             </tr> */}
+  //           </tbody>
+  //         </table>
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
+
   return (
     <div className="border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16 text-xs">
       {/* <ToastContainer
@@ -5597,156 +7057,6 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
               </tr>
             </thead>
             <tbody>
-              {loadingPLC ? (
-                <tr key="loading">
-                  <td colSpan="6" className="border p-2 text-center">
-                    Loading...
-                  </td>
-                </tr>
-              ) : billingRatesSchedule.length === 0 ? (
-                <tr key="no-data">
-                  <td colSpan="6" className="border p-2 text-center">
-                    No data available
-                  </td>
-                </tr>
-              ) : (
-                billingRatesSchedule.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
-                  >
-                    <td className="border p-2 sm:w-1/8">
-                      <span>{item.plc}</span>
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <input
-                          type="text"
-                          value={editBillRate[item.id] ?? item.billRate}
-                          onChange={(e) =>
-                            handleBillRateChange(item.id, e.target.value)
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        />
-                      ) : (
-                        <span>{item.billRate}</span>
-                      )}
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <select
-                          value={
-                            editProjectPlcFields[item.id]?.rateType ??
-                            item.rateType
-                          }
-                          onChange={(e) =>
-                            handleProjectPlcFieldChange(
-                              item.id,
-                              "rateType",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        >
-                          {rateTypeOptions.map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <span>{item.rateType}</span>
-                      )}
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <input
-                          type="date"
-                          value={
-                            editProjectPlcFields[item.id]?.startDate ??
-                            item.startDate
-                          }
-                          onChange={(e) =>
-                            handleProjectPlcFieldChange(
-                              item.id,
-                              "startDate",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        />
-                      ) : (
-                        <span>{item.startDate}</span>
-                      )}
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      {editingProjectPlcRowId === item.id ? (
-                        <input
-                          type="date"
-                          value={
-                            editProjectPlcFields[item.id]?.endDate ??
-                            item.endDate ??
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleProjectPlcFieldChange(
-                              item.id,
-                              "endDate",
-                              e.target.value
-                            )
-                          }
-                          className="w-full p-1 border rounded text-xs"
-                        />
-                      ) : (
-                        <span>{item.endDate || ""}</span>
-                      )}
-                    </td>
-                    <td className="border p-2 sm:w-1/5">
-                      <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-                        {editingProjectPlcRowId === item.id ? (
-                          <>
-                            <button
-                              onClick={() => handleUpdate(item.id)}
-                              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Save"
-                            >
-                              <FaSave className="text-sm" />
-                            </button>
-                            <button
-                              onClick={() => setEditingProjectPlcRowId(null)}
-                              className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Cancel"
-                            >
-                              <FaTimes className="text-sm" />
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              onClick={() => handleEditProjectPlcRow(item.id)}
-                              className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Edit"
-                            >
-                              <FaEdit className="text-sm" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(item.id)}
-                              className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
-                              disabled={loading}
-                              title="Delete"
-                            >
-                              <FaTrash className="text-sm" />
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
               {newRate && (
                 <tr
                   key="new-rate"
@@ -5871,6 +7181,166 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                   </td>
                 </tr>
               )}
+              {loadingPLC ? (
+                <tr key="loading">
+                  <td colSpan="6" className="border p-2 text-center">
+                    Loading...
+                  </td>
+                </tr>
+              ) : billingRatesSchedule.length === 0 ? (
+                <tr key="no-data">
+                  <td colSpan="6" className="border p-2 text-center">
+                    No data available
+                  </td>
+                </tr>
+              ) : (
+                billingRatesSchedule.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0"
+                  >
+                    <td className="border p-2 sm:w-1/8">
+                      <span>{item.plc}</span>
+                    </td>
+                    <td className="border p-2 sm:w-1/5">
+                      {editingProjectPlcRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={editBillRate[item.id] ?? item.billRate}
+                          onChange={(e) =>
+                            handleBillRateChange(item.id, e.target.value)
+                          }
+                          className="w-full p-1 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.billRate}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/5">
+                      {editingProjectPlcRowId === item.id ? (
+                        <select
+                          value={
+                            editProjectPlcFields[item.id]?.rateType ??
+                            item.rateType
+                          }
+                          onChange={(e) =>
+                            handleProjectPlcFieldChange(
+                              item.id,
+                              "rateType",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-1 border rounded text-xs"
+                        >
+                          {rateTypeOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span>{item.rateType}</span>
+                      )}
+                    </td>
+
+                    <td className="border p-2 sm:w-1/5">
+                      {editingProjectPlcRowId === item.id ? (
+                        <input
+                          type="date"
+                          value={
+                            editProjectPlcFields[item.id]?.startDate ??
+                            item.startDate
+                          }
+                          onChange={(e) =>
+                            handleProjectPlcFieldChange(
+                              item.id,
+                              "startDate",
+                              e.target.value
+                            )
+                          }
+                          min={selectedPlan.projStartDt} // ✅ cannot pick before project start
+                          max={selectedPlan.projEndDt} // ✅ cannot pick after project end
+                          className="w-full p-1 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.startDate}</span>
+                      )}
+                    </td>
+                    <td className="border p-2 sm:w-1/5">
+                      {editingProjectPlcRowId === item.id ? (
+                        <input
+                          type="date"
+                          value={
+                            editProjectPlcFields[item.id]?.endDate ??
+                            item.endDate ??
+                            ""
+                          }
+                          onChange={(e) =>
+                            handleProjectPlcFieldChange(
+                              item.id,
+                              "endDate",
+                              e.target.value
+                            )
+                          }
+                          className="w-full p-1 border rounded text-xs"
+                          min={
+                            editProjectPlcFields[item.id]?.startDate ??
+                            item.startDate ??
+                            selectedPlan.projStartDt
+                          } // ✅ end date cannot be before start date
+                          max={selectedPlan.projEndDt} // ✅ cannot pick after project end
+                        />
+                      ) : (
+                        <span>{item.endDate || ""}</span>
+                      )}
+                    </td>
+
+                    <td className="border p-2 sm:w-1/5">
+                      <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                        {editingProjectPlcRowId === item.id ? (
+                          <>
+                            <button
+                              onClick={() => handleUpdate(item.id)}
+                              className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loading}
+                              title="Save"
+                            >
+                              <FaSave className="text-sm" />
+                            </button>
+                            <button
+                              onClick={() => setEditingProjectPlcRowId(null)}
+                              className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loading}
+                              title="Cancel"
+                            >
+                              <FaTimes className="text-sm" />
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleEditProjectPlcRow(item.id)}
+                              className="bg-blue-200 text-blue-800 p-2 rounded hover:bg-blue-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loading}
+                              title="Edit"
+                            >
+                              <FaEdit className="text-sm" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="bg-gray-200 text-gray-800 p-2 rounded hover:bg-gray-300 transition w-full sm:w-8 h-8 flex items-center justify-center"
+                              disabled={loading}
+                              title="Delete"
+                            >
+                              <FaTrash className="text-sm" />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -5911,6 +7381,169 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
               </tr>
             </thead>
             <tbody>
+              {newEmployeeRate && (
+                <tr className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0">
+                  <td className="border p-2 sm:w-1/8">
+                    <select
+                      value={newEmployeeRate.lookupType}
+                      onChange={(e) =>
+                        handleNewEmployeeRateChange(
+                          "lookupType",
+                          e.target.value
+                        )
+                      }
+                      className="w-full p-1 border rounded text-xs"
+                    >
+                      {lookupTypeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="text"
+                      value={newEmployeeRate.empId || ""}
+                      onChange={(e) =>
+                        handleNewEmployeeRateChange("empId", e.target.value)
+                      }
+                      className="w-full p-1 border rounded text-xs"
+                      list="employee-list"
+                      disabled={employees.length === 0}
+                    />
+                    <datalist id="employee-list">
+                      {employees.map((emp) => (
+                        <option key={emp.empId} value={emp.empId}>
+                          {emp.employeeName}
+                        </option>
+                      ))}
+                    </datalist>
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    {newEmployeeRate.employeeName || ""}
+                  </td>
+                  {/* <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="text"
+                      value={newEmployeeRate.plc || ""}
+                      onChange={(e) => {
+                        handleNewEmployeeRateChange("plc", e.target.value);
+                        setPlcSearch(e.target.value);
+                      }}
+                      className="w-full p-1 border rounded text-xs"
+                      list="plc-list"
+                    />
+                    <datalist id="plc-list">
+                      {plcs.map((plc) => (
+                        <option
+                          key={plc.laborCategoryCode}
+                          value={plc.laborCategoryCode}
+                        >
+                          {plc.description}
+                        </option>
+                      ))}
+                    </datalist>
+                  </td> */}
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="text"
+                      value={newEmployeeRate.plc || ""}
+                      onChange={(e) => {
+                        handleNewEmployeeRateChange("plc", e.target.value);
+                        setPlcSearch(e.target.value);
+                      }}
+                      className="w-full p-1 border rounded text-xs"
+                      list="plc-list"
+                    />
+                    <datalist id="plc-list">
+                      {plcs.map((plc) => (
+                        <option
+                          key={plc.laborCategoryCode}
+                          value={plc.laborCategoryCode}
+                        >
+                          {plc.description}
+                        </option>
+                      ))}
+                    </datalist>
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    {plcs.find(
+                      (plc) => plc.laborCategoryCode === newEmployeeRate.plc
+                    )?.description || ""}
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="number"
+                      value={newEmployeeRate.billRate || ""}
+                      onChange={(e) =>
+                        handleNewEmployeeRateChange("billRate", e.target.value)
+                      }
+                      className="w-full p-1 border rounded text-xs"
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <select
+                      value={newEmployeeRate.rateType}
+                      onChange={(e) =>
+                        handleNewEmployeeRateChange("rateType", e.target.value)
+                      }
+                      className="w-full p-1 border rounded text-xs"
+                    >
+                      {rateTypeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="date"
+                      value={newEmployeeRate.startDate || ""}
+                      onChange={(e) =>
+                        handleNewEmployeeRateChange("startDate", e.target.value)
+                      }
+                      className="w-full p-1 border rounded text-xs"
+                      min={selectedPlan.projStartDt}
+                      max={selectedPlan.projEndDt}
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="date"
+                      value={newEmployeeRate.endDate || ""}
+                      onChange={(e) =>
+                        handleNewEmployeeRateChange("endDate", e.target.value)
+                      }
+                      className="w-full p-1 border rounded text-xs"
+                      min={
+                        handleNewEmployeeRateChange.startDate ||
+                        selectedPlan.projStartDt
+                      }
+                      max={selectedPlan.projEndDt}
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                      <button
+                        onClick={handleSaveNewEmployeeRate}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
+                        disabled={loading}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setNewEmployeeRate(null)}
+                        className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
+                        disabled={loading}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {loadingEmployee ? (
                 <tr>
                   <td colSpan="10" className="border p-2 text-center">
@@ -6091,7 +7724,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                         <span>{item.rateType}</span>
                       )}
                     </td>
-                    {/* <td className="border p-2 sm:w-1/8">
+                    <td className="border p-2 sm:w-1/8">
                       {editingEmployeeRowId === item.id ? (
                         <input
                           type="date"
@@ -6107,49 +7740,15 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                             )
                           }
                           className="w-full p-1 border rounded text-xs"
+                          min={selectedPlan.projStartDt}
+                          max={selectedPlan.projEndDt}
                         />
                       ) : (
                         <span>{item.startDate}</span>
                       )}
-                    </td> */}
-                    <td className="border p-2 sm:w-1/8">
-                      <input
-                        type="date"
-                        value={editEmployeeFields[item.id]?.startDate || ""}
-                        onChange={(e) =>
-                          handleNewEmployeeRateChange(
-                            "startDate",
-                            e.target.value,
-                            item.id
-                          )
-                        }
-                        className="w-full p-2 border rounded text-xs bg-gray-100"
-                        min={selectedPlan.projStartDt} // ✅ cannot go before project start
-                        max={selectedPlan.projEndDt} // ✅ cannot go after project end
-                      />
                     </td>
 
                     <td className="border p-2 sm:w-1/8">
-                      <input
-                        type="date"
-                        value={editEmployeeFields[item.id]?.endDate || ""}
-                        onChange={(e) =>
-                          handleNewEmployeeRateChange(
-                            "endDate",
-                            e.target.value,
-                            item.id
-                          )
-                        }
-                        className="w-full p-2 border rounded text-xs bg-gray-100"
-                        min={
-                          editEmployeeFields[item.id]?.startDate ||
-                          selectedPlan.projStartDt
-                        }
-                        max={selectedPlan.projEndDt} // ✅ must be ≤ project end
-                      />
-                    </td>
-
-                    {/* <td className="border p-2 sm:w-1/8">
                       {editingEmployeeRowId === item.id ? (
                         <input
                           type="date"
@@ -6166,11 +7765,16 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                             )
                           }
                           className="w-full p-1 border rounded text-xs"
+                          min={
+                            handleNewEmployeeRateChange.startDate ||
+                            selectedPlan.projStartDt
+                          }
+                          max={selectedPlan.projEndDt}
                         />
                       ) : (
                         <span>{item.endDate || ""}</span>
                       )}
-                    </td> */}
+                    </td>
                     {/* <td className="border p-2 sm:w-1/8">
                       <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
                         <button
@@ -6260,166 +7864,11 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                   </tr>
                 ))
               )}
-              {newEmployeeRate && (
-                <tr className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0">
-                  <td className="border p-2 sm:w-1/8">
-                    <select
-                      value={newEmployeeRate.lookupType}
-                      onChange={(e) =>
-                        handleNewEmployeeRateChange(
-                          "lookupType",
-                          e.target.value
-                        )
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    >
-                      {lookupTypeOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="text"
-                      value={newEmployeeRate.empId || ""}
-                      onChange={(e) =>
-                        handleNewEmployeeRateChange("empId", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                      list="employee-list"
-                      disabled={employees.length === 0}
-                    />
-                    <datalist id="employee-list">
-                      {employees.map((emp) => (
-                        <option key={emp.empId} value={emp.empId}>
-                          {emp.employeeName}
-                        </option>
-                      ))}
-                    </datalist>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {newEmployeeRate.employeeName || ""}
-                  </td>
-                  {/* <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="text"
-                      value={newEmployeeRate.plc || ""}
-                      onChange={(e) => {
-                        handleNewEmployeeRateChange("plc", e.target.value);
-                        setPlcSearch(e.target.value);
-                      }}
-                      className="w-full p-1 border rounded text-xs"
-                      list="plc-list"
-                    />
-                    <datalist id="plc-list">
-                      {plcs.map((plc) => (
-                        <option
-                          key={plc.laborCategoryCode}
-                          value={plc.laborCategoryCode}
-                        >
-                          {plc.description}
-                        </option>
-                      ))}
-                    </datalist>
-                  </td> */}
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="text"
-                      value={newEmployeeRate.plc || ""}
-                      onChange={(e) => {
-                        handleNewEmployeeRateChange("plc", e.target.value);
-                        setPlcSearch(e.target.value);
-                      }}
-                      className="w-full p-1 border rounded text-xs"
-                      list="plc-list"
-                    />
-                    <datalist id="plc-list">
-                      {plcs.map((plc) => (
-                        <option
-                          key={plc.laborCategoryCode}
-                          value={plc.laborCategoryCode}
-                        >
-                          {plc.description}
-                        </option>
-                      ))}
-                    </datalist>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {plcs.find(
-                      (plc) => plc.laborCategoryCode === newEmployeeRate.plc
-                    )?.description || ""}
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="number"
-                      value={newEmployeeRate.billRate || ""}
-                      onChange={(e) =>
-                        handleNewEmployeeRateChange("billRate", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <select
-                      value={newEmployeeRate.rateType}
-                      onChange={(e) =>
-                        handleNewEmployeeRateChange("rateType", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    >
-                      {rateTypeOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="date"
-                      value={newEmployeeRate.startDate || ""}
-                      onChange={(e) =>
-                        handleNewEmployeeRateChange("startDate", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="date"
-                      value={newEmployeeRate.endDate || ""}
-                      onChange={(e) =>
-                        handleNewEmployeeRateChange("endDate", e.target.value)
-                      }
-                      className="w-full p-1 border rounded text-xs"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-                      <button
-                        onClick={handleSaveNewEmployeeRate}
-                        className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
-                        disabled={loading}
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setNewEmployeeRate(null)}
-                        className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
-                        disabled={loading}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
       </div>
+
       {/* Vendor Billing Rates Schedule */}
       {/* <div className="mb-4">
         <h3 className="text-sm font-semibold">Vendor Billing Rates Schedule</h3>
@@ -6463,6 +7912,233 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
               </tr>
             </thead>
             <tbody>
+              {newVendorRate && (
+                <tr className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0">
+                  <td className="border p-2 sm:w-1/8">
+                    <select
+                      value={newVendorRate.lookupType}
+                      onChange={(e) =>
+                        handleNewVendorRateChange("lookupType", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs"
+                    >
+                      {vendorLookupTypeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="text"
+                      value={newVendorRate.vendorId || ""}
+                      onChange={(e) => {
+                        const selectedVend = vendorEmployees.find(
+                          (v) => v.vendId === e.target.value
+                        );
+                        setNewVendorRate((prev) => ({
+                          ...prev,
+                          vendorId: e.target.value,
+                          vendorName: selectedVend
+                            ? selectedVend.employeeName
+                            : prev.vendorName,
+                          vendorEmployee: selectedVend
+                            ? selectedVend.empId
+                            : prev.vendorEmployee,
+                          vendorEmployeeName: selectedVend
+                            ? selectedVend.employeeName
+                            : prev.vendorEmployeeName,
+                        }));
+                      }}
+                      className="w-full p-1 border rounded text-xs"
+                      list="vendor-list"
+                    />
+                    <datalist id="vendor-list">
+                      {vendorEmployees.map((v, index) => (
+                        // <option key={`${v.vendId}-${v.empId}`} value={v.vendId}>
+                        <option
+                          key={`${v.vendId}-${v.empId}-${index}`}
+                          value={v.vendId}
+                        >
+                          {v.employeeName}
+                        </option>
+                      ))}
+                    </datalist>
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="text"
+                      value={newVendorRate.vendorName || ""}
+                      readOnly
+                      onChange={(e) =>
+                        handleNewVendorRateChange("vendorName", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="text"
+                      value={newVendorRate.vendorEmployee || ""}
+                      readOnly
+                      onChange={(e) =>
+                        handleNewVendorRateChange(
+                          "vendorEmployee",
+                          e.target.value
+                        )
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/80">
+                    <input
+                      type="text"
+                      value={newVendorRate.vendorEmployeeName || ""}
+                      readOnly
+                      onChange={(e) =>
+                        handleNewVendorRateChange(
+                          "vendorEmployeeName",
+                          e.target.value
+                        )
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/18">
+                    <input
+                      type="text"
+                      value={newVendorRate.plc || ""}
+                      onChange={(e) => {
+                        handleNewVendorRateChange("plc", e.target.value);
+                        setPlcSearch(e.target.value);
+                      }}
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                      list="plc-list"
+                    />
+                    <datalist id="plc-list">
+                      {plcs.map((plc) => (
+                        <option
+                          key={plc.laborCategoryCode}
+                          value={plc.laborCategoryCode}
+                        >
+                          {plc.description}
+                        </option>
+                      ))}
+                    </datalist>
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    {plcs.find(
+                      (plc) => plc.laborCategoryCode === newVendorRate.plc
+                    )?.description || ""}
+                  </td>
+                  {/* <td className="border p-2 sm:w-1/18">
+                    <input
+                      type="text"
+                      value={newVendorRate.billRate || ""}
+                      onChange={(e) =>
+                        handleNewVendorRateChange("billRate", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                    />
+                  </td> */}
+                  <td>
+                    <input
+                      type="number"
+                      value={newVendorRate.billRate || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (/^\d*\.?\d*$/.test(val)) {
+                          // allows only numbers + decimal
+                          handleNewVendorRateChange("billRate", val);
+                        }
+                      }}
+                      className="w-full p-2 border rounded text-xs"
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/18">
+                    <select
+                      value={newVendorRate.rateType}
+                      onChange={(e) =>
+                        handleNewVendorRateChange("rateType", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                    >
+                      {rateTypeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+
+                  {/* <td className="border p-2 sm:w-1/18">
+                    <input
+                      type="date"
+                      value={newVendorRate.startDate || ""}
+                      onChange={(e) =>
+                        handleNewVendorRateChange("startDate", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                    />
+                  </td>
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="date"
+                      value={newVendorRate.endDate || ""}
+                      onChange={(e) =>
+                        handleNewVendorRateChange("endDate", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                    />
+                  </td> */}
+
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="date"
+                      value={newVendorRate.startDate || ""}
+                      onChange={(e) =>
+                        handleNewVendorRateChange("startDate", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                      min={selectedPlan.projStartDt} // cannot be before project start
+                      max={selectedPlan.projEndDt} // cannot be after project end
+                    />
+                  </td>
+
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="date"
+                      value={newVendorRate.endDate || ""}
+                      onChange={(e) =>
+                        handleNewVendorRateChange("endDate", e.target.value)
+                      }
+                      className="w-full p-2 border rounded text-xs bg-gray-100"
+                      min={newVendorRate.startDate || selectedPlan.projStartDt} // must be >= startDate
+                      max={selectedPlan.projEndDt} // cannot be after project end
+                    />
+                  </td>
+
+                  <td className="border p-2 sm:w-1/10">
+                    <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+                      <button
+                        onClick={handleSaveNewVendorRate}
+                        className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
+                        disabled={loading}
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setNewVendorRate(null)}
+                        className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
+                        disabled={loading}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {loadingVendor ? (
                 <tr>
                   <td colSpan="12" className="border p-2 text-center">
@@ -6691,6 +8367,8 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                             )
                           }
                           className="w-full p-2 border rounded text-xs"
+                          min={selectedPlan.projStartDt} // cannot be before project start
+                          max={selectedPlan.projEndDt} // cannot be after project end
                         />
                       ) : (
                         <span>{item.startDate}</span>
@@ -6713,6 +8391,11 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                             )
                           }
                           className="w-full p-2 border rounded text-xs"
+                          min={
+                            handleVendorFieldChange.startDate ||
+                            selectedPlan.projStartDt
+                          } // must be >= startDate
+                          max={selectedPlan.projEndDt} // cannot be after project end
                         />
                       ) : (
                         <span>{item.endDate || ""}</span>
@@ -6771,233 +8454,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                   </tr>
                 ))
               )}
-              {newVendorRate && (
-                <tr className="sm:table-row flex flex-col sm:flex-row mb-2 sm:mb-0">
-                  <td className="border p-2 sm:w-1/8">
-                    <select
-                      value={newVendorRate.lookupType}
-                      onChange={(e) =>
-                        handleNewVendorRateChange("lookupType", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs"
-                    >
-                      {vendorLookupTypeOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="text"
-                      value={newVendorRate.vendorId || ""}
-                      onChange={(e) => {
-                        const selectedVend = vendorEmployees.find(
-                          (v) => v.vendId === e.target.value
-                        );
-                        setNewVendorRate((prev) => ({
-                          ...prev,
-                          vendorId: e.target.value,
-                          vendorName: selectedVend
-                            ? selectedVend.employeeName
-                            : prev.vendorName,
-                          vendorEmployee: selectedVend
-                            ? selectedVend.empId
-                            : prev.vendorEmployee,
-                          vendorEmployeeName: selectedVend
-                            ? selectedVend.employeeName
-                            : prev.vendorEmployeeName,
-                        }));
-                      }}
-                      className="w-full p-1 border rounded text-xs"
-                      list="vendor-list"
-                    />
-                    <datalist id="vendor-list">
-                      {vendorEmployees.map((v, index) => (
-                        // <option key={`${v.vendId}-${v.empId}`} value={v.vendId}>
-                        <option
-                          key={`${v.vendId}-${v.empId}-${index}`}
-                          value={v.vendId}
-                        >
-                          {v.employeeName}
-                        </option>
-                      ))}
-                    </datalist>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="text"
-                      value={newVendorRate.vendorName || ""}
-                      readOnly
-                      onChange={(e) =>
-                        handleNewVendorRateChange("vendorName", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="text"
-                      value={newVendorRate.vendorEmployee || ""}
-                      readOnly
-                      onChange={(e) =>
-                        handleNewVendorRateChange(
-                          "vendorEmployee",
-                          e.target.value
-                        )
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/80">
-                    <input
-                      type="text"
-                      value={newVendorRate.vendorEmployeeName || ""}
-                      readOnly
-                      onChange={(e) =>
-                        handleNewVendorRateChange(
-                          "vendorEmployeeName",
-                          e.target.value
-                        )
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/18">
-                    <input
-                      type="text"
-                      value={newVendorRate.plc || ""}
-                      onChange={(e) => {
-                        handleNewVendorRateChange("plc", e.target.value);
-                        setPlcSearch(e.target.value);
-                      }}
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                      list="plc-list"
-                    />
-                    <datalist id="plc-list">
-                      {plcs.map((plc) => (
-                        <option
-                          key={plc.laborCategoryCode}
-                          value={plc.laborCategoryCode}
-                        >
-                          {plc.description}
-                        </option>
-                      ))}
-                    </datalist>
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    {plcs.find(
-                      (plc) => plc.laborCategoryCode === newVendorRate.plc
-                    )?.description || ""}
-                  </td>
-                  {/* <td className="border p-2 sm:w-1/18">
-                    <input
-                      type="text"
-                      value={newVendorRate.billRate || ""}
-                      onChange={(e) =>
-                        handleNewVendorRateChange("billRate", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                    />
-                  </td> */}
-                  <td>
-                    <input
-                      type="number"
-                      value={newVendorRate.billRate || ""}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (/^\d*\.?\d*$/.test(val)) {
-                          // allows only numbers + decimal
-                          handleNewVendorRateChange("billRate", val);
-                        }
-                      }}
-                      className="w-full p-2 border rounded text-xs"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/18">
-                    <select
-                      value={newVendorRate.rateType}
-                      onChange={(e) =>
-                        handleNewVendorRateChange("rateType", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                    >
-                      {rateTypeOptions.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
 
-                  {/* <td className="border p-2 sm:w-1/18">
-                    <input
-                      type="date"
-                      value={newVendorRate.startDate || ""}
-                      onChange={(e) =>
-                        handleNewVendorRateChange("startDate", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                    />
-                  </td>
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="date"
-                      value={newVendorRate.endDate || ""}
-                      onChange={(e) =>
-                        handleNewVendorRateChange("endDate", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                    />
-                  </td> */}
-
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="date"
-                      value={newVendorRate.startDate || ""}
-                      onChange={(e) =>
-                        handleNewVendorRateChange("startDate", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                      min={selectedPlan.projStartDt} // cannot be before project start
-                      max={selectedPlan.projEndDt} // cannot be after project end
-                    />
-                  </td>
-
-                  <td className="border p-2 sm:w-1/8">
-                    <input
-                      type="date"
-                      value={newVendorRate.endDate || ""}
-                      onChange={(e) =>
-                        handleNewVendorRateChange("endDate", e.target.value)
-                      }
-                      className="w-full p-2 border rounded text-xs bg-gray-100"
-                      min={newVendorRate.startDate || selectedPlan.projStartDt} // must be >= startDate
-                      max={selectedPlan.projEndDt} // cannot be after project end
-                    />
-                  </td>
-
-                  <td className="border p-2 sm:w-1/10">
-                    <div className="flex flex-col sm:flex-row justify-center space-y-1 sm:space-y-0 sm:space-x-2">
-                      <button
-                        onClick={handleSaveNewVendorRate}
-                        className="bg-green-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-green-600 transition w-full sm:w-auto"
-                        disabled={loading}
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setNewVendorRate(null)}
-                        className="bg-gray-500 text-white px-3 py-1 rounded text-xs font-normal hover:bg-gray-600 transition w-full sm:w-auto"
-                        disabled={loading}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              )}
               {/* <tr>
                 <td colSpan="12" className="border p-2">
                   <button
@@ -7015,6 +8472,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
       </div>
     </div>
   );
+
 };
 
 export default PLCComponent;

@@ -9656,7 +9656,7 @@ const ProjectBudgetStatus = () => {
               </div>
             )}
 
-            {activeTab === "plc" && selectedPlan && (
+            {/* {activeTab === "plc" && selectedPlan && (
               <div
                 className="relative border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
                 ref={(el) => (hoursRefs.current[searchTerm] = el)}
@@ -9680,6 +9680,86 @@ const ProjectBudgetStatus = () => {
                     />
                   </svg>
                 </button>
+                <PLCComponent
+                  selectedProjectId={selectedPlan.projId}
+                  selectedPlan={selectedPlan}
+                  showPLC={activeTab === "plc"}
+                />
+              </div>
+            )} */}
+
+            {activeTab === "plc" && selectedPlan && (
+              <div
+                className="relative border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
+                ref={(el) => (hoursRefs.current[searchTerm] = el)}
+              >
+                {/* <button
+                  className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl z-10"
+                  onClick={handleCloseTab}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button> */}
+                <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4 relative">
+                  <button
+                    className="absolute top-2 right-2 text-green-700 hover:text-red-500 text-xl z-20 cursor-pointer bg-white bg-opacity-80 rounded-full p-0.5 transition-shadow shadow"
+                    onClick={handleCloseTab}
+                    title="Close project details"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                  <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
+                    <span>
+                      <span className="font-semibold">Project ID: </span>
+                      {selectedPlan.projId}
+                    </span>
+                    <span>
+                      <span className="font-semibold">Type: </span>
+                      {selectedPlan.plType || "N/A"}
+                    </span>
+                    <span>
+                      <span className="font-semibold">Version: </span>
+                      {selectedPlan.version || "N/A"}
+                    </span>
+                    <span>
+                      <span className="font-semibold">Status: </span>
+                      {selectedPlan.status || "N/A"}
+                    </span>
+                    <span>
+                      <span className="font-semibold">
+                        Period of Performance:{" "}
+                      </span>
+                      Start Date:{" "}
+                      {formatDate(selectedPlan.projStartDt) || "N/A"} | End
+                      Date: {formatDate(selectedPlan.projEndDt) || "N/A"}
+                    </span>
+                  </div>
+                </div>
                 <PLCComponent
                   selectedProjectId={selectedPlan.projId}
                   selectedPlan={selectedPlan}

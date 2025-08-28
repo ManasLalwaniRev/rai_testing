@@ -10588,7 +10588,8 @@ const ProjectPlanTable = ({
       if (!updated.isApproved) updated.finalVersion = false;
     }
     if (field === "finalVersion")
-      updated.status = updated.finalVersion ? "Submitted" : "Approved";
+    //   updated.status = updated.finalVersion ? "Submitted" : "Approved";
+    updated.status = updated.finalVersion ? "Concluded" : "Approved";
     let newPlans;
     
     if (field === "isCompleted" && !updated.isCompleted) {
@@ -12098,6 +12099,8 @@ return (
                             ? "bg-red-100 text-black font-bold"
                             : col === "status" && plan.status === "Approved"
                             ? "bg-green-100 text-black font-bold"
+                            : col === "status" && plan.status === "Concluded"
+                            ? "bg-blue-200 text-black font-bold"
                             : ""
                         }
                           ${col === "status" ? "whitespace-nowrap text-center" : ""}
