@@ -36,83 +36,92 @@
   overflow-y: auto;
 }
 
-/* Global styles for the table */
-.project-plan-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-height: 100%; /* Fill the container height */
+
+/* ProjectPlanTable specific styles */
+.project-plan-table-container {
+  @apply w-full border border-gray-300 rounded-lg bg-white overflow-hidden;
 }
-.project-plan-table th,
+
+.project-plan-table-scroll {
+  @apply overflow-auto;
+  max-height: 280px;
+  min-height: 280px;
+}
+
+.project-plan-table {
+  @apply w-full table-fixed text-xs text-left border-collapse;
+}
+
+.project-plan-table th {
+  @apply p-1 border border-gray-300 font-normal text-center bg-gray-100 sticky top-0 z-10;
+}
+
 .project-plan-table td {
-  padding: 4px;
-  border: 1px solid #ddd;
-  text-align: left;
+  @apply p-1 border border-gray-300 font-normal;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.project-plan-table th {
-  background-color: #f5f5f5;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-.project-plan-table td.status {
-  min-width: 80px;
-  max-width: 10%;
-  text-align: center;
-}
-.project-plan-table td.project-id {
-  min-width: 100px;
-  max-width: 15%;
-}
-.project-plan-table td.closed-period {
-  min-width: 80px;
-  max-width: 10%;
-}
-.project-plan-table td.version-code input {
-  width: 100%;
+
+/* Column width constraints */
+.project-plan-table th:nth-child(1),
+.project-plan-table td:nth-child(1) {
+  width: 60px;
   min-width: 60px;
-  max-width: 120px;
-  box-sizing: border-box;
+  max-width: 60px;
 }
- 
+
+.project-plan-table th:nth-child(2),
+.project-plan-table td:nth-child(2) {
+  width: 120px;
+  min-width: 100px;
+  max-width: 150px;
+}
+
+.project-plan-table th:nth-child(3),
+.project-plan-table td:nth-child(3) {
+  width: 150px;
+  min-width: 120px;
+  max-width: 180px;
+}
+
+/* Status column styling */
+.project-plan-table td.status-submitted {
+  @apply bg-yellow-100 text-black font-bold whitespace-nowrap text-center;
+}
+
+.project-plan-table td.status-progress {
+  @apply bg-red-100 text-black font-bold whitespace-nowrap text-center;
+}
+
+.project-plan-table td.status-approved {
+  @apply bg-green-100 text-black font-bold whitespace-nowrap text-center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
-  .project-plan-table td,
-  .project-plan-table th {
-    font-size: 12px;
-    padding: 2px;
-  }
-  .project-plan-table td.status {
-    max-width: 12%;
-  }
-  .project-plan-table td.project-id {
-    max-width: 18%;
-  }
-}
-@media (max-width: 768px) {
-  .flex-row {
-    flex-direction: column;
-    height: auto;
-  }
-  .flex-col {
-    width: 100%;
-    min-width: 0;
-  }
-  .flex-1 {
-    width: 100%;
-    min-height: 0;
-  }
   .project-plan-table {
-    font-size: 10px;
+    @apply text-xs;
   }
-  .project-plan-table td.status,
-  .project-plan-table td.closed-period {
-    max-width: 15%;
-  }
-  .project-plan-table td.project-id {
-    max-width: 20%;
+  
+  .project-plan-table th,
+  .project-plan-table td {
+    @apply p-0.5;
   }
 }
- 
+
+@media (max-width: 768px) {
+  .project-plan-table th:nth-child(2),
+  .project-plan-table td:nth-child(2) {
+    width: 100px;
+    min-width: 80px;
+    max-width: 120px;
+  }
+  
+  .project-plan-table th:nth-child(3),
+  .project-plan-table td:nth-child(3) {
+    width: 120px;
+    min-width: 100px;
+    max-width: 140px;
+  }
+}

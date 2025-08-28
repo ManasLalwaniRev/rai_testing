@@ -5650,6 +5650,8 @@ const ProjectAmountsTable = ({
   const [sourceRowIndex, setSourceRowIndex] = useState(null);
   const [editedRowData, setEditedRowData] = useState({});
   const [idError, setIdError] = useState("");
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null); // dctId of selected employee
+  const [localEmployees, setLocalEmployees] = useState([]);
 
 
   const isEditable = initialData.status === "In Progress";
@@ -6651,15 +6653,69 @@ const handleSaveNewEntry = async () => {
   }
 };
 
+  // const handleRowClick = (actualEmpIdx) => {
+  //   if (!isEditable) return;
+  //   setSelectedRowIndex(
+  //     actualEmpIdx === selectedRowIndex ? null : actualEmpIdx
+  //   );
+  //   setSelectedColumnKey(null);
+  //   setReplaceScope(actualEmpIdx === selectedRowIndex ? "all" : "row");
+  //   if (showNewForm) setSourceRowIndex(actualEmpIdx);
+  // };
+  
   const handleRowClick = (actualEmpIdx) => {
     if (!isEditable) return;
+ 
     setSelectedRowIndex(
       actualEmpIdx === selectedRowIndex ? null : actualEmpIdx
     );
+ 
+    // Use employees instead of Employees
+    const selectedEmployee = employees[actualEmpIdx];
+    setSelectedEmployeeId(
+      selectedEmployee ? selectedEmployee.emple.dctId : null
+    );
+ 
     setSelectedColumnKey(null);
     setReplaceScope(actualEmpIdx === selectedRowIndex ? "all" : "row");
     if (showNewForm) setSourceRowIndex(actualEmpIdx);
   };
+
+  const handleDeleteEmployee = async (dctId) => {
+    if (!dctId) {
+      toast.error("No employee selected for deletion");
+      return;
+    }
+ 
+    try {
+      // Confirm deletion with user
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this employee?"
+      );
+      if (!confirmDelete) return;
+ 
+      // Call delete API
+      await axios.delete(
+        `https://test-api-3tmq.onrender.com/DirectCost/DeleteDirectCost/${dctId}`
+      );
+ 
+      // Show success message
+      toast.success("Employee deleted successfully!");
+ 
+      // Remove employee from local state
+      setEmployees((prev) => prev.filter((emp) => emp.emple.dctId !== dctId));
+ 
+      // Clear selection
+      setSelectedRowIndex(null);
+      setSelectedEmployeeId(null);
+    } catch (err) {
+      toast.error(
+        "Failed to delete employee: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
 
   const handleColumnHeaderClick = (uniqueKey) => {
     if (!isEditable) return;
@@ -6947,12 +7003,26 @@ const handleSaveNewEntry = async () => {
                 {showNewForm ? "Cancel" : "New"}
               </button>
               {!showNewForm && ( // Hide Find/Replace while creating new entry
+                <>
                 <button
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
                   onClick={() => isEditable && setShowFindReplace(true)}
                 >
                   Find / Replace
                 </button>
+                <button
+                      className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs font-medium"
+                      onClick={() => {
+                        if (!selectedEmployeeId) {
+                          toast.error("Please select an employee to delete");
+                          return;
+                        }
+                        handleDeleteEmployee(selectedEmployeeId);
+                      }}
+                    >
+                      Delete
+                    </button>
+                </>
               )}
               {showNewForm && (
                 <button

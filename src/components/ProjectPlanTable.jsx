@@ -11154,7 +11154,7 @@ const ProjectPlanTable = ({
               >
                 Delete
               </button>
-              <button
+              {/* <button
                 onClick={() => handleTopButtonToggle("isCompleted")}
                 disabled={getTopButtonDisabled("isCompleted")}
                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
@@ -11189,6 +11189,66 @@ const ProjectPlanTable = ({
                 title="Conclude"
               >
                 Conclude
+              </button> */}
+              {/* with submit and unsumit logic */}
+              <button
+                onClick={() => handleTopButtonToggle("isCompleted")}
+                disabled={
+                  getTopButtonDisabled("isCompleted") || isActionLoading
+                }
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  getTopButtonDisabled("isCompleted") || isActionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title={
+                  selectedPlan?.status === "Submitted" ? "Unsubmit" : "Submit"
+                }
+              >
+                {isActionLoading
+                  ? "Processing..." // show while API is running
+                  : selectedPlan?.status === "Submitted"
+                  ? "Unsubmit"
+                  : "Submit"}
+              </button>
+{/* with approve and unapprove logic */}
+              <button
+                onClick={() => handleTopButtonToggle("isApproved")}
+                disabled={getTopButtonDisabled("isApproved") || isActionLoading}
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  getTopButtonDisabled("isApproved") || isActionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title={
+                  selectedPlan?.status === "Approved" ? "Unapprove" : "Approve"
+                }
+              >
+                {isActionLoading
+                  ? "Processing..." // show while API is running
+                  : selectedPlan?.status === "Approved" ||
+                    selectedPlan?.finalVersion
+                  ? "Unapprove"
+                  : "Approve"}
+              </button>
+{/* with conclude and unconclude logic */}
+              <button
+                onClick={() => handleTopButtonToggle("finalVersion")}
+                disabled={
+                  getTopButtonDisabled("finalVersion") || isActionLoading
+                }
+                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+                  getTopButtonDisabled("finalVersion") || isActionLoading
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+                }`}
+                title={selectedPlan?.finalVersion ? "Unconclude" : "Conclude"}
+              >
+                {isActionLoading
+                  ? "Processing..."
+                  : selectedPlan?.finalVersion
+                  ? "Unconclude"
+                  : "Conclude"}
               </button>
               <button
                 onClick={() => {
@@ -11423,8 +11483,9 @@ const ProjectPlanTable = ({
           }
         </div>
       ) : (
+        <div className="w-full border border-gray-300 rounded-lg bg-white overflow-hidden">
         <div
-          className="overflow-auto"
+          className="w-full overflow-auto"
           style={{
             maxHeight: "280px",
             minHeight: "280px",
@@ -11433,7 +11494,7 @@ const ProjectPlanTable = ({
             background: "#fff",
           }}
         >
-          <table className="min-w-full text-xs text-left border-collapse border">
+          <table className="w-full table-auto  text-xs text-left border-collapse border">
             <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
               <tr>
                 <th className="p-1 border font-normal">Export</th>
@@ -11591,6 +11652,7 @@ const ProjectPlanTable = ({
               ))}
             </tbody>
           </table>
+        </div>
         </div>
       )}
       {showForm && (

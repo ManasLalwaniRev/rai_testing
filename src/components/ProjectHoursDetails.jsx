@@ -622,8 +622,6 @@
 //     }
 //   };
 
-
-
 //   const handleFillValues = async () => {
 //   if (!showNewForm || !isEditable) return;
 
@@ -728,7 +726,6 @@
 //   setSourceRowIndex(null);
 // };
 
-
 //   const handleSaveNewEntry = async () => {
 //     if (!planId) {
 //       toast.error("Plan ID is required to save a new entry.", {
@@ -826,7 +823,6 @@
 //     }
 //   };
 
-
 // const handleFindReplace = async () => {
 //   if (
 //     !isEditable ||
@@ -869,7 +865,7 @@
 //       }
 
 //       const currentInputKey = `${actualEmpIdx}_${uniqueKey}`;
-      
+
 //       // Get the actual displayed value
 //       let displayedValue;
 //       if (inputValues[currentInputKey] !== undefined) {
@@ -886,17 +882,17 @@
 
 //       const findValueTrimmed = findValue.trim();
 //       const displayedValueTrimmed = displayedValue.trim();
-      
+
 //       // Matching logic
 //       let isMatch = false;
-      
+
 //       // Helper
 //      function isZeroLike(val) {
 //   // Accept undefined and null as zero-like too
 //   if (val === undefined || val === null) return true;
-  
+
 //   if (typeof val === "number") return val === 0;
-  
+
 //   if (typeof val === "string") {
 //     const trimmed = val.trim();
 //     return (
@@ -909,7 +905,6 @@
 //   }
 //   return false;
 // }
-
 
 //       if (!isNaN(Number(findValueTrimmed)) && Number(findValueTrimmed) === 0) {
 //   // If searching for 0, match if displayedValue is zero-like
@@ -931,7 +926,7 @@
 //         const newNumericValue = newValue === "" ? 0 : (parseFloat(newValue) || 0);
 
 //         const forecast = getMonthHours(emp)[uniqueKey];
-        
+
 //         // Only proceed if we have a valid forecast with forecastid
 //         if (forecast && forecast.forecastid) {
 //           // Don't check against API value; check if a change is required for what's currently displayed
@@ -960,7 +955,7 @@
 //               updatedat: new Date().toISOString().split("T")[0],
 //               displayText: forecast.displayText ?? "",
 //             };
-            
+
 //             updates.push(
 //               axios
 //                 .put(
@@ -993,7 +988,7 @@
 //     if (updates.length > 0) {
 //       await Promise.all(updates);
 //     }
-    
+
 //     // Update local state only for cells that were actually updated
 //     setLocalEmployees((prev) => {
 //       const updated = [...prev];
@@ -1021,23 +1016,23 @@
 //       }
 //       return updated;
 //     });
-    
+
 //     if (replacementsCount > 0) {
 //       toast.success(`Successfully replaced ${replacementsCount} cells.`, {
 //         autoClose: 2000,
 //       });
 //     }
-    
+
 //     // if (skippedCount > 0) {
 //     //   toast.warn(`Skipped ${skippedCount} cells - forecast records must be created first before they can be edited.`, {
 //     //     autoClose: 4000,
 //     //   });
 //     // }
-    
+
 //     if (replacementsCount === 0 && skippedCount === 0) {
 //       toast.info("No cells replaced.", { autoClose: 2000 });
 //     }
-    
+
 //   } catch (err) {
 //     toast.error(
 //       "Failed to replace values: " + (err.response?.data?.message || err.message),
@@ -1057,8 +1052,6 @@
 //     setReplaceScope("all");
 //   }
 // };
-
- 
 
 // const handleRowClick = (actualEmpIdx) => {
 //     if (!isEditable) return;
@@ -1176,8 +1169,6 @@
 //         </div>
 //       </div>
 
-      
-
 //              {showFillValues && (
 //          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
 //            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-sm">
@@ -1288,7 +1279,6 @@
 //           </div>
 //          </div>
 //        )}
-
 
 //       {localEmployees.length === 0 &&
 //       !showNewForm &&
@@ -1767,7 +1757,6 @@
 //             </table>
 //           </div>
 
-
 //           <div className="synchronized-table-scroll last">
 //             <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
 //               <thead className="sticky-thead">
@@ -1939,8 +1928,6 @@
 //           </div>
 //         </div>
 
-
-    
 //       )}
 
 //       {showFindReplace && (
@@ -2068,7 +2055,6 @@
 // };
 
 // export default ProjectHoursDetails;
-
 
 // import React, { useEffect, useState, useRef } from "react";
 // import axios from "axios";
@@ -8185,8 +8171,6 @@
 //   const isEditable = status === "In Progress";
 //   const isBudPlan = planType === "BUD";
 
-  
-
 //   // Track unsaved changes
 //   const hasUnsavedChanges = () => {
 //     // Check newEntry for non-default values
@@ -8485,7 +8469,7 @@
 
 //   // const handleIdChange = (value) => {
 //   //   const trimmedValue = value.trim();
-    
+
 //   //   if (!trimmedValue) {
 //   //     // Clear all fields when ID is empty
 //   //     setNewEntry((prev) => ({
@@ -8503,7 +8487,7 @@
 //   //   }
 
 //   //   const selectedEmployee = validateAndPopulateEmployeeData(trimmedValue);
-    
+
 //   //   if (selectedEmployee) {
 //   //     setNewEntry((prev) => ({
 //   //       ...prev,
@@ -8526,13 +8510,13 @@
 //   // };
 //   const handleIdChange = (value) => {
 //   const trimmedValue = value.trim();
-  
+
 //   // Always update the ID field regardless of validity
 //   setNewEntry((prev) => ({
 //     ...prev,
 //     id: trimmedValue,
 //   }));
-  
+
 //   if (!trimmedValue) {
 //     // Clear all fields when ID is empty
 //     setNewEntry((prev) => ({
@@ -8554,7 +8538,7 @@
 //     const selectedEmployee = employeeSuggestions.find(
 //       (emp) => emp.emplId === trimmedValue
 //     );
-    
+
 //     if (selectedEmployee) {
 //       // Valid employee found - populate fields
 //       setNewEntry((prev) => ({
@@ -8577,7 +8561,7 @@
 //           autoClose: 3000,
 //         });
 //       }
-      
+
 //       // Don't auto-populate fields for invalid IDs, but keep the entered value
 //       setNewEntry((prev) => ({
 //         ...prev,
@@ -8595,12 +8579,12 @@
 
 //   // const handleIdBlur = (value) => {
 //   //   const trimmedValue = value.trim();
-    
+
 //   //   if (trimmedValue && employeeSuggestions.length > 0) {
 //   //     const selectedEmployee = employeeSuggestions.find(
 //   //       (emp) => emp.emplId === trimmedValue
 //   //     );
-      
+
 //   //     if (!selectedEmployee) {
 //   //       toast.error("Please enter a valid Employee ID from the available list.", {
 //   //         toastId: "invalid-employee-id",
@@ -9005,7 +8989,7 @@
 //     const validEmployee = employeeSuggestions.find(
 //       (emp) => emp.emplId === newEntry.id.trim()
 //     );
-    
+
 //     if (!validEmployee) {
 //       toast.error("Please enter a valid Employee ID from the available list.", {
 //         toastId: "invalid-employee-id-save",
@@ -10295,7 +10279,6 @@
 
 // export default ProjectHoursDetails;
 
-
 // import React, { useEffect, useState, useRef } from "react";
 // import axios from "axios";
 // import { toast } from "react-toastify";
@@ -10438,7 +10421,6 @@
 //   // Only allow numeric values
 //   return /^\d+$/.test(val.trim());
 // };
-
 
 //   const isValidPlc = (val) => !val || plcOptions.some(opt => opt.value === val);
 
@@ -10630,7 +10612,7 @@
 //   //                 perHourRate: emp.perHourRate || emp.hrRate || "",
 //   //                 plc: emp.plc || "",
 //   //                 orgId: emp.orgId || "",
-                  
+
 //   //               };
 //   //             } else {
 //   //               const [lastName, firstName] = (emp.employeeName || "")
@@ -10656,8 +10638,6 @@
 //   //       });
 //   //     }
 //   //   };
-
-    
 
 //   //   const fetchLaborAccounts = async () => {
 //   //     if (!projectId || !showNewForm) return;
@@ -10741,7 +10721,7 @@
 //   // }, [projectId, showNewForm, plcSearch, newEntry.idType]);
 
 //   // ID Type change handler
-  
+
 //   useEffect(() => {
 //   const fetchEmployeesSuggestions = async () => {
 //     if (!projectId || !showNewForm) return;
@@ -10868,8 +10848,6 @@
 //   };
 // }, [projectId, showNewForm, plcSearch, newEntry.idType]);
 
-  
-  
 //   const handleIdTypeChange = (value) => {
 //     setNewEntry((prev) => ({
 //       ...prev,
@@ -10877,7 +10855,7 @@
 //       // Clear ID field when switching to PLC
 //       id: value === "PLC" ? "" : prev.id,
 //     }));
-    
+
 //     // Clear other fields when changing ID type
 //     if (value === "PLC") {
 //       setNewEntry((prev) => ({
@@ -10908,7 +10886,7 @@
 //   // };
 
 //   // Account validation handlers
-  
+
 //   const handlePlcBlur = (val) => {
 //     if (val && !isValidPlc(val)) {
 //       toast.error("Please enter a valid Plc from the available list.", {autoClose: 3000});
@@ -10931,14 +10909,14 @@
 //   // };
 
 //   // Organization validation handlers
-  
+
 //   const handleAccountBlur = (val) => {
 //     if (val && !isValidAccount(val)) {
 //       toast.error("Please enter a valid Account from the available list.", {autoClose: 3000});
 //       setNewEntry(prev => ({...prev, acctId: ""}));
 //     }
 //   };
-  
+
 //   const handleOrgChange = (value) => {
 //     setNewEntry((prev) => ({ ...prev, orgId: value }));
 //   };
@@ -10949,7 +10927,6 @@
 //     setNewEntry(prev => ({...prev, orgId: ""}));
 //   }
 // };
-
 
 // //   const handleOrgBlur = (val) => {
 // //   if (val && !isValidOrg(val)) {
@@ -10977,7 +10954,7 @@
 
 //   // const handleIdChange = (value) => {
 //   //   const trimmedValue = value.trim();
-    
+
 //   //   // Don't allow input if ID Type is PLC
 //   //   if (newEntry.idType === "PLC") {
 //   //     toast.warn("ID field is disabled when ID Type is PLC.", {
@@ -10986,13 +10963,13 @@
 //   //     });
 //   //     return;
 //   //   }
-    
+
 //   //   // Always update the ID field regardless of validity
 //   //   setNewEntry((prev) => ({
 //   //     ...prev,
 //   //     id: trimmedValue,
 //   //   }));
-    
+
 //   //   if (!trimmedValue) {
 //   //     // Clear all fields when ID is empty
 //   //     setNewEntry((prev) => ({
@@ -11023,7 +11000,7 @@
 //   //     const selectedEmployee = employeeSuggestions.find(
 //   //       (emp) => emp.emplId === trimmedValue
 //   //     );
-      
+
 //   //     if (selectedEmployee) {
 //   //       // Valid employee found - populate fields
 //   //       setNewEntry((prev) => ({
@@ -11045,7 +11022,7 @@
 //   //           autoClose: 3000,
 //   //         });
 //   //       }
-        
+
 //   //       // Don't auto-populate fields for invalid IDs, but keep the entered value
 //   //       setNewEntry((prev) => ({
 //   //         ...prev,
@@ -11121,16 +11098,16 @@
 
 // //   const handleIdChange = (value) => {
 // //   const trimmedValue = value.trim();
-  
+
 // //   // For PLC type, always set to "PLC"
 // //   if (newEntry.idType === "PLC") {
 // //     setNewEntry(prev => ({ ...prev, id: "PLC" }));
 // //     return;
 // //   }
-  
+
 // //   // Always update the ID field regardless of validity
 // //   setNewEntry(prev => ({ ...prev, id: trimmedValue }));
-  
+
 // //   if (!trimmedValue) {
 // //     // Clear all fields when ID is empty
 // //     setNewEntry(prev => ({
@@ -11148,10 +11125,10 @@
 // //   }
 
 // //   // Check for duplicate employee ID
-// //   const isDuplicate = localEmployees.some(emp => 
+// //   const isDuplicate = localEmployees.some(emp =>
 // //     emp.emple && emp.emple.emplId === trimmedValue
 // //   );
-  
+
 // //   if (isDuplicate) {
 // //     toast.error("This ID already exists. Please use a different ID.", {
 // //       toastId: "duplicate-id",
@@ -11172,7 +11149,7 @@
 // //     employeeSuggestions.length > 0
 // //   ) {
 // //     const selectedEmployee = employeeSuggestions.find(emp => emp.emplId === trimmedValue);
-    
+
 // //     if (selectedEmployee) {
 // //       // Valid employee found - populate fields
 // //       setNewEntry(prev => ({
@@ -11194,7 +11171,7 @@
 // //           autoClose: 3000,
 // //         });
 // //       }
-      
+
 // //       // Don't auto-populate fields for invalid IDs, but keep the entered value
 // //       setNewEntry(prev => ({
 // //         ...prev,
@@ -11212,19 +11189,19 @@
 
 // // const handleIdChange = (value) => {
 // //   const trimmedValue = value.trim();
-  
+
 // //   // For PLC type, always set to "PLC"
 // //   if (newEntry.idType === "PLC") {
 // //     setNewEntry(prev => ({ ...prev, id: "PLC" }));
 // //     return;
 // //   }
-  
+
 // //   // Always update the ID field regardless of validity
 // //   setNewEntry((prev) => ({
 // //     ...prev,
 // //     id: trimmedValue,
 // //   }));
-  
+
 // //   if (!trimmedValue) {
 // //     // Clear all fields when ID is empty
 // //     setNewEntry((prev) => ({
@@ -11242,10 +11219,10 @@
 // //   }
 
 // //   // Check for duplicate employee ID
-// //   const isDuplicate = localEmployees.some(emp => 
+// //   const isDuplicate = localEmployees.some(emp =>
 // //     emp.emple && emp.emple.emplId === trimmedValue
 // //   );
-  
+
 // //   if (isDuplicate) {
 // //     toast.error("This ID already exists. Please use a different ID.", {
 // //       toastId: "duplicate-id",
@@ -11265,7 +11242,7 @@
 // //     employeeSuggestions.length > 0
 // //   ) {
 // //     const selectedEmployee = employeeSuggestions.find(emp => emp.emplId === trimmedValue);
-    
+
 // //     if (selectedEmployee) {
 // //       // Valid employee found - populate fields
 // //       setNewEntry((prev) => ({
@@ -11286,7 +11263,7 @@
 // //         const partialMatch = employeeSuggestions.some((emp) =>
 // //           emp.emplId.startsWith(trimmedValue)
 // //         );
-        
+
 // //         if (!partialMatch) {
 // //           toast.error("❌ Invalid ID, please select a valid one!", {
 // //             toastId: "invalid-id",
@@ -11294,7 +11271,7 @@
 // //           });
 // //         }
 // //       }
-      
+
 // //       // Don't auto-populate fields for invalid IDs, but keep the entered value
 // //       setNewEntry((prev) => ({
 // //         ...prev,
@@ -11312,19 +11289,19 @@
 
 // const handleIdChange = (value) => {
 //   const trimmedValue = value.trim();
-  
+
 //   // For PLC type, always set to "PLC"
 //   if (newEntry.idType === "PLC") {
 //     setNewEntry(prev => ({ ...prev, id: "PLC" }));
 //     return;
 //   }
-  
+
 //   // Always update the ID field regardless of validity
 //   setNewEntry((prev) => ({
 //     ...prev,
 //     id: trimmedValue,
 //   }));
-  
+
 //   if (!trimmedValue) {
 //     // Clear all fields when ID is empty
 //     setNewEntry((prev) => ({
@@ -11342,10 +11319,10 @@
 //   }
 
 //   // Check for duplicate employee ID
-//   const isDuplicate = localEmployees.some(emp => 
+//   const isDuplicate = localEmployees.some(emp =>
 //     emp.emple && emp.emple.emplId === trimmedValue
 //   );
-  
+
 //   if (isDuplicate) {
 //     toast.error("This ID already exists. Please use a different ID.", {
 //       toastId: "duplicate-id",
@@ -11365,7 +11342,7 @@
 //     employeeSuggestions.length > 0
 //   ) {
 //     const selectedEmployee = employeeSuggestions.find(emp => emp.emplId === trimmedValue);
-    
+
 //     if (selectedEmployee) {
 //       // Valid employee found - populate fields INCLUDING PLC for Vendor
 //       setNewEntry((prev) => ({
@@ -11386,7 +11363,7 @@
 //         const partialMatch = employeeSuggestions.some((emp) =>
 //           emp.emplId.startsWith(trimmedValue)
 //         );
-        
+
 //         if (!partialMatch) {
 //           toast.error("Invalid ID, please select a valid one!", {
 //             toastId: "invalid-id",
@@ -11394,7 +11371,7 @@
 //           });
 //         }
 //       }
-      
+
 //       // Don't auto-populate fields for invalid IDs, but keep the entered value
 //       setNewEntry((prev) => ({
 //         ...prev,
@@ -11410,9 +11387,6 @@
 //     }
 //   }
 // };
-
-
-
 
 //   const getEmployeeRow = (emp, idx) => {
 //     if (!emp || !emp.emple) {
@@ -11827,7 +11801,7 @@
 //   //       const validEmployee = employeeSuggestions.find(
 //   //         (emp) => emp.emplId === newEntry.id.trim()
 //   //       );
-        
+
 //   //       if (!validEmployee) {
 //   //         toast.error("Please enter a valid Employee ID from the available list.", {
 //   //           toastId: "invalid-employee-id-save",
@@ -11942,7 +11916,7 @@
 //   //     setTimeout(() => setShowSuccessMessage(false), 2000);
 //   //   }
 //   // };
-  
+
 //   //  const handleSaveNewEntry = async () => {
 //   //   if (!planId) {
 //   //     toast.error("Plan ID is required to save a new entry.", {autoClose: 3000});
@@ -12773,7 +12747,6 @@
 //   />
 // </td>
 
-
 //                       <td className="border border-gray-300 px-1.5 py-0.5">
 //                         <input
 //                           type="text"
@@ -13522,23 +13495,22 @@
 //     }
 //     return true;
 //   };
-  
+
 //   const isValidAccount = (val) => !val || laborAccounts.some(acc => acc.id === val);
-  
+
 //   // Fixed organization validation - allow any non-empty value
 //   const isValidOrg = (val) => {
 //     if (!val) return true; // Allow empty
 //     return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 //   };
-  
+
 //   // const isValidPlc = (val) => !val || plcOptions.some(opt => opt.value === val) || autoPopulatedPLC;
 //   const isValidPlc = (val) => {
 //   if (!val) return true; // Allow empty
 //   // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
-//   return plcOptions.some(opt => opt.value === val) || 
+//   return plcOptions.some(opt => opt.value === val) ||
 //          employeeSuggestions.some(emp => emp.plc === val);
 // };
-
 
 //   // Track unsaved changes
 //   const hasUnsavedChanges = () => {
@@ -13865,7 +13837,7 @@
 //       setNewEntry(prev => ({...prev, acctId: ""}));
 //     }
 //   };
-  
+
 //   const handleOrgChange = (value) => {
 //     setNewEntry((prev) => ({ ...prev, orgId: value }));
 //   };
@@ -13879,19 +13851,19 @@
 
 // //   const handleIdChange = (value) => {
 // //     const trimmedValue = value.trim();
-    
+
 // //     // For PLC type, always set to "PLC"
 // //     if (newEntry.idType === "PLC") {
 // //       setNewEntry(prev => ({ ...prev, id: "PLC" }));
 // //       return;
 // //     }
-    
+
 // //     // Always update the ID field regardless of validity
 // //     setNewEntry((prev) => ({
 // //       ...prev,
 // //       id: trimmedValue,
 // //     }));
-    
+
 // //     if (!trimmedValue) {
 // //       // Clear all fields when ID is empty
 // //       setNewEntry((prev) => ({
@@ -13910,10 +13882,10 @@
 // //     }
 
 // //     // Check for duplicate employee ID
-// //     const isDuplicate = localEmployees.some(emp => 
+// //     const isDuplicate = localEmployees.some(emp =>
 // //       emp.emple && emp.emple.emplId === trimmedValue
 // //     );
-    
+
 // //     if (isDuplicate) {
 // //       toast.error("This ID already exists. Please use a different ID.", {
 // //         toastId: "duplicate-id",
@@ -13933,7 +13905,7 @@
 // //       employeeSuggestions.length > 0
 // //     ) {
 // //       const selectedEmployee = employeeSuggestions.find(emp => emp.emplId === trimmedValue);
-      
+
 // //       if (selectedEmployee) {
 // //         // Valid employee found - populate fields INCLUDING PLC for Vendor
 // //         setNewEntry((prev) => ({
@@ -13955,7 +13927,7 @@
 // //           const partialMatch = employeeSuggestions.some((emp) =>
 // //             emp.emplId.startsWith(trimmedValue)
 // //           );
-          
+
 // //           if (!partialMatch) {
 // //             toast.error("Invalid ID, please select a valid one!", {
 // //               toastId: "invalid-id",
@@ -13963,7 +13935,7 @@
 // //             });
 // //           }
 // //         }
-        
+
 // //         // Don't auto-populate fields for invalid IDs, but keep the entered value
 // //         setNewEntry((prev) => ({
 // //           ...prev,
@@ -14084,7 +14056,6 @@
 //     }
 //   }
 // };
-
 
 //   const getEmployeeRow = (emp, idx) => {
 //     if (!emp || !emp.emple) {
@@ -15912,20 +15883,20 @@
 //     }
 //     return true;
 //   };
-  
+
 //   const isValidAccount = (val) => !val || laborAccounts.some(acc => acc.id === val);
-  
+
 //   // Fixed organization validation - allow any non-empty value
 //   const isValidOrg = (val) => {
 //     if (!val) return true; // Allow empty
 //     return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 //   };
-  
+
 //   // const isValidPlc = (val) => !val || plcOptions.some(opt => opt.value === val) || autoPopulatedPLC;
 //   const isValidPlc = (val) => {
 //   if (!val) return true; // Allow empty
 //   // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
-//   return plcOptions.some(opt => opt.value === val) || 
+//   return plcOptions.some(opt => opt.value === val) ||
 //          employeeSuggestions.some(emp => emp.plc === val);
 // };
 
@@ -16254,7 +16225,7 @@
 //       setNewEntry(prev => ({...prev, acctId: ""}));
 //     }
 //   };
-  
+
 //   const handleOrgChange = (value) => {
 //     let filteredValue = value;
 //     if (newEntry.idType === "Vendor") {
@@ -16373,7 +16344,6 @@
 //     }
 //   }
 // };
-
 
 // //   const handleIdChange = (value) => {
 // //     const trimmedValue = value.trim();
@@ -18242,8 +18212,6 @@
 
 // export default ProjectHoursDetails;
 
-
-
 // import React, { useEffect, useState, useRef } from "react";
 // import axios from "axios";
 // import { toast } from "react-toastify";
@@ -18396,20 +18364,20 @@
 //     }
 //     return true;
 //   };
-  
+
 //   const isValidAccount = (val) => !val || laborAccounts.some(acc => acc.id === val);
-  
+
 //   // Fixed organization validation - allow any non-empty value
 //   const isValidOrg = (val) => {
 //     if (!val) return true; // Allow empty
 //     return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 //   };
-  
+
 //   // const isValidPlc = (val) => !val || plcOptions.some(opt => opt.value === val) || autoPopulatedPLC;
 //   const isValidPlc = (val) => {
 //   if (!val) return true; // Allow empty
 //   // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
-//   return plcOptions.some(opt => opt.value === val) || 
+//   return plcOptions.some(opt => opt.value === val) ||
 //          employeeSuggestions.some(emp => emp.plc === val);
 // };
 
@@ -18737,7 +18705,7 @@
 //       setNewEntry(prev => ({...prev, acctId: ""}));
 //     }
 //   };
-  
+
 //   const handleOrgChange = (value) => {
 //     let filteredValue = value;
 //     if (newEntry.idType === "Vendor") {
@@ -20553,7 +20521,6 @@
 
 // export default ProjectHoursDetails;
 
-
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -20652,6 +20619,11 @@ const ProjectHoursDetails = ({
   const [fillEndDate, setFillEndDate] = useState(endDate);
   const [isLoading, setIsLoading] = useState(false);
   const [autoPopulatedPLC, setAutoPopulatedPLC] = useState(false); // Track if PLC is auto-populated
+  const [organizationOptions, setOrganizationOptions] = useState([]);
+  const [orgSearch, setOrgSearch] = useState("");
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+ 
+
   const debounceTimeout = useRef(null);
   const horizontalScrollRef = useRef(null);
   const verticalScrollRef = useRef(null);
@@ -20680,7 +20652,7 @@ const ProjectHoursDetails = ({
       setAutoPopulatedPLC(false);
     } else if (newEntry.idType !== "") {
       // Clear all fields when switching to any other type
-      setNewEntry(prev => ({
+      setNewEntry((prev) => ({
         ...prev,
         id: "",
         firstName: "",
@@ -20693,36 +20665,50 @@ const ProjectHoursDetails = ({
       setPlcSearch("");
       setAutoPopulatedPLC(false);
     }
-  // eslint-disable-next-line
+    // eslint-disable-next-line
   }, [newEntry.idType]);
 
   const isValidEmployeeId = (id) => {
     if (!id) return false;
     if (newEntry.idType === "Employee" || newEntry.idType === "Vendor") {
-      return !!employeeSuggestions.find(emp => emp.emplId === id);
+      return !!employeeSuggestions.find((emp) => emp.emplId === id);
     }
     if (newEntry.idType === "Other") {
-      return !!employeeSuggestions.find(emp => emp.emplId === id);
+      return !!employeeSuggestions.find((emp) => emp.emplId === id);
     }
     return true;
   };
-  
-  const isValidAccount = (val) => !val || laborAccounts.some(acc => acc.id === val);
-  
+
+  const isValidAccount = (val) =>
+    !val || laborAccounts.some((acc) => acc.id === val);
+
   // Fixed organization validation - allow any non-empty value
-  const isValidOrg = (val) => {
-    if (!val) return true; // Allow empty
-    return val.toString().trim().length > 0; // Just check if it's not empty after trimming
-  };
-  
+//   const isValidOrg = (val) => {
+//     if (!val) return true; // Allow empty
+//     return val.toString().trim().length > 0; // Just check if it's not empty after trimming
+//   };
+const isValidOrg = (val) => {
+  if (!val) return true; // Allow empty
+  // Check if it's numeric and exists in organization options
+  return /^\d+$/.test(val) && organizationOptions.some(opt => opt.value === val);
+};
+
+
   // const isValidPlc = (val) => !val || plcOptions.some(opt => opt.value === val) || autoPopulatedPLC;
-  const isValidPlc = (val) => {
+//   const isValidPlc = (val) => {
+//     if (!val) return true; // Allow empty
+//     // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
+//     return (
+//       plcOptions.some((opt) => opt.value === val) ||
+//       employeeSuggestions.some((emp) => emp.plc === val)
+//     );
+//   };
+const isValidPlc = (val) => {
   if (!val) return true; // Allow empty
   // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
   return plcOptions.some(opt => opt.value === val) || 
          employeeSuggestions.some(emp => emp.plc === val);
 };
-
 
   // Track unsaved changes
   const hasUnsavedChanges = () => {
@@ -20936,9 +20922,9 @@ const ProjectHoursDetails = ({
 
         // ONLY auto-populate organization for Vendor Employee type
         if (newEntry.idType === "Vendor" && data.orgId) {
-          setNewEntry(prev => ({
+          setNewEntry((prev) => ({
             ...prev,
-            orgId: data.orgId
+            orgId: data.orgId,
           }));
         }
       } catch (err) {
@@ -20950,33 +20936,81 @@ const ProjectHoursDetails = ({
       }
     };
 
+    // const fetchPlcOptions = async (searchTerm) => {
+    //   if (!projectId || !showNewForm) return;
+    //   try {
+    //     const response = await axios.get(
+    //       `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(
+    //         searchTerm
+    //       )}`
+    //     );
+    //     const options = Array.isArray(response.data)
+    //       ? response.data.map((plc) => ({
+    //           value: plc.laborCategoryCode,
+    //           label: `${plc.laborCategoryCode} - ${plc.description}`,
+    //         }))
+    //       : [];
+    //     setPlcOptions(options);
+    //   } catch (err) {
+    //     setPlcOptions([]);
+    //     toast.error(`Failed to fetch PLC options for search '${searchTerm}'`, {
+    //       toastId: "plc-fetch-error",
+    //       autoClose: 3000,
+    //     });
+    //   }
+    // };
+
+    // Add this new function for organizations
+    
     const fetchPlcOptions = async (searchTerm) => {
-      if (!projectId || !showNewForm) return;
-      try {
-        const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(
-            searchTerm
-          )}`
-        );
-        const options = Array.isArray(response.data)
-          ? response.data.map((plc) => ({
-              value: plc.laborCategoryCode,
-              label: `${plc.laborCategoryCode} - ${plc.description}`,
-            }))
-          : [];
-        setPlcOptions(options);
-      } catch (err) {
-        setPlcOptions([]);
-        toast.error(`Failed to fetch PLC options for search '${searchTerm}'`, {
-          toastId: "plc-fetch-error",
-          autoClose: 3000,
-        });
-      }
-    };
+  if (!projectId || !showNewForm) return;
+  try {
+    // FIX: Handle empty search term - call API without parameter
+    const url = searchTerm && searchTerm.trim().length > 0 
+      ? `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(searchTerm)}`
+      : `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`;
+    
+    const response = await axios.get(url);
+    const options = Array.isArray(response.data)
+      ? response.data.map((plc) => ({
+          value: plc.laborCategoryCode,
+          label: `${plc.laborCategoryCode} - ${plc.description}`,
+        }))
+      : [];
+    setPlcOptions(options);
+  } catch (err) {
+    setPlcOptions([]);
+    console.error(`Failed to fetch PLC options:`, err);
+  }
+};
+
+  
+    const fetchOrganizationOptions = async () => {
+    if (!projectId || !showNewForm) return;
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+      );
+      const options = Array.isArray(response.data)
+        ? response.data.map((org) => ({
+            value: org.orgId,
+            label: org.orgId,
+          }))
+        : [];
+      setOrganizationOptions(options);
+    } catch (err) {
+      setOrganizationOptions([]);
+      toast.error(`Failed to fetch organization options`, {
+        toastId: "org-fetch-error",
+        autoClose: 3000,
+      });
+    }
+  };
 
     if (showNewForm) {
       fetchEmployeesSuggestions();
       fetchLaborAccounts();
+      fetchOrganizationOptions(); // ADD THIS LINE
       if (plcSearch && !autoPopulatedPLC) {
         if (debounceTimeout.current) {
           clearTimeout(debounceTimeout.current);
@@ -20988,11 +21022,11 @@ const ProjectHoursDetails = ({
         setPlcOptions([]);
       }
     } else {
-      setEmployeeSuggestions([]);
-      setLaborAccounts([]);
-      setPlcOptions([]);
-      setPlcSearch("");
-      setAutoPopulatedPLC(false);
+    setEmployeeSuggestions([]); // Only clear employee suggestions
+    setLaborAccounts([]); // Only clear labor accounts
+    setPlcSearch("");
+    setOrgSearch("");
+    setAutoPopulatedPLC(false);
     }
 
     return () => {
@@ -21001,8 +21035,177 @@ const ProjectHoursDetails = ({
       }
     };
   }, [projectId, showNewForm, plcSearch, newEntry.idType, autoPopulatedPLC]);
+  
+  // New useEffect ONLY for existing row updates (not new form)
+  // This useEffect should load initial options for existing row updates
+useEffect(() => {
+  const fetchOptionsForUpdates = async () => {
+    if (showNewForm || !projectId || !isEditable || !isBudPlan) return;
+    
+    try {
+      console.log('Fetching options for existing row updates...'); // Add this debug log
+      
+      // Always load organization options for updates
+      const orgResponse = await axios.get(
+        `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+      );
+      const orgOptions = Array.isArray(orgResponse.data)
+        ? orgResponse.data.map((org) => ({
+            value: org.orgId,
+            label: org.orgId,
+          }))
+        : [];
+      setOrganizationOptions(orgOptions);
+      console.log('Org options loaded:', orgOptions); // Add this debug log
+
+      // Always load PLC options for updates
+      const plcResponse = await axios.get(
+        `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`
+      );
+      const plcOptionsAll = Array.isArray(plcResponse.data)
+        ? plcResponse.data.map((plc) => ({
+            value: plc.laborCategoryCode,
+            label: `${plc.laborCategoryCode} - ${plc.description}`,
+          }))
+        : [];
+      setPlcOptions(plcOptionsAll);
+      console.log('PLC options loaded:', plcOptionsAll); // Add this debug log
+
+    } catch (err) {
+      console.error("Failed to load options for updates:", err);
+      setOrganizationOptions([]);
+      setPlcOptions([]);
+    }
+  };
+
+  // Only run when NOT in new form mode
+  if (!showNewForm && projectId && isEditable && isBudPlan) {
+    fetchOptionsForUpdates();
+  }
+}, [projectId, isEditable, isBudPlan, showNewForm]);
+
+
+
+const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
+  const numericValue = value.replace(/[^0-9]/g, "");
+  handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
+  setOrgSearch(numericValue);
+  
+  // Clear previous timeout
+  if (debounceTimeout.current) {
+    clearTimeout(debounceTimeout.current);
+  }
+  
+  // FIX: Always fetch filtered organizations when user types
+  if (numericValue.length >= 1) {
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+        );
+        const filteredOptions = Array.isArray(response.data)
+          ? response.data
+              .filter(org => org.orgId.toString().includes(numericValue))
+              .map((org) => ({
+                value: org.orgId,
+                label: org.orgId,
+              }))
+          : [];
+        setOrganizationOptions(filteredOptions);
+        console.log('Filtered org options:', filteredOptions); // Debug log
+      } catch (err) {
+        console.error("Failed to fetch filtered organizations:", err);
+        setOrganizationOptions([]);
+      }
+    }, 300);
+  } else {
+    // Load all organizations when input is empty
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+        );
+        const orgOptions = Array.isArray(response.data)
+          ? response.data.map((org) => ({
+              value: org.orgId,
+              label: org.orgId,
+            }))
+          : [];
+        setOrganizationOptions(orgOptions);
+      } catch (err) {
+        console.error("Failed to fetch all organizations:", err);
+      }
+    }, 300);
+  }
+};
+
+const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+  handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+  setPlcSearch(value);
+  
+  // Clear previous timeout
+  if (debounceTimeout.current) {
+    clearTimeout(debounceTimeout.current);
+  }
+  
+  // FIX: Always fetch PLC options when user types
+  if (value.length >= 1) {
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(value)}`
+        );
+        const options = Array.isArray(response.data)
+          ? response.data.map((plc) => ({
+              value: plc.laborCategoryCode,
+              label: `${plc.laborCategoryCode} - ${plc.description}`,
+            }))
+          : [];
+        setPlcOptions(options);
+        console.log('Filtered PLC options:', options); // Debug log
+      } catch (err) {
+        console.error("Failed to fetch filtered PLCs:", err);
+        setPlcOptions([]);
+      }
+    }, 300);
+  } else {
+    // Load all PLCs when input is empty  
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`
+        );
+        const options = Array.isArray(response.data)
+          ? response.data.map((plc) => ({
+              value: plc.laborCategoryCode,
+              label: `${plc.laborCategoryCode} - ${plc.description}`,
+            }))
+          : [];
+        setPlcOptions(options);
+      } catch (err) {
+        console.error("Failed to fetch all PLCs:", err);
+      }
+    }, 300);
+  }
+};
+
+
+//   const handleOrgInputChange = (value) => {
+//   // Only allow numeric input
+//   const numericValue = value.replace(/[^0-9]/g, "");
+//   setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
+//   setOrgSearch(numericValue);
+// };
+
 
   // ID Type change handler
+  const handleOrgInputChange = (value) => {
+  // FIX: Allow decimal numbers for hour rate, only numeric for orgId
+  const numericValue = value.replace(/[^0-9]/g, "");
+  setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
+  setOrgSearch(numericValue);
+};
+  
   const handleIdTypeChange = (value) => {
     setNewEntry((prev) => ({
       id: "",
@@ -21029,15 +21232,17 @@ const ProjectHoursDetails = ({
     }
   };
 
+  // Update the existing handlePlcBlur
   const handlePlcBlur = (val) => {
-    if (val && !isValidPlc(val)) {
-      toast.error("Please enter a valid Plc from the available list.", {autoClose: 3000});
-      if (!autoPopulatedPLC) {
-        setNewEntry(prev => ({...prev, plcGlcCode: ""}));
-        setPlcSearch("");
-      }
+  if (val && val.length >= 3 && !isValidPlc(val)) {
+    toast.error("Please enter a valid PLC from the available list.", {autoClose: 3000});
+    if (!autoPopulatedPLC) {
+      setNewEntry(prev => ({...prev, plcGlcCode: ""}));
+      setPlcSearch("");
     }
-  };
+  }
+};
+
 
   const handleAccountChange = (value) => {
     setNewEntry((prev) => ({ ...prev, acctId: value }));
@@ -21045,230 +21250,237 @@ const ProjectHoursDetails = ({
 
   const handleAccountBlur = (val) => {
     if (val && !isValidAccount(val)) {
-      toast.error("Please enter a valid Account from the available list.", {autoClose: 3000});
-      setNewEntry(prev => ({...prev, acctId: ""}));
+      toast.error("Please enter a valid Account from the available list.", {
+        autoClose: 3000,
+      });
+      setNewEntry((prev) => ({ ...prev, acctId: "" }));
     }
   };
-  
+
   const handleOrgChange = (value) => {
     setNewEntry((prev) => ({ ...prev, orgId: value }));
+    setOrgSearch(value); // Add this line to track search
+
   };
 
   const handleOrgBlur = (val) => {
-    if (val && !isValidOrg(val)) {
-      toast.error("Organization is required and cannot be empty.", {autoClose: 3000});
-      setNewEntry(prev => ({...prev, orgId: ""}));
-    }
-  };
-
-//   const handleIdChange = (value) => {
-//     const trimmedValue = value.trim();
-    
-//     // For PLC type, always set to "PLC"
-//     if (newEntry.idType === "PLC") {
-//       setNewEntry(prev => ({ ...prev, id: "PLC" }));
-//       return;
-//     }
-    
-//     // Always update the ID field regardless of validity
-//     setNewEntry((prev) => ({
-//       ...prev,
-//       id: trimmedValue,
-//     }));
-    
-//     if (!trimmedValue) {
-//       // Clear all fields when ID is empty
-//       setNewEntry((prev) => ({
-//         ...prev,
-//         id: "",
-//         firstName: "",
-//         lastName: "",
-//         perHourRate: "",
-//         orgId: newEntry.idType === "Vendor" ? prev.orgId : "", // Keep orgId for Vendor type
-//         plcGlcCode: "",
-//         acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-//       }));
-//       setPlcSearch("");
-//       setAutoPopulatedPLC(false);
-//       return;
-//     }
-
-//     // Check for duplicate employee ID
-//     const isDuplicate = localEmployees.some(emp => 
-//       emp.emple && emp.emple.emplId === trimmedValue
-//     );
-    
-//     if (isDuplicate) {
-//       toast.error("This ID already exists. Please use a different ID.", {
-//         toastId: "duplicate-id",
-//         autoClose: 3000,
-//       });
-//       return;
-//     }
-
-//     // For "Other" type, allow any ID without validation
-//     if (newEntry.idType === "Other") {
-//       return;
-//     }
-
-//     // Only validate and populate for Employee/Vendor types if we have suggestions loaded
-//     if (
-//       (newEntry.idType === "Employee" || newEntry.idType === "Vendor") &&
-//       employeeSuggestions.length > 0
-//     ) {
-//       const selectedEmployee = employeeSuggestions.find(emp => emp.emplId === trimmedValue);
-      
-//       if (selectedEmployee) {
-//         // Valid employee found - populate fields INCLUDING PLC for Vendor
-//         setNewEntry((prev) => ({
-//           ...prev,
-//           id: trimmedValue,
-//           firstName: selectedEmployee.firstName || "",
-//           lastName: selectedEmployee.lastName || "",
-//           perHourRate: selectedEmployee.perHourRate || "",
-//           orgId: selectedEmployee.orgId || prev.orgId, // Keep existing orgId if not provided
-//           plcGlcCode: selectedEmployee.plc || "", // AUTO-POPULATE PLC
-//           acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-//         }));
-//         setPlcSearch(selectedEmployee.plc || ""); // UPDATE PLC SEARCH TOO
-//         setAutoPopulatedPLC(!!selectedEmployee.plc); // Mark as auto-populated if PLC exists
-//       } else {
-//         // Only show error if the user has typed at least 3 characters AND no partial match exists
-//         if (trimmedValue.length >= 3) {
-//           // Check if any employee ID starts with typed value
-//           const partialMatch = employeeSuggestions.some((emp) =>
-//             emp.emplId.startsWith(trimmedValue)
-//           );
-          
-//           if (!partialMatch) {
-//             toast.error("Invalid ID, please select a valid one!", {
-//               toastId: "invalid-id",
-//               autoClose: 3000,
-//             });
-//           }
-//         }
-        
-//         // Don't auto-populate fields for invalid IDs, but keep the entered value
-//         setNewEntry((prev) => ({
-//           ...prev,
-//           firstName: "",
-//           lastName: "",
-//           perHourRate: "",
-//           // DON'T clear orgId for Vendor type as it should come from project
-//           orgId: newEntry.idType === "Vendor" ? prev.orgId : "",
-//           plcGlcCode: "",
-//           acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-//         }));
-//         setPlcSearch("");
-//         setAutoPopulatedPLC(false);
-//       }
-//     }
-//   };
-
-const handleIdChange = (value) => {
-  const trimmedValue = value.trim();
-
-  // 1. PLC type is always “PLC”
-  if (newEntry.idType === "PLC") {
-    setNewEntry(prev => ({ ...prev, id: "PLC" }));
-    return;
-  }
-
-  // 2. Persist whatever the user typed
-  setNewEntry(prev => ({ ...prev, id: trimmedValue }));
-
-  // 3. If the field is cleared, reset most fields and exit
-  if (!trimmedValue) {
-    setNewEntry(prev => ({
-      ...prev,
-      id: "",
-      firstName: "",
-      lastName: "",
-      perHourRate: "",
-      orgId: newEntry.idType === "Vendor" ? prev.orgId : "",
-      plcGlcCode: "",
-      acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-    }));
-    setPlcSearch("");
-    setAutoPopulatedPLC(false);
-    return;
-  }
-
-  // 4. Duplicate check against already-saved employees
-  const isDuplicate = localEmployees.some(
-    emp => emp.emple && emp.emple.emplId === trimmedValue
-  );
-  if (isDuplicate) {
-    toast.error("This ID already exists. Please use a different ID.", {
-      toastId: "duplicate-id",
+  if (val && val.length >= 3 && !isValidOrg(val)) {
+    toast.error("Please enter a valid numeric Organization ID from the available list.", {
       autoClose: 3000,
     });
-    return;
+    setNewEntry(prev => ({...prev, orgId: ""}));
+    setOrgSearch("");
   }
+};
 
-  // 5. “Other” type needs no further validation
-  if (newEntry.idType === "Other") return;
 
-  // 6. For Employee / Vendor types, try to auto-populate from suggestions
-  if (
-    (newEntry.idType === "Employee" || newEntry.idType === "Vendor") &&
-    employeeSuggestions.length > 0
-  ) {
-    const selectedEmployee = employeeSuggestions.find(
-      emp => emp.emplId === trimmedValue
-    );
+  //   const handleIdChange = (value) => {
+  //     const trimmedValue = value.trim();
 
-    if (selectedEmployee) {
-      // Found a match – copy its details, *including PLC*
-      setNewEntry(prev => ({
+  //     // For PLC type, always set to "PLC"
+  //     if (newEntry.idType === "PLC") {
+  //       setNewEntry(prev => ({ ...prev, id: "PLC" }));
+  //       return;
+  //     }
+
+  //     // Always update the ID field regardless of validity
+  //     setNewEntry((prev) => ({
+  //       ...prev,
+  //       id: trimmedValue,
+  //     }));
+
+  //     if (!trimmedValue) {
+  //       // Clear all fields when ID is empty
+  //       setNewEntry((prev) => ({
+  //         ...prev,
+  //         id: "",
+  //         firstName: "",
+  //         lastName: "",
+  //         perHourRate: "",
+  //         orgId: newEntry.idType === "Vendor" ? prev.orgId : "", // Keep orgId for Vendor type
+  //         plcGlcCode: "",
+  //         acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
+  //       }));
+  //       setPlcSearch("");
+  //       setAutoPopulatedPLC(false);
+  //       return;
+  //     }
+
+  //     // Check for duplicate employee ID
+  //     const isDuplicate = localEmployees.some(emp =>
+  //       emp.emple && emp.emple.emplId === trimmedValue
+  //     );
+
+  //     if (isDuplicate) {
+  //       toast.error("This ID already exists. Please use a different ID.", {
+  //         toastId: "duplicate-id",
+  //         autoClose: 3000,
+  //       });
+  //       return;
+  //     }
+
+  //     // For "Other" type, allow any ID without validation
+  //     if (newEntry.idType === "Other") {
+  //       return;
+  //     }
+
+  //     // Only validate and populate for Employee/Vendor types if we have suggestions loaded
+  //     if (
+  //       (newEntry.idType === "Employee" || newEntry.idType === "Vendor") &&
+  //       employeeSuggestions.length > 0
+  //     ) {
+  //       const selectedEmployee = employeeSuggestions.find(emp => emp.emplId === trimmedValue);
+
+  //       if (selectedEmployee) {
+  //         // Valid employee found - populate fields INCLUDING PLC for Vendor
+  //         setNewEntry((prev) => ({
+  //           ...prev,
+  //           id: trimmedValue,
+  //           firstName: selectedEmployee.firstName || "",
+  //           lastName: selectedEmployee.lastName || "",
+  //           perHourRate: selectedEmployee.perHourRate || "",
+  //           orgId: selectedEmployee.orgId || prev.orgId, // Keep existing orgId if not provided
+  //           plcGlcCode: selectedEmployee.plc || "", // AUTO-POPULATE PLC
+  //           acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
+  //         }));
+  //         setPlcSearch(selectedEmployee.plc || ""); // UPDATE PLC SEARCH TOO
+  //         setAutoPopulatedPLC(!!selectedEmployee.plc); // Mark as auto-populated if PLC exists
+  //       } else {
+  //         // Only show error if the user has typed at least 3 characters AND no partial match exists
+  //         if (trimmedValue.length >= 3) {
+  //           // Check if any employee ID starts with typed value
+  //           const partialMatch = employeeSuggestions.some((emp) =>
+  //             emp.emplId.startsWith(trimmedValue)
+  //           );
+
+  //           if (!partialMatch) {
+  //             toast.error("Invalid ID, please select a valid one!", {
+  //               toastId: "invalid-id",
+  //               autoClose: 3000,
+  //             });
+  //           }
+  //         }
+
+  //         // Don't auto-populate fields for invalid IDs, but keep the entered value
+  //         setNewEntry((prev) => ({
+  //           ...prev,
+  //           firstName: "",
+  //           lastName: "",
+  //           perHourRate: "",
+  //           // DON'T clear orgId for Vendor type as it should come from project
+  //           orgId: newEntry.idType === "Vendor" ? prev.orgId : "",
+  //           plcGlcCode: "",
+  //           acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
+  //         }));
+  //         setPlcSearch("");
+  //         setAutoPopulatedPLC(false);
+  //       }
+  //     }
+  //   };
+
+  const handleIdChange = (value) => {
+    const trimmedValue = value.trim();
+
+    // 1. PLC type is always “PLC”
+    if (newEntry.idType === "PLC") {
+      setNewEntry((prev) => ({ ...prev, id: "PLC" }));
+      return;
+    }
+
+    // 2. Persist whatever the user typed
+    setNewEntry((prev) => ({ ...prev, id: trimmedValue }));
+
+    // 3. If the field is cleared, reset most fields and exit
+    if (!trimmedValue) {
+      setNewEntry((prev) => ({
         ...prev,
-        id: trimmedValue,
-        firstName: selectedEmployee.firstName || "",
-        lastName: selectedEmployee.lastName || "",
-        perHourRate: selectedEmployee.perHourRate || "",
-        orgId: selectedEmployee.orgId || prev.orgId,
-        plcGlcCode: selectedEmployee.plc || "",
-        acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-      }));
-      setPlcSearch(selectedEmployee.plc || "");
-      setAutoPopulatedPLC(!!selectedEmployee.plc);
-    } else {
-      // No exact match – warn only if the entry is clearly invalid
-      if (trimmedValue.length >= 3) {
-        const partialMatch = employeeSuggestions.some(emp =>
-          emp.emplId.startsWith(trimmedValue)
-        );
-        if (!partialMatch) {
-          toast.error("Invalid ID, please select a valid one!", {
-            toastId: "invalid-id",
-            autoClose: 3000,
-          });
-        }
-      }
-
-      // Leave any previously auto-populated PLC untouched;
-      // only clear PLC when it wasn’t auto-filled.
-      setNewEntry(prev => ({
-        ...prev,
+        id: "",
         firstName: "",
         lastName: "",
         perHourRate: "",
         orgId: newEntry.idType === "Vendor" ? prev.orgId : "",
-        plcGlcCode:
-          newEntry.idType === "Vendor" && autoPopulatedPLC
-            ? prev.plcGlcCode
-            : "",
+        plcGlcCode: "",
         acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
       }));
+      setPlcSearch("");
+      setAutoPopulatedPLC(false);
+      return;
+    }
 
-      if (!(newEntry.idType === "Vendor" && autoPopulatedPLC)) {
-        setPlcSearch("");
-        setAutoPopulatedPLC(false);
+    // 4. Duplicate check against already-saved employees
+    const isDuplicate = localEmployees.some(
+      (emp) => emp.emple && emp.emple.emplId === trimmedValue
+    );
+    if (isDuplicate) {
+      toast.error("This ID already exists. Please use a different ID.", {
+        toastId: "duplicate-id",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    // 5. “Other” type needs no further validation
+    if (newEntry.idType === "Other") return;
+
+    // 6. For Employee / Vendor types, try to auto-populate from suggestions
+    if (
+      (newEntry.idType === "Employee" || newEntry.idType === "Vendor") &&
+      employeeSuggestions.length > 0
+    ) {
+      const selectedEmployee = employeeSuggestions.find(
+        (emp) => emp.emplId === trimmedValue
+      );
+
+      if (selectedEmployee) {
+        // Found a match – copy its details, *including PLC*
+        setNewEntry((prev) => ({
+          ...prev,
+          id: trimmedValue,
+          firstName: selectedEmployee.firstName || "",
+          lastName: selectedEmployee.lastName || "",
+          perHourRate: selectedEmployee.perHourRate || "",
+          orgId: selectedEmployee.orgId || prev.orgId,
+          plcGlcCode: selectedEmployee.plc || "",
+          acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
+        }));
+        setPlcSearch(selectedEmployee.plc || "");
+        setAutoPopulatedPLC(!!selectedEmployee.plc);
+      } else {
+        // No exact match – warn only if the entry is clearly invalid
+        if (trimmedValue.length >= 3) {
+          const partialMatch = employeeSuggestions.some((emp) =>
+            emp.emplId.startsWith(trimmedValue)
+          );
+          if (!partialMatch) {
+            toast.error("Invalid ID, please select a valid one!", {
+              toastId: "invalid-id",
+              autoClose: 3000,
+            });
+          }
+        }
+
+        // Leave any previously auto-populated PLC untouched;
+        // only clear PLC when it wasn’t auto-filled.
+        setNewEntry((prev) => ({
+          ...prev,
+          firstName: "",
+          lastName: "",
+          perHourRate: "",
+          orgId: newEntry.idType === "Vendor" ? prev.orgId : "",
+          plcGlcCode:
+            newEntry.idType === "Vendor" && autoPopulatedPLC
+              ? prev.plcGlcCode
+              : "",
+          acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
+        }));
+
+        if (!(newEntry.idType === "Vendor" && autoPopulatedPLC)) {
+          setPlcSearch("");
+          setAutoPopulatedPLC(false);
+        }
       }
     }
-  }
-};
-
+  };
 
   const getEmployeeRow = (emp, idx) => {
     if (!emp || !emp.emple) {
@@ -21643,25 +21855,32 @@ const handleIdChange = (value) => {
 
   const handleSaveNewEntry = async () => {
     if (!planId) {
-      toast.error("Plan ID is required to save a new entry.", { autoClose: 3000 });
-      return;
-    }
-
-    // Check for duplicate employee ID before validating anything else
-    const isDuplicate = localEmployees.some(
-      emp => emp.emple && emp.emple.emplId === newEntry.id.trim()
-    );
-    if (isDuplicate) {
-      toast.error("Can't save entry with existing ID. Please use a different ID.", {
-        toastId: "duplicate-save-error",
+      toast.error("Plan ID is required to save a new entry.", {
         autoClose: 3000,
       });
       return;
     }
 
+    // Check for duplicate employee ID before validating anything else
+    const isDuplicate = localEmployees.some(
+      (emp) => emp.emple && emp.emple.emplId === newEntry.id.trim()
+    );
+    if (isDuplicate) {
+      toast.error(
+        "Can't save entry with existing ID. Please use a different ID.",
+        {
+          toastId: "duplicate-save-error",
+          autoClose: 3000,
+        }
+      );
+      return;
+    }
+
     if (newEntry.idType === "PLC") {
       if (!newEntry.id || newEntry.id !== "PLC") {
-        toast.error("ID must be automatically set to 'PLC' for PLC type.", { autoClose: 3000 });
+        toast.error("ID must be automatically set to 'PLC' for PLC type.", {
+          autoClose: 3000,
+        });
         return;
       }
     } else if (newEntry.idType === "Other") {
@@ -21677,16 +21896,22 @@ const handleIdChange = (value) => {
       }
       // Only validate against suggestions if we have them
       if (employeeSuggestions.length > 0) {
-        const validEmployee = employeeSuggestions.find(emp => emp.emplId === newEntry.id.trim());
+        const validEmployee = employeeSuggestions.find(
+          (emp) => emp.emplId === newEntry.id.trim()
+        );
         if (!validEmployee) {
-          toast.error("Please enter a valid ID from the available list.", { autoClose: 3000 });
+          toast.error("Please enter a valid ID from the available list.", {
+            autoClose: 3000,
+          });
           return;
         }
       }
     }
 
     if (!isValidAccount(newEntry.acctId)) {
-      toast.error("Please enter a valid Account from the available list.", { autoClose: 3000 });
+      toast.error("Please enter a valid Account from the available list.", {
+        autoClose: 3000,
+      });
       return;
     }
     if (!isValidOrg(newEntry.orgId)) {
@@ -21694,13 +21919,17 @@ const handleIdChange = (value) => {
       return;
     }
     if (!isValidPlc(newEntry.plcGlcCode)) {
-      toast.error("Please enter a valid Plc from the available list.", { autoClose: 3000 });
+      toast.error("Please enter a valid Plc from the available list.", {
+        autoClose: 3000,
+      });
       return;
     }
 
     setIsDurationLoading(true);
-    const payloadForecasts = durations.map(duration => ({
-      forecastedhours: Number(newEntryPeriodHours[`${duration.monthNo}_${duration.year}`]) || 0,
+    const payloadForecasts = durations.map((duration) => ({
+      forecastedhours:
+        Number(newEntryPeriodHours[`${duration.monthNo}_${duration.year}`]) ||
+        0,
       projId: projectId,
       plId: planId,
       emplId: newEntry.id,
@@ -21991,14 +22220,48 @@ const handleIdChange = (value) => {
     }
   };
 
-  const handleRowClick = (actualEmpIdx) => {
+//   const handleRowClick = (actualEmpIdx) => {
+//     if (!isEditable) return;
+//     setSelectedRowIndex(
+//       actualEmpIdx === selectedRowIndex ? null : actualEmpIdx
+//     );
+//     setSelectedColumnKey(null);
+//     setReplaceScope(actualEmpIdx === selectedRowIndex ? "all" : "row");
+//     if (showNewForm) setSourceRowIndex(actualEmpIdx);
+//   };
+  
+const handleRowClick = (actualEmpIdx) => {
     if (!isEditable) return;
     setSelectedRowIndex(
       actualEmpIdx === selectedRowIndex ? null : actualEmpIdx
     );
+    setSelectedEmployeeId(localEmployees[actualEmpIdx]?.emple_Id);
     setSelectedColumnKey(null);
     setReplaceScope(actualEmpIdx === selectedRowIndex ? "all" : "row");
     if (showNewForm) setSourceRowIndex(actualEmpIdx);
+  };
+
+  // handle delete employee here
+  const handleDeleteEmployee = async (emple_Id) => {
+    if (!emple_Id) return;
+ 
+    try {
+      await axios.delete(
+        `https://test-api-3tmq.onrender.com/Employee/DeleteEmployee/${emple_Id}`
+      );
+ 
+      toast.success("Employee deleted successfully!");
+ 
+      // Remove deleted employee from local state
+      setLocalEmployees((prev) =>
+        prev.filter((emp) => emp.emple_Id !== emple_Id)
+      );
+    } catch (err) {
+      toast.error(
+        "Failed to delete employee: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
   };
 
   const handleColumnHeaderClick = (uniqueKey) => {
@@ -22081,12 +22344,33 @@ const handleIdChange = (value) => {
                 {showNewForm ? "Cancel" : "New"}
               </button>
               {!showNewForm && (
+                <>
                 <button
                   className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
                   onClick={() => isEditable && setShowFindReplace(true)}
                 >
                   Find / Replace
                 </button>
+                <button
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs font-medium"
+                    onClick={() => {
+                      if (!selectedEmployeeId) {
+                        toast.error("Please select an employee to delete");
+                        return;
+                      }
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this employee?"
+                        )
+                      ) {
+                        handleDeleteEmployee(selectedEmployeeId);
+                        setSelectedEmployeeId(null); // optional: clear selection
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                </>
               )}
               {showNewForm && (
                 <button
@@ -22269,12 +22553,18 @@ const handleIdChange = (value) => {
                           onChange={(e) => handleIdChange(e.target.value)}
                           disabled={newEntry.idType === "PLC"}
                           className={`w-full rounded px-1 py-0.5 text-xs outline-none focus:ring-0 no-datalist-border ${
-                            newEntry.idType === "PLC" ? "bg-gray-100 cursor-not-allowed" : ""
+                            newEntry.idType === "PLC"
+                              ? "bg-gray-100 cursor-not-allowed"
+                              : ""
                           }`}
                           list="employee-id-list"
-                          placeholder={newEntry.idType === "PLC" ? "Not required for PLC" : "Enter ID"}
+                          placeholder={
+                            newEntry.idType === "PLC"
+                              ? "Not required for PLC"
+                              : "Enter ID"
+                          }
                         />
-                        <datalist id="employee-id-list">
+                        {/* <datalist id="employee-id-list">
                           {employeeSuggestions
                             .filter(
                               (emp) =>
@@ -22290,9 +22580,29 @@ const handleIdChange = (value) => {
                                   : emp.lastName || emp.firstName || emp.emplId}
                               </option>
                             ))}
+                        </datalist> */}
+                        <datalist id="employee-id-list">
+                          {newEntry.idType !== "Other" &&
+                            employeeSuggestions
+                              .filter(
+                                (emp) =>
+                                  emp.emplId && typeof emp.emplId === "string"
+                              )
+                              .map((emp, index) => (
+                                <option
+                                  key={`${emp.emplId}-${index}`}
+                                  value={emp.emplId}
+                                >
+                                  {emp.lastName && emp.firstName
+                                    ? `${emp.lastName}, ${emp.firstName}`
+                                    : emp.lastName ||
+                                      emp.firstName ||
+                                      emp.emplId}
+                                </option>
+                              ))}
                         </datalist>
                       </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5">
+                      {/* <td className="border border-gray-300 px-1.5 py-0.5">
                         <input
                           type="text"
                           name="name"
@@ -22307,7 +22617,49 @@ const handleIdChange = (value) => {
                           className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
                           placeholder="Name (auto-filled)"
                         />
-                      </td>
+                      </td> */}
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+  <input
+    type="text"
+    name="name"
+    value={
+      newEntry.idType === "Other"
+        ? `${newEntry.firstName || ""} ${newEntry.lastName || ""}`.trim()
+        : newEntry.idType === "Vendor"
+        ? newEntry.lastName || newEntry.firstName || ""
+        : newEntry.lastName && newEntry.firstName
+        ? `${newEntry.lastName}, ${newEntry.firstName}`
+        : newEntry.lastName || newEntry.firstName || ""
+    }
+    readOnly={newEntry.idType !== "Other"}
+    onChange={(e) => {
+      if (newEntry.idType === "Other") {
+        const fullName = e.target.value.trim();
+        // Split name into first and last (assuming format: "First Last")
+        const nameParts = fullName.split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+        
+        setNewEntry(prev => ({
+          ...prev,
+          firstName: firstName,
+          lastName: lastName
+        }));
+      }
+    }}
+    className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+      newEntry.idType === "Other" 
+        ? "bg-white" 
+        : "bg-gray-100 cursor-not-allowed"
+    }`}
+    placeholder={
+      newEntry.idType === "Other" 
+        ? "Enter name" 
+        : "Name (auto-filled)"
+    }
+  />
+</td>
+
                       <td className="border border-gray-300 px-1.5 py-0.5">
                         <input
                           type="text"
@@ -22333,7 +22685,7 @@ const handleIdChange = (value) => {
                           ))}
                         </datalist>
                       </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5">
+                      {/* <td className="border border-gray-300 px-1.5 py-0.5">
                         <input
                           type="text"
                           name="orgId"
@@ -22346,7 +22698,34 @@ const handleIdChange = (value) => {
                           placeholder="Enter Organization"
                           disabled={!isBudPlan}
                         />
-                      </td>
+                      </td> */}
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+  <input
+    type="text"
+    name="orgId"
+    value={newEntry.orgId}
+    onChange={(e) => handleOrgInputChange(e.target.value)}
+    onBlur={(e) => handleOrgBlur(e.target.value)}
+    className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+      !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+    }`}
+    list="organization-list"
+    placeholder="Enter Organization ID (numeric)"
+    disabled={!isBudPlan}
+  />
+  <datalist id="organization-list">
+    {organizationOptions.map((org, index) => (
+      <option
+        key={`${org.value}-${index}`}
+        value={org.value}
+      >
+        {org.label}
+      </option>
+    ))}
+  </datalist>
+</td>
+
+
                       <td className="border border-gray-300 px-1.5 py-0.5">
                         <input
                           type="text"
@@ -22357,7 +22736,9 @@ const handleIdChange = (value) => {
                           }
                           onBlur={(e) => handlePlcBlur(e.target.value)}
                           className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isBudPlan || autoPopulatedPLC ? "bg-gray-100 cursor-not-allowed" : ""
+                            !isBudPlan || autoPopulatedPLC
+                              ? "bg-gray-100 cursor-not-allowed"
+                              : ""
                           }`}
                           list="plc-list"
                           placeholder="Enter Plc"
@@ -22506,7 +22887,7 @@ const handleIdChange = (value) => {
                               row.acctId
                             )}
                           </td>
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
                             {isBudPlan && isEditable ? (
                               <input
                                 type="text"
@@ -22530,8 +22911,39 @@ const handleIdChange = (value) => {
                             ) : (
                               row.orgId
                             )}
-                          </td>
+                          </td> */}
                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.orgId !== undefined
+          ? editedData.orgId
+          : row.orgId
+      }
+      onChange={(e) => handleOrgInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={(e) => {
+        const val = e.target.value;
+        if (val && val.length >= 3 && !isValidOrg(val)) {
+          toast.error("Please enter a valid numeric Organization ID from the available list.", {
+            autoClose: 3000,
+          });
+          handleEmployeeDataChange(actualEmpIdx, "orgId", "");
+        } else {
+          handleEmployeeDataBlur(actualEmpIdx, emp);
+        }
+      }}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list="organization-list"
+      placeholder="Enter Organization ID"
+    />
+  ) : (
+    row.orgId
+  )}
+</td>
+
+
+                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
                             {isBudPlan && isEditable ? (
                               <input
                                 type="text"
@@ -22556,7 +22968,38 @@ const handleIdChange = (value) => {
                             ) : (
                               row.glcPlc
                             )}
-                          </td>
+                          </td> */}
+                         <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.glcPlc !== undefined
+          ? editedData.glcPlc
+          : row.glcPlc
+      }
+      onChange={(e) => handlePlcInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={(e) => {
+        const val = e.target.value;
+        if (val && val.length >= 3 && !isValidPlc(val)) {
+          toast.error("Please enter a valid PLC from the available list.", {
+            autoClose: 3000,
+          });
+          handleEmployeeDataChange(actualEmpIdx, "glcPlc", "");
+        } else {
+          handleEmployeeDataBlur(actualEmpIdx, emp);
+        }
+      }}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list="plc-list"
+      placeholder="Enter PLC"
+    />
+  ) : (
+    row.glcPlc
+  )}
+</td>
+
+
                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
                             {isBudPlan && isEditable ? (
                               <input
@@ -22943,4 +23386,3 @@ const handleIdChange = (value) => {
 };
 
 export default ProjectHoursDetails;
-
