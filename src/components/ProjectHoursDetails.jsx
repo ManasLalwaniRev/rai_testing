@@ -21167,35 +21167,185 @@ useEffect(() => {
 //     }
 //   };
 
+// const fetchLaborAccounts = async () => {
+//   if (!projectId || !showNewForm) return;
+//   try {
+//     const response = await axios.get(
+//       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//     );
+//     const data = Array.isArray(response.data)
+//       ? response.data[0]
+//       : response.data;
+//     const accounts = Array.isArray(data.employeeLaborAccounts)
+//       ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
+//       : [];
+//     setLaborAccounts(accounts);
+
+//     // ONLY auto-populate organization for Vendor Employee type
+//     if (newEntry.idType === "Vendor" && data.orgId) {
+//       setNewEntry((prev) => ({
+//         ...prev,
+//         orgId: data.orgId,
+//       }));
+//     }
+//   } catch (err) {
+//     setLaborAccounts([]);
+//     toast.error(`Failed to fetch labor accounts`, {
+//       toastId: "labor-accounts-error",
+//       autoClose: 3000,
+//     });
+//   }
+// };
+
+// const fetchLaborAccounts = async () => {
+//   if (!projectId || !showNewForm) return;
+//   try {
+//     const response = await axios.get(
+//       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//     );
+//     const data = Array.isArray(response.data)
+//       ? response.data[0]
+//       : response.data;
+
+//     let accounts = [];
+//     if (newEntry.idType === "Employee") {
+//       accounts = Array.isArray(data.employeeLaborAccounts)
+//         ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
+//         : [];
+//     } else if (newEntry.idType === "Vendor") {
+//       accounts = Array.isArray(data.sunContractorLaborAccounts)
+//         ? data.sunContractorLaborAccounts.map((account) => ({ id: account.accountId }))
+//         : [];
+//     } else {
+//       accounts = [];
+//     }
+
+//     setLaborAccounts(accounts);
+
+//     // ONLY auto-populate organization for Vendor Employee type
+//     if (newEntry.idType === "Vendor" && data.orgId) {
+//       setNewEntry((prev) => ({
+//         ...prev,
+//         orgId: data.orgId,
+//       }));
+//     }
+//   } catch (err) {
+//     setLaborAccounts([]);
+//     toast.error(`Failed to fetch labor accounts`, {
+//       toastId: "labor-accounts-error",
+//       autoClose: 3000,
+//     });
+//   }
+// };
+
+// const fetchLaborAccounts = async () => {
+//   if (!projectId || !showNewForm) return;
+//   try {
+//     const response = await axios.get(
+//       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//     );
+//     const data = Array.isArray(response.data) ? response.data[0] : response.data;
+
+//     let accounts = [];
+
+//     if (newEntry.idType === "Employee") {
+//       accounts = Array.isArray(data.employeeLaborAccounts)
+//         ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
+//         : [];
+//     } else if (newEntry.idType === "Vendor") {
+//       accounts = Array.isArray(data.sunContractorLaborAccounts)
+//         ? data.sunContractorLaborAccounts.map((account) => ({ id: account.accountId }))
+//         : [];
+
+//     } else {
+//       accounts = [];
+//     }
+
+//     console.log(JSON.stringify(accounts))
+
+//     // Remove duplicates (account IDs), if any
+//     const uniqueAccounts = [];
+//     const seenIds = new Set();
+//     for (const acc of accounts) {
+//       if (!seenIds.has(acc.id)) {
+//         seenIds.add(acc.id);
+//         uniqueAccounts.push(acc);
+//       }
+//     }
+
+//     setLaborAccounts(uniqueAccounts);
+
+//     // Auto-populate organization for Vendor Employee only
+//     if (newEntry.idType === "Vendor" && data.orgId) {
+//       setNewEntry((prev) => ({
+//         ...prev,
+//         orgId: data.orgId,
+//       }));
+//     }
+//   } catch (err) {
+//     setLaborAccounts([]);
+//     toast.error(`Failed to fetch labor accounts`, {
+//       toastId: "labor-accounts-error",
+//       autoClose: 3000,
+//     });
+//   }
+// };
+
 const fetchLaborAccounts = async () => {
   if (!projectId || !showNewForm) return;
   try {
     const response = await axios.get(
       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
     );
-    const data = Array.isArray(response.data)
-      ? response.data[0]
-      : response.data;
-    const accounts = Array.isArray(data.employeeLaborAccounts)
-      ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
-      : [];
-    setLaborAccounts(accounts);
+    const data = Array.isArray(response.data) ? response.data[0] : response.data;
 
-    // ONLY auto-populate organization for Vendor Employee type
+    let accounts = [];
+
+    if (newEntry.idType === "Employee") {
+      accounts = Array.isArray(data.employeeLaborAccounts)
+        ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
+        : [];
+    } else if (newEntry.idType === "Vendor") {
+      accounts = Array.isArray(data.sunContractorLaborAccounts)
+        ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
+        : [];
+    } else {
+      accounts = [];
+    }
+
+    console.log(JSON.stringify(accounts))
+
+    
+
+    // Remove duplicates by account ID string
+    const uniqueAccountsMap = new Map();
+    accounts.forEach(acc => {
+      if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+        uniqueAccountsMap.set(acc.id, acc);
+      }
+    });
+    const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+
+    setLaborAccounts(uniqueAccounts);
+
+    // Auto-populate organization for Vendor Employees if present
     if (newEntry.idType === "Vendor" && data.orgId) {
-      setNewEntry((prev) => ({
+      setNewEntry(prev => ({
         ...prev,
         orgId: data.orgId,
       }));
     }
   } catch (err) {
     setLaborAccounts([]);
-    toast.error(`Failed to fetch labor accounts`, {
+    toast.error("Failed to fetch labor accounts", {
       toastId: "labor-accounts-error",
       autoClose: 3000,
     });
   }
 };
+
+
+
 
 
   if (showNewForm) {
