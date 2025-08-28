@@ -10551,102 +10551,211 @@ const ProjectPlanTable = ({
     }
   };
 
-  const handleCheckboxChange = async (idx, field) => {
-    const prevPlans = [...plans];
-    const plan = plans[idx];
-    const planId = plan.plId;
-    if (!plan.plType || !plan.version) {
+//   const handleCheckboxChange = async (idx, field) => {
+//     const prevPlans = [...plans];
+//     const plan = plans[idx];
+//     const planId = plan.plId;
+//     if (!plan.plType || !plan.version) {
+//       toast.error(
+//         `Cannot update ${field}: Plan Type and Version are required.`,
+//         { toastId: "checkbox-error" }
+//       );
+//       return;
+//     }
+//     if (field === "isApproved" && !plan.isCompleted) {
+//       toast.error("You can't approve this row until Submitted is checked", {
+//         toastId: "checkbox-error",
+//       });
+//       return;
+//     }
+//     if (field === "finalVersion" && !plan.isApproved) {
+//       toast.error("You can't set Conclude until Approved is checked", {
+//         toastId: "checkbox-error",
+//       });
+//       return;
+//     }
+//     let updated = { ...plan };
+//     updated[field] = !plan[field];
+//     if (field === "isCompleted") {
+//       updated.status = updated.isCompleted ? "Submitted" : "In Progress";
+//       if (!updated.isCompleted) {
+//         updated.isApproved = false;
+//         updated.finalVersion = false;
+//       }
+//     }
+//     if (field === "isApproved") {
+//       updated.status = updated.isApproved ? "Approved" : "Submitted";
+//       if (!updated.isApproved) updated.finalVersion = false;
+//     }
+//     if (field === "finalVersion")
+//     //   updated.status = updated.finalVersion ? "Submitted" : "Approved";
+//     updated.status = updated.finalVersion ? "Concluded" : "Approved";
+//     let newPlans;
+    
+//     if (field === "isCompleted" && !updated.isCompleted) {
+//       const isEAC = updated.plType === "EAC";
+//       const inProgressCount = plans.filter(
+//         (p) => p.status === "In Progress" && p.plType === updated.plType
+//       ).length;
+//       if (inProgressCount > 0 && updated.status === "In Progress") {
+//         toast.error(
+//           `Only one ${
+//             isEAC ? "EAC" : "BUD"
+//           } plan can have In Progress status at a time.`,
+//           { toastId: "checkbox-error" }
+//         );
+//         return;
+//       }
+//     }
+//     if (field === "finalVersion" && updated.finalVersion) {
+//       newPlans = plans.map((p, i) =>
+//         i === idx
+//           ? updated
+//           : (p.plType === updated.plType && p.projId === updated.projId)
+//           ? { ...p, finalVersion: false }
+//           : p
+//       );
+//     } else {
+//       newPlans = plans.map((p, i) => (i === idx ? updated : p));
+//     }
+
+//     // "In Progress" handling for exclusivity
+//     if (updated.status === "In Progress") {
+//       newPlans = newPlans.map((p, i) =>
+//         i !== idx && p.status === "In Progress" && p.plType === updated.plType
+//           ? { ...p, status: "Submitted", isCompleted: true }
+//           : p
+//       );
+//     }
+//     setPlans(newPlans);
+//     onPlanSelect(updated);
+//     if (
+//       (BOOLEAN_FIELDS.includes(field) || field === "status") &&
+//       planId &&
+//       Number(planId) > 0
+//     ) {
+//       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+//       try {
+//         await axios.put(updateUrl, updated);
+//       } catch (err) {
+//         setPlans(prevPlans);
+//         toast.error(
+//           "Error updating plan: " +
+
+//             (err.response?.data?.message || err.message),
+//           { toastId: "checkbox-error" }
+//         );
+//       }
+//     }
+//   };
+   
+const handleCheckboxChange = async (idx, field) => {
+  const prevPlans = [...plans];
+  const plan = plans[idx];
+  const planId = plan.plId;
+  if (!plan.plType || !plan.version) {
+    toast.error(
+      `Cannot update ${field}: Plan Type and Version are required.`,
+      { toastId: "checkbox-error" }
+    );
+    return;
+  }
+  if (field === "isApproved" && !plan.isCompleted) {
+    toast.error("You can't approve this row until Submitted is checked", {
+      toastId: "checkbox-error",
+    });
+    return;
+  }
+  if (field === "finalVersion" && !plan.isApproved) {
+    toast.error("You can't set Conclude until Approved is checked", {
+      toastId: "checkbox-error",
+    });
+    return;
+  }
+  let updated = { ...plan };
+  updated[field] = !plan[field];
+  if (field === "isCompleted") {
+    updated.status = updated.isCompleted ? "Submitted" : "In Progress";
+    if (!updated.isCompleted) {
+      updated.isApproved = false;
+      updated.finalVersion = false;
+    }
+  }
+  if (field === "isApproved") {
+    updated.status = updated.isApproved ? "Approved" : "Submitted";
+    if (!updated.isApproved) updated.finalVersion = false;
+  }
+  if (field === "finalVersion")
+    updated.status = updated.finalVersion ? "Concluded" : "Approved";
+  let newPlans;
+  
+  if (field === "isCompleted" && !updated.isCompleted) {
+    const isEAC = updated.plType === "EAC";
+    const inProgressCount = plans.filter(
+      (p) => p.status === "In Progress" && p.plType === updated.plType
+    ).length;
+    if (inProgressCount > 0 && updated.status === "In Progress") {
       toast.error(
-        `Cannot update ${field}: Plan Type and Version are required.`,
+        `Only one ${isEAC ? "EAC" : "BUD"} plan can have In Progress status at a time.`,
         { toastId: "checkbox-error" }
       );
       return;
     }
-    if (field === "isApproved" && !plan.isCompleted) {
-      toast.error("You can't approve this row until Submitted is checked", {
-        toastId: "checkbox-error",
-      });
-      return;
-    }
-    if (field === "finalVersion" && !plan.isApproved) {
-      toast.error("You can't set Conclude until Approved is checked", {
-        toastId: "checkbox-error",
-      });
-      return;
-    }
-    let updated = { ...plan };
-    updated[field] = !plan[field];
-    if (field === "isCompleted") {
-      updated.status = updated.isCompleted ? "Submitted" : "In Progress";
-      if (!updated.isCompleted) {
-        updated.isApproved = false;
-        updated.finalVersion = false;
-      }
-    }
-    if (field === "isApproved") {
-      updated.status = updated.isApproved ? "Approved" : "Submitted";
-      if (!updated.isApproved) updated.finalVersion = false;
-    }
-    if (field === "finalVersion")
-    //   updated.status = updated.finalVersion ? "Submitted" : "Approved";
-    updated.status = updated.finalVersion ? "Concluded" : "Approved";
-    let newPlans;
-    
-    if (field === "isCompleted" && !updated.isCompleted) {
-      const isEAC = updated.plType === "EAC";
-      const inProgressCount = plans.filter(
-        (p) => p.status === "In Progress" && p.plType === updated.plType
-      ).length;
-      if (inProgressCount > 0 && updated.status === "In Progress") {
-        toast.error(
-          `Only one ${
-            isEAC ? "EAC" : "BUD"
-          } plan can have In Progress status at a time.`,
-          { toastId: "checkbox-error" }
-        );
-        return;
-      }
-    }
-    if (field === "finalVersion" && updated.finalVersion) {
-      newPlans = plans.map((p, i) =>
-        i === idx
-          ? updated
-          : (p.plType === updated.plType && p.projId === updated.projId)
-          ? { ...p, finalVersion: false }
-          : p
-      );
-    } else {
-      newPlans = plans.map((p, i) => (i === idx ? updated : p));
-    }
+  }
+  if (field === "finalVersion" && updated.finalVersion) {
+    newPlans = plans.map((p, i) =>
+      i === idx
+        ? updated
+        : (p.plType === updated.plType && p.projId === updated.projId)
+        ? { ...p, finalVersion: false }
+        : p
+    );
+  } else {
+    newPlans = plans.map((p, i) => (i === idx ? updated : p));
+  }
 
-    // "In Progress" handling for exclusivity
-    if (updated.status === "In Progress") {
-      newPlans = newPlans.map((p, i) =>
-        i !== idx && p.status === "In Progress" && p.plType === updated.plType
-          ? { ...p, status: "Submitted", isCompleted: true }
-          : p
+  // "In Progress" handling for exclusivity
+  if (updated.status === "In Progress") {
+    newPlans = newPlans.map((p, i) =>
+      i !== idx && p.status === "In Progress" && p.plType === updated.plType
+        ? { ...p, status: "Submitted", isCompleted: true }
+        : p
+    );
+  }
+  setPlans(newPlans);
+  onPlanSelect(updated);
+
+  if (
+    (BOOLEAN_FIELDS.includes(field) || field === "status") &&
+    planId &&
+    Number(planId) > 0
+  ) {
+    const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+    
+    const payload = {
+      plId: updated.plId,
+      projId: updated.projId,
+      plType: updated.plType,
+      versionCode: updated.versionCode,
+      finalVersion: updated.finalVersion,
+      isCompleted: updated.isCompleted,
+      isApproved: updated.isApproved,
+      status: updated.status,
+      approvedBy: updated.approvedBy,
+      templateId: updated.templateId
+    };
+    try {
+      await axios.put(updateUrl, payload);
+    } catch (err) {
+      setPlans(prevPlans);
+      toast.error(
+        "Error updating plan: " +
+        (err.response?.data?.message || err.message),
+        { toastId: "checkbox-error" }
       );
     }
-    setPlans(newPlans);
-    onPlanSelect(updated);
-    if (
-      (BOOLEAN_FIELDS.includes(field) || field === "status") &&
-      planId &&
-      Number(planId) > 0
-    ) {
-      const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
-      try {
-        await axios.put(updateUrl, updated);
-      } catch (err) {
-        setPlans(prevPlans);
-        toast.error(
-          "Error updating plan: " +
-            (err.response?.data?.message || err.message),
-          { toastId: "checkbox-error" }
-        );
-      }
-    }
-  };
+  }
+};
 
   const handleVersionCodeChange = async (idx, value) => {
     const prevPlans = [...plans];
