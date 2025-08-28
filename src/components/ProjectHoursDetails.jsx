@@ -21137,35 +21137,66 @@ useEffect(() => {
     }
   };
 
-  const fetchLaborAccounts = async () => {
-    if (!projectId || !showNewForm) return;
-    try {
-      const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
-      );
-      const data = Array.isArray(response.data)
-        ? response.data[0]
-        : response.data;
-      const accounts = Array.isArray(data.laborAccounts)
-        ? data.laborAccounts.map((account) => ({ id: account }))
-        : [];
-      setLaborAccounts(accounts);
+//   const fetchLaborAccounts = async () => {
+//     if (!projectId || !showNewForm) return;
+//     try {
+//       const response = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//       );
+//       const data = Array.isArray(response.data)
+//         ? response.data[0]
+//         : response.data;
+//       const accounts = Array.isArray(data.laborAccounts)
+//         ? data.laborAccounts.map((account) => ({ id: account }))
+//         : [];
+//       setLaborAccounts(accounts);
 
-      // ONLY auto-populate organization for Vendor Employee type
-      if (newEntry.idType === "Vendor" && data.orgId) {
-        setNewEntry((prev) => ({
-          ...prev,
-          orgId: data.orgId,
-        }));
-      }
-    } catch (err) {
-      setLaborAccounts([]);
-      toast.error(`Failed to fetch labor accounts`, {
-        toastId: "labor-accounts-error",
-        autoClose: 3000,
-      });
+//       // ONLY auto-populate organization for Vendor Employee type
+//       if (newEntry.idType === "Vendor" && data.orgId) {
+//         setNewEntry((prev) => ({
+//           ...prev,
+//           orgId: data.orgId,
+//         }));
+//       }
+//     } catch (err) {
+//       setLaborAccounts([]);
+//       toast.error(`Failed to fetch labor accounts`, {
+//         toastId: "labor-accounts-error",
+//         autoClose: 3000,
+//       });
+//     }
+//   };
+
+const fetchLaborAccounts = async () => {
+  if (!projectId || !showNewForm) return;
+  try {
+    const response = await axios.get(
+      `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+    );
+    const data = Array.isArray(response.data)
+      ? response.data[0]
+      : response.data;
+    const accounts = Array.isArray(data.employeeLaborAccounts)
+      ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
+      : [];
+    setLaborAccounts(accounts);
+
+    // ONLY auto-populate organization for Vendor Employee type
+    if (newEntry.idType === "Vendor" && data.orgId) {
+      setNewEntry((prev) => ({
+        ...prev,
+        orgId: data.orgId,
+      }));
     }
-  };
+  } catch (err) {
+    setLaborAccounts([]);
+    toast.error(`Failed to fetch labor accounts`, {
+      toastId: "labor-accounts-error",
+      autoClose: 3000,
+    });
+  }
+};
+
 
   if (showNewForm) {
     fetchEmployeesSuggestions();
@@ -23502,3 +23533,4 @@ const handleRowClick = (actualEmpIdx) => {
 };
 
 export default ProjectHoursDetails;
+
