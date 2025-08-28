@@ -20687,10 +20687,14 @@ const ProjectHoursDetails = ({
 //     if (!val) return true; // Allow empty
 //     return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 //   };
+// const isValidOrg = (val) => {
+//   if (!val) return true; // Allow empty
+//   // Check if it's numeric and exists in organization options
+//   return /^\d+$/.test(val) && organizationOptions.some(opt => opt.value === val);
+// };
 const isValidOrg = (val) => {
   if (!val) return true; // Allow empty
-  // Check if it's numeric and exists in organization options
-  return /^\d+$/.test(val) && organizationOptions.some(opt => opt.value === val);
+  return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 };
 
 
@@ -20703,11 +20707,15 @@ const isValidOrg = (val) => {
 //       employeeSuggestions.some((emp) => emp.plc === val)
 //     );
 //   };
+// const isValidPlc = (val) => {
+//   if (!val) return true; // Allow empty
+//   // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
+//   return plcOptions.some(opt => opt.value === val) || 
+//          employeeSuggestions.some(emp => emp.plc === val);
+// };
 const isValidPlc = (val) => {
   if (!val) return true; // Allow empty
-  // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
-  return plcOptions.some(opt => opt.value === val) || 
-         employeeSuggestions.some(emp => emp.plc === val);
+  return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 };
 
   // Track unsaved changes
@@ -20861,229 +20869,321 @@ const isValidPlc = (val) => {
     fetchDurations();
   }, [startDate, endDate]);
 
-  useEffect(() => {
-    const fetchEmployeesSuggestions = async () => {
-      if (!projectId || !showNewForm) return;
-      try {
-        const endpoint =
-          newEntry.idType === "Vendor"
-            ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
-            : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
-        const response = await axios.get(endpoint);
-        const suggestions = Array.isArray(response.data)
-          ? response.data.map((emp) => {
-              if (newEntry.idType === "Vendor") {
-                return {
-                  emplId: emp.vendId, // Use vendId as the main ID
-                  firstName: "",
-                  lastName: emp.employeeName || "",
-                  perHourRate: emp.perHourRate || emp.hrRate || "",
-                  plc: emp.plc || "", // This is the PLC from API
-                  orgId: emp.orgId || "",
-                };
-              } else {
-                const [lastName, firstName] = (emp.employeeName || "")
-                  .split(", ")
-                  .map((str) => str.trim());
-                return {
-                  emplId: emp.empId,
-                  firstName: firstName || "",
-                  lastName: lastName || "",
-                  perHourRate: emp.perHourRate || emp.hrRate || "",
-                  plc: emp.plc || "",
-                  orgId: emp.orgId || "",
-                };
-              }
-            })
-          : [];
-        setEmployeeSuggestions(suggestions);
-      } catch (err) {
-        setEmployeeSuggestions([]);
-        toast.error(`Failed to fetch employee suggestions`, {
-          toastId: "employee-fetch-error",
-          autoClose: 3000,
-        });
-      }
-    };
+//   useEffect(() => {
+//     const fetchEmployeesSuggestions = async () => {
+//       if (!projectId || !showNewForm) return;
+//       try {
+//         const endpoint =
+//           newEntry.idType === "Vendor"
+//             ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
+//             : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
+//         const response = await axios.get(endpoint);
+//         const suggestions = Array.isArray(response.data)
+//           ? response.data.map((emp) => {
+//               if (newEntry.idType === "Vendor") {
+//                 return {
+//                   emplId: emp.vendId, // Use vendId as the main ID
+//                   firstName: "",
+//                   lastName: emp.employeeName || "",
+//                   perHourRate: emp.perHourRate || emp.hrRate || "",
+//                   plc: emp.plc || "", // This is the PLC from API
+//                   orgId: emp.orgId || "",
+//                 };
+//               } else {
+//                 const [lastName, firstName] = (emp.employeeName || "")
+//                   .split(", ")
+//                   .map((str) => str.trim());
+//                 return {
+//                   emplId: emp.empId,
+//                   firstName: firstName || "",
+//                   lastName: lastName || "",
+//                   perHourRate: emp.perHourRate || emp.hrRate || "",
+//                   plc: emp.plc || "",
+//                   orgId: emp.orgId || "",
+//                 };
+//               }
+//             })
+//           : [];
+//         setEmployeeSuggestions(suggestions);
+//       } catch (err) {
+//         setEmployeeSuggestions([]);
+//         toast.error(`Failed to fetch employee suggestions`, {
+//           toastId: "employee-fetch-error",
+//           autoClose: 3000,
+//         });
+//       }
+//     };
 
-    const fetchLaborAccounts = async () => {
-      if (!projectId || !showNewForm) return;
-      try {
-        const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
-        );
-        const data = Array.isArray(response.data)
-          ? response.data[0]
-          : response.data;
-        const accounts = Array.isArray(data.laborAccounts)
-          ? data.laborAccounts.map((account) => ({ id: account }))
-          : [];
-        setLaborAccounts(accounts);
+//     const fetchLaborAccounts = async () => {
+//       if (!projectId || !showNewForm) return;
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//         );
+//         const data = Array.isArray(response.data)
+//           ? response.data[0]
+//           : response.data;
+//         const accounts = Array.isArray(data.laborAccounts)
+//           ? data.laborAccounts.map((account) => ({ id: account }))
+//           : [];
+//         setLaborAccounts(accounts);
 
-        // ONLY auto-populate organization for Vendor Employee type
-        if (newEntry.idType === "Vendor" && data.orgId) {
-          setNewEntry((prev) => ({
-            ...prev,
-            orgId: data.orgId,
-          }));
-        }
-      } catch (err) {
-        setLaborAccounts([]);
-        toast.error(`Failed to fetch labor accounts`, {
-          toastId: "labor-accounts-error",
-          autoClose: 3000,
-        });
-      }
-    };
+//         // ONLY auto-populate organization for Vendor Employee type
+//         if (newEntry.idType === "Vendor" && data.orgId) {
+//           setNewEntry((prev) => ({
+//             ...prev,
+//             orgId: data.orgId,
+//           }));
+//         }
+//       } catch (err) {
+//         setLaborAccounts([]);
+//         toast.error(`Failed to fetch labor accounts`, {
+//           toastId: "labor-accounts-error",
+//           autoClose: 3000,
+//         });
+//       }
+//     };
 
-    // const fetchPlcOptions = async (searchTerm) => {
-    //   if (!projectId || !showNewForm) return;
-    //   try {
-    //     const response = await axios.get(
-    //       `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(
-    //         searchTerm
-    //       )}`
-    //     );
-    //     const options = Array.isArray(response.data)
-    //       ? response.data.map((plc) => ({
-    //           value: plc.laborCategoryCode,
-    //           label: `${plc.laborCategoryCode} - ${plc.description}`,
-    //         }))
-    //       : [];
-    //     setPlcOptions(options);
-    //   } catch (err) {
-    //     setPlcOptions([]);
-    //     toast.error(`Failed to fetch PLC options for search '${searchTerm}'`, {
-    //       toastId: "plc-fetch-error",
-    //       autoClose: 3000,
-    //     });
-    //   }
-    // };
+//     // const fetchPlcOptions = async (searchTerm) => {
+//     //   if (!projectId || !showNewForm) return;
+//     //   try {
+//     //     const response = await axios.get(
+//     //       `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(
+//     //         searchTerm
+//     //       )}`
+//     //     );
+//     //     const options = Array.isArray(response.data)
+//     //       ? response.data.map((plc) => ({
+//     //           value: plc.laborCategoryCode,
+//     //           label: `${plc.laborCategoryCode} - ${plc.description}`,
+//     //         }))
+//     //       : [];
+//     //     setPlcOptions(options);
+//     //   } catch (err) {
+//     //     setPlcOptions([]);
+//     //     toast.error(`Failed to fetch PLC options for search '${searchTerm}'`, {
+//     //       toastId: "plc-fetch-error",
+//     //       autoClose: 3000,
+//     //     });
+//     //   }
+//     // };
 
-    // Add this new function for organizations
+//     // Add this new function for organizations
     
-    const fetchPlcOptions = async (searchTerm) => {
-  if (!projectId || !showNewForm) return;
-  try {
-    // FIX: Handle empty search term - call API without parameter
-    const url = searchTerm && searchTerm.trim().length > 0 
-      ? `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(searchTerm)}`
-      : `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`;
+//     const fetchPlcOptions = async (searchTerm) => {
+//   if (!projectId || !showNewForm) return;
+//   try {
+//     // FIX: Handle empty search term - call API without parameter
+//     const url = searchTerm && searchTerm.trim().length > 0 
+//       ? `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(searchTerm)}`
+//       : `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`;
     
-    const response = await axios.get(url);
-    const options = Array.isArray(response.data)
-      ? response.data.map((plc) => ({
-          value: plc.laborCategoryCode,
-          label: `${plc.laborCategoryCode} - ${plc.description}`,
-        }))
-      : [];
-    setPlcOptions(options);
-  } catch (err) {
-    setPlcOptions([]);
-    console.error(`Failed to fetch PLC options:`, err);
-  }
-};
+//     const response = await axios.get(url);
+//     const options = Array.isArray(response.data)
+//       ? response.data.map((plc) => ({
+//           value: plc.laborCategoryCode,
+//           label: `${plc.laborCategoryCode} - ${plc.description}`,
+//         }))
+//       : [];
+//     setPlcOptions(options);
+//   } catch (err) {
+//     setPlcOptions([]);
+//     console.error(`Failed to fetch PLC options:`, err);
+//   }
+// };
 
   
-    const fetchOrganizationOptions = async () => {
+// //     const fetchOrganizationOptions = async () => {
+// //     if (!projectId || !showNewForm) return;
+// //     try {
+// //       const response = await axios.get(
+// //         `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+// //       );
+// //       const options = Array.isArray(response.data)
+// //         ? response.data.map((org) => ({
+// //             value: org.orgId,
+// //             label: org.orgId,
+// //           }))
+// //         : [];
+// //       setOrganizationOptions(options);
+// //     } catch (err) {
+// //       setOrganizationOptions([]);
+// //       toast.error(`Failed to fetch organization options`, {
+// //         toastId: "org-fetch-error",
+// //         autoClose: 3000,
+// //       });
+// //     }
+// //   };
+
+//     if (showNewForm) {
+//       fetchEmployeesSuggestions();
+//       fetchLaborAccounts();
+//     //   fetchOrganizationOptions(); // ADD THIS LINE
+//       if (plcSearch && !autoPopulatedPLC) {
+//         if (debounceTimeout.current) {
+//           clearTimeout(debounceTimeout.current);
+//         }
+//         debounceTimeout.current = setTimeout(() => {
+//           fetchPlcOptions(plcSearch);
+//         }, 300);
+//       } else {
+//         setPlcOptions([]);
+//       }
+//     } else {
+//     setEmployeeSuggestions([]); // Only clear employee suggestions
+//     setLaborAccounts([]); // Only clear labor accounts
+//     setPlcSearch("");
+//     setOrgSearch("");
+//     setAutoPopulatedPLC(false);
+//     }
+
+//     return () => {
+//       if (debounceTimeout.current) {
+//         clearTimeout(debounceTimeout.current);
+//       }
+//     };
+//   }, [projectId, showNewForm, plcSearch, newEntry.idType, autoPopulatedPLC]);
+  
+  // New useEffect ONLY for existing row updates (not new form)
+  // This useEffect should load initial options for existing row updates
+// useEffect(() => {
+//   const fetchOptionsForUpdates = async () => {
+//     if (showNewForm || !projectId || !isEditable || !isBudPlan) return;
+    
+//     try {
+//       console.log('Fetching options for existing row updates...'); // Add this debug log
+      
+//       // Always load organization options for updates
+//       const orgResponse = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//       );
+//       const orgOptions = Array.isArray(orgResponse.data)
+//         ? orgResponse.data.map((org) => ({
+//             value: org.orgId,
+//             label: org.orgId,
+//           }))
+//         : [];
+//       setOrganizationOptions(orgOptions);
+//       console.log('Org options loaded:', orgOptions); // Add this debug log
+
+//       // Always load PLC options for updates
+//       const plcResponse = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`
+//       );
+//       const plcOptionsAll = Array.isArray(plcResponse.data)
+//         ? plcResponse.data.map((plc) => ({
+//             value: plc.laborCategoryCode,
+//             label: `${plc.laborCategoryCode} - ${plc.description}`,
+//           }))
+//         : [];
+//       setPlcOptions(plcOptionsAll);
+//       console.log('PLC options loaded:', plcOptionsAll); // Add this debug log
+
+//     } catch (err) {
+//       console.error("Failed to load options for updates:", err);
+//       setOrganizationOptions([]);
+//       setPlcOptions([]);
+//     }
+//   };
+
+//   // Only run when NOT in new form mode
+//   if (!showNewForm && projectId && isEditable && isBudPlan) {
+//     fetchOptionsForUpdates();
+//   }
+// }, [projectId, isEditable, isBudPlan, showNewForm]);
+
+useEffect(() => {
+  const fetchEmployeesSuggestions = async () => {
     if (!projectId || !showNewForm) return;
     try {
-      const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
-      );
-      const options = Array.isArray(response.data)
-        ? response.data.map((org) => ({
-            value: org.orgId,
-            label: org.orgId,
-          }))
+      const endpoint =
+        newEntry.idType === "Vendor"
+          ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
+          : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
+      const response = await axios.get(endpoint);
+      const suggestions = Array.isArray(response.data)
+        ? response.data.map((emp) => {
+            if (newEntry.idType === "Vendor") {
+              return {
+                emplId: emp.vendId,
+                firstName: "",
+                lastName: emp.employeeName || "",
+                perHourRate: emp.perHourRate || emp.hrRate || "",
+                plc: emp.plc || "",
+                orgId: emp.orgId || "",
+              };
+            } else {
+              const [lastName, firstName] = (emp.employeeName || "")
+                .split(", ")
+                .map((str) => str.trim());
+              return {
+                emplId: emp.empId,
+                firstName: firstName || "",
+                lastName: lastName || "",
+                perHourRate: emp.perHourRate || emp.hrRate || "",
+                plc: emp.plc || "",
+                orgId: emp.orgId || "",
+              };
+            }
+          })
         : [];
-      setOrganizationOptions(options);
+      setEmployeeSuggestions(suggestions);
     } catch (err) {
-      setOrganizationOptions([]);
-      toast.error(`Failed to fetch organization options`, {
-        toastId: "org-fetch-error",
+      setEmployeeSuggestions([]);
+      toast.error(`Failed to fetch employee suggestions`, {
+        toastId: "employee-fetch-error",
         autoClose: 3000,
       });
     }
   };
 
-    if (showNewForm) {
-      fetchEmployeesSuggestions();
-      fetchLaborAccounts();
-      fetchOrganizationOptions(); // ADD THIS LINE
-      if (plcSearch && !autoPopulatedPLC) {
-        if (debounceTimeout.current) {
-          clearTimeout(debounceTimeout.current);
-        }
-        debounceTimeout.current = setTimeout(() => {
-          fetchPlcOptions(plcSearch);
-        }, 300);
-      } else {
-        setPlcOptions([]);
-      }
-    } else {
-    setEmployeeSuggestions([]); // Only clear employee suggestions
-    setLaborAccounts([]); // Only clear labor accounts
-    setPlcSearch("");
-    setOrgSearch("");
-    setAutoPopulatedPLC(false);
-    }
-
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [projectId, showNewForm, plcSearch, newEntry.idType, autoPopulatedPLC]);
-  
-  // New useEffect ONLY for existing row updates (not new form)
-  // This useEffect should load initial options for existing row updates
-useEffect(() => {
-  const fetchOptionsForUpdates = async () => {
-    if (showNewForm || !projectId || !isEditable || !isBudPlan) return;
-    
+  const fetchLaborAccounts = async () => {
+    if (!projectId || !showNewForm) return;
     try {
-      console.log('Fetching options for existing row updates...'); // Add this debug log
-      
-      // Always load organization options for updates
-      const orgResponse = await axios.get(
-        `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
       );
-      const orgOptions = Array.isArray(orgResponse.data)
-        ? orgResponse.data.map((org) => ({
-            value: org.orgId,
-            label: org.orgId,
-          }))
+      const data = Array.isArray(response.data)
+        ? response.data[0]
+        : response.data;
+      const accounts = Array.isArray(data.laborAccounts)
+        ? data.laborAccounts.map((account) => ({ id: account }))
         : [];
-      setOrganizationOptions(orgOptions);
-      console.log('Org options loaded:', orgOptions); // Add this debug log
+      setLaborAccounts(accounts);
 
-      // Always load PLC options for updates
-      const plcResponse = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`
-      );
-      const plcOptionsAll = Array.isArray(plcResponse.data)
-        ? plcResponse.data.map((plc) => ({
-            value: plc.laborCategoryCode,
-            label: `${plc.laborCategoryCode} - ${plc.description}`,
-          }))
-        : [];
-      setPlcOptions(plcOptionsAll);
-      console.log('PLC options loaded:', plcOptionsAll); // Add this debug log
-
+      // ONLY auto-populate organization for Vendor Employee type
+      if (newEntry.idType === "Vendor" && data.orgId) {
+        setNewEntry((prev) => ({
+          ...prev,
+          orgId: data.orgId,
+        }));
+      }
     } catch (err) {
-      console.error("Failed to load options for updates:", err);
-      setOrganizationOptions([]);
-      setPlcOptions([]);
+      setLaborAccounts([]);
+      toast.error(`Failed to fetch labor accounts`, {
+        toastId: "labor-accounts-error",
+        autoClose: 3000,
+      });
     }
   };
 
-  // Only run when NOT in new form mode
-  if (!showNewForm && projectId && isEditable && isBudPlan) {
-    fetchOptionsForUpdates();
+  if (showNewForm) {
+    fetchEmployeesSuggestions();
+    fetchLaborAccounts();
+  } else {
+    setEmployeeSuggestions([]);
+    setLaborAccounts([]);
+    setPlcSearch("");
+    setOrgSearch("");
+    setAutoPopulatedPLC(false);
   }
-}, [projectId, isEditable, isBudPlan, showNewForm]);
 
+  return () => {
+    if (debounceTimeout.current) {
+      clearTimeout(debounceTimeout.current);
+    }
+  };
+}, [projectId, showNewForm, newEntry.idType]);
 
 
 const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
@@ -21408,16 +21508,16 @@ const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
     }
 
     // 4. Duplicate check against already-saved employees
-    const isDuplicate = localEmployees.some(
-      (emp) => emp.emple && emp.emple.emplId === trimmedValue
-    );
-    if (isDuplicate) {
-      toast.error("This ID already exists. Please use a different ID.", {
-        toastId: "duplicate-id",
-        autoClose: 3000,
-      });
-      return;
-    }
+    // const isDuplicate = localEmployees.some(
+    //   (emp) => emp.emple && emp.emple.emplId === trimmedValue
+    // );
+    // if (isDuplicate) {
+    //   toast.error("This ID already exists. Please use a different ID.", {
+    //     toastId: "duplicate-id",
+    //     autoClose: 3000,
+    //   });
+    //   return;
+    // }
 
     // 5. “Other” type needs no further validation
     if (newEntry.idType === "Other") return;
@@ -21862,19 +21962,35 @@ const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
     }
 
     // Check for duplicate employee ID before validating anything else
+    // const isDuplicate = localEmployees.some(
+    //   (emp) => emp.emple && emp.emple.emplId === newEntry.id.trim()
+    // );
+    // if (isDuplicate) {
+    //   toast.error(
+    //     "Can't save entry with existing ID. Please use a different ID.",
+    //     {
+    //       toastId: "duplicate-save-error",
+    //       autoClose: 3000,
+    //     }
+    //   );
+    //   return;
+    // }
+
     const isDuplicate = localEmployees.some(
-      (emp) => emp.emple && emp.emple.emplId === newEntry.id.trim()
-    );
-    if (isDuplicate) {
-      toast.error(
-        "Can't save entry with existing ID. Please use a different ID.",
-        {
-          toastId: "duplicate-save-error",
-          autoClose: 3000,
-        }
-      );
-      return;
+  (emp) => emp.emple && 
+    emp.emple.emplId === newEntry.id.trim() && 
+    emp.emple.plcGlcCode === newEntry.plcGlcCode.trim()
+);
+if (isDuplicate) {
+  toast.error(
+    "Can't save entry with existing ID and PLC combination. Please use a different ID or PLC.",
+    {
+      toastId: "duplicate-save-error",
+      autoClose: 3000,
     }
+  );
+  return;
+}
 
     if (newEntry.idType === "PLC") {
       if (!newEntry.id || newEntry.id !== "PLC") {

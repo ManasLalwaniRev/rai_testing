@@ -80,14 +80,34 @@ const Login = () => {
 
       if (response.ok) {
         const data = await response.json();
-        // Optionally save token to localStorage for future requests
         if (data.token) {
           localStorage.setItem("authToken", data.token);
         }
         navigate("/dashboard");
       } else {
-        const errData = await response.json();
-        setError(errData.message || "Login failed. Please check your credentials.");
+        // Check the Content-Type to determine how to parse the response
+        const contentType = response.headers.get("content-type");
+        let errorMessage = "Login failed. Please check your credentials.";
+
+        if (contentType && contentType.includes("application/json")) {
+          // Response is JSON
+          try {
+            const errData = await response.json();
+            errorMessage = errData.message || errData.error || errData.Message || errData.Error || errorMessage;
+          } catch (jsonError) {
+            errorMessage = "Login failed. Please check your credentials.";
+          }
+        } else {
+          // Response is plain text (like in your case)
+          try {
+            const textResponse = await response.text();
+            errorMessage = textResponse || errorMessage;
+          } catch (textError) {
+            errorMessage = "Login failed. Please check your credentials.";
+          }
+        }
+
+        setError(errorMessage);
       }
     } catch (error) {
       setError("Network error. Please try again later.");

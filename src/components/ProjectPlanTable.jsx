@@ -10116,6 +10116,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProjectPlanForm from "./ProjectPlanForm";
+import NewBusiness from "./NewBusiness";
 import { formatDate } from "./utils";
 
 const BOOLEAN_FIELDS = ["finalVersion", "isCompleted", "isApproved"];
@@ -10158,6 +10159,8 @@ const ProjectPlanTable = ({
   const [editingVersionCodeIdx, setEditingVersionCodeIdx] = useState(null);
   const [editingVersionCodeValue, setEditingVersionCodeValue] = useState("");
   const [budEacFilter, setBudEacFilter] = useState(false);
+  const [showNewBusinessPopup, setShowNewBusinessPopup] = useState(false);
+
   
   // Add a ref to track the last fetched project ID to prevent unnecessary API calls
   const lastFetchedProjectId = useRef(null);
@@ -10316,6 +10319,7 @@ const ProjectPlanTable = ({
       const filtered = plans.filter(plan => plan.plType === "BUD" || plan.plType === "EAC");
       setFilteredPlans(filtered);
     } else {
+
       setFilteredPlans(plans);
     }
   }, [budEacFilter, plans]);
@@ -11035,22 +11039,725 @@ const ProjectPlanTable = ({
     );
   }
 
-  return (
-    <div className="p-4 relative z-10" key={refreshKey}>
-      {isActionLoading && (
-        <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-20">
-          <div className="flex items-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-2 text-sm text-gray-700">Processing...</span>
+//   return (
+//     <div className="p-4 relative z-10" key={refreshKey}>
+//       {isActionLoading && (
+//         <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-20">
+//           <div className="flex items-center">
+//             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+//             <span className="ml-2 text-sm text-gray-700">Processing...</span>
+//           </div>
+//         </div>
+//       )}
+//       <div className="flex justify-between items-center mb-2">
+//         <div className="flex gap-1 flex-wrap">
+//           {plans.length > 0 && (
+//             <>
+
+//             <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Budget"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Budget") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                     .sameLevelBud
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Budget") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                     .sameLevelBud
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Budget"
+//               >
+//                 New Budget
+//               </button>
+ 
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Blank Budget"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                     .sameLevelBud
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Blank Budget"
+//               >
+//                 New Blank Budget
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create EAC"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create EAC") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                     .sameLevelBud
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create EAC") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                     .sameLevelBud
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create EAC"
+//               >
+//                 New EAC
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Delete"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Delete") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                     .sameLevelBud
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Delete") ||
+//                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+//                     .sameLevelBud
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+//                 }`}
+//                 title="Delete Selected Plan"
+//               >
+//                 Delete
+//               </button>
+//               {/* <button
+//                 onClick={() => handleTopButtonToggle("isCompleted")}
+//                 disabled={getTopButtonDisabled("isCompleted")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isCompleted")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Submit"
+//               >
+//                 Submit
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("isApproved")}
+//                 disabled={getTopButtonDisabled("isApproved")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isApproved")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Approve"
+//               >
+//                 Approve
+//               </button>
+//               <button
+//                 onClick={() => handleTopButtonToggle("finalVersion")}
+//                 disabled={getTopButtonDisabled("finalVersion")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("finalVersion")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Conclude"
+//               >
+//                 Conclude
+//               </button> */}
+//               {/* with submit and unsumit logic */}
+//               <button
+//                 onClick={() => handleTopButtonToggle("isCompleted")}
+//                 disabled={
+//                   getTopButtonDisabled("isCompleted") || isActionLoading
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isCompleted") || isActionLoading
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title={
+//                   selectedPlan?.status === "Submitted" ? "Unsubmit" : "Submit"
+//                 }
+//               >
+//                 {isActionLoading
+//                   ? "Processing..." // show while API is running
+//                   : selectedPlan?.status === "Submitted"
+//                   ? "Unsubmit"
+//                   : "Submit"}
+//               </button>
+// {/* with approve and unapprove logic */}
+//               <button
+//                 onClick={() => handleTopButtonToggle("isApproved")}
+//                 disabled={getTopButtonDisabled("isApproved") || isActionLoading}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("isApproved") || isActionLoading
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title={
+//                   selectedPlan?.status === "Approved" ? "Unapprove" : "Approve"
+//                 }
+//               >
+//                 {isActionLoading
+//                   ? "Processing..." // show while API is running
+//                   : selectedPlan?.status === "Approved" ||
+//                     selectedPlan?.finalVersion
+//                   ? "Unapprove"
+//                   : "Approve"}
+//               </button>
+// {/* with conclude and unconclude logic */}
+//               <button
+//                 onClick={() => handleTopButtonToggle("finalVersion")}
+//                 disabled={
+//                   getTopButtonDisabled("finalVersion") || isActionLoading
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getTopButtonDisabled("finalVersion") || isActionLoading
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title={selectedPlan?.finalVersion ? "Unconclude" : "Conclude"}
+//               >
+//                 {isActionLoading
+//                   ? "Processing..."
+//                   : selectedPlan?.finalVersion
+//                   ? "Unconclude"
+//                   : "Conclude"}
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   setIsActionLoading(true);
+//                   handleCalc();
+//                 }}
+//                 disabled={getCalcButtonDisabled()}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   getCalcButtonDisabled()
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Calculate"
+//               >
+//                 Calc
+//               </button>
+
+            
+//              {/* <button
+//                  onClick={() => {
+//                    handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Budget"
+//                    );
+//                  }}
+//                 disabled={
+//                    !selectedPlan ||
+//                    !getButtonAvailability(selectedPlan, "Create Budget")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Budget")
+//                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Budget"
+//               >
+//                 New Budget
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                     "Create Blank Budget"
+//                   );
+//                 }}
+//                 disabled={
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget")
+//                 }
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                   !selectedPlan ||
+//                   !getButtonAvailability(selectedPlan, "Create Blank Budget")
+//                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Create Blank Budget"
+//               >
+//                 New Blank Budget
+//               </button>
+//               <button
+//                 onClick={() => {
+//                   handleActionSelect(
+//                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                      "Create EAC"
+//                    );
+//                  }}
+//                  disabled={
+//                    !selectedPlan ||
+//                    !getButtonAvailability(selectedPlan, "Create EAC")
+//                  }
+//                  className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                    !selectedPlan ||
+//                    !getButtonAvailability(selectedPlan, "Create EAC")
+//                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                      : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                  }`}
+//                  title="Create EAC"
+//                >
+//                  New EAC
+//                </button>
+//                <button
+//                  onClick={() => {
+//                    handleActionSelect(
+//                      plans.findIndex((p) => p.plId === selectedPlan?.plId),
+//                      "Delete"
+//                    );
+//                  }}
+//                  disabled={
+//                    !selectedPlan ||
+//                    !getButtonAvailability(selectedPlan, "Delete")
+//                  }
+//                  className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                    !selectedPlan ||
+//                    !getButtonAvailability(selectedPlan, "Delete")
+//                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                      : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+//                  }`}
+//                  title="Delete Selected Plan"
+//                >
+//                  Delete
+//                </button>
+//                <button
+//                  onClick={() => handleTopButtonToggle("isCompleted")}
+//                 disabled={getTopButtonDisabled("isCompleted")}
+//                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                    getTopButtonDisabled("isCompleted")
+//                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                      : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                  }`}
+//                  title="Toggle Submitted"
+//                >
+//                  Submitted
+//               </button>
+//                <button
+//                  onClick={() => handleTopButtonToggle("isApproved")}
+//                  disabled={getTopButtonDisabled("isApproved")}
+//                  className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                    getTopButtonDisabled("isApproved")
+//                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                      : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                  }`}
+//                  title="Toggle Approved"
+//                >
+//                  Approved
+//                </button>
+//                <button
+//                  onClick={() => handleTopButtonToggle("finalVersion")}
+//                  disabled={getTopButtonDisabled("finalVersion")}
+//                  className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                    getTopButtonDisabled("finalVersion")
+//                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                      : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                  }`}
+//                  title="Toggle Conclude"
+//                >
+//                  Conclude
+//                </button>
+//                <button
+//                  onClick={() => {
+//                    setIsActionLoading(true);
+//                    handleCalc();
+//                  }}
+//                  disabled={getCalcButtonDisabled()}
+//                  className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
+//                    getCalcButtonDisabled()
+//                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+//                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+//                 }`}
+//                 title="Calculate"
+//               >
+//                 Calc
+//                </button> */}
+
+//                 <button
+//                  onClick={() => setBudEacFilter(!budEacFilter)}
+//                  className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap "
+//                  title="Filter BUD/EAC Plans"
+//                >
+//                  BUD/EAC
+//                </button>
+
+//                <button
+//   onClick={() => setShowNewBusinessPopup(true)}
+//   className="bg-green-600 text-white hover:bg-green-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap"
+//   title="New Business"
+// >
+//   New Business
+// </button>
+//             </>
+
+
+            
+            
+//           )}
+//         </div>
+
+//         <div className="flex items-center gap-4">
+//           <button
+//             onClick={() => {
+//               fileInputRef.current.click();
+//             }}
+//             className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer whitespace-nowrap"
+//             title="Import Plan"
+//           >
+//             <svg
+//               xmlns="http://www.w3.org/2000/svg"
+//               className="h-4 w-4 mr-1"
+//               fill="none"
+//               viewBox="0 0 24 24"
+//               stroke="currentColor"
+//             >
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth={2}
+//                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+//               />
+//             </svg>
+//             Import
+//           </button>
+//           <input
+//             type="file"
+//             ref={fileInputRef}
+//             onChange={(e) => {
+//               handleImportPlan(e);
+//             }}
+//             accept=".xlsx,.xls"
+//             className="hidden"
+//           />
+
+//           <div className="flex items-center gap-2">
+//             <label
+//               htmlFor="fiscalYear"
+//               className="font-semibold text-xs sm:text-sm whitespace-nowrap"
+//             >
+//               Fiscal Year:
+//             </label>
+//             <select
+//               id="fiscalYear"
+//               value={fiscalYear}
+//               onChange={(e) => setFiscalYear(e.target.value)}
+//               className="border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+//               disabled={fiscalYearOptions?.length === 0}
+//             >
+//               {fiscalYearOptions?.map((year) => (
+//                 <option key={year} value={year}>
+//                   {year}
+//                 </option>
+//               ))}
+//             </select>
+//           </div>
+//         </div>
+//       </div>
+//       {filteredPlans.length === 0 ? (
+//         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+//           {plans.length === 0 
+//             ? `No project plans found for project ID: ${projectId}`
+//             : "No plans match the current filter criteria"
+//           }
+//         </div>
+//       ) : (
+//         <div className="w-full border border-gray-300 rounded-lg bg-white overflow-hidden">
+//         <div
+//           className="w-full overflow-auto"
+//           style={{
+//             maxHeight: "280px",
+//             minHeight: "280px",
+//             border: "1px solid #e5e7eb",
+//             borderRadius: "0.5rem",
+//             background: "#fff",
+//           }}
+//         >
+//           <table className="w-full table-auto  text-xs text-left border-collapse border">
+//             <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
+//               <tr>
+//                 <th className="p-1 border font-normal">Export</th>
+//                 {columns.map((col) => (
+//                   <th key={col} className="p-1 border font-normal text-center">
+//                     {COLUMN_LABELS[col] || col}
+//                   </th>
+//                 ))}
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filteredPlans.map((plan, idx) => (
+//                 <tr
+//                   key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
+//                   className={`transition-all duration-200 cursor-pointer ${
+//                     selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
+//                       ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
+//                       : "even:bg-gray-50 hover:bg-blue-50"  
+//                   }`}
+//                   onClick={() =>{
+//                     handleRowClick(plan);
+//                     getMasterAndRelatedProjects(plans, plan.projId);
+//                   } 
+//                   }
+//                 >
+//                   <td className="p-1 border text-center">
+//                     <button
+//                       onClick={(e) => {
+//                         e.stopPropagation();
+//                         handleExportPlan(plan);
+//                       }}
+//                       className="text-blue-600 hover:text-blue-800"
+//                       title="Export Plan"
+//                       disabled={!plan.projId || !plan.version || !plan.plType}
+//                     >
+//                       <svg
+//                         xmlns="http://www.w3.org/2000/svg"
+//                         className="h-4 w-4 cursor-pointer"
+//                         fill="none"
+//                         viewBox="0 0 24 24"
+//                         stroke="currentColor"
+//                       >
+//                         <path
+//                           strokeLinecap="round"
+//                           strokeLinejoin="round"
+//                           strokeWidth={2}
+//                           d="M12 4v12m0 0l-3-3m3 3l3-3m-2 8H5a2 2 0 01-2-2V3a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2z"
+//                         />
+//                       </svg>
+//                     </button>
+//                   </td>
+//                   {columns.map((col) => (
+//                     <td
+//                       key={col}
+//                       className={`p-1 border font-normal ${
+//                         col === "status" && plan.status === "Submitted"
+//                           ? "bg-yellow-100 text-black font-bold"
+//                           : col === "status" && plan.status === "In Progress"
+//                           ? "bg-red-100 text-black font-bold"
+//                           : col === "status" && plan.status === "Approved"
+//                           ? "bg-green-100 text-black font-bold"
+//                           : ""
+//                       }
+//                         ${col === "status" ? "whitespace-nowrap text-center" : ""}
+//                         ${col === "projId" || col === "projName" ? "break-words" : ""}
+//                         ${
+//                           col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
+//                             ? "whitespace-nowrap"
+//                             : ""
+//                         }`}
+//                       style={
+//                         col === "status"
+//                           ? { minWidth: "80px", maxWidth: "100px" }
+//                           : col === "projId"
+//                           ? { minWidth: "100px", maxWidth: "150px" }
+//                           : col === "projName"
+//                           ? { minWidth: "120px", maxWidth: "180px" }
+//                           : col === "closedPeriod"
+//                           ? { minWidth: "80px", maxWidth: "100px" }
+//                           : col === "createdAt" || col === "updatedAt"
+//                           ? { minWidth: "160px", maxWidth: "200px" }
+//                           : {}
+//                       }
+//                     >
+//                       {col === "closedPeriod" ? (
+//                         formatDateOnly(plan[col])
+//                       ) : col === "createdAt" || col === "updatedAt" ? (
+//                         formatDateWithTime(plan[col])
+//                       ) : col === "versionCode" ? (
+//                         <input
+//                           type="text"
+//                           value={
+//                             editingVersionCodeIdx === idx
+//                               ? editingVersionCodeValue
+//                               : plan.versionCode || ""
+//                           }
+//                           autoFocus={editingVersionCodeIdx === idx}
+//                           onClick={(e) => {
+//                             e.stopPropagation();
+//                             setEditingVersionCodeIdx(idx);
+//                             setEditingVersionCodeValue(plan.versionCode || "");
+//                           }}
+//                           onChange={(e) =>
+//                             setEditingVersionCodeValue(e.target.value)
+//                           }
+//                           onBlur={() => {
+//                             if (editingVersionCodeIdx === idx) {
+//                               handleVersionCodeChange(
+//                                 idx,
+//                                 editingVersionCodeValue
+//                               );
+//                               setEditingVersionCodeIdx(null);
+//                             }
+//                           }}
+//                           onKeyDown={(e) => {
+//                             if (e.key === "Enter") {
+//                               handleVersionCodeChange(
+//                                 idx,
+//                                 editingVersionCodeValue
+//                               );
+//                               setEditingVersionCodeIdx(null);
+//                             } else if (e.key === "Escape") {
+//                               setEditingVersionCodeIdx(null);
+//                             }
+//                           }}
+//                           className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+//                             !plan.plType || !plan.version
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : "bg-white"
+//                           }`}
+//                           style={{ minWidth: 60, maxWidth: 120 }}
+//                           disabled={!plan.plType || !plan.version}
+//                         />
+//                       ) : typeof plan[col] === "boolean" ? (
+//                         <input
+//                           type="checkbox"
+//                           checked={getCheckboxProps(plan, col, idx).checked}
+//                           disabled={getCheckboxProps(plan, col, idx).disabled}
+//                           onClick={(e) => e.stopPropagation()}
+//                           onMouseDown={(e) => e.stopPropagation()}
+//                           onDoubleClick={(e) => e.stopPropagation()}
+//                           onKeyDown={(e) => e.stopPropagation()}
+//                           onChange={(e) => {
+//                             e.stopPropagation();
+//                             handleCheckboxChange(idx, col);
+//                           }}
+//                           className="cursor-pointer"
+//                         />
+//                       ) : (
+//                         plan[col] || ""
+//                       )}
+//                     </td>
+//                   ))}
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//         </div>
+//       )}
+//       {showForm && (
+//         <ProjectPlanForm
+//           projectId={fullProjectId.current || projectId}
+//           onClose={() => {
+//             setShowForm(false);
+//             setIsActionLoading(false);
+//           }}
+//           onPlanCreated={() => {
+//             refreshPlans();
+//             setShowForm(false);
+//             setIsActionLoading(false);
+//           }}
+//         />
+//       )}
+
+//       {/* New Business Popup Modal */}
+// {showNewBusinessPopup && (
+//   <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+//     <div className="bg-white rounded-lg shadow-xl max-w-6xl max-h-[90vh] w-full mx-4 overflow-hidden">
+//       {/* Header */}
+//       <div className="bg-gray-100 px-4 py-3 border-b flex justify-between items-center">
+//         <h3 className="text-lg font-semibold text-gray-800">New Business</h3>
+//         <button
+//           onClick={() => setShowNewBusinessPopup(false)}
+//           className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+//         >
+//           ×
+//         </button>
+//       </div>
+      
+//       {/* Content */}
+//       <div className="overflow-y-auto max-h-[calc(90vh-60px)]">
+//         <NewBusiness />
+//       </div>
+//     </div>
+//   </div>
+// )}
+
+//     </div>
+//   );
+
+return (
+  <div className="p-4 relative z-10" key={refreshKey}>
+    {isActionLoading && (
+      <div className="absolute inset-0 bg-gray-100 bg-opacity-50 flex items-center justify-center z-20">
+        <div className="flex items-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <span className="ml-2 text-sm text-gray-700">Processing...</span>
+        </div>
+      </div>
+    )}
+
+    {/* New Business Popup Overlay - positioned specifically over the table area */}
+    
+    {showNewBusinessPopup && (
+      <div className="absolute inset-0 z-30">
+        {/* Blur overlay */}
+        <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm"></div>
+        
+        {/* Popup container */}
+        <div className="absolute inset-0 flex items-start justify-center pt-2 ">
+          <div className="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-none mx-4 max-h-[calc(100%-2rem)] overflow-hidden">
+            {/* Header */}
+            <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
+              <h3 className="text-sm font-semibold text-gray-800">New Business</h3>
+              <button
+                onClick={() => setShowNewBusinessPopup(false)}
+                className="text-gray-500 hover:text-gray-700 text-lg font-bold leading-none hover:bg-gray-200 rounded px-1"
+              >
+                ×
+              </button>
+            </div>
+            
+            {/* Content */}
+            <div className="overflow-y-auto max-h-[calc(100vh-8rem)]">
+              <NewBusiness />
+            </div>
           </div>
         </div>
-      )}
+      </div>
+    )}
+
+    
+
+    {/* Your existing content with blur effect when popup is open */}
+    <div className={`transition-all duration-200 ${showNewBusinessPopup ? 'blur-sm pointer-events-none' : ''}`}>
       <div className="flex justify-between items-center mb-2">
         <div className="flex gap-1 flex-wrap">
           {plans.length > 0 && (
             <>
-
-            <button
+              <button
                 onClick={() => {
                   setIsActionLoading(true);
                   handleActionSelect(
@@ -11076,7 +11783,7 @@ const ProjectPlanTable = ({
               >
                 New Budget
               </button>
- 
+
               <button
                 onClick={() => {
                   setIsActionLoading(true);
@@ -11089,6 +11796,7 @@ const ProjectPlanTable = ({
                   !selectedPlan ||
                   !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
                   !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
+                    .sameLevelBud
                 }
                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
                   !selectedPlan ||
@@ -11102,6 +11810,7 @@ const ProjectPlanTable = ({
               >
                 New Blank Budget
               </button>
+
               <button
                 onClick={() => {
                   setIsActionLoading(true);
@@ -11128,6 +11837,7 @@ const ProjectPlanTable = ({
               >
                 New EAC
               </button>
+
               <button
                 onClick={() => {
                   setIsActionLoading(true);
@@ -11154,43 +11864,7 @@ const ProjectPlanTable = ({
               >
                 Delete
               </button>
-              {/* <button
-                onClick={() => handleTopButtonToggle("isCompleted")}
-                disabled={getTopButtonDisabled("isCompleted")}
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  getTopButtonDisabled("isCompleted")
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Submit"
-              >
-                Submit
-              </button>
-              <button
-                onClick={() => handleTopButtonToggle("isApproved")}
-                disabled={getTopButtonDisabled("isApproved")}
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  getTopButtonDisabled("isApproved")
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Approve"
-              >
-                Approve
-              </button>
-              <button
-                onClick={() => handleTopButtonToggle("finalVersion")}
-                disabled={getTopButtonDisabled("finalVersion")}
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  getTopButtonDisabled("finalVersion")
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Conclude"
-              >
-                Conclude
-              </button> */}
-              {/* with submit and unsumit logic */}
+
               <button
                 onClick={() => handleTopButtonToggle("isCompleted")}
                 disabled={
@@ -11206,12 +11880,12 @@ const ProjectPlanTable = ({
                 }
               >
                 {isActionLoading
-                  ? "Processing..." // show while API is running
+                  ? "Processing..."
                   : selectedPlan?.status === "Submitted"
                   ? "Unsubmit"
                   : "Submit"}
               </button>
-{/* with approve and unapprove logic */}
+
               <button
                 onClick={() => handleTopButtonToggle("isApproved")}
                 disabled={getTopButtonDisabled("isApproved") || isActionLoading}
@@ -11225,13 +11899,13 @@ const ProjectPlanTable = ({
                 }
               >
                 {isActionLoading
-                  ? "Processing..." // show while API is running
+                  ? "Processing..."
                   : selectedPlan?.status === "Approved" ||
                     selectedPlan?.finalVersion
                   ? "Unapprove"
                   : "Approve"}
               </button>
-{/* with conclude and unconclude logic */}
+
               <button
                 onClick={() => handleTopButtonToggle("finalVersion")}
                 disabled={
@@ -11250,6 +11924,7 @@ const ProjectPlanTable = ({
                   ? "Unconclude"
                   : "Conclude"}
               </button>
+
               <button
                 onClick={() => {
                   setIsActionLoading(true);
@@ -11266,155 +11941,22 @@ const ProjectPlanTable = ({
                 Calc
               </button>
 
-            
-             {/* <button
-                 onClick={() => {
-                   handleActionSelect(
-                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                    "Create Budget"
-                   );
-                 }}
-                disabled={
-                   !selectedPlan ||
-                   !getButtonAvailability(selectedPlan, "Create Budget")
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Budget")
-                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Create Budget"
-              >
-                New Budget
-              </button>
               <button
-                onClick={() => {
-                  handleActionSelect(
-                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                    "Create Blank Budget"
-                  );
-                }}
-                disabled={
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Blank Budget")
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Blank Budget")
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Create Blank Budget"
+                onClick={() => setBudEacFilter(!budEacFilter)}
+                className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap"
+                title="Filter BUD/EAC Plans"
               >
-                New Blank Budget
+                BUD/EAC
               </button>
-              <button
-                onClick={() => {
-                  handleActionSelect(
-                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                     "Create EAC"
-                   );
-                 }}
-                 disabled={
-                   !selectedPlan ||
-                   !getButtonAvailability(selectedPlan, "Create EAC")
-                 }
-                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                   !selectedPlan ||
-                   !getButtonAvailability(selectedPlan, "Create EAC")
-                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                 }`}
-                 title="Create EAC"
-               >
-                 New EAC
-               </button>
-               <button
-                 onClick={() => {
-                   handleActionSelect(
-                     plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                     "Delete"
-                   );
-                 }}
-                 disabled={
-                   !selectedPlan ||
-                   !getButtonAvailability(selectedPlan, "Delete")
-                 }
-                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                   !selectedPlan ||
-                   !getButtonAvailability(selectedPlan, "Delete")
-                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                     : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-                 }`}
-                 title="Delete Selected Plan"
-               >
-                 Delete
-               </button>
-               <button
-                 onClick={() => handleTopButtonToggle("isCompleted")}
-                disabled={getTopButtonDisabled("isCompleted")}
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                   getTopButtonDisabled("isCompleted")
-                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                 }`}
-                 title="Toggle Submitted"
-               >
-                 Submitted
-              </button>
-               <button
-                 onClick={() => handleTopButtonToggle("isApproved")}
-                 disabled={getTopButtonDisabled("isApproved")}
-                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                   getTopButtonDisabled("isApproved")
-                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                 }`}
-                 title="Toggle Approved"
-               >
-                 Approved
-               </button>
-               <button
-                 onClick={() => handleTopButtonToggle("finalVersion")}
-                 disabled={getTopButtonDisabled("finalVersion")}
-                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                   getTopButtonDisabled("finalVersion")
-                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                     : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                 }`}
-                 title="Toggle Conclude"
-               >
-                 Conclude
-               </button>
-               <button
-                 onClick={() => {
-                   setIsActionLoading(true);
-                   handleCalc();
-                 }}
-                 disabled={getCalcButtonDisabled()}
-                 className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                   getCalcButtonDisabled()
-                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                   : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Calculate"
-              >
-                Calc
-               </button> */}
 
-                <button
-                 onClick={() => setBudEacFilter(!budEacFilter)}
-                 className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap "
-                 title="Filter BUD/EAC Plans"
-               >
-                 BUD/EAC
-               </button>
+              <button
+                onClick={() => setShowNewBusinessPopup(true)}
+                className="bg-green-600 text-white hover:bg-green-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap"
+                title="New Business"
+              >
+                New Business
+              </button>
             </>
-
-
-            
-            
           )}
         </div>
 
@@ -11475,6 +12017,7 @@ const ProjectPlanTable = ({
           </div>
         </div>
       </div>
+
       {filteredPlans.length === 0 ? (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
           {plans.length === 0 
@@ -11484,177 +12027,177 @@ const ProjectPlanTable = ({
         </div>
       ) : (
         <div className="w-full border border-gray-300 rounded-lg bg-white overflow-hidden">
-        <div
-          className="w-full overflow-auto"
-          style={{
-            maxHeight: "280px",
-            minHeight: "280px",
-            border: "1px solid #e5e7eb",
-            borderRadius: "0.5rem",
-            background: "#fff",
-          }}
-        >
-          <table className="w-full table-auto  text-xs text-left border-collapse border">
-            <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
-              <tr>
-                <th className="p-1 border font-normal">Export</th>
-                {columns.map((col) => (
-                  <th key={col} className="p-1 border font-normal text-center">
-                    {COLUMN_LABELS[col] || col}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPlans.map((plan, idx) => (
-                <tr
-                  key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
-                  className={`transition-all duration-200 cursor-pointer ${
-                    selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
-                      ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
-                      : "even:bg-gray-50 hover:bg-blue-50"  
-                  }`}
-                  onClick={() =>{
-                    handleRowClick(plan);
-                    getMasterAndRelatedProjects(plans, plan.projId);
-                  } 
-                  }
-                >
-                  <td className="p-1 border text-center">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleExportPlan(plan);
-                      }}
-                      className="text-blue-600 hover:text-blue-800"
-                      title="Export Plan"
-                      disabled={!plan.projId || !plan.version || !plan.plType}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 cursor-pointer"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v12m0 0l-3-3m3 3l3-3m-2 8H5a2 2 0 01-2-2V3a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                    </button>
-                  </td>
+          <div
+            className="w-full overflow-auto"
+            style={{
+              maxHeight: "280px",
+              minHeight: "280px",
+              border: "1px solid #e5e7eb",
+              borderRadius: "0.5rem",
+              background: "#fff",
+            }}
+          >
+            <table className="w-full table-auto text-xs text-left border-collapse border">
+              <thead className="bg-gray-100 text-gray-800 sticky top-0 z-10">
+                <tr>
+                  <th className="p-1 border font-normal">Export</th>
                   {columns.map((col) => (
-                    <td
-                      key={col}
-                      className={`p-1 border font-normal ${
-                        col === "status" && plan.status === "Submitted"
-                          ? "bg-yellow-100 text-black font-bold"
-                          : col === "status" && plan.status === "In Progress"
-                          ? "bg-red-100 text-black font-bold"
-                          : col === "status" && plan.status === "Approved"
-                          ? "bg-green-100 text-black font-bold"
-                          : ""
-                      }
-                        ${col === "status" ? "whitespace-nowrap text-center" : ""}
-                        ${col === "projId" || col === "projName" ? "break-words" : ""}
-                        ${
-                          col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
-                            ? "whitespace-nowrap"
-                            : ""
-                        }`}
-                      style={
-                        col === "status"
-                          ? { minWidth: "80px", maxWidth: "100px" }
-                          : col === "projId"
-                          ? { minWidth: "100px", maxWidth: "150px" }
-                          : col === "projName"
-                          ? { minWidth: "120px", maxWidth: "180px" }
-                          : col === "closedPeriod"
-                          ? { minWidth: "80px", maxWidth: "100px" }
-                          : col === "createdAt" || col === "updatedAt"
-                          ? { minWidth: "160px", maxWidth: "200px" }
-                          : {}
-                      }
-                    >
-                      {col === "closedPeriod" ? (
-                        formatDateOnly(plan[col])
-                      ) : col === "createdAt" || col === "updatedAt" ? (
-                        formatDateWithTime(plan[col])
-                      ) : col === "versionCode" ? (
-                        <input
-                          type="text"
-                          value={
-                            editingVersionCodeIdx === idx
-                              ? editingVersionCodeValue
-                              : plan.versionCode || ""
-                          }
-                          autoFocus={editingVersionCodeIdx === idx}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingVersionCodeIdx(idx);
-                            setEditingVersionCodeValue(plan.versionCode || "");
-                          }}
-                          onChange={(e) =>
-                            setEditingVersionCodeValue(e.target.value)
-                          }
-                          onBlur={() => {
-                            if (editingVersionCodeIdx === idx) {
-                              handleVersionCodeChange(
-                                idx,
-                                editingVersionCodeValue
-                              );
-                              setEditingVersionCodeIdx(null);
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              handleVersionCodeChange(
-                                idx,
-                                editingVersionCodeValue
-                              );
-                              setEditingVersionCodeIdx(null);
-                            } else if (e.key === "Escape") {
-                              setEditingVersionCodeIdx(null);
-                            }
-                          }}
-                          className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
-                            !plan.plType || !plan.version
-                              ? "bg-gray-100 cursor-not-allowed"
-                              : "bg-white"
-                          }`}
-                          style={{ minWidth: 60, maxWidth: 120 }}
-                          disabled={!plan.plType || !plan.version}
-                        />
-                      ) : typeof plan[col] === "boolean" ? (
-                        <input
-                          type="checkbox"
-                          checked={getCheckboxProps(plan, col, idx).checked}
-                          disabled={getCheckboxProps(plan, col, idx).disabled}
-                          onClick={(e) => e.stopPropagation()}
-                          onMouseDown={(e) => e.stopPropagation()}
-                          onDoubleClick={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => e.stopPropagation()}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleCheckboxChange(idx, col);
-                          }}
-                          className="cursor-pointer"
-                        />
-                      ) : (
-                        plan[col] || ""
-                      )}
-                    </td>
+                    <th key={col} className="p-1 border font-normal text-center">
+                      {COLUMN_LABELS[col] || col}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filteredPlans.map((plan, idx) => (
+                  <tr
+                    key={`plan-${plan.plId || idx}-${plan.projId || "unknown"}`}
+                    className={`transition-all duration-200 cursor-pointer ${
+                      selectedPlan && selectedPlan.plId === plan.plId && selectedPlan.projId === plan.projId
+                        ? "bg-blue-100 hover:bg-blue-200 border-l-4 border-l-blue-600"
+                        : "even:bg-gray-50 hover:bg-blue-50"  
+                    }`}
+                    onClick={() =>{
+                      handleRowClick(plan);
+                      getMasterAndRelatedProjects(plans, plan.projId);
+                    }}
+                  >
+                    <td className="p-1 border text-center">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleExportPlan(plan);
+                        }}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Export Plan"
+                        disabled={!plan.projId || !plan.version || !plan.plType}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 cursor-pointer"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 4v12m0 0l-3-3m3 3l3-3m-2 8H5a2 2 0 01-2-2V3a2 2 0 012-2h14a2 2 0 012 2v16a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </button>
+                    </td>
+                    {columns.map((col) => (
+                      <td
+                        key={col}
+                        className={`p-1 border font-normal ${
+                          col === "status" && plan.status === "Submitted"
+                            ? "bg-yellow-100 text-black font-bold"
+                            : col === "status" && plan.status === "In Progress"
+                            ? "bg-red-100 text-black font-bold"
+                            : col === "status" && plan.status === "Approved"
+                            ? "bg-green-100 text-black font-bold"
+                            : ""
+                        }
+                          ${col === "status" ? "whitespace-nowrap text-center" : ""}
+                          ${col === "projId" || col === "projName" ? "break-words" : ""}
+                          ${
+                            col === "createdAt" || col === "updatedAt" || col === "closedPeriod"
+                              ? "whitespace-nowrap"
+                              : ""
+                          }`}
+                        style={
+                          col === "status"
+                            ? { minWidth: "80px", maxWidth: "100px" }
+                            : col === "projId"
+                            ? { minWidth: "100px", maxWidth: "150px" }
+                            : col === "projName"
+                            ? { minWidth: "120px", maxWidth: "180px" }
+                            : col === "closedPeriod"
+                            ? { minWidth: "80px", maxWidth: "100px" }
+                            : col === "createdAt" || col === "updatedAt"
+                            ? { minWidth: "160px", maxWidth: "200px" }
+                            : {}
+                        }
+                      >
+                        {col === "closedPeriod" ? (
+                          formatDateOnly(plan[col])
+                        ) : col === "createdAt" || col === "updatedAt" ? (
+                          formatDateWithTime(plan[col])
+                        ) : col === "versionCode" ? (
+                          <input
+                            type="text"
+                            value={
+                              editingVersionCodeIdx === idx
+                                ? editingVersionCodeValue
+                                : plan.versionCode || ""
+                            }
+                            autoFocus={editingVersionCodeIdx === idx}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingVersionCodeIdx(idx);
+                              setEditingVersionCodeValue(plan.versionCode || "");
+                            }}
+                            onChange={(e) =>
+                              setEditingVersionCodeValue(e.target.value)
+                            }
+                            onBlur={() => {
+                              if (editingVersionCodeIdx === idx) {
+                                handleVersionCodeChange(
+                                  idx,
+                                  editingVersionCodeValue
+                                );
+                                setEditingVersionCodeIdx(null);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                handleVersionCodeChange(
+                                  idx,
+                                  editingVersionCodeValue
+                                );
+                                setEditingVersionCodeIdx(null);
+                              } else if (e.key === "Escape") {
+                                setEditingVersionCodeIdx(null);
+                              }
+                            }}
+                            className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+                              !plan.plType || !plan.version
+                                ? "bg-gray-100 cursor-not-allowed"
+                                : "bg-white"
+                            }`}
+                            style={{ minWidth: 60, maxWidth: 120 }}
+                            disabled={!plan.plType || !plan.version}
+                          />
+                        ) : typeof plan[col] === "boolean" ? (
+                          <input
+                            type="checkbox"
+                            checked={getCheckboxProps(plan, col, idx).checked}
+                            disabled={getCheckboxProps(plan, col, idx).disabled}
+                            onClick={(e) => e.stopPropagation()}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onDoubleClick={(e) => e.stopPropagation()}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleCheckboxChange(idx, col);
+                            }}
+                            className="cursor-pointer"
+                          />
+                        ) : (
+                          plan[col] || ""
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
+
       {showForm && (
         <ProjectPlanForm
           projectId={fullProjectId.current || projectId}
@@ -11670,7 +12213,11 @@ const ProjectPlanTable = ({
         />
       )}
     </div>
-  );
+  </div>
+);
+
+
+
 };
 
 export default ProjectPlanTable;
