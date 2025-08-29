@@ -20622,6 +20622,8 @@ const ProjectHoursDetails = ({
   const [organizationOptions, setOrganizationOptions] = useState([]);
   const [orgSearch, setOrgSearch] = useState("");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [filteredPlcOptions, setFilteredPlcOptions] = useState([]);
+
  
 
   const debounceTimeout = useRef(null);
@@ -20682,41 +20684,47 @@ const ProjectHoursDetails = ({
   const isValidAccount = (val) =>
     !val || laborAccounts.some((acc) => acc.id === val);
 
-  // Fixed organization validation - allow any non-empty value
-//   const isValidOrg = (val) => {
-//     if (!val) return true; // Allow empty
-//     return val.toString().trim().length > 0; // Just check if it's not empty after trimming
-//   };
+ 
 // const isValidOrg = (val) => {
 //   if (!val) return true; // Allow empty
-//   // Check if it's numeric and exists in organization options
-//   return /^\d+$/.test(val) && organizationOptions.some(opt => opt.value === val);
+//   return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 // };
+
 const isValidOrg = (val) => {
-  if (!val) return true; // Allow empty
-  return val.toString().trim().length > 0; // Just check if it's not empty after trimming
+  if (!val) return false; // Do not allow empty
+  const trimmed = val.toString().trim();
+  // Only allow numeric/decimal strings
+  if (!/^[\d.]+$/.test(trimmed)) return false;
+  // Only allow exact match in organizationOptions (from API)
+  return organizationOptions.some(opt => opt.value.toString() === trimmed);
 };
 
 
-  // const isValidPlc = (val) => !val || plcOptions.some(opt => opt.value === val) || autoPopulatedPLC;
-//   const isValidPlc = (val) => {
-//     if (!val) return true; // Allow empty
-//     // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
-//     return (
-//       plcOptions.some((opt) => opt.value === val) ||
-//       employeeSuggestions.some((emp) => emp.plc === val)
-//     );
-//   };
+
 // const isValidPlc = (val) => {
 //   if (!val) return true; // Allow empty
-//   // Allow if it's in plcOptions OR if it's auto-populated from employee suggestions
-//   return plcOptions.some(opt => opt.value === val) || 
-//          employeeSuggestions.some(emp => emp.plc === val);
+//   return val.toString().trim().length > 0; // Just check if it's not empty after trimming
 // };
+
+// const isValidPlc = (val) => {
+//   if (!val) return false; // Do not allow empty
+//   const trimmed = val.toString().trim();
+//   return plcOptions.some(opt => opt.value === trimmed);
+// };
+
+// const isValidPlc = (val) => {
+//   if (!val) return true; // Allow empty
+//   return plcOptions.some(option => option.value === val.trim());
+// };
+
 const isValidPlc = (val) => {
   if (!val) return true; // Allow empty
-  return val.toString().trim().length > 0; // Just check if it's not empty after trimming
+  if (plcOptions.length === 0) return true; // If no options loaded yet, allow it
+  const isValid = plcOptions.some(option => option.value === val.trim());
+  console.log('PLC validation for:', val, 'isValid:', isValid, 'available options:', plcOptions.length); // DEBUG LOG
+  return isValid;
 };
+
 
   // Track unsaved changes
   const hasUnsavedChanges = () => {
@@ -20869,232 +20877,40 @@ const isValidPlc = (val) => {
     fetchDurations();
   }, [startDate, endDate]);
 
-//   useEffect(() => {
-//     const fetchEmployeesSuggestions = async () => {
-//       if (!projectId || !showNewForm) return;
-//       try {
-//         const endpoint =
-//           newEntry.idType === "Vendor"
-//             ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
-//             : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
-//         const response = await axios.get(endpoint);
-//         const suggestions = Array.isArray(response.data)
-//           ? response.data.map((emp) => {
-//               if (newEntry.idType === "Vendor") {
-//                 return {
-//                   emplId: emp.vendId, // Use vendId as the main ID
-//                   firstName: "",
-//                   lastName: emp.employeeName || "",
-//                   perHourRate: emp.perHourRate || emp.hrRate || "",
-//                   plc: emp.plc || "", // This is the PLC from API
-//                   orgId: emp.orgId || "",
-//                 };
-//               } else {
-//                 const [lastName, firstName] = (emp.employeeName || "")
-//                   .split(", ")
-//                   .map((str) => str.trim());
-//                 return {
-//                   emplId: emp.empId,
-//                   firstName: firstName || "",
-//                   lastName: lastName || "",
-//                   perHourRate: emp.perHourRate || emp.hrRate || "",
-//                   plc: emp.plc || "",
-//                   orgId: emp.orgId || "",
-//                 };
-//               }
-//             })
-//           : [];
-//         setEmployeeSuggestions(suggestions);
-//       } catch (err) {
-//         setEmployeeSuggestions([]);
-//         toast.error(`Failed to fetch employee suggestions`, {
-//           toastId: "employee-fetch-error",
-//           autoClose: 3000,
-//         });
-//       }
-//     };
-
-//     const fetchLaborAccounts = async () => {
-//       if (!projectId || !showNewForm) return;
-//       try {
-//         const response = await axios.get(
-//           `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
-//         );
-//         const data = Array.isArray(response.data)
-//           ? response.data[0]
-//           : response.data;
-//         const accounts = Array.isArray(data.laborAccounts)
-//           ? data.laborAccounts.map((account) => ({ id: account }))
-//           : [];
-//         setLaborAccounts(accounts);
-
-//         // ONLY auto-populate organization for Vendor Employee type
-//         if (newEntry.idType === "Vendor" && data.orgId) {
-//           setNewEntry((prev) => ({
-//             ...prev,
-//             orgId: data.orgId,
-//           }));
-//         }
-//       } catch (err) {
-//         setLaborAccounts([]);
-//         toast.error(`Failed to fetch labor accounts`, {
-//           toastId: "labor-accounts-error",
-//           autoClose: 3000,
-//         });
-//       }
-//     };
-
-//     // const fetchPlcOptions = async (searchTerm) => {
-//     //   if (!projectId || !showNewForm) return;
-//     //   try {
-//     //     const response = await axios.get(
-//     //       `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(
-//     //         searchTerm
-//     //       )}`
-//     //     );
-//     //     const options = Array.isArray(response.data)
-//     //       ? response.data.map((plc) => ({
-//     //           value: plc.laborCategoryCode,
-//     //           label: `${plc.laborCategoryCode} - ${plc.description}`,
-//     //         }))
-//     //       : [];
-//     //     setPlcOptions(options);
-//     //   } catch (err) {
-//     //     setPlcOptions([]);
-//     //     toast.error(`Failed to fetch PLC options for search '${searchTerm}'`, {
-//     //       toastId: "plc-fetch-error",
-//     //       autoClose: 3000,
-//     //     });
-//     //   }
-//     // };
-
-//     // Add this new function for organizations
+  // ADD THIS useEffect after your existing useEffects
+useEffect(() => {
+  const loadOrganizationOptions = async () => {
+    if (!showNewForm) return;
     
-//     const fetchPlcOptions = async (searchTerm) => {
-//   if (!projectId || !showNewForm) return;
-//   try {
-//     // FIX: Handle empty search term - call API without parameter
-//     const url = searchTerm && searchTerm.trim().length > 0 
-//       ? `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(searchTerm)}`
-//       : `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`;
-    
-//     const response = await axios.get(url);
-//     const options = Array.isArray(response.data)
-//       ? response.data.map((plc) => ({
-//           value: plc.laborCategoryCode,
-//           label: `${plc.laborCategoryCode} - ${plc.description}`,
-//         }))
-//       : [];
-//     setPlcOptions(options);
-//   } catch (err) {
-//     setPlcOptions([]);
-//     console.error(`Failed to fetch PLC options:`, err);
-//   }
-// };
+    try {
+      const response = await axios.get(
+        `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+      );
+      const orgOptions = Array.isArray(response.data)
+        ? response.data.map((org) => ({
+            value: org.orgId,
+            label: org.orgId,
+          }))
+        : [];
+      setOrganizationOptions(orgOptions);
+    } catch (err) {
+      console.error("Failed to fetch organizations:", err);
+    }
+  };
 
-  
-// //     const fetchOrganizationOptions = async () => {
-// //     if (!projectId || !showNewForm) return;
-// //     try {
-// //       const response = await axios.get(
-// //         `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
-// //       );
-// //       const options = Array.isArray(response.data)
-// //         ? response.data.map((org) => ({
-// //             value: org.orgId,
-// //             label: org.orgId,
-// //           }))
-// //         : [];
-// //       setOrganizationOptions(options);
-// //     } catch (err) {
-// //       setOrganizationOptions([]);
-// //       toast.error(`Failed to fetch organization options`, {
-// //         toastId: "org-fetch-error",
-// //         autoClose: 3000,
-// //       });
-// //     }
-// //   };
+  loadOrganizationOptions();
+}, [showNewForm]);
 
-//     if (showNewForm) {
-//       fetchEmployeesSuggestions();
-//       fetchLaborAccounts();
-//     //   fetchOrganizationOptions(); // ADD THIS LINE
-//       if (plcSearch && !autoPopulatedPLC) {
-//         if (debounceTimeout.current) {
-//           clearTimeout(debounceTimeout.current);
-//         }
-//         debounceTimeout.current = setTimeout(() => {
-//           fetchPlcOptions(plcSearch);
-//         }, 300);
-//       } else {
-//         setPlcOptions([]);
-//       }
-//     } else {
-//     setEmployeeSuggestions([]); // Only clear employee suggestions
-//     setLaborAccounts([]); // Only clear labor accounts
-//     setPlcSearch("");
-//     setOrgSearch("");
-//     setAutoPopulatedPLC(false);
-//     }
 
-//     return () => {
-//       if (debounceTimeout.current) {
-//         clearTimeout(debounceTimeout.current);
-//       }
-//     };
-//   }, [projectId, showNewForm, plcSearch, newEntry.idType, autoPopulatedPLC]);
-  
-  // New useEffect ONLY for existing row updates (not new form)
-  // This useEffect should load initial options for existing row updates
-// useEffect(() => {
-//   const fetchOptionsForUpdates = async () => {
-//     if (showNewForm || !projectId || !isEditable || !isBudPlan) return;
-    
-//     try {
-//       console.log('Fetching options for existing row updates...'); // Add this debug log
-      
-//       // Always load organization options for updates
-//       const orgResponse = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
-//       );
-//       const orgOptions = Array.isArray(orgResponse.data)
-//         ? orgResponse.data.map((org) => ({
-//             value: org.orgId,
-//             label: org.orgId,
-//           }))
-//         : [];
-//       setOrganizationOptions(orgOptions);
-//       console.log('Org options loaded:', orgOptions); // Add this debug log
 
-//       // Always load PLC options for updates
-//       const plcResponse = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`
-//       );
-//       const plcOptionsAll = Array.isArray(plcResponse.data)
-//         ? plcResponse.data.map((plc) => ({
-//             value: plc.laborCategoryCode,
-//             label: `${plc.laborCategoryCode} - ${plc.description}`,
-//           }))
-//         : [];
-//       setPlcOptions(plcOptionsAll);
-//       console.log('PLC options loaded:', plcOptionsAll); // Add this debug log
-
-//     } catch (err) {
-//       console.error("Failed to load options for updates:", err);
-//       setOrganizationOptions([]);
-//       setPlcOptions([]);
-//     }
-//   };
-
-//   // Only run when NOT in new form mode
-//   if (!showNewForm && projectId && isEditable && isBudPlan) {
-//     fetchOptionsForUpdates();
-//   }
-// }, [projectId, isEditable, isBudPlan, showNewForm]);
 
 useEffect(() => {
   const fetchEmployeesSuggestions = async () => {
-    if (!projectId || !showNewForm) return;
+if (!projectId || !showNewForm || !newEntry.idType || newEntry.idType === "") {
+  setEmployeeSuggestions([]);
+  return;
+}
+
     try {
       const endpoint =
         newEntry.idType === "Vendor"
@@ -21137,35 +20953,7 @@ useEffect(() => {
     }
   };
 
-//   const fetchLaborAccounts = async () => {
-//     if (!projectId || !showNewForm) return;
-//     try {
-//       const response = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
-//       );
-//       const data = Array.isArray(response.data)
-//         ? response.data[0]
-//         : response.data;
-//       const accounts = Array.isArray(data.laborAccounts)
-//         ? data.laborAccounts.map((account) => ({ id: account }))
-//         : [];
-//       setLaborAccounts(accounts);
 
-//       // ONLY auto-populate organization for Vendor Employee type
-//       if (newEntry.idType === "Vendor" && data.orgId) {
-//         setNewEntry((prev) => ({
-//           ...prev,
-//           orgId: data.orgId,
-//         }));
-//       }
-//     } catch (err) {
-//       setLaborAccounts([]);
-//       toast.error(`Failed to fetch labor accounts`, {
-//         toastId: "labor-accounts-error",
-//         autoClose: 3000,
-//       });
-//     }
-//   };
 
 // const fetchLaborAccounts = async () => {
 //   if (!projectId || !showNewForm) return;
@@ -21173,65 +20961,47 @@ useEffect(() => {
 //     const response = await axios.get(
 //       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
 //     );
-//     const data = Array.isArray(response.data)
-//       ? response.data[0]
-//       : response.data;
-//     const accounts = Array.isArray(data.employeeLaborAccounts)
-//       ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
-//       : [];
-//     setLaborAccounts(accounts);
-
-//     // ONLY auto-populate organization for Vendor Employee type
-//     if (newEntry.idType === "Vendor" && data.orgId) {
-//       setNewEntry((prev) => ({
-//         ...prev,
-//         orgId: data.orgId,
-//       }));
-//     }
-//   } catch (err) {
-//     setLaborAccounts([]);
-//     toast.error(`Failed to fetch labor accounts`, {
-//       toastId: "labor-accounts-error",
-//       autoClose: 3000,
-//     });
-//   }
-// };
-
-// const fetchLaborAccounts = async () => {
-//   if (!projectId || !showNewForm) return;
-//   try {
-//     const response = await axios.get(
-//       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
-//     );
-//     const data = Array.isArray(response.data)
-//       ? response.data[0]
-//       : response.data;
+//     const data = Array.isArray(response.data) ? response.data[0] : response.data;
 
 //     let accounts = [];
+
 //     if (newEntry.idType === "Employee") {
 //       accounts = Array.isArray(data.employeeLaborAccounts)
-//         ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
+//         ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
 //         : [];
 //     } else if (newEntry.idType === "Vendor") {
 //       accounts = Array.isArray(data.sunContractorLaborAccounts)
-//         ? data.sunContractorLaborAccounts.map((account) => ({ id: account.accountId }))
+//         ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
 //         : [];
 //     } else {
 //       accounts = [];
 //     }
 
-//     setLaborAccounts(accounts);
+//     console.log(JSON.stringify(accounts))
 
-//     // ONLY auto-populate organization for Vendor Employee type
+    
+
+//     // Remove duplicates by account ID string
+//     const uniqueAccountsMap = new Map();
+//     accounts.forEach(acc => {
+//       if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//         uniqueAccountsMap.set(acc.id, acc);
+//       }
+//     });
+//     const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+
+//     setLaborAccounts(uniqueAccounts);
+
+//     // Auto-populate organization for Vendor Employees if present
 //     if (newEntry.idType === "Vendor" && data.orgId) {
-//       setNewEntry((prev) => ({
+//       setNewEntry(prev => ({
 //         ...prev,
 //         orgId: data.orgId,
 //       }));
 //     }
 //   } catch (err) {
 //     setLaborAccounts([]);
-//     toast.error(`Failed to fetch labor accounts`, {
+//     toast.error("Failed to fetch labor accounts", {
 //       toastId: "labor-accounts-error",
 //       autoClose: 3000,
 //     });
@@ -21250,41 +21020,173 @@ useEffect(() => {
 
 //     if (newEntry.idType === "Employee") {
 //       accounts = Array.isArray(data.employeeLaborAccounts)
-//         ? data.employeeLaborAccounts.map((account) => ({ id: account.accountId }))
+//         ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
 //         : [];
 //     } else if (newEntry.idType === "Vendor") {
 //       accounts = Array.isArray(data.sunContractorLaborAccounts)
-//         ? data.sunContractorLaborAccounts.map((account) => ({ id: account.accountId }))
+//         ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
 //         : [];
-
 //     } else {
 //       accounts = [];
 //     }
 
-//     console.log(JSON.stringify(accounts))
-
-//     // Remove duplicates (account IDs), if any
-//     const uniqueAccounts = [];
-//     const seenIds = new Set();
-//     for (const acc of accounts) {
-//       if (!seenIds.has(acc.id)) {
-//         seenIds.add(acc.id);
-//         uniqueAccounts.push(acc);
+//     // Remove duplicates by account ID string
+//     const uniqueAccountsMap = new Map();
+//     accounts.forEach(acc => {
+//       if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//         uniqueAccountsMap.set(acc.id, acc);
 //       }
-//     }
+//     });
+//     const uniqueAccounts = Array.from(uniqueAccountsMap.values());
 
 //     setLaborAccounts(uniqueAccounts);
 
-//     // Auto-populate organization for Vendor Employee only
+//     // **ADD THIS SECTION FOR PLC OPTIONS**
+//     // Set PLC options from project data
+//     if (data.plc && Array.isArray(data.plc)) {
+//       const plcOptions = data.plc.map(plc => ({
+//         value: plc.laborCategoryCode,
+//         label: `${plc.laborCategoryCode} - ${plc.description}`,
+//       }));
+//       setPlcOptions(plcOptions);
+//     }
+
+//     // Auto-populate organization for Vendor Employees if present
 //     if (newEntry.idType === "Vendor" && data.orgId) {
-//       setNewEntry((prev) => ({
+//       setNewEntry(prev => ({
 //         ...prev,
 //         orgId: data.orgId,
 //       }));
 //     }
 //   } catch (err) {
 //     setLaborAccounts([]);
-//     toast.error(`Failed to fetch labor accounts`, {
+//     setPlcOptions([]); // Clear PLC options on error
+//     toast.error("Failed to fetch labor accounts", {
+//       toastId: "labor-accounts-error",
+//       autoClose: 3000,
+//     });
+//   }
+// };
+
+// const fetchLaborAccounts = async () => {
+//   if (!projectId || !showNewForm) return;
+//   try {
+//     const response = await axios.get(
+//       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//     );
+//     const data = Array.isArray(response.data) ? response.data[0] : response.data;
+
+//     let accounts = [];
+
+//     if (newEntry.idType === "Employee") {
+//       accounts = Array.isArray(data.employeeLaborAccounts)
+//         ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+//     } else if (newEntry.idType === "Vendor") {
+//       accounts = Array.isArray(data.sunContractorLaborAccounts)
+//         ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+//     } else {
+//       accounts = [];
+//     }
+
+//     // Remove duplicates
+//     const uniqueAccountsMap = new Map();
+//     accounts.forEach(acc => {
+//       if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//         uniqueAccountsMap.set(acc.id, acc);
+//       }
+//     });
+//     const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+//     setLaborAccounts(uniqueAccounts);
+
+//     // **ADD THIS SECTION** - Set PLC options from project data
+//     if (data.plc && Array.isArray(data.plc)) {
+//       const plcOptions = data.plc.map(plc => ({
+//         value: plc.laborCategoryCode,
+//         label: `${plc.laborCategoryCode} - ${plc.description}`,
+//       }));
+//       setPlcOptions(plcOptions);
+//       setFilteredPlcOptions(plcOptions);
+//     }
+
+//     // Auto-populate organization for Vendor Employees if present
+//     if (newEntry.idType === "Vendor" && data.orgId) {
+//       setNewEntry(prev => ({
+//         ...prev,
+//         orgId: data.orgId,
+//       }));
+//     }
+//   } catch (err) {
+//     setLaborAccounts([]);
+//     setPlcOptions([]); // Clear PLC options on error
+//     toast.error("Failed to fetch labor accounts", {
+//       toastId: "labor-accounts-error",
+//       autoClose: 3000,
+//     });
+//   }
+// };
+
+// const fetchLaborAccounts = async () => {
+//   if (!projectId || !showNewForm) return;
+//   try {
+//     const response = await axios.get(
+//       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//     );
+//     const data = Array.isArray(response.data) ? response.data[0] : response.data;
+
+//     let accounts = [];
+
+//     if (newEntry.idType === "Employee") {
+//       accounts = Array.isArray(data.employeeLaborAccounts)
+//         ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+//     } else if (newEntry.idType === "Vendor") {
+//       accounts = Array.isArray(data.sunContractorLaborAccounts)
+//         ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+//     } else {
+//       accounts = [];
+//     }
+
+//     // Remove duplicates
+//     const uniqueAccountsMap = new Map();
+//     accounts.forEach(acc => {
+//       if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//         uniqueAccountsMap.set(acc.id, acc);
+//       }
+//     });
+//     const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+//     setLaborAccounts(uniqueAccounts);
+
+//     // **FIX: Set PLC options from project data**
+//     if (data.plc && Array.isArray(data.plc)) {
+//       const plcOptionsFromApi = data.plc.map(plc => ({
+//         value: plc.laborCategoryCode,
+//         label: `${plc.laborCategoryCode} - ${plc.description}`,
+//       }));
+//       console.log('PLC Options loaded:', plcOptionsFromApi); // DEBUG LOG
+//       setPlcOptions(plcOptionsFromApi);
+//       setFilteredPlcOptions(plcOptionsFromApi);
+//     } else {
+//       console.log('No PLC data found in API response:', data); // DEBUG LOG
+//       setPlcOptions([]);
+//       setFilteredPlcOptions([]);
+//     }
+
+//     // Auto-populate organization for Vendor Employees if present
+//     if (newEntry.idType === "Vendor" && data.orgId) {
+//       setNewEntry(prev => ({
+//         ...prev,
+//         orgId: data.orgId,
+//       }));
+//     }
+//   } catch (err) {
+//     console.error('Error fetching labor accounts:', err); // DEBUG LOG
+//     setLaborAccounts([]);
+//     setPlcOptions([]);
+//     setFilteredPlcOptions([]);
+//     toast.error("Failed to fetch labor accounts", {
 //       toastId: "labor-accounts-error",
 //       autoClose: 3000,
 //     });
@@ -21313,11 +21215,7 @@ const fetchLaborAccounts = async () => {
       accounts = [];
     }
 
-    console.log(JSON.stringify(accounts))
-
-    
-
-    // Remove duplicates by account ID string
+    // Remove duplicates
     const uniqueAccountsMap = new Map();
     accounts.forEach(acc => {
       if (acc.id && !uniqueAccountsMap.has(acc.id)) {
@@ -21325,8 +21223,22 @@ const fetchLaborAccounts = async () => {
       }
     });
     const uniqueAccounts = Array.from(uniqueAccountsMap.values());
-
     setLaborAccounts(uniqueAccounts);
+
+    // **FIX: Set PLC options from project data**
+    if (data.plc && Array.isArray(data.plc)) {
+      const plcOptionsFromApi = data.plc.map(plc => ({
+        value: plc.laborCategoryCode,
+        label: `${plc.laborCategoryCode} - ${plc.description}`,
+      }));
+      console.log('PLC Options loaded:', plcOptionsFromApi); // DEBUG LOG
+      setPlcOptions(plcOptionsFromApi);
+      setFilteredPlcOptions(plcOptionsFromApi); // Initialize filtered options
+    } else {
+      console.log('No PLC data found in API response:', data); // DEBUG LOG
+      setPlcOptions([]);
+      setFilteredPlcOptions([]);
+    }
 
     // Auto-populate organization for Vendor Employees if present
     if (newEntry.idType === "Vendor" && data.orgId) {
@@ -21336,7 +21248,10 @@ const fetchLaborAccounts = async () => {
       }));
     }
   } catch (err) {
+    console.error('Error fetching labor accounts:', err); // DEBUG LOG
     setLaborAccounts([]);
+    setPlcOptions([]);
+    setFilteredPlcOptions([]);
     toast.error("Failed to fetch labor accounts", {
       toastId: "labor-accounts-error",
       autoClose: 3000,
@@ -21348,15 +21263,26 @@ const fetchLaborAccounts = async () => {
 
 
 
+
+
+
+
   if (showNewForm) {
     fetchEmployeesSuggestions();
     fetchLaborAccounts();
   } else {
     setEmployeeSuggestions([]);
-    setLaborAccounts([]);
-    setPlcSearch("");
-    setOrgSearch("");
-    setAutoPopulatedPLC(false);
+  setLaborAccounts([]);
+  setPlcOptions([]);
+  setFilteredPlcOptions([]); // ADD THIS LINE
+  setPlcSearch("");
+  setOrgSearch("");
+  setAutoPopulatedPLC(false);
+    // setEmployeeSuggestions([]);
+    // setLaborAccounts([]);
+    // setPlcSearch("");
+    // setOrgSearch("");
+    // setAutoPopulatedPLC(false);
   }
 
   return () => {
@@ -21366,9 +21292,24 @@ const fetchLaborAccounts = async () => {
   };
 }, [projectId, showNewForm, newEntry.idType]);
 
+// Initialize filtered PLC options when PLC options change
+// useEffect(() => {
+//   if (plcOptions.length > 0) {
+//     setFilteredPlcOptions(plcOptions);
+//   }
+// }, [plcOptions]);
+
+// Initialize filtered PLC options when PLC options change
+useEffect(() => {
+  if (plcOptions.length > 0) {
+    setFilteredPlcOptions(plcOptions);
+    console.log('PLC options initialized:', plcOptions.length); // DEBUG LOG
+  }
+}, [plcOptions]);
+
 
 const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
-  const numericValue = value.replace(/[^0-9]/g, "");
+  const numericValue = value.replace(/[^0-9.]/g, "");
   handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
   setOrgSearch(numericValue);
   
@@ -21377,7 +21318,7 @@ const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
     clearTimeout(debounceTimeout.current);
   }
   
-  // FIX: Always fetch filtered organizations when user types
+  // Only fetch if user typed something - DO NOT update the input value
   if (numericValue.length >= 1) {
     debounceTimeout.current = setTimeout(async () => {
       try {
@@ -21386,16 +21327,286 @@ const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
         );
         const filteredOptions = Array.isArray(response.data)
           ? response.data
-              .filter(org => org.orgId.toString().includes(numericValue))
+              .filter(org => org.orgId.toString().startsWith(numericValue))
               .map((org) => ({
                 value: org.orgId,
                 label: org.orgId,
               }))
           : [];
         setOrganizationOptions(filteredOptions);
-        console.log('Filtered org options:', filteredOptions); // Debug log
+        // IMPORTANT: DO NOT UPDATE THE INPUT VALUE HERE
       } catch (err) {
-        console.error("Failed to fetch filtered organizations:", err);
+        console.error("Failed to fetch organizations:", err);
+        setOrganizationOptions([]);
+      }
+    }, 500); // Increased timeout to reduce API calls
+  } else {
+    setOrganizationOptions([]); // Clear options when input is empty
+  }
+};
+
+
+// const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
+//   const numericValue = value.replace(/[^0-9.]/g, "");
+//   handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
+//   setOrgSearch(numericValue);
+  
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
+  
+//   // Filter organizations starting with input
+//   if (numericValue.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const filteredOptions = Array.isArray(response.data)
+//           ? response.data
+//               .filter(org => org.orgId.toString().startsWith(numericValue))
+//               .map((org) => ({
+//                 value: org.orgId,
+//                 label: org.orgId,
+//               }))
+//           : [];
+//         setOrganizationOptions(filteredOptions);
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//         setOrganizationOptions([]);
+//       }
+//     }, 300);
+//   }
+// };
+
+
+
+// const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
+  
+//   // Keep only numbers and period (for decimals)
+//   const numericValue = value.replace(/[^0-9.]/g, "");
+//   handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
+//   setOrgSearch(numericValue);
+  
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
+  
+//   // FIX: Always fetch filtered organizations when user types
+//   if (numericValue.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const filteredOptions = Array.isArray(response.data)
+//           ? response.data
+//               .filter(org => org.orgId.toString().includes(numericValue))
+//               .map((org) => ({
+//                 value: org.orgId,
+//                 label: org.orgId,
+//               }))
+//           : [];
+//         setOrganizationOptions(filteredOptions);
+//         console.log('Filtered org options:', filteredOptions); // Debug log
+//       } catch (err) {
+//         console.error("Failed to fetch filtered organizations:", err);
+//         setOrganizationOptions([]);
+//       }
+//     }, 300);
+//   } else {
+//     // Load all organizations when input is empty
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const orgOptions = Array.isArray(response.data)
+//           ? response.data.map((org) => ({
+//               value: org.orgId,
+//               label: org.orgId,
+//             }))
+//           : [];
+//         setOrganizationOptions(orgOptions);
+//       } catch (err) {
+//         console.error("Failed to fetch all organizations:", err);
+//       }
+//     }, 300);
+//   }
+// };
+
+// const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+  
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
+  
+//   // FIX: Always fetch PLC options when user types
+//   if (value.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(value)}`
+//         );
+//         const options = Array.isArray(response.data)
+//           ? response.data.map((plc) => ({
+//               value: plc.laborCategoryCode,
+//               label: `${plc.laborCategoryCode} - ${plc.description}`,
+//             }))
+//           : [];
+//         setPlcOptions(options);
+//         console.log('Filtered PLC options:', options); // Debug log
+//       } catch (err) {
+//         console.error("Failed to fetch filtered PLCs:", err);
+//         setPlcOptions([]);
+//       }
+//     }, 300);
+//   } else {
+//     // Load all PLCs when input is empty  
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`
+//         );
+//         const options = Array.isArray(response.data)
+//           ? response.data.map((plc) => ({
+//               value: plc.laborCategoryCode,
+//               label: `${plc.laborCategoryCode} - ${plc.description}`,
+//             }))
+//           : [];
+//         setPlcOptions(options);
+//       } catch (err) {
+//         console.error("Failed to fetch all PLCs:", err);
+//       }
+//     }, 300);
+//   }
+// };
+
+
+
+
+
+  // ID Type change handler
+
+//   const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+//   // No API calls needed - PLC options are loaded from project data
+// };
+
+const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+  handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+  setPlcSearch(value);
+  
+  // Filter PLC options for update mode too
+  if (value.length >= 1) {
+    const filtered = plcOptions.filter(option => 
+      option.value.toLowerCase().startsWith(value.toLowerCase())
+    );
+    setFilteredPlcOptions(filtered);
+  } else {
+    setFilteredPlcOptions(plcOptions);
+  }
+};
+
+
+
+
+//   const handleOrgInputChange = (value) => {
+//   // FIX: Allow decimal numbers for hour rate, only numeric for orgId
+//   const numericValue = value.replace(/[^0-9]/g, "");
+//   setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
+//   setOrgSearch(numericValue);
+// };
+  
+//   const handleOrgInputChange = (value) => {
+//   // Keep only numbers and period (for decimals)
+//   const numericValue = value.replace(/[^0-9.]/g, "");
+//   setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
+//   setOrgSearch(numericValue);
+  
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
+  
+//   // Fetch organizations when user types
+//   if (numericValue.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const filteredOptions = Array.isArray(response.data)
+//           ? response.data
+//               .filter(org => org.orgId.toString().startsWith(numericValue))
+//               .map((org) => ({
+//                 value: org.orgId,
+//                 label: org.orgId,
+//               }))
+//           : [];
+//         setOrganizationOptions(filteredOptions);
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//         setOrganizationOptions([]);
+//       }
+//     }, 300);
+//   } else {
+//     // Load all organizations when input is empty
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const orgOptions = Array.isArray(response.data)
+//           ? response.data.map((org) => ({
+//               value: org.orgId,
+//               label: org.orgId,
+//             }))
+//           : [];
+//         setOrganizationOptions(orgOptions);
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//       }
+//     }, 300);
+//   }
+// };
+
+const handleOrgInputChange = (value) => {
+  // Keep only numbers and period (for decimals)
+  const numericValue = value.replace(/[^0-9.]/g, "");
+  setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
+  setOrgSearch(numericValue);
+  
+  // Clear previous timeout
+  if (debounceTimeout.current) {
+    clearTimeout(debounceTimeout.current);
+  }
+  
+  // Fetch organizations when user types - DO NOT update input value
+  if (numericValue.length >= 1) {
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+        );
+        const filteredOptions = Array.isArray(response.data)
+          ? response.data
+              .filter(org => org.orgId.toString().startsWith(numericValue))
+              .map((org) => ({
+                value: org.orgId,
+                label: org.orgId,
+              }))
+          : [];
+        setOrganizationOptions(filteredOptions);
+        // IMPORTANT: DO NOT UPDATE newEntry.orgId HERE
+      } catch (err) {
+        console.error("Failed to fetch organizations:", err);
         setOrganizationOptions([]);
       }
     }, 300);
@@ -21414,79 +21625,13 @@ const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
           : [];
         setOrganizationOptions(orgOptions);
       } catch (err) {
-        console.error("Failed to fetch all organizations:", err);
-      }
-    }, 300);
-  }
-};
-
-const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
-  handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
-  setPlcSearch(value);
-  
-  // Clear previous timeout
-  if (debounceTimeout.current) {
-    clearTimeout(debounceTimeout.current);
-  }
-  
-  // FIX: Always fetch PLC options when user types
-  if (value.length >= 1) {
-    debounceTimeout.current = setTimeout(async () => {
-      try {
-        const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${encodeURIComponent(value)}`
-        );
-        const options = Array.isArray(response.data)
-          ? response.data.map((plc) => ({
-              value: plc.laborCategoryCode,
-              label: `${plc.laborCategoryCode} - ${plc.description}`,
-            }))
-          : [];
-        setPlcOptions(options);
-        console.log('Filtered PLC options:', options); // Debug log
-      } catch (err) {
-        console.error("Failed to fetch filtered PLCs:", err);
-        setPlcOptions([]);
-      }
-    }, 300);
-  } else {
-    // Load all PLCs when input is empty  
-    debounceTimeout.current = setTimeout(async () => {
-      try {
-        const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/`
-        );
-        const options = Array.isArray(response.data)
-          ? response.data.map((plc) => ({
-              value: plc.laborCategoryCode,
-              label: `${plc.laborCategoryCode} - ${plc.description}`,
-            }))
-          : [];
-        setPlcOptions(options);
-      } catch (err) {
-        console.error("Failed to fetch all PLCs:", err);
+        console.error("Failed to fetch organizations:", err);
       }
     }, 300);
   }
 };
 
 
-//   const handleOrgInputChange = (value) => {
-//   // Only allow numeric input
-//   const numericValue = value.replace(/[^0-9]/g, "");
-//   setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
-//   setOrgSearch(numericValue);
-// };
-
-
-  // ID Type change handler
-  const handleOrgInputChange = (value) => {
-  // FIX: Allow decimal numbers for hour rate, only numeric for orgId
-  const numericValue = value.replace(/[^0-9]/g, "");
-  setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
-  setOrgSearch(numericValue);
-};
-  
   const handleIdTypeChange = (value) => {
     setNewEntry((prev) => ({
       id: "",
@@ -21505,24 +21650,114 @@ const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
     setAutoPopulatedPLC(false);
   };
 
-  const handlePlcInputChange = (value) => {
-    // Only allow manual input if PLC is not auto-populated
-    if (!autoPopulatedPLC) {
-      setPlcSearch(value);
-      setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
-    }
-  };
+//   const handlePlcInputChange = (value) => {
+//     // Only allow manual input if PLC is not auto-populated
+//     if (!autoPopulatedPLC) {
+//       setPlcSearch(value);
+//       setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
+//     }
+//   };
 
   // Update the existing handlePlcBlur
-  const handlePlcBlur = (val) => {
-  if (val && val.length >= 3 && !isValidPlc(val)) {
-    toast.error("Please enter a valid PLC from the available list.", {autoClose: 3000});
+//   const handlePlcBlur = (val) => {
+//   if (val && val.length >= 3 && !isValidPlc(val)) {
+//     toast.error("Please enter a valid PLC from the available list.", {autoClose: 3000});
+//     if (!autoPopulatedPLC) {
+//       setNewEntry(prev => ({...prev, plcGlcCode: ""}));
+//       setPlcSearch("");
+//     }
+//   }
+// };
+
+// const handlePlcInputChange = (value) => {
+//   // Only allow manual input if PLC is not auto-populated
+//   if (!autoPopulatedPLC) {
+//     setPlcSearch(value);
+//     setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
+    
+//     // Filter PLC options based on first character match
+//     if (value.length >= 1) {
+//       const filtered = plcOptions.filter(option => 
+//         option.value.toLowerCase().startsWith(value.toLowerCase())
+//       );
+//       setFilteredPlcOptions(filtered);
+//     } else {
+//       setFilteredPlcOptions(plcOptions);
+//     }
+//   }
+// };
+
+// const handlePlcInputChange = (value) => {
+//   console.log('PLC input changed:', value, 'autoPopulatedPLC:', autoPopulatedPLC); // DEBUG LOG
+//   console.log('Current plcOptions:', plcOptions); // DEBUG LOG
+  
+//   // Only allow manual input if PLC is not auto-populated
+//   if (!autoPopulatedPLC) {
+//     setPlcSearch(value);
+//     setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
+    
+//     // Filter PLC options based on first character match
+//     if (value.length >= 1) {
+//       const filtered = plcOptions.filter(option => 
+//         option.value.toLowerCase().startsWith(value.toLowerCase())
+//       );
+//       console.log('Filtered PLC options:', filtered); // DEBUG LOG
+//       setFilteredPlcOptions(filtered);
+//     } else {
+//       setFilteredPlcOptions(plcOptions);
+//     }
+//   }
+// };
+
+const handlePlcInputChange = (value) => {
+  console.log('PLC input changed:', value, 'autoPopulatedPLC:', autoPopulatedPLC); // DEBUG LOG
+  
+  // ALWAYS allow manual input - remove autoPopulatedPLC check
+  setPlcSearch(value);
+  setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
+  
+  // Filter PLC options based on first character match
+  if (value.length >= 1) {
+    const filtered = plcOptions.filter(option => 
+      option.value.toLowerCase().startsWith(value.toLowerCase())
+    );
+    console.log('Filtered PLC options:', filtered); // DEBUG LOG
+    setFilteredPlcOptions(filtered);
+  } else {
+    setFilteredPlcOptions(plcOptions);
+  }
+  
+  // Reset auto-populated flag when user manually types
+  if (autoPopulatedPLC && value !== newEntry.plcGlcCode) {
+    setAutoPopulatedPLC(false);
+  }
+};
+
+
+
+
+
+// const handlePlcBlur = (val) => {
+//   if (!isValidPlc(val)) {
+//     toast.error("Please enter a valid PLC from the available list.", { autoClose: 3000 });
+//     if (!autoPopulatedPLC) {
+//       setNewEntry(prev => ({ ...prev, plcGlcCode: "" }));
+//       setPlcSearch("");
+//     }
+//   }
+// };
+
+const handlePlcBlur = (val) => {
+  if (val && !isValidPlc(val)) {
+    toast.error("Please enter a valid PLC from the available list.", { autoClose: 3000 });
+    // Only clear if it's not a valid PLC AND not auto-populated initially
     if (!autoPopulatedPLC) {
-      setNewEntry(prev => ({...prev, plcGlcCode: ""}));
+      setNewEntry(prev => ({ ...prev, plcGlcCode: "" }));
       setPlcSearch("");
     }
   }
 };
+
 
 
   const handleAccountChange = (value) => {
@@ -21544,120 +21779,26 @@ const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
 
   };
 
-  const handleOrgBlur = (val) => {
-  if (val && val.length >= 3 && !isValidOrg(val)) {
-    toast.error("Please enter a valid numeric Organization ID from the available list.", {
-      autoClose: 3000,
-    });
-    setNewEntry(prev => ({...prev, orgId: ""}));
+//   const handleOrgBlur = (val) => {
+//   if (val && val.length >= 3 && !isValidOrg(val)) {
+//     toast.error("Please enter a valid numeric Organization ID from the available list.", {
+//       autoClose: 3000,
+//     });
+//     setNewEntry(prev => ({...prev, orgId: ""}));
+//     setOrgSearch("");
+//   }
+// };
+
+const handleOrgBlur = (val) => {
+  if (!isValidOrg(val)) {
+    toast.error("Please enter a valid numeric Organization ID from the available list.", { autoClose: 3000 });
+    setNewEntry(prev => ({ ...prev, orgId: "" }));
     setOrgSearch("");
   }
 };
 
 
-  //   const handleIdChange = (value) => {
-  //     const trimmedValue = value.trim();
-
-  //     // For PLC type, always set to "PLC"
-  //     if (newEntry.idType === "PLC") {
-  //       setNewEntry(prev => ({ ...prev, id: "PLC" }));
-  //       return;
-  //     }
-
-  //     // Always update the ID field regardless of validity
-  //     setNewEntry((prev) => ({
-  //       ...prev,
-  //       id: trimmedValue,
-  //     }));
-
-  //     if (!trimmedValue) {
-  //       // Clear all fields when ID is empty
-  //       setNewEntry((prev) => ({
-  //         ...prev,
-  //         id: "",
-  //         firstName: "",
-  //         lastName: "",
-  //         perHourRate: "",
-  //         orgId: newEntry.idType === "Vendor" ? prev.orgId : "", // Keep orgId for Vendor type
-  //         plcGlcCode: "",
-  //         acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-  //       }));
-  //       setPlcSearch("");
-  //       setAutoPopulatedPLC(false);
-  //       return;
-  //     }
-
-  //     // Check for duplicate employee ID
-  //     const isDuplicate = localEmployees.some(emp =>
-  //       emp.emple && emp.emple.emplId === trimmedValue
-  //     );
-
-  //     if (isDuplicate) {
-  //       toast.error("This ID already exists. Please use a different ID.", {
-  //         toastId: "duplicate-id",
-  //         autoClose: 3000,
-  //       });
-  //       return;
-  //     }
-
-  //     // For "Other" type, allow any ID without validation
-  //     if (newEntry.idType === "Other") {
-  //       return;
-  //     }
-
-  //     // Only validate and populate for Employee/Vendor types if we have suggestions loaded
-  //     if (
-  //       (newEntry.idType === "Employee" || newEntry.idType === "Vendor") &&
-  //       employeeSuggestions.length > 0
-  //     ) {
-  //       const selectedEmployee = employeeSuggestions.find(emp => emp.emplId === trimmedValue);
-
-  //       if (selectedEmployee) {
-  //         // Valid employee found - populate fields INCLUDING PLC for Vendor
-  //         setNewEntry((prev) => ({
-  //           ...prev,
-  //           id: trimmedValue,
-  //           firstName: selectedEmployee.firstName || "",
-  //           lastName: selectedEmployee.lastName || "",
-  //           perHourRate: selectedEmployee.perHourRate || "",
-  //           orgId: selectedEmployee.orgId || prev.orgId, // Keep existing orgId if not provided
-  //           plcGlcCode: selectedEmployee.plc || "", // AUTO-POPULATE PLC
-  //           acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-  //         }));
-  //         setPlcSearch(selectedEmployee.plc || ""); // UPDATE PLC SEARCH TOO
-  //         setAutoPopulatedPLC(!!selectedEmployee.plc); // Mark as auto-populated if PLC exists
-  //       } else {
-  //         // Only show error if the user has typed at least 3 characters AND no partial match exists
-  //         if (trimmedValue.length >= 3) {
-  //           // Check if any employee ID starts with typed value
-  //           const partialMatch = employeeSuggestions.some((emp) =>
-  //             emp.emplId.startsWith(trimmedValue)
-  //           );
-
-  //           if (!partialMatch) {
-  //             toast.error("Invalid ID, please select a valid one!", {
-  //               toastId: "invalid-id",
-  //               autoClose: 3000,
-  //             });
-  //           }
-  //         }
-
-  //         // Don't auto-populate fields for invalid IDs, but keep the entered value
-  //         setNewEntry((prev) => ({
-  //           ...prev,
-  //           firstName: "",
-  //           lastName: "",
-  //           perHourRate: "",
-  //           // DON'T clear orgId for Vendor type as it should come from project
-  //           orgId: newEntry.idType === "Vendor" ? prev.orgId : "",
-  //           plcGlcCode: "",
-  //           acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
-  //         }));
-  //         setPlcSearch("");
-  //         setAutoPopulatedPLC(false);
-  //       }
-  //     }
-  //   };
+  
 
   const handleIdChange = (value) => {
     const trimmedValue = value.trim();
@@ -21688,17 +21829,7 @@ const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
       return;
     }
 
-    // 4. Duplicate check against already-saved employees
-    // const isDuplicate = localEmployees.some(
-    //   (emp) => emp.emple && emp.emple.emplId === trimmedValue
-    // );
-    // if (isDuplicate) {
-    //   toast.error("This ID already exists. Please use a different ID.", {
-    //     toastId: "duplicate-id",
-    //     autoClose: 3000,
-    //   });
-    //   return;
-    // }
+    
 
     // 5. “Other” type needs no further validation
     if (newEntry.idType === "Other") return;
@@ -21725,7 +21856,7 @@ const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
           acctId: laborAccounts.length > 0 ? laborAccounts[0].id : "",
         }));
         setPlcSearch(selectedEmployee.plc || "");
-        setAutoPopulatedPLC(!!selectedEmployee.plc);
+        // setAutoPopulatedPLC(!!selectedEmployee.plc);
       } else {
         // No exact match – warn only if the entry is clearly invalid
         if (trimmedValue.length >= 3) {
@@ -22517,15 +22648,7 @@ if (isDuplicate) {
     }
   };
 
-//   const handleRowClick = (actualEmpIdx) => {
-//     if (!isEditable) return;
-//     setSelectedRowIndex(
-//       actualEmpIdx === selectedRowIndex ? null : actualEmpIdx
-//     );
-//     setSelectedColumnKey(null);
-//     setReplaceScope(actualEmpIdx === selectedRowIndex ? "all" : "row");
-//     if (showNewForm) setSourceRowIndex(actualEmpIdx);
-//   };
+
   
 const handleRowClick = (actualEmpIdx) => {
     if (!isEditable) return;
@@ -23024,7 +23147,7 @@ const handleRowClick = (actualEmpIdx) => {
 
 
                       <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
+                        {/* <input
                           type="text"
                           name="plcGlcCode"
                           value={newEntry.plcGlcCode}
@@ -23041,8 +23164,22 @@ const handleRowClick = (actualEmpIdx) => {
                           placeholder="Enter Plc"
                           disabled={!isBudPlan || autoPopulatedPLC}
                           readOnly={autoPopulatedPLC}
-                        />
-                        <datalist id="plc-list">
+                        /> */}
+                        <input
+  type="text"
+  name="plcGlcCode"
+  value={newEntry.plcGlcCode}
+  onChange={(e) => handlePlcInputChange(e.target.value)}
+  onBlur={(e) => handlePlcBlur(e.target.value)}
+  className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+    autoPopulatedPLC ? "bg-gray-100 cursor-not-allowed" : ""
+  }`}
+  list="plc-list"
+  placeholder="Enter Plc"
+//   disabled={autoPopulatedPLC}
+//   readOnly={autoPopulatedPLC}
+/>
+                        {/* <datalist id="plc-list">
                           {plcOptions.map((plc, index) => (
                             <option
                               key={`${plc.value}-${index}`}
@@ -23051,7 +23188,18 @@ const handleRowClick = (actualEmpIdx) => {
                               {plc.label}
                             </option>
                           ))}
-                        </datalist>
+                        </datalist> */}
+                        <datalist id="plc-list">
+  {filteredPlcOptions.map((plc, index) => (
+    <option
+      key={`${plc.value}-${index}`}
+      value={plc.value}
+    >
+      {plc.label}
+    </option>
+  ))}
+</datalist>
+
                       </td>
                       <td className="border border-gray-300 px-1.5 py-0.5 text-center">
                         <input
