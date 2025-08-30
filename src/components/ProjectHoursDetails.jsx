@@ -20623,6 +20623,11 @@ const ProjectHoursDetails = ({
   const [orgSearch, setOrgSearch] = useState("");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [filteredPlcOptions, setFilteredPlcOptions] = useState([]);
+  // Add these state variables after your existing useState declarations
+  const [updateAccountOptions, setUpdateAccountOptions] = useState([]);
+  const [updateOrganizationOptions, setUpdateOrganizationOptions] = useState([]);
+  const [updatePlcOptions, setUpdatePlcOptions] = useState([]);
+
 
  
 
@@ -20699,6 +20704,23 @@ const isValidOrg = (val) => {
   return organizationOptions.some(opt => opt.value.toString() === trimmed);
 };
 
+// Update the validation function to check the correct options based on context
+const isValidOrgForUpdate = (val, updateOptions) => {
+  if (!val) return false;
+  const trimmed = val.toString().trim();
+  if (!/^[\d.]+$/.test(trimmed)) return false;
+  return updateOptions.some(opt => opt.value.toString() === trimmed);
+};
+
+// Add this validation function for accounts
+const isValidAccountForUpdate = (val, updateOptions) => {
+  if (!val) return false;
+  const trimmed = val.toString().trim();
+  return updateOptions.some(opt => opt.id === trimmed);
+};
+
+
+
 
 
 // const isValidPlc = (val) => {
@@ -20724,6 +20746,15 @@ const isValidPlc = (val) => {
   console.log('PLC validation for:', val, 'isValid:', isValid, 'available options:', plcOptions.length); // DEBUG LOG
   return isValid;
 };
+
+// Add this validation function for PLC updates
+const isValidPlcForUpdate = (val, updateOptions) => {
+  if (!val) return true; // Allow empty
+  if (updateOptions.length === 0) return true; // If no options loaded yet, allow it
+  const trimmed = val.toString().trim();
+  return updateOptions.some(option => option.value === trimmed);
+};
+
 
 
   // Track unsaved changes
@@ -20901,6 +20932,102 @@ useEffect(() => {
   loadOrganizationOptions();
 }, [showNewForm]);
 
+// Add this useEffect to initialize update options when employees are loaded
+useEffect(() => {
+  const initializeUpdateOptions = async () => {
+    if (localEmployees.length === 0) return;
+    
+    try {
+      // Load organizations for updates
+      const orgResponse = await axios.get(
+        `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+      );
+      const orgOptions = Array.isArray(orgResponse.data)
+        ? orgResponse.data.map((org) => ({
+            value: org.orgId,
+            label: org.orgId,
+          }))
+        : [];
+      
+      // Load PLC options from project data for updates
+      if (projectId) {
+        try {
+          const response = await axios.get(
+            `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+          );
+          const data = Array.isArray(response.data) ? response.data[0] : response.data;
+          
+          let plcOptionsForUpdate = [];
+          if (data.plc && Array.isArray(data.plc)) {
+            plcOptionsForUpdate = data.plc.map(plc => ({
+              value: plc.laborCategoryCode,
+              label: `${plc.laborCategoryCode} - ${plc.description}`,
+            }));
+          }
+          
+          // Load account options for updates
+          let accountsForUpdate = [];
+          if (data.employeeLaborAccounts && Array.isArray(data.employeeLaborAccounts)) {
+            accountsForUpdate = data.employeeLaborAccounts.map(account => ({ id: account.accountId }));
+          }
+          if (data.sunContractorLaborAccounts && Array.isArray(data.sunContractorLaborAccounts)) {
+            const vendorAccounts = data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }));
+            accountsForUpdate = [...accountsForUpdate, ...vendorAccounts];
+          }
+          
+          // Remove duplicates from accounts
+          const uniqueAccountsMap = new Map();
+          accountsForUpdate.forEach(acc => {
+            if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+              uniqueAccountsMap.set(acc.id, acc);
+            }
+          });
+          const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+          
+          // Initialize all update options
+          setUpdateAccountOptions(uniqueAccounts);
+          setUpdateOrganizationOptions(orgOptions);
+          setUpdatePlcOptions(plcOptionsForUpdate);
+        } catch (err) {
+          console.error("Failed to load project data for updates:", err);
+          setUpdateAccountOptions(laborAccounts);
+          setUpdateOrganizationOptions(orgOptions);
+          setUpdatePlcOptions(plcOptions);
+        }
+      } else {
+        // Fallback to existing options
+        setUpdateAccountOptions(laborAccounts);
+        setUpdateOrganizationOptions(orgOptions);
+        setUpdatePlcOptions(plcOptions);
+      }
+      
+    } catch (err) {
+      console.error("Failed to initialize update options:", err);
+    }
+  };
+  
+  initializeUpdateOptions();
+}, [localEmployees.length, projectId,  plcOptions]); // Add projectId as dependency
+
+
+// useEffect(() => {
+//   if (localEmployees.length > 0) {
+//     // Initialize update options with current data
+//     setUpdateAccountOptions(laborAccounts);
+//     setUpdateOrganizationOptions(organizationOptions);
+//     setUpdatePlcOptions(plcOptions);
+//   }
+// }, [localEmployees, laborAccounts, organizationOptions, plcOptions]);
+
+// useEffect(() => {
+//   if (localEmployees.length > 0) {
+//     // Initialize update options with current data
+//     setUpdateAccountOptions(laborAccounts);
+//     setUpdateOrganizationOptions(organizationOptions);
+//     setUpdatePlcOptions(plcOptions);
+//   }
+// }, [localEmployees, laborAccounts, organizationOptions, plcOptions]);
+
 
 
 
@@ -20952,6 +21079,8 @@ if (!projectId || !showNewForm || !newEntry.idType || newEntry.idType === "") {
       });
     }
   };
+
+  
 
 
 
@@ -21308,42 +21437,42 @@ useEffect(() => {
 }, [plcOptions]);
 
 
-const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
-  const numericValue = value.replace(/[^0-9.]/g, "");
-  handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
-  setOrgSearch(numericValue);
+// const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
+//   const numericValue = value.replace(/[^0-9.]/g, "");
+//   handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
+//   setOrgSearch(numericValue);
   
-  // Clear previous timeout
-  if (debounceTimeout.current) {
-    clearTimeout(debounceTimeout.current);
-  }
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
   
-  // Only fetch if user typed something - DO NOT update the input value
-  if (numericValue.length >= 1) {
-    debounceTimeout.current = setTimeout(async () => {
-      try {
-        const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
-        );
-        const filteredOptions = Array.isArray(response.data)
-          ? response.data
-              .filter(org => org.orgId.toString().startsWith(numericValue))
-              .map((org) => ({
-                value: org.orgId,
-                label: org.orgId,
-              }))
-          : [];
-        setOrganizationOptions(filteredOptions);
-        // IMPORTANT: DO NOT UPDATE THE INPUT VALUE HERE
-      } catch (err) {
-        console.error("Failed to fetch organizations:", err);
-        setOrganizationOptions([]);
-      }
-    }, 500); // Increased timeout to reduce API calls
-  } else {
-    setOrganizationOptions([]); // Clear options when input is empty
-  }
-};
+//   // Only fetch if user typed something - DO NOT update the input value
+//   if (numericValue.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const filteredOptions = Array.isArray(response.data)
+//           ? response.data
+//               .filter(org => org.orgId.toString().startsWith(numericValue))
+//               .map((org) => ({
+//                 value: org.orgId,
+//                 label: org.orgId,
+//               }))
+//           : [];
+//         setOrganizationOptions(filteredOptions);
+//         // IMPORTANT: DO NOT UPDATE THE INPUT VALUE HERE
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//         setOrganizationOptions([]);
+//       }
+//     }, 500); // Increased timeout to reduce API calls
+//   } else {
+//     setOrganizationOptions([]); // Clear options when input is empty
+//   }
+// };
 
 
 // const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
@@ -21499,20 +21628,121 @@ const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
 //   // No API calls needed - PLC options are loaded from project data
 // };
 
-const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
-  handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
-  setPlcSearch(value);
+// const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
+//   const numericValue = value.replace(/[^0-9.]/g, "");
   
-  // Filter PLC options for update mode too
-  if (value.length >= 1) {
-    const filtered = plcOptions.filter(option => 
-      option.value.toLowerCase().startsWith(value.toLowerCase())
-    );
-    setFilteredPlcOptions(filtered);
+//   // Real-time validation
+//   if (numericValue && !organizationOptions.some(opt => opt.value.toString().startsWith(numericValue))) {
+//     toast.error("Please enter a valid numeric Organization ID from the available list.", {
+//       autoClose: 3000,
+//     });
+//     return; // Don't update if invalid
+//   }
+  
+//   handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
+//   setOrgSearch(numericValue);
+  
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
+  
+//   // Filter organizations
+//   if (numericValue.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const filteredOptions = Array.isArray(response.data)
+//           ? response.data
+//               .filter(org => org.orgId.toString().startsWith(numericValue))
+//               .map((org) => ({
+//                 value: org.orgId,
+//                 label: org.orgId,
+//               }))
+//           : [];
+//         setUpdateOrganizationOptions(filteredOptions);
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//         setUpdateOrganizationOptions([]);
+//       }
+//     }, 300);
+//   } else {
+//     setUpdateOrganizationOptions([]);
+//   }
+// };
+
+const handleOrgInputChangeForUpdate = (value, actualEmpIdx) => {
+  const numericValue = value.replace(/[^0-9.]/g, "");
+  
+  // Remove real-time validation - only validate on blur
+  handleEmployeeDataChange(actualEmpIdx, "orgId", numericValue);
+  setOrgSearch(numericValue);
+  
+  // Clear previous timeout
+  if (debounceTimeout.current) {
+    clearTimeout(debounceTimeout.current);
+  }
+  
+  // Always fetch filtered organizations when user types
+  if (numericValue.length >= 1) {
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+        );
+        const filteredOptions = Array.isArray(response.data)
+          ? response.data
+              .filter(org => org.orgId.toString().startsWith(numericValue))
+              .map((org) => ({
+                value: org.orgId,
+                label: org.orgId,
+              }))
+          : [];
+        setUpdateOrganizationOptions(filteredOptions); // Use correct state variable
+      } catch (err) {
+        console.error("Failed to fetch organizations:", err);
+        setUpdateOrganizationOptions([]);
+      }
+    }, 300);
   } else {
-    setFilteredPlcOptions(plcOptions);
+    // Load all organizations when input is empty
+    debounceTimeout.current = setTimeout(async () => {
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+        );
+        const orgOptions = Array.isArray(response.data)
+          ? response.data.map((org) => ({
+              value: org.orgId,
+              label: org.orgId,
+            }))
+          : [];
+        setUpdateOrganizationOptions(orgOptions);
+      } catch (err) {
+        console.error("Failed to fetch organizations:", err);
+        setUpdateOrganizationOptions([]);
+      }
+    }, 300);
   }
 };
+
+
+// const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+  
+//   // Filter PLC options for update mode too
+//   if (value.length >= 1) {
+//     const filtered = plcOptions.filter(option => 
+//       option.value.toLowerCase().startsWith(value.toLowerCase())
+//     );
+//     setFilteredPlcOptions(filtered);
+//   } else {
+//     setFilteredPlcOptions(plcOptions);
+//   }
+// };
 
 
 
@@ -21577,9 +21807,224 @@ const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
 //   }
 // };
 
+// const handleOrgInputChange = (value) => {
+//   // Keep only numbers and period (for decimals)
+//   const numericValue = value.replace(/[^0-9.]/g, "");
+//   setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
+//   setOrgSearch(numericValue);
+  
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
+  
+//   // Fetch organizations when user types - DO NOT update input value
+//   if (numericValue.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const filteredOptions = Array.isArray(response.data)
+//           ? response.data
+//               .filter(org => org.orgId.toString().startsWith(numericValue))
+//               .map((org) => ({
+//                 value: org.orgId,
+//                 label: org.orgId,
+//               }))
+//           : [];
+//         setOrganizationOptions(filteredOptions);
+//         // IMPORTANT: DO NOT UPDATE newEntry.orgId HERE
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//         setOrganizationOptions([]);
+//       }
+//     }, 300);
+//   } else {
+//     // Load all organizations when input is empty
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const orgOptions = Array.isArray(response.data)
+//           ? response.data.map((org) => ({
+//               value: org.orgId,
+//               label: org.orgId,
+//             }))
+//           : [];
+//         setOrganizationOptions(orgOptions);
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//       }
+//     }, 300);
+//   }
+// };
+
+// const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   // Real-time validation
+//   if (value && plcOptions.length > 0 && !plcOptions.some(option => option.value.toLowerCase().startsWith(value.toLowerCase()))) {
+//     toast.error("Please enter a valid PLC from the available list.", {
+//       autoClose: 3000,
+//     });
+//     return; // Don't update if invalid
+//   }
+  
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+  
+//   // Filter PLC options
+//   if (value.length >= 1) {
+//     const filtered = plcOptions.filter(option => 
+//       option.value.toLowerCase().startsWith(value.toLowerCase())
+//     );
+//     setUpdatePlcOptions(filtered);
+//   } else {
+//     setUpdatePlcOptions(plcOptions);
+//   }
+// };
+
+// const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   // Remove real-time validation - only validate on blur
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+  
+//   // Filter PLC options based on input
+//   if (value.length >= 1) {
+//     const filtered = plcOptions.filter(option => 
+//       option.value.toLowerCase().startsWith(value.toLowerCase())
+//     );
+//     setUpdatePlcOptions(filtered);
+//   } else {
+//     setUpdatePlcOptions(plcOptions);
+//   }
+// };
+
+// const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+  
+//   // Filter PLC options based on input - use contains instead of startsWith for better matching
+//   if (value.length >= 1) {
+//     const filtered = updatePlcOptions.filter(option => 
+//       option.value.toLowerCase().includes(value.toLowerCase()) ||
+//       option.label.toLowerCase().includes(value.toLowerCase())
+//     );
+//     setUpdatePlcOptions(filtered);
+//   } else {
+//     // Reset to all available PLC options when input is empty
+//     if (plcOptions.length > 0) {
+//       setUpdatePlcOptions(plcOptions);
+//     }
+//   }
+// };
+
+// const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+  
+//   // Filter PLC options based on input - show suggestions from first character
+//   if (value.length >= 1) {
+//     const filtered = updatePlcOptions.filter(option => 
+//       option.value.toLowerCase().includes(value.toLowerCase()) ||
+//       option.label.toLowerCase().includes(value.toLowerCase())
+//     );
+//     setUpdatePlcOptions(filtered);
+//   } else {
+//     // Reset to all available PLC options when input is empty
+//     if (plcOptions.length > 0) {
+//       setUpdatePlcOptions(plcOptions);
+//     }
+//   }
+// };
+
+// const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+//   setPlcSearch(value);
+  
+//   // Always filter from the original plcOptions, not updatePlcOptions
+//   if (value.length >= 1) {
+//     const filtered = plcOptions.filter(option => 
+//       option.value.toLowerCase().includes(value.toLowerCase()) ||
+//       option.label.toLowerCase().includes(value.toLowerCase())
+//     );
+//     setUpdatePlcOptions(filtered);
+//   } else {
+//     // Reset to all available PLC options when input is empty
+//     setUpdatePlcOptions(plcOptions);
+//   }
+// };
+
+const handlePlcInputChangeForUpdate = (value, actualEmpIdx) => {
+  handleEmployeeDataChange(actualEmpIdx, "glcPlc", value);
+  setPlcSearch(value);
+  
+  // Always filter from the original plcOptions, not updatePlcOptions
+  if (value.length >= 1) {
+    const filtered = plcOptions.filter(option => 
+      option.value.toLowerCase().includes(value.toLowerCase()) ||
+      option.label.toLowerCase().includes(value.toLowerCase())
+    );
+    setUpdatePlcOptions(filtered);
+  } else {
+    // Reset to all available PLC options when input is empty
+    setUpdatePlcOptions(plcOptions);
+  }
+};
+
+
+
+
+
+// const handleOrgInputChange = (value) => {
+//   const numericValue = value.replace(/[^0-9.]/g, "");
+  
+//   // Real-time validation
+//   if (numericValue && !organizationOptions.some(opt => opt.value.toString().startsWith(numericValue))) {
+//     toast.error("Please enter a valid numeric Organization ID from the available list.", {
+//       autoClose: 3000,
+//     });
+//     return; // Don't update if invalid
+//   }
+  
+//   setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
+//   setOrgSearch(numericValue);
+  
+//   // Clear previous timeout
+//   if (debounceTimeout.current) {
+//     clearTimeout(debounceTimeout.current);
+//   }
+  
+//   // Fetch filtered organizations
+//   if (numericValue.length >= 1) {
+//     debounceTimeout.current = setTimeout(async () => {
+//       try {
+//         const response = await axios.get(
+//           `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//         );
+//         const filteredOptions = Array.isArray(response.data)
+//           ? response.data
+//               .filter(org => org.orgId.toString().startsWith(numericValue))
+//               .map((org) => ({
+//                 value: org.orgId,
+//                 label: org.orgId,
+//               }))
+//           : [];
+//         setOrganizationOptions(filteredOptions);
+//       } catch (err) {
+//         console.error("Failed to fetch organizations:", err);
+//         setOrganizationOptions([]);
+//       }
+//     }, 300);
+//   } else {
+//     setOrganizationOptions([]);
+//   }
+// };
+
 const handleOrgInputChange = (value) => {
-  // Keep only numbers and period (for decimals)
   const numericValue = value.replace(/[^0-9.]/g, "");
+  
+  // Remove real-time validation - only validate on blur
   setNewEntry((prev) => ({ ...prev, orgId: numericValue }));
   setOrgSearch(numericValue);
   
@@ -21588,7 +22033,7 @@ const handleOrgInputChange = (value) => {
     clearTimeout(debounceTimeout.current);
   }
   
-  // Fetch organizations when user types - DO NOT update input value
+  // Always fetch filtered organizations when user types
   if (numericValue.length >= 1) {
     debounceTimeout.current = setTimeout(async () => {
       try {
@@ -21604,7 +22049,6 @@ const handleOrgInputChange = (value) => {
               }))
           : [];
         setOrganizationOptions(filteredOptions);
-        // IMPORTANT: DO NOT UPDATE newEntry.orgId HERE
       } catch (err) {
         console.error("Failed to fetch organizations:", err);
         setOrganizationOptions([]);
@@ -21626,6 +22070,7 @@ const handleOrgInputChange = (value) => {
         setOrganizationOptions(orgOptions);
       } catch (err) {
         console.error("Failed to fetch organizations:", err);
+        setOrganizationOptions([]);
       }
     }, 300);
   }
@@ -21709,19 +22154,68 @@ const handleOrgInputChange = (value) => {
 //   }
 // };
 
-const handlePlcInputChange = (value) => {
-  console.log('PLC input changed:', value, 'autoPopulatedPLC:', autoPopulatedPLC); // DEBUG LOG
+// const handlePlcInputChange = (value) => {
+//   console.log('PLC input changed:', value, 'autoPopulatedPLC:', autoPopulatedPLC); // DEBUG LOG
   
-  // ALWAYS allow manual input - remove autoPopulatedPLC check
+//   // ALWAYS allow manual input - remove autoPopulatedPLC check
+//   setPlcSearch(value);
+//   setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
+  
+//   // Filter PLC options based on first character match
+//   if (value.length >= 1) {
+//     const filtered = plcOptions.filter(option => 
+//       option.value.toLowerCase().startsWith(value.toLowerCase())
+//     );
+//     console.log('Filtered PLC options:', filtered); // DEBUG LOG
+//     setFilteredPlcOptions(filtered);
+//   } else {
+//     setFilteredPlcOptions(plcOptions);
+//   }
+  
+//   // Reset auto-populated flag when user manually types
+//   if (autoPopulatedPLC && value !== newEntry.plcGlcCode) {
+//     setAutoPopulatedPLC(false);
+//   }
+// };
+
+// const handlePlcInputChange = (value) => {
+//   // Real-time validation
+//   if (value && plcOptions.length > 0 && !plcOptions.some(option => option.value.toLowerCase().startsWith(value.toLowerCase()))) {
+//     toast.error("Please enter a valid PLC from the available list.", {
+//       autoClose: 3000,
+//     });
+//     return; // Don't update if invalid
+//   }
+  
+//   setPlcSearch(value);
+//   setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
+  
+//   // Filter PLC options
+//   if (value.length >= 1) {
+//     const filtered = plcOptions.filter(option => 
+//       option.value.toLowerCase().startsWith(value.toLowerCase())
+//     );
+//     setFilteredPlcOptions(filtered);
+//   } else {
+//     setFilteredPlcOptions(plcOptions);
+//   }
+  
+//   // Reset auto-populated flag when user manually types
+//   if (autoPopulatedPLC && value !== newEntry.plcGlcCode) {
+//     setAutoPopulatedPLC(false);
+//   }
+// };
+
+const handlePlcInputChange = (value) => {
+  // Remove real-time validation - only validate on blur
   setPlcSearch(value);
   setNewEntry((prev) => ({ ...prev, plcGlcCode: value }));
   
-  // Filter PLC options based on first character match
+  // Filter PLC options
   if (value.length >= 1) {
     const filtered = plcOptions.filter(option => 
       option.value.toLowerCase().startsWith(value.toLowerCase())
     );
-    console.log('Filtered PLC options:', filtered); // DEBUG LOG
     setFilteredPlcOptions(filtered);
   } else {
     setFilteredPlcOptions(plcOptions);
@@ -21732,6 +22226,8 @@ const handlePlcInputChange = (value) => {
     setAutoPopulatedPLC(false);
   }
 };
+
+
 
 
 
@@ -22149,6 +22645,61 @@ const handleOrgBlur = (val) => {
       );
     }
   };
+
+//   const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
+//   // Real-time validation
+//   if (value && !laborAccounts.some(acc => acc.id === value.trim())) {
+//     toast.error("Please enter a valid Account from the available list.", {
+//       autoClose: 3000,
+//     });
+//     return; // Don't update if invalid
+//   }
+  
+//   handleEmployeeDataChange(actualEmpIdx, "acctId", value);
+  
+//   // Filter accounts based on input
+//   if (value.length >= 1) {
+//     const filtered = laborAccounts.filter(acc => 
+//       acc.id.toLowerCase().includes(value.toLowerCase())
+//     );
+//     setUpdateAccountOptions(filtered);
+//   } else {
+//     setUpdateAccountOptions(laborAccounts);
+//   }
+// };
+
+// const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
+//   // Remove real-time validation - only validate on blur
+//   handleEmployeeDataChange(actualEmpIdx, "acctId", value);
+  
+//   // Filter accounts based on input
+//   if (value.length >= 1) {
+//     const filtered = laborAccounts.filter(acc => 
+//       acc.id.toLowerCase().includes(value.toLowerCase())
+//     );
+//     setUpdateAccountOptions(filtered);
+//   } else {
+//     setUpdateAccountOptions(laborAccounts);
+//   }
+// };
+
+const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
+  handleEmployeeDataChange(actualEmpIdx, "acctId", value);
+  
+  // Filter accounts based on input
+  if (value.length >= 1) {
+    const filtered = updateAccountOptions.filter(acc => 
+      acc.id.toLowerCase().includes(value.toLowerCase())
+    );
+    setUpdateAccountOptions(filtered);
+  } else {
+    // Reset to all available accounts when input is empty
+    if (laborAccounts.length > 0) {
+      setUpdateAccountOptions(laborAccounts);
+    }
+  }
+};
+
 
   const handleFillValues = async () => {
     if (!showNewForm || !isEditable) return;
@@ -23306,7 +23857,79 @@ const handleRowClick = (actualEmpIdx) => {
                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
                             {row.name}
                           </td>
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+
+                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.acctId !== undefined
+          ? editedData.acctId
+          : row.acctId
+      }
+      onChange={(e) => handleAccountInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={() => handleEmployeeDataBlur(actualEmpIdx, emp)}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list={`account-list-${actualEmpIdx}`}
+      placeholder="Enter Account"
+    />
+  ) : (
+    row.acctId
+  )}
+  <datalist id={`account-list-${actualEmpIdx}`}>
+    {updateAccountOptions.map((account, index) => (
+      <option
+        key={`${account.id}-${index}`}
+        value={account.id}
+      >
+        {account.id}
+      </option>
+    ))}
+  </datalist>
+</td> */}
+
+<td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.acctId !== undefined
+          ? editedData.acctId
+          : row.acctId
+      }
+      onChange={(e) => handleAccountInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={(e) => {
+        const val = e.target.value;
+        if (val && !isValidAccountForUpdate(val, updateAccountOptions)) {
+          toast.error("Please enter a valid Account from the available list.", {
+            autoClose: 3000,
+          });
+        } else {
+          handleEmployeeDataBlur(actualEmpIdx, emp);
+        }
+      }}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list={`account-list-${actualEmpIdx}`}
+      placeholder="Enter Account"
+    />
+  ) : (
+    row.acctId
+  )}
+  <datalist id={`account-list-${actualEmpIdx}`}>
+    {updateAccountOptions.map((account, index) => (
+      <option
+        key={`${account.id}-${index}`}
+        value={account.id}
+      >
+        {account.id}
+      </option>
+    ))}
+  </datalist>
+</td>
+
+
+                          
+                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
                             {isBudPlan && isEditable ? (
                               <input
                                 type="text"
@@ -23331,7 +23954,9 @@ const handleRowClick = (actualEmpIdx) => {
                             ) : (
                               row.acctId
                             )}
-                          </td>
+                          </td> */}
+                         
+                         
                           {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
                             {isBudPlan && isEditable ? (
                               <input
@@ -23357,7 +23982,7 @@ const handleRowClick = (actualEmpIdx) => {
                               row.orgId
                             )}
                           </td> */}
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
   {isBudPlan && isEditable ? (
     <input
       type="text"
@@ -23385,7 +24010,63 @@ const handleRowClick = (actualEmpIdx) => {
   ) : (
     row.orgId
   )}
+</td> */}
+
+<td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.orgId !== undefined
+          ? editedData.orgId
+          : row.orgId
+      }
+      onChange={(e) => handleOrgInputChangeForUpdate(e.target.value, actualEmpIdx)}
+    //   onBlur={(e) => {
+    //     const val = e.target.value;
+    //     if (val && !isValidOrg(val)) {
+    //       toast.error("Please enter a valid numeric Organization ID from the available list.", {
+    //         autoClose: 3000,
+    //       });
+    //       // Don't clear the value automatically - let user fix it
+    //     } else {
+    //       handleEmployeeDataBlur(actualEmpIdx, emp);
+    //     }
+    //   }}
+    onBlur={(e) => {
+  const val = e.target.value;
+  const originalValue = row.orgId;
+  
+  // Only validate if the value has actually changed
+  if (val !== originalValue && val && !isValidOrgForUpdate(val, updateOrganizationOptions)) {
+    toast.error("Please enter a valid numeric Organization ID from the available list.", {
+      autoClose: 3000,
+    });
+  } else {
+    handleEmployeeDataBlur(actualEmpIdx, emp);
+  }
+}}
+
+
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list={`organization-list-${actualEmpIdx}`}
+      placeholder="Enter Organization ID"
+    />
+  ) : (
+    row.orgId
+  )}
+  <datalist id={`organization-list-${actualEmpIdx}`}>
+    {updateOrganizationOptions.map((org, index) => (
+      <option
+        key={`${org.value}-${index}`}
+        value={org.value}
+      >
+        {org.label}
+      </option>
+    ))}
+  </datalist>
 </td>
+
 
 
                           {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
@@ -23414,7 +24095,7 @@ const handleRowClick = (actualEmpIdx) => {
                               row.glcPlc
                             )}
                           </td> */}
-                         <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                         {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
   {isBudPlan && isEditable ? (
     <input
       type="text"
@@ -23442,7 +24123,118 @@ const handleRowClick = (actualEmpIdx) => {
   ) : (
     row.glcPlc
   )}
+</td> */}
+{/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.glcPlc !== undefined
+          ? editedData.glcPlc
+          : row.glcPlc
+      }
+      onChange={(e) => handlePlcInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={() => handleEmployeeDataBlur(actualEmpIdx, emp)}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list={`plc-list-${actualEmpIdx}`}
+      placeholder="Enter PLC"
+    />
+  ) : (
+    row.glcPlc
+  )}
+  <datalist id={`plc-list-${actualEmpIdx}`}>
+    {updatePlcOptions.map((plc, index) => (
+      <option
+        key={`${plc.value}-${index}`}
+        value={plc.value}
+      >
+        {plc.label}
+      </option>
+    ))}
+  </datalist>
+</td> */}
+{/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.glcPlc !== undefined
+          ? editedData.glcPlc
+          : row.glcPlc
+      }
+      onChange={(e) => handlePlcInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={(e) => {
+        const val = e.target.value;
+        if (val && !isValidPlcForUpdate(val, updatePlcOptions)) {
+          toast.error("Please enter a valid PLC from the available list.", {
+            autoClose: 3000,
+          });
+        } else {
+          handleEmployeeDataBlur(actualEmpIdx, emp);
+        }
+      }}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list={`plc-list-${actualEmpIdx}`}
+      placeholder="Enter PLC"
+    />
+  ) : (
+    row.glcPlc
+  )}
+  <datalist id={`plc-list-${actualEmpIdx}`}>
+    {updatePlcOptions.map((plc, index) => (
+      <option
+        key={`${plc.value}-${index}`}
+        value={plc.value}
+      >
+        {plc.label}
+      </option>
+    ))}
+  </datalist>
+</td> */}
+<td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.glcPlc !== undefined
+          ? editedData.glcPlc
+          : row.glcPlc
+      }
+      onChange={(e) => handlePlcInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={(e) => {
+        const val = e.target.value;
+        const originalValue = row.glcPlc;
+        
+        // Only validate if the value has actually changed
+        if (val !== originalValue && val && !isValidPlcForUpdate(val, updatePlcOptions)) {
+          toast.error("Please enter a valid PLC from the available list.", {
+            autoClose: 3000,
+          });
+        } else {
+          handleEmployeeDataBlur(actualEmpIdx, emp);
+        }
+      }}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list={`plc-list-${actualEmpIdx}`}
+      placeholder="Enter PLC"
+    />
+  ) : (
+    row.glcPlc
+  )}
+  <datalist id={`plc-list-${actualEmpIdx}`}>
+    {(updatePlcOptions.length > 0 ? updatePlcOptions : plcOptions).map((plc, index) => (
+      <option
+        key={`${plc.value}-${index}`}
+        value={plc.value}
+      >
+        {plc.label}
+      </option>
+    ))}
+  </datalist>
 </td>
+
+
+
 
 
                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">

@@ -612,6 +612,43 @@ const RevenueSetupComponent = ({ selectedPlan, revenueAccount }) => {
               }`}
               value={atRiskValue}
               onChange={(e) => {
+                // remove non-digits (ignore commas, decimals, etc.)
+                const rawDigits = e.target.value.replace(/\D/g, "");
+ 
+                if (rawDigits === "") {
+                  setAtRiskValue("");
+                  return;
+                }
+ 
+                // interpret as cents
+                const cents = parseInt(rawDigits, 10);
+ 
+                // divide by 100 to get dollars
+                const dollars = cents / 100;
+ 
+                // format in US currency style with 2 decimals
+                const formatted = dollars.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                });
+ 
+                setAtRiskValue(formatted);
+              }}
+              disabled={!overrideFundingCeilingFl}
+            />
+          </div>
+ 
+          {/* <div className="flex-1">
+            <label className="text-sm font-normal mr-2">At Risk Value</label>
+            <input
+              type="text"
+              className={`border border-gray-300 rounded px-2 py-1 w-full sm:w-24 text-sm font-normal ${
+                !overrideFundingCeilingFl
+                  ? "bg-gray-100 cursor-not-allowed"
+                  : ""
+              }`}
+              value={atRiskValue}
+              onChange={(e) => {
                 // remove commas so we can parse
                 const raw = e.target.value.replace(/,/g, "");
                 if (!isNaN(raw) && raw !== "") {
@@ -622,7 +659,7 @@ const RevenueSetupComponent = ({ selectedPlan, revenueAccount }) => {
               }}
               disabled={!overrideFundingCeilingFl}
             />
-          </div>
+          </div> */}
  
           {/* <div className="flex-1">
             <label className="text-sm font-normal mr-2">At Risk Value</label>

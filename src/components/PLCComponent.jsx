@@ -4289,22 +4289,68 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     }
   };
 
+  // const handleNewRateChange = (field, value) => {
+  //   if (field === "billRate") {
+  //     // Allow only numbers (with decimals)
+  //     if (!/^\d*\.?\d*$/.test(value)) {
+  //       return; // ignore invalid input
+  //     }
+  //   }
+  //   setNewRate((prev) => ({ ...prev, [field]: value }));
+  // };
+  
+  // const handleNewRateChange = (field, value) => {
+  //   if (field === "billRate") {
+  //     // Allow only numbers, commas, and decimals
+  //     if (!/^[0-9,]*\.?[0-9]*$/.test(value)) {
+  //       return; // ignore invalid input
+  //     }
+ 
+  //     // Remove commas before saving as number string
+  //     const cleanValue = value.replace(/,/g, "");
+ 
+  //     setNewRate((prev) => ({ ...prev, [field]: cleanValue }));
+  //     return;
+  //   }
+ 
+  //   setNewRate((prev) => ({ ...prev, [field]: value }));
+  // };
+
   const handleNewRateChange = (field, value) => {
     if (field === "billRate") {
-      // Allow only numbers (with decimals)
-      if (!/^\d*\.?\d*$/.test(value)) {
+      // Allow only digits, commas, and ONE decimal point
+      if (!/^\d{0,3}(?:,?\d{3})*(?:\.\d*)?$/.test(value) && value !== "") {
         return; // ignore invalid input
       }
+ 
+      // Keep value as-is (don't parse here, so user can type 4.5 naturally)
+      setNewRate((prev) => ({ ...prev, [field]: value }));
+      return;
     }
+ 
     setNewRate((prev) => ({ ...prev, [field]: value }));
   };
 
+
+  // const handleBillRateChange = (id, value) => {
+  //   setEditBillRate((prev) => ({
+  //     ...prev,
+  //     [id]: value === "" ? "" : parseFloat(value) || 0,
+  //   }));
+  // };
+  
   const handleBillRateChange = (id, value) => {
+    // Allow only digits, commas, and one decimal
+    if (!/^\d{0,3}(?:,?\d{3})*(?:\.\d*)?$/.test(value) && value !== "") {
+      return; // ignore invalid input
+    }
+ 
     setEditBillRate((prev) => ({
       ...prev,
-      [id]: value === "" ? "" : parseFloat(value) || 0,
+      [id]: value,
     }));
   };
+
 
   const handleProjectPlcFieldChange = (id, field, value) => {
     setEditProjectPlcFields((prev) => ({
@@ -4535,17 +4581,37 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     }
   };
 
-  const handleEmployeeBillRateChange = (id, value) => {
-    if (isNaN(newRate.billRate) || Number(newRate.billRate) <= 0) {
+  // const handleEmployeeBillRateChange = (id, value) => {
+  //   if (isNaN(newRate.billRate) || Number(newRate.billRate) <= 0) {
+  //     toast.error("Bill Rate must be a valid number greater than 0.");
+  //     return;
+  //   }
+  //   setEditEmployeeBillRate((prev) => ({
+  //     ...prev,
+  //     [id]: value === "" ? "" : parseFloat(value) || 0,
+  //   }));
+  // };
+  
+   const handleEmployeeBillRateChange = (id, value) => {
+    // ✅ allow only numbers, commas, and decimals while typing
+    if (!/^[0-9,]*\.?[0-9]*$/.test(value) && value !== "") {
+      return; // ❌ ignore invalid input
+    }
+ 
+    // Remove commas for validation/storage
+    const cleanValue = value.replace(/,/g, "");
+ 
+    if (cleanValue !== "" && (isNaN(cleanValue) || Number(cleanValue) <= 0)) {
       toast.error("Bill Rate must be a valid number greater than 0.");
       return;
     }
+ 
     setEditEmployeeBillRate((prev) => ({
       ...prev,
-      [id]: value === "" ? "" : parseFloat(value) || 0,
+      [id]: cleanValue, // store clean number string
     }));
   };
-
+ 
   const handleUpdateEmployee = async (id) => {
     if (!id) {
       console.error("Invalid ID for update");
@@ -4717,8 +4783,89 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   //   }
   // };
 
+  // const handleNewEmployeeRateChange = (field, value, id = null) => {
+  //   const updateState = (prev, selectedEmp = null, selectedPlc = null) => {
+  //     const updated = {
+  //       ...prev,
+  //       [field]: value,
+  //       ...(field === "empId" && selectedEmp
+  //         ? { employeeName: selectedEmp.employeeName }
+  //         : {}),
+  //       ...(field === "plc" && selectedPlc
+  //         ? { plcDescription: selectedPlc.description }
+  //         : {}),
+  //     };
+
+  //     // ✅ Date validations
+  //     if (updated.startDate && updated.endDate) {
+  //       if (new Date(updated.startDate) > new Date(updated.endDate)) {
+  //         toast.error("End Date cannot be before Start Date.");
+  //         return prev; // ❌ reject update
+  //       }
+  //     }
+
+  //     if (updated.startDate) {
+  //       if (
+  //         new Date(updated.startDate) < new Date(selectedPlan.projStartDt) ||
+  //         new Date(updated.startDate) > new Date(selectedPlan.projEndDt)
+  //       ) {
+  //         toast.error("Start Date must be within project dates.");
+  //         return prev;
+  //       }
+  //     }
+
+  //     if (updated.endDate) {
+  //       if (
+  //         new Date(updated.endDate) < new Date(selectedPlan.projStartDt) ||
+  //         new Date(updated.endDate) > new Date(selectedPlan.projEndDt)
+  //       ) {
+  //         toast.error("End Date must be within project dates.");
+  //         return prev;
+  //       }
+  //     }
+
+  //     return updated; // ✅ valid update
+  //   };
+
+  //   if (id) {
+  //     // Editing existing row
+  //     const selectedEmp =
+  //       field === "empId" ? employees.find((emp) => emp.empId === value) : null;
+  //     const selectedPlc =
+  //       field === "plc"
+  //         ? plcs.find((plc) => plc.laborCategoryCode === value)
+  //         : null;
+
+  //     setEditEmployeeFields((prev) => ({
+  //       ...prev,
+  //       [id]: updateState(prev[id] || {}, selectedEmp, selectedPlc),
+  //     }));
+  //   } else {
+  //     // Adding new row
+  //     const selectedEmp =
+  //       field === "empId" ? employees.find((emp) => emp.empId === value) : null;
+  //     const selectedPlc =
+  //       field === "plc"
+  //         ? plcs.find((plc) => plc.laborCategoryCode === value)
+  //         : null;
+
+  //     setNewEmployeeRate((prev) => updateState(prev, selectedEmp, selectedPlc));
+  //   }
+  // };
+
   const handleNewEmployeeRateChange = (field, value, id = null) => {
     const updateState = (prev, selectedEmp = null, selectedPlc = null) => {
+      // ✅ Special handling for billRate
+      if (field === "billRate") {
+        // Only allow digits, commas, decimals
+        if (!/^[0-9,]*\.?[0-9]*$/.test(value) && value !== "") {
+          return prev; // ❌ invalid → don't update
+        }
+        // Clean commas for storage
+        const cleanValue = value.replace(/,/g, "");
+        return { ...prev, [field]: cleanValue };
+      }
+ 
       const updated = {
         ...prev,
         [field]: value,
@@ -4729,15 +4876,15 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
           ? { plcDescription: selectedPlc.description }
           : {}),
       };
-
+ 
       // ✅ Date validations
       if (updated.startDate && updated.endDate) {
         if (new Date(updated.startDate) > new Date(updated.endDate)) {
           toast.error("End Date cannot be before Start Date.");
-          return prev; // ❌ reject update
+          return prev;
         }
       }
-
+ 
       if (updated.startDate) {
         if (
           new Date(updated.startDate) < new Date(selectedPlan.projStartDt) ||
@@ -4747,7 +4894,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
           return prev;
         }
       }
-
+ 
       if (updated.endDate) {
         if (
           new Date(updated.endDate) < new Date(selectedPlan.projStartDt) ||
@@ -4757,10 +4904,10 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
           return prev;
         }
       }
-
+ 
       return updated; // ✅ valid update
     };
-
+ 
     if (id) {
       // Editing existing row
       const selectedEmp =
@@ -4769,7 +4916,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
         field === "plc"
           ? plcs.find((plc) => plc.laborCategoryCode === value)
           : null;
-
+ 
       setEditEmployeeFields((prev) => ({
         ...prev,
         [id]: updateState(prev[id] || {}, selectedEmp, selectedPlc),
@@ -4782,7 +4929,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
         field === "plc"
           ? plcs.find((plc) => plc.laborCategoryCode === value)
           : null;
-
+ 
       setNewEmployeeRate((prev) => updateState(prev, selectedEmp, selectedPlc));
     }
   };
@@ -5251,12 +5398,34 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     }
   };
 
+  // const handleVendorBillRateChange = (id, value) => {
+  //   setEditVendorBillRate((prev) => ({
+  //     ...prev,
+  //     [id]: value === "" ? "" : parseFloat(value) || 0,
+  //   }));
+  // };
+  
   const handleVendorBillRateChange = (id, value) => {
+    // ✅ Allow only digits, commas, and decimals
+    if (!/^[0-9,]*\.?[0-9]*$/.test(value) && value !== "") {
+      return; // ignore invalid characters
+    }
+ 
+    // ✅ Clean commas
+    const clean = value.replace(/,/g, "");
+ 
+    // ✅ Reject 0 or negative values
+    if (clean !== "" && parseFloat(clean) <= 0) {
+      toast.error("Bill Rate must be greater than 0.");
+      return;
+    }
+ 
     setEditVendorBillRate((prev) => ({
       ...prev,
-      [id]: value === "" ? "" : parseFloat(value) || 0,
+      [id]: clean, // keep numeric string (so "2.5" stays "2.5")
     }));
   };
+
 
   const handleUpdateVendor = async (id) => {
     // setLoading(true);
@@ -5405,19 +5574,75 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   // const handleNewVendorRateChange = (field, value) => {
   //   setNewVendorRate((prev) => ({ ...prev, [field]: value }));
   // };
+  // const handleNewVendorRateChange = (field, value) => {
+  //   setNewVendorRate((prev) => {
+  //     const updated = { ...prev, [field]: value };
+
+  //     // ✅ Check Start & End relation
+  //     if (updated.startDate && updated.endDate) {
+  //       if (new Date(updated.startDate) > new Date(updated.endDate)) {
+  //         toast.error("End Date cannot be before Start Date.");
+  //         return prev; // stop updating
+  //       }
+  //     }
+
+  //     // ✅ Check Start Date within project dates
+  //     if (updated.startDate) {
+  //       if (
+  //         new Date(updated.startDate) < new Date(selectedPlan.projStartDt) ||
+  //         new Date(updated.startDate) > new Date(selectedPlan.projEndDt)
+  //       ) {
+  //         toast.error("Start Date must be within project dates.");
+  //         return prev;
+  //       }
+  //     }
+
+  //     // ✅ Check End Date within project dates
+  //     if (updated.endDate) {
+  //       if (
+  //         new Date(updated.endDate) < new Date(selectedPlan.projStartDt) ||
+  //         new Date(updated.endDate) > new Date(selectedPlan.projEndDt)
+  //       ) {
+  //         toast.error("End Date must be within project dates.");
+  //         return prev;
+  //       }
+  //     }
+
+  //     return updated; // ✅ only update if valid
+  //   });
+  // };
   const handleNewVendorRateChange = (field, value) => {
     setNewVendorRate((prev) => {
-      const updated = { ...prev, [field]: value };
-
-      // ✅ Check Start & End relation
+      let updated = { ...prev, [field]: value };
+ 
+      // ✅ Bill Rate validation
+      if (field === "billRate") {
+        // Allow only digits, commas, and ONE decimal
+        if (!/^[0-9,]*\.?[0-9]*$/.test(value) && value !== "") {
+          toast.error("Bill Rate must contain only numbers and decimal.");
+          return prev;
+        }
+ 
+        // Remove commas for clean numeric value
+        const clean = value.replace(/,/g, "");
+ 
+        // Prevent 0 or negative
+        if (clean !== "" && parseFloat(clean) <= 0) {
+          toast.error("Bill Rate must be greater than 0.");
+          return prev;
+        }
+ 
+        updated = { ...prev, [field]: clean }; // store clean value
+      }
+ 
+      // ✅ Date validations
       if (updated.startDate && updated.endDate) {
         if (new Date(updated.startDate) > new Date(updated.endDate)) {
           toast.error("End Date cannot be before Start Date.");
-          return prev; // stop updating
+          return prev;
         }
       }
-
-      // ✅ Check Start Date within project dates
+ 
       if (updated.startDate) {
         if (
           new Date(updated.startDate) < new Date(selectedPlan.projStartDt) ||
@@ -5427,8 +5652,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
           return prev;
         }
       }
-
-      // ✅ Check End Date within project dates
+ 
       if (updated.endDate) {
         if (
           new Date(updated.endDate) < new Date(selectedPlan.projStartDt) ||
@@ -5438,8 +5662,8 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
           return prev;
         }
       }
-
-      return updated; // ✅ only update if valid
+ 
+      return updated; // ✅ valid update
     });
   };
 
@@ -7088,7 +7312,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                       ))}
                     </datalist>
                   </td>
-                  <td className="border p-2 sm:w-1/5">
+                  {/* <td className="border p-2 sm:w-1/5">
                     <input
                       type="text"
                       value={newRate.billRate || ""}
@@ -7097,7 +7321,61 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                       }
                       className="w-full p-1 border rounded text-xs"
                     />
+                  </td> */}
+                  {/* <td className="border p-2 sm:w-1/5">
+                    <input
+                      type="text"
+                      value={newRate.billRate || ""}
+                      onChange={(e) =>
+                        handleNewRateChange("billRate", e.target.value)
+                      }
+                      onBlur={() => {
+                        if (newRate.billRate) {
+                          const num = parseFloat(
+                            newRate.billRate.replace(/,/g, "")
+                          );
+                          if (!isNaN(num)) {
+                            // format with US commas + 2 decimals
+                            handleNewRateChange(
+                              "billRate",
+                              num.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })
+                            );
+                          }
+                        }
+                      }}
+                      className="w-full p-1 border rounded text-xs"
+                    />
+                  </td> */}
+                  <td className="border p-2 sm:w-1/5">
+                    <input
+                      type="text"
+                      value={newRate.billRate || ""}
+                      onChange={(e) =>
+                        handleNewRateChange("billRate", e.target.value)
+                      }
+                      onBlur={() => {
+                        if (newRate.billRate) {
+                          const num = parseFloat(
+                            newRate.billRate.replace(/,/g, "")
+                          );
+                          if (!isNaN(num)) {
+                            handleNewRateChange(
+                              "billRate",
+                              num.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })
+                            );
+                          }
+                        }
+                      }}
+                      className="w-full p-1 border rounded text-xs"
+                    />
                   </td>
+ 
                   <td className="border p-2 sm:w-1/5">
                     <select
                       value={newRate.rateType}
@@ -7202,6 +7480,20 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                     <td className="border p-2 sm:w-1/8">
                       <span>{item.plc}</span>
                     </td>
+                    {/* <td className="border p-2 sm:w-1/5">
+                      {editingProjectPlcRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={editBillRate[item.id] ?? item.billRate}
+                          onChange={(e) =>
+                            handleBillRateChange(item.id, e.target.value)
+                          }
+                          className="w-full p-1 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.billRate}</span>
+                      )}
+                    </td> */}
                     <td className="border p-2 sm:w-1/5">
                       {editingProjectPlcRowId === item.id ? (
                         <input
@@ -7210,6 +7502,21 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                           onChange={(e) =>
                             handleBillRateChange(item.id, e.target.value)
                           }
+                          onBlur={() => {
+                            const raw = editBillRate[item.id] ?? item.billRate;
+                            const num = parseFloat(
+                              (raw || "").replace(/,/g, "")
+                            );
+                            if (!isNaN(num)) {
+                              handleBillRateChange(
+                                item.id,
+                                num.toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })
+                              );
+                            }
+                          }}
                           className="w-full p-1 border rounded text-xs"
                         />
                       ) : (
@@ -7472,13 +7779,40 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                       (plc) => plc.laborCategoryCode === newEmployeeRate.plc
                     )?.description || ""}
                   </td>
-                  <td className="border p-2 sm:w-1/8">
+                  {/* <td className="border p-2 sm:w-1/8">
                     <input
                       type="number"
                       value={newEmployeeRate.billRate || ""}
                       onChange={(e) =>
                         handleNewEmployeeRateChange("billRate", e.target.value)
                       }
+                      className="w-full p-1 border rounded text-xs"
+                    />
+                  </td> */}
+                  <td className="border p-2 sm:w-1/8">
+                    <input
+                      type="text"
+                      value={newEmployeeRate.billRate || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        // ✅ allow only digits, optional commas, optional decimal
+                        if (/^[0-9,]*\.?[0-9]*$/.test(val) || val === "") {
+                          handleNewEmployeeRateChange("billRate", val);
+                        }
+                      }}
+                      onBlur={() => {
+                        const raw = newEmployeeRate.billRate;
+                        const num = parseFloat((raw || "").replace(/,/g, ""));
+                        if (!isNaN(num)) {
+                          handleNewEmployeeRateChange(
+                            "billRate",
+                            num.toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })
+                          );
+                        }
+                      }}
                       className="w-full p-1 border rounded text-xs"
                     />
                   </td>
@@ -7681,7 +8015,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                           ?.description || item.plcDescription}
                       </span>
                     </td>
-                    <td className="border p-2 sm:w-1/8">
+                    {/* <td className="border p-2 sm:w-1/8">
                       {editingEmployeeRowId === item.id ? (
                         <input
                           type="text"
@@ -7697,7 +8031,42 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                       ) : (
                         <span>{item.billRate}</span>
                       )}
+                    </td> */}
+                    <td className="border p-2 sm:w-1/8">
+                      {editingEmployeeRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={editEmployeeBillRate[item.id] ?? item.billRate}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            // ✅ allow only digits, optional commas, optional decimal
+                            if (/^[0-9,]*\.?[0-9]*$/.test(val) || val === "") {
+                              handleEmployeeBillRateChange(item.id, val);
+                            }
+                          }}
+                          onBlur={() => {
+                            const raw =
+                              editEmployeeBillRate[item.id] ?? item.billRate;
+                            const num = parseFloat(
+                              (raw || "").replace(/,/g, "")
+                            );
+                            if (!isNaN(num)) {
+                              handleEmployeeBillRateChange(
+                                item.id,
+                                num.toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })
+                              );
+                            }
+                          }}
+                          className="w-full p-1 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.billRate}</span>
+                      )}
                     </td>
+ 
                     <td className="border p-2 sm:w-1/8">
                       {editingEmployeeRowId === item.id ? (
                         <select
@@ -8042,7 +8411,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                       className="w-full p-2 border rounded text-xs bg-gray-100"
                     />
                   </td> */}
-                  <td>
+                  {/* <td>
                     <input
                       type="number"
                       value={newVendorRate.billRate || ""}
@@ -8051,6 +8420,43 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                         if (/^\d*\.?\d*$/.test(val)) {
                           // allows only numbers + decimal
                           handleNewVendorRateChange("billRate", val);
+                        }
+                      }}
+                      className="w-full p-2 border rounded text-xs"
+                    />
+                  </td> */}
+                  <td>
+                    <input
+                      type="text" // switch to text so commas work
+                      value={newVendorRate.billRate || ""}
+                      onChange={(e) => {
+                        const val = e.target.value;
+ 
+                        // ✅ allow only numbers, commas, and decimal
+                        if (!/^[0-9,]*\.?[0-9]*$/.test(val) && val !== "") {
+                          return; // ignore invalid input
+                        }
+ 
+                        handleNewVendorRateChange("billRate", val);
+                      }}
+                      onBlur={() => {
+                        if (newVendorRate.billRate) {
+                          const num = parseFloat(
+                            newVendorRate.billRate.replace(/,/g, "")
+                          );
+                          if (!isNaN(num) && num > 0) {
+                            // ✅ format with commas and 2 decimals
+                            handleNewVendorRateChange(
+                              "billRate",
+                              num.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })
+                            );
+                          } else {
+                            toast.error("Bill Rate must be greater than 0");
+                            handleNewVendorRateChange("billRate", "");
+                          }
                         }
                       }}
                       className="w-full p-2 border rounded text-xs"
@@ -8310,6 +8716,22 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                         <span>{item.plcDescription}</span>
                       )}
                     </td>
+                    {/* <td className="border p-2 sm:w-1/8">
+                      {editingVendorRowId === item.id ? (
+                        <input
+                          type="text"
+                          value={
+                            editVendorBillRate[item.id] ?? item.billRate ?? ""
+                          }
+                          onChange={(e) =>
+                            handleVendorBillRateChange(item.id, e.target.value)
+                          }
+                          className="w-full p-2 border rounded text-xs"
+                        />
+                      ) : (
+                        <span>{item.billRate}</span>
+                      )}
+                    </td> */}
                     <td className="border p-2 sm:w-1/8">
                       {editingVendorRowId === item.id ? (
                         <input
@@ -8320,6 +8742,24 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                           onChange={(e) =>
                             handleVendorBillRateChange(item.id, e.target.value)
                           }
+                          onBlur={() => {
+                            const raw =
+                              editVendorBillRate[item.id] ?? item.billRate;
+                            const num = parseFloat(
+                              (raw || "").replace(/,/g, "")
+                            );
+                            if (!isNaN(num) && num > 0) {
+                              handleVendorBillRateChange(
+                                item.id,
+                                num.toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })
+                              );
+                            } else if (raw) {
+                              toast.error("Bill Rate must be greater than 0.");
+                            }
+                          }}
                           className="w-full p-2 border rounded text-xs"
                         />
                       ) : (

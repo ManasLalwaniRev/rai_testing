@@ -5652,6 +5652,9 @@ const ProjectAmountsTable = ({
   const [idError, setIdError] = useState("");
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null); // dctId of selected employee
   const [localEmployees, setLocalEmployees] = useState([]);
+  const [employeeNonLaborAccounts, setEmployeeNonLaborAccounts] = useState([]);
+  const [subContractorNonLaborAccounts, setSubContractorNonLaborAccounts] = useState([]);
+  const [organizationOptions, setOrganizationOptions] = useState([]);
 
 
   const isEditable = initialData.status === "In Progress";
@@ -5659,6 +5662,28 @@ const ProjectAmountsTable = ({
   const projectId = initialData.projId;
   const closedPeriod = initialData.closedPeriod;
   const isBudPlan = planType && planType.toUpperCase() === "BUD";
+
+   const verticalScrollRef = useRef(null);
+  const vfirstTableRef = useRef(null);
+  const vlastTableRef = useRef(null);
+  // Vertical sync only
+  useEffect(() => {
+    const container = verticalScrollRef.current;
+    const firstScroll = vfirstTableRef.current;
+    const lastScroll = vlastTableRef.current;
+ 
+    if (!container || !firstScroll || !lastScroll) return;
+ 
+    const onScroll = () => {
+      const scrollTop = container.scrollTop;
+      firstScroll.scrollTop = scrollTop;
+      lastScroll.scrollTop = scrollTop;
+    };
+ 
+    container.addEventListener("scroll", onScroll);
+    return () => container.removeEventListener("scroll", onScroll);
+  }, []);
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -5744,131 +5769,154 @@ const ProjectAmountsTable = ({
     fetchData();
   }, [startDate, endDate, planId, refreshKey]); // Added propFiscalYear for refetch on fiscal year change
 
-  useEffect(() => {
-    const fetchEmployees = async () => {
-      if (!projectId) {
-        console.warn("projectId is undefined, skipping employee fetch");
-        setEmployeeSuggestions([]);
-        return;
-      }
-      if (!showNewForm) {
-        console.log("New entry form is not open, skipping employee fetch");
-        setEmployeeSuggestions([]);
-        return;
-      }
-      console.log(`Fetching employees for projectId: ${projectId}`);
-      try {
-        const endpoint =
-          newEntry.idType === "Vendor" || newEntry.idType === "Vendor Employee"
-            ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
-            : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
-        const response = await axios.get(endpoint);
-        console.log("Employee suggestions response:", response.data);
-        const suggestions = Array.isArray(response.data)
-          ? response.data.map((emp) => {
-              if (newEntry.idType === "Vendor") {
-                return {
-                  emplId: emp.vendId,
-                  firstName: "",
-                  lastName: emp.employeeName || "",
-                };
-              } else if (newEntry.idType === "Vendor Employee") {
-                return {
-                  emplId: emp.empId,
-                  firstName: "",
-                  lastName: emp.employeeName || "",
-                };
-              } else {
-                const [lastName, firstName] = (emp.employeeName || "")
-                  .split(", ")
-                  .map((str) => str.trim());
-                return {
-                  emplId: emp.empId,
-                  firstName: firstName || "",
-                  lastName: lastName || "",
-                  orgId: emp.orgId,
-                };
-              }
-            })
-          : [];
-        setEmployeeSuggestions(suggestions);
-        console.log("Updated employeeSuggestions:", suggestions);
-      } catch (err) {
-        console.error("Error fetching employees:", err);
-        setEmployeeSuggestions([]);
-        toast.error(
-          `Failed to fetch ${
-            newEntry.idType === "Vendor" ||
-            newEntry.idType === "Vendor Employee"
-              ? "vendor "
-              : ""
-          }employee suggestions${
-            projectId
-              ? " for project ID " + projectId
-              : ". Project ID is missing."
-          }`,
-          {
-            toastId: "employee-fetch-error",
-            autoClose: 3000,
-          }
-        );
-      }
-    };
-
-    const fetchNonLaborAccounts = async () => {
-      if (!projectId) {
-        console.warn(
-          "projectId is undefined, skipping non-labor accounts fetch"
-        );
-        setNonLaborAccounts([]);
-        return;
-      }
-      if (!showNewForm) {
-        console.log(
-          "New entry form is not open, skipping non-labor accounts fetch"
-        );
-        setNonLaborAccounts([]);
-        return;
-      }
-      console.log(`Fetching non-labor accounts for projectId: ${projectId}`);
+    useEffect(() => {
+    const loadOrganizationOptions = async () => {
       try {
         const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
         );
-        console.log("Non-labor accounts response:", response.data);
-        const data = Array.isArray(response.data)
-          ? response.data[0]
-          : response.data;
-        const accounts = Array.isArray(data.nonLaborAccounts)
-          ? data.nonLaborAccounts.map((account) => ({ id: account }))
+        const orgOptions = Array.isArray(response.data)
+          ? response.data.map((org) => ({
+              value: org.orgId,
+              label: org.orgId,
+            }))
           : [];
-        setNonLaborAccounts(accounts);
-        console.log("Updated nonLaborAccounts:", accounts);
+        setOrganizationOptions(orgOptions);
       } catch (err) {
-        console.error("Error fetching non-labor accounts:", err);
-        setNonLaborAccounts([]);
-        toast.error(
-          `Failed to fetch non-labor accounts${
-            projectId
-              ? " for project ID " + projectId
-              : ". Project ID is missing."
-          }`,
-          {
-            toastId: "non-labor-accounts-error",
-            autoClose: 3000,
-          }
-        );
+        console.error("Failed to fetch organizations:", err);
       }
     };
-
-    if (showNewForm) {
-      fetchEmployees();
-      fetchNonLaborAccounts();
-    } else {
-      setEmployeeSuggestions([]);
-      setNonLaborAccounts([]);
+    if (showNewForm || isEditable) {
+      loadOrganizationOptions();
     }
-  }, [projectId, showNewForm, newEntry.idType]);
+  }, [showNewForm, isEditable]);
+ 
+
+  // useEffect(() => {
+  //   const fetchEmployees = async () => {
+  //     if (!projectId) {
+  //       console.warn("projectId is undefined, skipping employee fetch");
+  //       setEmployeeSuggestions([]);
+  //       return;
+  //     }
+  //     if (!showNewForm) {
+  //       console.log("New entry form is not open, skipping employee fetch");
+  //       setEmployeeSuggestions([]);
+  //       return;
+  //     }
+  //     console.log(`Fetching employees for projectId: ${projectId}`);
+  //     try {
+  //       const endpoint =
+  //         newEntry.idType === "Vendor" || newEntry.idType === "Vendor Employee"
+  //           ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
+  //           : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
+  //       const response = await axios.get(endpoint);
+  //       console.log("Employee suggestions response:", response.data);
+  //       const suggestions = Array.isArray(response.data)
+  //         ? response.data.map((emp) => {
+  //             if (newEntry.idType === "Vendor") {
+  //               return {
+  //                 emplId: emp.vendId,
+  //                 firstName: "",
+  //                 lastName: emp.employeeName || "",
+  //               };
+  //             } else if (newEntry.idType === "Vendor Employee") {
+  //               return {
+  //                 emplId: emp.empId,
+  //                 firstName: "",
+  //                 lastName: emp.employeeName || "",
+  //               };
+  //             } else {
+  //               const [lastName, firstName] = (emp.employeeName || "")
+  //                 .split(", ")
+  //                 .map((str) => str.trim());
+  //               return {
+  //                 emplId: emp.empId,
+  //                 firstName: firstName || "",
+  //                 lastName: lastName || "",
+  //                 orgId: emp.orgId,
+  //               };
+  //             }
+  //           })
+  //         : [];
+  //       setEmployeeSuggestions(suggestions);
+  //       console.log("Updated employeeSuggestions:", suggestions);
+  //     } catch (err) {
+  //       console.error("Error fetching employees:", err);
+  //       setEmployeeSuggestions([]);
+  //       toast.error(
+  //         `Failed to fetch ${
+  //           newEntry.idType === "Vendor" ||
+  //           newEntry.idType === "Vendor Employee"
+  //             ? "vendor "
+  //             : ""
+  //         }employee suggestions${
+  //           projectId
+  //             ? " for project ID " + projectId
+  //             : ". Project ID is missing."
+  //         }`,
+  //         {
+  //           toastId: "employee-fetch-error",
+  //           autoClose: 3000,
+  //         }
+  //       );
+  //     }
+  //   };
+
+  //   const fetchNonLaborAccounts = async () => {
+  //     if (!projectId) {
+  //       console.warn(
+  //         "projectId is undefined, skipping non-labor accounts fetch"
+  //       );
+  //       setNonLaborAccounts([]);
+  //       return;
+  //     }
+  //     if (!showNewForm) {
+  //       console.log(
+  //         "New entry form is not open, skipping non-labor accounts fetch"
+  //       );
+  //       setNonLaborAccounts([]);
+  //       return;
+  //     }
+  //     console.log(`Fetching non-labor accounts for projectId: ${projectId}`);
+  //     try {
+  //       const response = await axios.get(
+  //         `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+  //       );
+  //       console.log("Non-labor accounts response:", response.data);
+  //       const data = Array.isArray(response.data)
+  //         ? response.data[0]
+  //         : response.data;
+  //       const accounts = Array.isArray(data.nonLaborAccounts)
+  //         ? data.nonLaborAccounts.map((account) => ({ id: account }))
+  //         : [];
+  //       setNonLaborAccounts(accounts);
+  //       console.log("Updated nonLaborAccounts:", accounts);
+  //     } catch (err) {
+  //       console.error("Error fetching non-labor accounts:", err);
+  //       setNonLaborAccounts([]);
+  //       toast.error(
+  //         `Failed to fetch non-labor accounts${
+  //           projectId
+  //             ? " for project ID " + projectId
+  //             : ". Project ID is missing."
+  //         }`,
+  //         {
+  //           toastId: "non-labor-accounts-error",
+  //           autoClose: 3000,
+  //         }
+  //       );
+  //     }
+  //   };
+
+  //   if (showNewForm) {
+  //     fetchEmployees();
+  //     fetchNonLaborAccounts();
+  //   } else {
+  //     setEmployeeSuggestions([]);
+  //     setNonLaborAccounts([]);
+  //   }
+  // }, [projectId, showNewForm, newEntry.idType]);
 
   
 
@@ -5940,6 +5988,202 @@ const ProjectAmountsTable = ({
 //   }));
 //   console.log("Selected employee orgId:", selectedEmployee?.orgId);
 // };
+  
+useEffect(() => {
+    const formOpen = showNewForm || isEditable;
+    const fetchEmployees = async () => {
+      if (!projectId || !formOpen) {
+        console.warn("projectId is undefined, skipping employee fetch");
+        setEmployeeSuggestions([]);
+        return;
+      }
+      if (!showNewForm) {
+        console.log("New entry form is not open, skipping employee fetch");
+        setEmployeeSuggestions([]);
+        return;
+      }
+      console.log(`Fetching employees for projectId: ${projectId}`);
+      try {
+        const endpoint =
+          newEntry.idType === "Vendor" || newEntry.idType === "Vendor Employee"
+            ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
+            : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
+        const response = await axios.get(endpoint);
+        console.log("Employee suggestions response:", response.data);
+        const suggestions = Array.isArray(response.data)
+          ? response.data.map((emp) => {
+              if (newEntry.idType === "Vendor") {
+                return {
+                  emplId: emp.vendId,
+                  firstName: "",
+                  lastName: emp.employeeName || "",
+                };
+              } else if (newEntry.idType === "Vendor Employee") {
+                return {
+                  emplId: emp.empId,
+                  firstName: "",
+                  lastName: emp.employeeName || "",
+                };
+              } else {
+                const [lastName, firstName] = (emp.employeeName || "")
+                  .split(", ")
+                  .map((str) => str.trim());
+                return {
+                  emplId: emp.empId,
+                  firstName: firstName || "",
+                  lastName: lastName || "",
+                  orgId: emp.orgId,
+                  acctId: emp.acctId,
+                };
+              }
+            })
+          : [];
+        setEmployeeSuggestions(suggestions);
+        console.log("Updated employeeSuggestions:", suggestions);
+      } catch (err) {
+        console.error("Error fetching employees:", err);
+        setEmployeeSuggestions([]);
+        toast.error(
+          `Failed to fetch ${
+            newEntry.idType === "Vendor" ||
+            newEntry.idType === "Vendor Employee"
+              ? "vendor "
+              : ""
+          }employee suggestions${
+            projectId
+              ? " for project ID " + projectId
+              : ". Project ID is missing."
+          }`,
+          {
+            toastId: "employee-fetch-error",
+            autoClose: 3000,
+          }
+        );
+      }
+    };
+ 
+    // const fetchNonLaborAccounts = async () => {
+    //   if (!projectId) {
+    //     console.warn(
+    //       "projectId is undefined, skipping non-labor accounts fetch"
+    //     );
+    //     setNonLaborAccounts([]);
+    //     return;
+    //   }
+    //   if (!showNewForm) {
+    //     console.log(
+    //       "New entry form is not open, skipping non-labor accounts fetch"
+    //     );
+    //     setNonLaborAccounts([]);
+    //     return;
+    //   }
+    //   console.log(`Fetching non-labor accounts for projectId: ${projectId}`);
+    //   try {
+    //     const response = await axios.get(
+    //       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+    //     );
+    //     console.log("Non-labor accounts response:", response.data);
+    //     const data = Array.isArray(response.data)
+    //       ? response.data[0]
+    //       : response.data;
+    //     const accounts = Array.isArray(data.nonLaborAccounts)
+    //       ? data.nonLaborAccounts.map((account) => ({ id: account }))
+    //       : [];
+    //     setNonLaborAccounts(accounts);
+    //     console.log("Updated nonLaborAccounts:", accounts);
+    //   } catch (err) {
+    //     console.error("Error fetching non-labor accounts:", err);
+    //     setNonLaborAccounts([]);
+    //     toast.error(
+    //       `Failed to fetch non-labor accounts${
+    //         projectId
+    //           ? " for project ID " + projectId
+    //           : ". Project ID is missing."
+    //       }`,
+    //       {
+    //         toastId: "non-labor-accounts-error",
+    //         autoClose: 3000,
+    //       }
+    //     );
+    //   }
+    // };
+    const fetchNonLaborAccounts = async () => {
+      if (!projectId || !formOpen) {
+        setEmployeeNonLaborAccounts([]);
+        setSubContractorNonLaborAccounts([]);
+        return;
+      }
+ 
+      try {
+        const response = await axios.get(
+          `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+        );
+ 
+        const data = Array.isArray(response.data)
+          ? response.data[0]
+          : response.data;
+ 
+        // -------------------------
+        // Employee Non-Labor Accounts
+        // -------------------------
+        let employeeAccounts = Array.isArray(data.employeeNonLaborAccounts)
+          ? data.employeeNonLaborAccounts.map((account) => ({
+              id: account.accountId || account, // handle both object/string
+              name: account.acctName || account.accountId || String(account),
+            }))
+          : [];
+ 
+        // Deduplicate employee accounts
+        const uniqueEmployeeMap = new Map();
+        employeeAccounts.forEach((acc) => {
+          if (acc.id && !uniqueEmployeeMap.has(acc.id)) {
+            uniqueEmployeeMap.set(acc.id, acc);
+          }
+        });
+        const uniqueEmployeeAccounts = Array.from(uniqueEmployeeMap.values());
+        setEmployeeNonLaborAccounts(uniqueEmployeeAccounts);
+ 
+        // -------------------------
+        // SubContractor Non-Labor Accounts
+        // -------------------------
+        let subAccounts = Array.isArray(data.subContractorNonLaborAccounts)
+          ? data.subContractorNonLaborAccounts.map((account) => ({
+              id: account.accountId || account,
+              name: account.acctName || account.accountId || String(account),
+            }))
+          : [];
+ 
+        // Deduplicate subcontractor accounts
+        const uniqueSubMap = new Map();
+        subAccounts.forEach((acc) => {
+          if (acc.id && !uniqueSubMap.has(acc.id)) {
+            uniqueSubMap.set(acc.id, acc);
+          }
+        });
+        const uniqueSubAccounts = Array.from(uniqueSubMap.values());
+        setSubContractorNonLaborAccounts(uniqueSubAccounts);
+      } catch (err) {
+        console.error("Error fetching non-labor accounts:", err);
+        setEmployeeNonLaborAccounts([]);
+        setSubContractorNonLaborAccounts([]);
+        toast.error("Failed to fetch non-labor accounts", {
+          toastId: "non-labor-accounts-error",
+          autoClose: 3000,
+        });
+      }
+    };
+ 
+    if (formOpen) {
+      fetchEmployees();
+      fetchNonLaborAccounts();
+    } else {
+      setEmployeeNonLaborAccounts([]); // ✅ correct reset
+      setSubContractorNonLaborAccounts([]);
+      setEmployeeSuggestions([]);
+      // setOrganizationOptions([]);
+    }
+  }, [projectId, showNewForm, newEntry.idType, isEditable]);
+ 
 
 const handleIdChange = (value) => {
   console.log("handleIdChange called with value:", value);
@@ -6022,13 +6266,77 @@ const handleIdChange = (value) => {
     }));
   };
 
+  // const handleRowFieldBlur = async (rowIdx, emp) => {
+  //   if (!isBudPlan || !isEditable) return;
+  //   if (!emp || !emp.emple) {
+  //     toast.error("Employee data is missing for update.");
+  //     return;
+  //   }
+
+  //   const edited = editedRowData[rowIdx] || {};
+  //   if (
+  //     edited.acctId === undefined &&
+  //     edited.orgId === undefined &&
+  //     edited.isRev === undefined &&
+  //     edited.isBrd === undefined
+  //   )
+  //     return;
+
+  //   const payload = {
+  //     dctId: emp.emple.dctId || 0,
+  //     plId: emp.emple.plId || 0,
+  //     accId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId, 
+  //     orgId: edited.orgId !== undefined ? edited.orgId : emp.emple.orgId,
+  //     type: emp.emple.type || "",
+  //     category: emp.emple.category || "",
+  //     amountType: emp.emple.amountType || "",
+  //     id: emp.emple.emplId || "",
+  //     isRev: edited.isRev !== undefined ? edited.isRev : emp.emple.isRev,
+  //     isBrd: edited.isBrd !== undefined ? edited.isBrd : emp.emple.isBrd,
+  //     createdBy: emp.emple.createdBy || "System",
+  //     lastModifiedBy: "System",
+  //   };
+
+  //   try {
+  //     await axios.put(
+  //       "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
+  //       { ...payload, acctId: payload.accId },
+  //       { headers: { "Content-Type": "application/json" } }
+  //     );
+  //     setEditedRowData((prev) => {
+  //       const newData = { ...prev };
+  //       delete newData[rowIdx];
+  //       return newData;
+  //     });
+  //     setEmployees((prev) => {
+  //       const updated = [...prev];
+  //       updated[rowIdx] = {
+  //         ...updated[rowIdx],
+  //         emple: {
+  //           ...updated[rowIdx].emple,
+  //           ...payload,
+  //         },
+  //       };
+  //       return updated;
+  //     });
+  //     toast.success("Employee updated successfully!", {
+  //       toastId: `employee-update-${rowIdx}`,
+  //       autoClose: 2000,
+  //     });
+  //   } catch (err) {
+  //     toast.error(
+  //       "Failed to update row: " + (err.response?.data?.message || err.message)
+  //     );
+  //   }
+  // };
+  
   const handleRowFieldBlur = async (rowIdx, emp) => {
     if (!isBudPlan || !isEditable) return;
     if (!emp || !emp.emple) {
       toast.error("Employee data is missing for update.");
       return;
     }
-
+ 
     const edited = editedRowData[rowIdx] || {};
     if (
       edited.acctId === undefined &&
@@ -6037,11 +6345,11 @@ const handleIdChange = (value) => {
       edited.isBrd === undefined
     )
       return;
-
+ 
     const payload = {
       dctId: emp.emple.dctId || 0,
       plId: emp.emple.plId || 0,
-      accId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId, 
+      accId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId,
       orgId: edited.orgId !== undefined ? edited.orgId : emp.emple.orgId,
       type: emp.emple.type || "",
       category: emp.emple.category || "",
@@ -6052,7 +6360,24 @@ const handleIdChange = (value) => {
       createdBy: emp.emple.createdBy || "System",
       lastModifiedBy: "System",
     };
-
+ 
+    // ✅ Add validation BEFORE saving
+    const validAccounts =
+      emp.idType === "Vendor" || emp.idType === "Vendor Employee"
+        ? subContractorNonLaborAccounts.map((a) => a.id || a.accountId || "")
+        : employeeNonLaborAccounts.map((a) => a.id || a.accountId || "");
+ 
+    if (payload.accId && !validAccounts.includes(payload.accId)) {
+      toast.error("Please select a valid account from suggestions");
+      return; // 🚫 stop here, don't call API or show success
+    }
+    // ✅ Validate orgId against organizationOptions
+    const validOrgs = organizationOptions.map((org) => org.value);
+    if (payload.orgId && !validOrgs.includes(payload.orgId)) {
+      toast.error("Please select a valid organization from suggestions");
+      return; // 🚫 block update
+    }
+ 
     try {
       await axios.put(
         "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
@@ -6297,6 +6622,21 @@ const handleIdChange = (value) => {
     } finally {
       setTimeout(() => setShowSuccessMessage(false), 2000);
     }
+  };
+
+  const resetNewEntry = (newIdType) => {
+    setNewEntry({
+      id: "",
+      firstName: "",
+      lastName: "",
+      isRev: false,
+      isBrd: false,
+      idType: newIdType || "", // preserve new idType
+      acctId: "",
+      orgId: "",
+      perHourRate: "",
+      status: "Act",
+    });
   };
 
   const handleFillValues = async () => {
@@ -6549,7 +6889,7 @@ const handleSaveNewEntry = async () => {
     acctId: newEntry.acctId || "",
     orgId: newEntry.orgId || "",
     notes: "",
-    category: newEntry.name || "Test",
+    category: newEntry.name || "",
     amountType: "",
     id: newEntry.id,
     type: newEntry.idType || "Employee",
@@ -6980,37 +7320,837 @@ const handleSaveNewEntry = async () => {
     2
   );
 
+  // return (
+  //   <div className="relative p-4 font-inter w-full synchronized-tables-outer">
+  //     {/* <h2 className="text-xs font-semibold mb-3 text-gray-800">Amounts</h2> */}
+  //     <div className="w-full flex justify-between mb-4 gap-2">
+  //       <div className="flex-grow"></div>
+  //       <div className="flex gap-2">
+  //         {Object.values(hiddenRows).some(Boolean) && (
+  //           <button
+  //             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+  //             onClick={showHiddenRows}
+  //           >
+  //             Show Hidden Rows
+  //           </button>
+  //         )}
+  //         {isEditable && (
+  //           <>
+  //             <button
+  //               onClick={() => setShowNewForm((prev) => !prev)}
+  //               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+  //             >
+  //               {showNewForm ? "Cancel" : "New"}
+  //             </button>
+  //             {!showNewForm && ( // Hide Find/Replace while creating new entry
+  //               <>
+  //               <button
+  //                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+  //                 onClick={() => isEditable && setShowFindReplace(true)}
+  //               >
+  //                 Find / Replace
+  //               </button>
+  //               <button
+  //                     className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs font-medium"
+  //                     onClick={() => {
+  //                       if (!selectedEmployeeId) {
+  //                         toast.error("Please select an employee to delete");
+  //                         return;
+  //                       }
+  //                       handleDeleteEmployee(selectedEmployeeId);
+  //                     }}
+  //                   >
+  //                     Delete
+  //                   </button>
+  //               </>
+  //             )}
+  //             {showNewForm && (
+  //               <button
+  //                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+  //                 onClick={() => isEditable && setShowFillValues(true)}
+  //               >
+  //                 Fill Values
+  //               </button>
+  //             )}
+  //           </>
+  //         )}
+  //         {showNewForm && (
+  //           <button
+  //             onClick={handleSaveNewEntry}
+  //             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+  //           >
+  //             Save Entry
+  //           </button>
+  //         )}
+  //       </div>
+  //     </div>
+
+  //     {showFillValues && (
+  //       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+  //         <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-sm">
+  //           <h3 className="text-lg font-semibold mb-4">
+  //             Fill Values to selected record/s
+  //           </h3>
+  //           <div className="mb-4">
+  //             <label className="block text-gray-700 text-xs font-medium mb-1">
+  //               Select Fill Method
+  //             </label>
+  //             <select
+  //               value={fillMethod}
+  //               onChange={(e) => setFillMethod(e.target.value)}
+  //               className="w-full border border-gray-300 rounded-md p-2 text-xs"
+  //             >
+  //               <option value="None">None</option>
+  //               <option value="Copy From Source Record">
+  //                 Copy from source record
+  //               </option>
+  //             </select>
+  //           </div>
+  //           <div className="mb-4">
+  //             <label className="block text-gray-700 text-xs font-medium mb-1">
+  //               Start Period
+  //             </label>
+  //             <input
+  //               type="text"
+  //               value={startDate}
+  //               readOnly
+  //               className="w-full border border-gray-300 rounded-md p-2 text-xs bg-gray-100 cursor-not-allowed"
+  //             />
+  //           </div>
+  //           <div className="mb-4">
+  //             <label className="block text-gray-700 text-xs font-medium mb-1">
+  //               End Period
+  //             </label>
+  //             <input
+  //               type="text"
+  //               value={endDate}
+  //               readOnly
+  //               className="w-full border border-gray-300 rounded-md p-2 text-xs bg-gray-100 cursor-not-allowed"
+  //             />
+  //           </div>
+  //           <div className="flex justify-end gap-3">
+  //             <button
+  //               type="button"
+  //               onClick={() => {
+  //                 setShowFillValues(false);
+  //                 setFillMethod("None");
+  //                 setSourceRowIndex(null);
+  //               }}
+  //               className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 text-xs"
+  //             >
+  //               Close
+  //             </button>
+  //             <button
+  //               type="button"
+  //               onClick={handleFillValues}
+  //               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs"
+  //             >
+  //               Fill
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     )}
+
+  //     {employees.length === 0 && !showNewForm && sortedDurations.length > 0 ? (
+  //       <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded text-xs">
+  //         No forecast data available for this plan.
+  //       </div>
+  //     ) : (
+  //       <div className="synchronized-tables-container">
+  //         <div className="synchronized-table-scroll">
+  //           <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
+  //             <thead className="sticky-thead">
+  //               <tr
+  //                 style={{
+  //                   height: `${ROW_HEIGHT_DEFAULT}px`,
+  //                   lineHeight: "normal",
+  //                 }}
+  //               >
+  //                 {EMPLOYEE_COLUMNS.map((col) => (
+  //                   <th
+  //                     key={col.key}
+  //                     className="p-1.5 border border-gray-200 whitespace-nowrap text-xs text-gray-900 font-normal min-w-[70px]" // Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px]
+  //                   >
+  //                     {col.label}
+  //                   </th>
+  //                 ))}
+  //               </tr>
+  //             </thead>
+  //             <tbody>
+  //               {showNewForm && (
+  //                 <tr
+  //                   key="new-entry"
+  //                   className="bg-gray-50"
+  //                   style={{
+  //                     height: `${ROW_HEIGHT_DEFAULT}px`,
+  //                     lineHeight: "normal",
+  //                   }}
+  //                 >
+  //                   <td className="border border-gray-300 px-1.5 py-0.5">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <select
+  //                       name="idType"
+  //                       value={newEntry.idType || ""}
+  //                       onChange={(e) =>
+  //                         setNewEntry({ ...newEntry, idType: e.target.value })
+  //                       }
+  //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+  //                     >
+  //                       {ID_TYPE_OPTIONS.map((opt) => (
+  //                         <option key={opt.value} value={opt.value}>
+  //                           {opt.label}
+  //                         </option>
+  //                       ))}
+  //                     </select>
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <input
+  //                       type="text"
+  //                       name="id"
+  //                       value={newEntry.id}
+  //                       onChange={(e) => handleIdChange(e.target.value)}
+  //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+  //                       list="employee-id-list"
+  //                       placeholder="Enter ID"
+  //                     />
+  //                     <datalist id="employee-id-list">
+  //                       {employeeSuggestions
+  //                         .filter(
+  //                           (emp) =>
+  //                             emp.emplId && typeof emp.emplId === "string"
+  //                         )
+  //                         .map((emp, index) => (
+  //                           <option
+  //                             key={`${emp.emplId}-${index}`}
+  //                             value={emp.emplId}
+  //                           >
+  //                             {emp.lastName && emp.firstName
+  //                               ? `${emp.lastName}, ${emp.firstName}`
+  //                               : emp.lastName || emp.firstName || emp.emplId}
+  //                           </option>
+  //                         ))}
+  //                     </datalist>
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <input
+  //                       type="text"
+  //                       name="name"
+  //                       value={
+  //                         newEntry.lastName && newEntry.firstName
+  //                           ? `${newEntry.lastName}, ${newEntry.firstName}`
+  //                           : newEntry.lastName || newEntry.firstName || ""
+  //                       }
+  //                       readOnly
+  //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
+  //                       placeholder="Name (auto-filled)"
+  //                     />
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <input
+  //                       type="text"
+  //                       name="acctId"
+  //                       value={newEntry.acctId}
+  //                       onChange={(e) =>
+  //                         isBudPlan &&
+  //                         setNewEntry({ ...newEntry, acctId: e.target.value })
+  //                       }
+  //                       className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+  //                         !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+  //                       }`}
+  //                       list="account-list"
+  //                       placeholder="Enter Account"
+  //                       readOnly={!isBudPlan}
+  //                     />
+  //                     <datalist id="account-list">
+  //                       {nonLaborAccounts.map((account, index) => (
+  //                         <option
+  //                           key={`${account.id}-${index}`}
+  //                           value={account.id}
+  //                         >
+  //                           {account.id}
+  //                         </option>
+  //                       ))}
+  //                     </datalist>
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <input
+  //                       type="text"
+  //                       name="orgId"
+  //                       value={newEntry.orgId}
+  //                       onChange={(e) =>
+  //                         isBudPlan &&
+  //                         setNewEntry({ ...newEntry, orgId: e.target.value })
+  //                       }
+  //                       className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+  //                         !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+  //                       }`}
+  //                       placeholder="Enter Organization"
+  //                       readOnly={!isBudPlan}
+  //                     />
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <input
+  //                       type="checkbox"
+  //                       name="isRev"
+  //                       checked={newEntry.isRev}
+  //                       onChange={(e) =>
+  //                         isBudPlan &&
+  //                         setNewEntry({ ...newEntry, isRev: e.target.checked })
+  //                       }
+  //                       className={`w-4 h-4 ${
+  //                         !isBudPlan ? "cursor-not-allowed" : ""
+  //                       }`}
+  //                       disabled={!isBudPlan}
+  //                     />
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <input
+  //                       type="checkbox"
+  //                       name="isBrd"
+  //                       checked={newEntry.isBrd}
+  //                       onChange={(e) =>
+  //                         isBudPlan &&
+  //                         setNewEntry({ ...newEntry, isBrd: e.target.checked })
+  //                       }
+  //                       className={`w-4 h-4 ${
+  //                         !isBudPlan ? "cursor-not-allowed" : ""
+  //                       }`}
+  //                       disabled={!isBudPlan}
+  //                     />
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     <input
+  //                       type="text"
+  //                       name="status"
+  //                       value={newEntry.status}
+  //                       onChange={(e) =>
+  //                         setNewEntry({ ...newEntry, status: e.target.value })
+  //                       }
+  //                       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+  //                       placeholder="Enter Status"
+  //                     />
+  //                   </td>
+  //                   <td className="border border-gray-300 px-1.5 py-0.5">
+  //                     {" "}
+  //                     {/* Changed px-2 to px-1.5 */}
+  //                     {Object.values(newEntryPeriodAmounts)
+  //                       .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
+  //                       .toFixed(2)}
+  //                   </td>
+  //                 </tr>
+  //               )}
+  //               {employees
+  //                 .filter((_, idx) => !hiddenRows[idx])
+  //                 .map((emp, idx) => {
+  //                   const actualEmpIdx = employees.findIndex((e) => e === emp);
+  //                   const row = getEmployeeRow(emp, actualEmpIdx);
+  //                   const uniqueRowKey = `${
+  //                     emp.emple.emplId || "emp"
+  //                   }-${actualEmpIdx}`;
+  //                   return (
+  //                     <tr
+  //                       key={uniqueRowKey}
+  //                       className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+  //                         selectedRowIndex === actualEmpIdx
+  //                           ? "bg-yellow-100"
+  //                           : "even:bg-gray-50"
+  //                       }`}
+  //                       style={{
+  //                         height: `${ROW_HEIGHT_DEFAULT}px`,
+  //                         lineHeight: "normal",
+  //                         cursor: isEditable ? "pointer" : "default",
+  //                       }}
+  //                       onClick={() => handleRowClick(actualEmpIdx)}
+  //                     >
+  //                       {EMPLOYEE_COLUMNS.map((col) => {
+  //                         if (isBudPlan && isEditable) {
+  //                           if (col.key === "acctId") {
+  //                             return (
+  //                               <td
+  //                                 key={`${uniqueRowKey}-acctId`}
+  //                                 className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+  //                               >
+  //                                 {" "}
+  //                                 {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+  //                                 <input
+  //                                   type="text"
+  //                                   value={
+  //                                     editedRowData[actualEmpIdx]?.acctId !==
+  //                                     undefined
+  //                                       ? editedRowData[actualEmpIdx].acctId
+  //                                       : row.acctId
+  //                                   }
+  //                                   onChange={(e) =>
+  //                                     handleRowFieldChange(
+  //                                       actualEmpIdx,
+  //                                       "acctId",
+  //                                       e.target.value
+  //                                     )
+  //                                   }
+  //                                   onBlur={() =>
+  //                                     handleRowFieldBlur(actualEmpIdx, emp)
+  //                                   }
+  //                                   className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+  //                                 />
+  //                               </td>
+  //                             );
+  //                           }
+  //                           if (col.key === "orgId") {
+  //                             return (
+  //                               <td
+  //                                 key={`${uniqueRowKey}-orgId`}
+  //                                 className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+  //                               >
+  //                                 {" "}
+  //                                 {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+  //                                 <input
+  //                                   type="text"
+  //                                   value={
+  //                                     editedRowData[actualEmpIdx]?.orgId !==
+  //                                     undefined
+  //                                       ? editedRowData[actualEmpIdx].orgId
+  //                                       : row.orgId
+  //                                   }
+  //                                   onChange={(e) =>
+  //                                     handleRowFieldChange(
+  //                                       actualEmpIdx,
+  //                                       "orgId",
+  //                                       e.target.value
+  //                                     )
+  //                                   }
+  //                                   onBlur={() =>
+  //                                     handleRowFieldBlur(actualEmpIdx, emp)
+  //                                   }
+  //                                   className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+  //                                 />
+  //                               </td>
+  //                             );
+  //                           }
+  //                           if (col.key === "isRev") {
+  //                             return (
+  //                               <td
+  //                                 key={`${uniqueRowKey}-isRev`}
+  //                                 className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+  //                               >
+  //                                 {" "}
+  //                                 {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+  //                                 <input
+  //                                   type="checkbox"
+  //                                   checked={
+  //                                     editedRowData[actualEmpIdx]?.isRev !==
+  //                                     undefined
+  //                                       ? editedRowData[actualEmpIdx].isRev
+  //                                       : emp.emple.isRev
+  //                                   }
+  //                                   onChange={(e) =>
+  //                                     handleRowFieldChange(
+  //                                       actualEmpIdx,
+  //                                       "isRev",
+  //                                       e.target.checked
+  //                                     )
+  //                                   }
+  //                                   onBlur={() =>
+  //                                     handleRowFieldBlur(actualEmpIdx, emp)
+  //                                   }
+  //                                   className="w-4 h-4"
+  //                                 />
+  //                               </td>
+  //                             );
+  //                           }
+  //                           if (col.key === "isBrd") {
+  //                             return (
+  //                               <td
+  //                                 key={`${uniqueRowKey}-isBrd`}
+  //                                 className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+  //                               >
+  //                                 {" "}
+  //                                 {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+  //                                 <input
+  //                                   type="checkbox"
+  //                                   checked={
+  //                                     editedRowData[actualEmpIdx]?.isBrd !==
+  //                                     undefined
+  //                                       ? editedRowData[actualEmpIdx].isBrd
+  //                                       : emp.emple.isBrd
+  //                                   }
+  //                                   onChange={(e) =>
+  //                                     handleRowFieldChange(
+  //                                       actualEmpIdx,
+  //                                       "isBrd",
+  //                                       e.target.checked
+  //                                     )
+  //                                   }
+  //                                   onBlur={() =>
+  //                                     handleRowFieldBlur(actualEmpIdx, emp)
+  //                                   }
+  //                                   className="w-4 h-4"
+  //                                 />
+  //                               </td>
+  //                             );
+  //                           }
+  //                         }
+  //                         return (
+  //                           <td
+  //                             key={`${uniqueRowKey}-${col.key}`}
+  //                             className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+  //                           >
+  //                             {" "}
+  //                             {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+  //                             {row[col.key]}
+  //                           </td>
+  //                         );
+  //                       })}
+  //                     </tr>
+  //                   );
+  //                 })}
+  //             </tbody>
+  //           </table>
+  //         </div>
+  //         <div className="synchronized-table-scroll">
+  //           <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
+  //             <thead className="sticky-thead">
+  //               <tr
+  //                 style={{
+  //                   height: `${ROW_HEIGHT_DEFAULT}px`,
+  //                   lineHeight: "normal",
+  //                 }}
+  //               >
+  //                 {sortedDurations.map((duration) => {
+  //                   const uniqueKey = `${duration.monthNo}_${duration.year}`;
+  //                   return (
+  //                     <th
+  //                       key={uniqueKey}
+  //                       className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
+  //                         /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+  //                         selectedColumnKey === uniqueKey ? "bg-yellow-100" : ""
+  //                       }`}
+  //                       style={{ cursor: isEditable ? "pointer" : "default" }}
+  //                       onClick={() => handleColumnHeaderClick(uniqueKey)}
+  //                     >
+  //                       <div className="flex flex-col items-center justify-center h-full">
+  //                         <span className="whitespace-nowrap text-xs text-gray-900 font-normal">
+  //                           {duration.month}
+  //                         </span>
+  //                       </div>
+  //                     </th>
+  //                   );
+  //                 })}
+  //               </tr>
+  //             </thead>
+  //             <tbody>
+  //               {showNewForm && (
+  //                 <tr
+  //                   key="new-entry"
+  //                   className="bg-gray-50"
+  //                   style={{
+  //                     height: `${ROW_HEIGHT_DEFAULT}px`,
+  //                     lineHeight: "normal",
+  //                   }}
+  //                 >
+  //                   {sortedDurations.map((duration) => {
+  //                     const uniqueKey = `${duration.monthNo}_${duration.year}`;
+  //                     const isInputEditable =
+  //                       isEditable &&
+  //                       isMonthEditable(duration, closedPeriod, planType);
+  //                     return (
+  //                       <td
+  //                         key={`new-${uniqueKey}`}
+  //                         className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+  //                           /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+  //                           planType === "EAC"
+  //                             ? isInputEditable
+  //                               ? "bg-green-50"
+  //                               : "bg-gray-200"
+  //                             : ""
+  //                         }`}
+  //                       >
+  //                         <input
+  //                           type="text"
+  //                           inputMode="numeric"
+  //                           value={newEntryPeriodAmounts[uniqueKey] || ""}
+  //                           onChange={(e) =>
+  //                             isInputEditable &&
+  //                             setNewEntryPeriodAmounts((prev) => ({
+  //                               ...prev,
+  //                               [uniqueKey]: e.target.value.replace(
+  //                                 /[^0-9.]/g,
+  //                                 ""
+  //                               ),
+  //                             }))
+  //                           }
+  //                           className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+  //                             /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
+  //                             !isInputEditable
+  //                               ? "cursor-not-allowed text-gray-400"
+  //                               : "text-gray-700"
+  //                           }`}
+  //                           disabled={!isInputEditable}
+  //                           placeholder="Enter Amount"
+  //                         />
+  //                       </td>
+  //                     );
+  //                   })}
+  //                 </tr>
+  //               )}
+  //               {employees
+  //                 .filter((_, idx) => !hiddenRows[idx])
+  //                 .map((emp, idx) => {
+  //                   const actualEmpIdx = employees.findIndex((e) => e === emp);
+  //                   const monthAmounts = getMonthAmounts(emp);
+  //                   const uniqueRowKey = `${
+  //                     emp.emple.emplId || "emp"
+  //                   }-${actualEmpIdx}`;
+  //                   return (
+  //                     <tr
+  //                       key={uniqueRowKey}
+  //                       className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+  //                         selectedRowIndex === actualEmpIdx
+  //                           ? "bg-yellow-100"
+  //                           : "even:bg-gray-50"
+  //                       }`}
+  //                       style={{
+  //                         height: `${ROW_HEIGHT_DEFAULT}px`,
+  //                         lineHeight: "normal",
+  //                         cursor: isEditable ? "pointer" : "default",
+  //                       }}
+  //                       onClick={() => handleRowClick(actualEmpIdx)}
+  //                     >
+  //                       {sortedDurations.map((duration) => {
+  //                         const uniqueKey = `${duration.monthNo}_${duration.year}`;
+  //                         const forecast = monthAmounts[uniqueKey];
+  //                         const value =
+  //                           inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
+  //                           (forecast?.value !== undefined
+  //                             ? forecast.value
+  //                             : "0");
+  //                         const isInputEditable =
+  //                           isEditable &&
+  //                           isMonthEditable(duration, closedPeriod, planType);
+  //                         return (
+  //                           <td
+  //                             key={`${uniqueRowKey}-${uniqueKey}`}
+  //                             className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+  //                               /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+  //                               selectedColumnKey === uniqueKey
+  //                                 ? "bg-yellow-100"
+  //                                 : ""
+  //                             } ${
+  //                               planType === "EAC"
+  //                                 ? isInputEditable
+  //                                   ? "bg-green-50"
+  //                                   : "bg-gray-200"
+  //                                 : ""
+  //                             }`}
+  //                           >
+  //                             <input
+  //                               type="text"
+  //                               inputMode="numeric"
+  //                               className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+  //                                 /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
+  //                                 !isInputEditable
+  //                                   ? "cursor-not-allowed text-gray-400"
+  //                                   : "text-gray-700"
+  //                               }`}
+  //                               value={value}
+  //                               onChange={(e) =>
+  //                                 handleInputChange(
+  //                                   actualEmpIdx,
+  //                                   uniqueKey,
+  //                                   e.target.value.replace(/[^0-9.]/g, "")
+  //                                 )
+  //                               }
+  //                               onBlur={(e) =>
+  //                                 handleForecastAmountBlur(
+  //                                   actualEmpIdx,
+  //                                   uniqueKey,
+  //                                   e.target.value
+  //                                 )
+  //                               }
+  //                               disabled={!isInputEditable}
+  //                               placeholder="Enter Amount"
+  //                             />
+  //                           </td>
+  //                         );
+  //                       })}
+  //                     </tr>
+  //                   );
+  //                 })}
+  //             </tbody>
+  //           </table>
+  //         </div>
+  //       </div>
+  //     )}
+
+  //     {showFindReplace && (
+  //       <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+  //         <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md text-sm">
+  //           <h3 className="text-lg font-semibold mb-4">
+  //             Find and Replace Amounts
+  //           </h3>
+  //           <div className="mb-3">
+  //             <label
+  //               htmlFor="findValue"
+  //               className="block text-gray-700 text-xs font-medium mb-1"
+  //             >
+  //               Find:
+  //             </label>
+  //             <input
+  //               type="text"
+  //               id="findValue"
+  //               className="w-full border border-gray-300 rounded-md p-2 text-xs"
+  //               value={findValue}
+  //               onChange={(e) => setFindValue(e.target.value)}
+  //               placeholder="Value to find (e.g., 100 or empty)"
+  //             />
+  //           </div>
+  //           <div className="mb-4">
+  //             <label
+  //               htmlFor="replaceValue"
+  //               className="block text-gray-700 text-xs font-medium mb-1"
+  //             >
+  //               Replace with:
+  //             </label>
+  //             <input
+  //               type="text"
+  //               id="replaceValue"
+  //               className="w-full border border-gray-300 rounded-md p-2 text-xs"
+  //               value={replaceValue}
+  //               onChange={(e) =>
+  //                 setReplaceValue(e.target.value.replace(/[^0-9.]/g, ""))
+  //               }
+  //               placeholder="New value (e.g., 120 or empty)"
+  //             />
+  //           </div>
+  //           <div className="mb-4">
+  //             <label className="block text-gray-700 text-xs font-medium mb-1">
+  //               Scope:
+  //             </label>
+  //             <div className="flex gap-4 flex-wrap">
+  //               <label className="inline-flex items-center text-xs cursor-pointer">
+  //                 <input
+  //                   type="radio"
+  //                   className="form-radio text-blue-600"
+  //                   name="replaceScope"
+  //                   value="all"
+  //                   checked={replaceScope === "all"}
+  //                   onChange={(e) => setReplaceScope(e.target.value)}
+  //                 />
+  //                 <span className="ml-2">All</span>
+  //               </label>
+  //               <label className="inline-flex items-center text-xs cursor-pointer">
+  //                 <input
+  //                   type="radio"
+  //                   className="form-radio text-blue-600"
+  //                   name="replaceScope"
+  //                   value="row"
+  //                   checked={replaceScope === "row"}
+  //                   onChange={(e) => setReplaceScope(e.target.value)}
+  //                   disabled={selectedRowIndex === null}
+  //                 />
+  //                 <span className="ml-2">
+  //                   Selected Row (
+  //                   {selectedRowIndex !== null
+  //                     ? employees[selectedRowIndex]?.emple.emplId
+  //                     : "N/A"}
+  //                   )
+  //                 </span>
+  //               </label>
+  //               <label className="inline-flex items-center text-xs cursor-pointer">
+  //                 <input
+  //                   type="radio"
+  //                   className="form-radio text-blue-600"
+  //                   name="replaceScope"
+  //                   value="column"
+  //                   checked={replaceScope === "column"}
+  //                   onChange={(e) => setReplaceScope(e.target.value)}
+  //                   disabled={selectedColumnKey === null}
+  //                 />
+  //                 <span className="ml-2">
+  //                   Selected Column (
+  //                   {selectedColumnKey
+  //                     ? sortedDurations.find(
+  //                         (d) => `${d.monthNo}_${d.year}` === selectedColumnKey
+  //                       )?.month
+  //                     : "N/A"}
+  //                   )
+  //                 </span>
+  //               </label>
+  //             </div>
+  //           </div>
+  //           <div className="flex justify-end gap-3">
+  //             <button
+  //               type="button"
+  //               onClick={() => {
+  //                 setShowFindReplace(false);
+  //                 setSelectedRowIndex(null);
+  //                 setSelectedColumnKey(null);
+  //                 setReplaceScope("all");
+  //               }}
+  //               className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 text-xs"
+  //             >
+  //               Cancel
+  //             </button>
+  //             <button
+  //               type="button"
+  //               onClick={handleFindReplace}
+  //               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-xs cursor-pointer"
+  //             >
+  //               Replace All
+  //             </button>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     )}
+  //   </div>
+  // );
+  
   return (
     <div className="relative p-4 font-inter w-full synchronized-tables-outer">
       {/* <h2 className="text-xs font-semibold mb-3 text-gray-800">Amounts</h2> */}
       <div className="w-full flex justify-between mb-4 gap-2">
-        <div className="flex-grow"></div>
-        <div className="flex gap-2">
-          {Object.values(hiddenRows).some(Boolean) && (
-            <button
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
-              onClick={showHiddenRows}
-            >
-              Show Hidden Rows
-            </button>
-          )}
-          {isEditable && (
-            <>
+        <div className="flex-grow">
+          <div className="flex gap-2">
+            {Object.values(hiddenRows).some(Boolean) && (
               <button
-                onClick={() => setShowNewForm((prev) => !prev)}
-                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+                onClick={showHiddenRows}
               >
-                {showNewForm ? "Cancel" : "New"}
+                Show Hidden Rows
               </button>
-              {!showNewForm && ( // Hide Find/Replace while creating new entry
-                <>
+            )}
+            {isEditable && (
+              <>
                 <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
-                  onClick={() => isEditable && setShowFindReplace(true)}
+                  onClick={() => setShowNewForm((prev) => !prev)}
+                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
                 >
-                  Find / Replace
+                  {showNewForm ? "Cancel" : "New"}
                 </button>
-                <button
+                {!showNewForm && ( // Hide Find/Replace while creating new entry
+                  <>
+                    <button
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+                      onClick={() => isEditable && setShowFindReplace(true)}
+                    >
+                      Find / Replace
+                    </button>
+                    <button
                       className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs font-medium"
                       onClick={() => {
                         if (!selectedEmployeeId) {
@@ -7022,26 +8162,27 @@ const handleSaveNewEntry = async () => {
                     >
                       Delete
                     </button>
-                </>
-              )}
-              {showNewForm && (
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
-                  onClick={() => isEditable && setShowFillValues(true)}
-                >
-                  Fill Values
-                </button>
-              )}
-            </>
-          )}
-          {showNewForm && (
-            <button
-              onClick={handleSaveNewEntry}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
-            >
-              Save Entry
-            </button>
-          )}
+                  </>
+                )}
+                {showNewForm && (
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+                    onClick={() => isEditable && setShowFillValues(true)}
+                  >
+                    Fill Values
+                  </button>
+                )}
+              </>
+            )}
+            {showNewForm && (
+              <button
+                onClick={handleSaveNewEntry}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+              >
+                Save Entry
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -7117,407 +8258,771 @@ const handleSaveNewEntry = async () => {
           No forecast data available for this plan.
         </div>
       ) : (
-        <div className="synchronized-tables-container">
-          <div className="synchronized-table-scroll">
-            <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
-              <thead className="sticky-thead">
-                <tr
-                  style={{
-                    height: `${ROW_HEIGHT_DEFAULT}px`,
-                    lineHeight: "normal",
-                  }}
-                >
-                  {EMPLOYEE_COLUMNS.map((col) => (
-                    <th
-                      key={col.key}
-                      className="p-1.5 border border-gray-200 whitespace-nowrap text-xs text-gray-900 font-normal min-w-[70px]" // Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px]
-                    >
-                      {col.label}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {showNewForm && (
+        <div ref={verticalScrollRef} className="vertical-scroll-wrapper">
+          <div className="synchronized-tables-container">
+            <div className="synchronized-table-scroll" ref={vfirstTableRef}>
+              <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
+                <thead className="sticky-thead">
                   <tr
-                    key="new-entry"
-                    className="bg-gray-50"
                     style={{
                       height: `${ROW_HEIGHT_DEFAULT}px`,
                       lineHeight: "normal",
                     }}
                   >
-                    <td className="border border-gray-300 px-1.5 py-0.5">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <select
-                        name="idType"
-                        value={newEntry.idType || ""}
-                        onChange={(e) =>
-                          setNewEntry({ ...newEntry, idType: e.target.value })
-                        }
-                        className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                    {EMPLOYEE_COLUMNS.map((col) => (
+                      <th
+                        key={col.key}
+                        className="p-1.5 border border-gray-200 whitespace-nowrap text-xs text-gray-900 font-normal min-w-[70px]" // Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px]
                       >
-                        {ID_TYPE_OPTIONS.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <input
-                        type="text"
-                        name="id"
-                        value={newEntry.id}
-                        onChange={(e) => handleIdChange(e.target.value)}
-                        className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                        list="employee-id-list"
-                        placeholder="Enter ID"
-                      />
-                      <datalist id="employee-id-list">
-                        {employeeSuggestions
-                          .filter(
-                            (emp) =>
-                              emp.emplId && typeof emp.emplId === "string"
-                          )
-                          .map((emp, index) => (
-                            <option
-                              key={`${emp.emplId}-${index}`}
-                              value={emp.emplId}
-                            >
-                              {emp.lastName && emp.firstName
-                                ? `${emp.lastName}, ${emp.firstName}`
-                                : emp.lastName || emp.firstName || emp.emplId}
+                        {col.label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {showNewForm && (
+                    <tr
+                      key="new-entry"
+                      className="bg-gray-50"
+                      style={{
+                        height: `${ROW_HEIGHT_DEFAULT}px`,
+                        lineHeight: "normal",
+                      }}
+                    >
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        <select
+                          name="idType"
+                          value={newEntry.idType || ""}
+                          // onChange={(e) =>
+                          //   setNewEntry({ ...newEntry, idType: e.target.value })
+                          // }
+                          onChange={(e) => resetNewEntry(e.target.value)}
+                          className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                        >
+                          {ID_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
                             </option>
                           ))}
-                      </datalist>
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <input
-                        type="text"
-                        name="name"
-                        value={
-                          newEntry.lastName && newEntry.firstName
-                            ? `${newEntry.lastName}, ${newEntry.firstName}`
-                            : newEntry.lastName || newEntry.firstName || ""
-                        }
-                        readOnly
-                        className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
-                        placeholder="Name (auto-filled)"
-                      />
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <input
-                        type="text"
-                        name="acctId"
-                        value={newEntry.acctId}
-                        onChange={(e) =>
-                          isBudPlan &&
-                          setNewEntry({ ...newEntry, acctId: e.target.value })
-                        }
-                        className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                          !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
-                        }`}
-                        list="account-list"
-                        placeholder="Enter Account"
-                        readOnly={!isBudPlan}
-                      />
-                      <datalist id="account-list">
-                        {nonLaborAccounts.map((account, index) => (
-                          <option
-                            key={`${account.id}-${index}`}
-                            value={account.id}
-                          >
-                            {account.id}
-                          </option>
-                        ))}
-                      </datalist>
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <input
-                        type="text"
-                        name="orgId"
-                        value={newEntry.orgId}
-                        onChange={(e) =>
-                          isBudPlan &&
-                          setNewEntry({ ...newEntry, orgId: e.target.value })
-                        }
-                        className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                          !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
-                        }`}
-                        placeholder="Enter Organization"
-                        readOnly={!isBudPlan}
-                      />
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5 text-center">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <input
-                        type="checkbox"
-                        name="isRev"
-                        checked={newEntry.isRev}
-                        onChange={(e) =>
-                          isBudPlan &&
-                          setNewEntry({ ...newEntry, isRev: e.target.checked })
-                        }
-                        className={`w-4 h-4 ${
-                          !isBudPlan ? "cursor-not-allowed" : ""
-                        }`}
-                        disabled={!isBudPlan}
-                      />
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5 text-center">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <input
-                        type="checkbox"
-                        name="isBrd"
-                        checked={newEntry.isBrd}
-                        onChange={(e) =>
-                          isBudPlan &&
-                          setNewEntry({ ...newEntry, isBrd: e.target.checked })
-                        }
-                        className={`w-4 h-4 ${
-                          !isBudPlan ? "cursor-not-allowed" : ""
-                        }`}
-                        disabled={!isBudPlan}
-                      />
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      <input
-                        type="text"
-                        name="status"
-                        value={newEntry.status}
-                        onChange={(e) =>
-                          setNewEntry({ ...newEntry, status: e.target.value })
-                        }
-                        className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                        placeholder="Enter Status"
-                      />
-                    </td>
-                    <td className="border border-gray-300 px-1.5 py-0.5">
-                      {" "}
-                      {/* Changed px-2 to px-1.5 */}
-                      {Object.values(newEntryPeriodAmounts)
-                        .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
-                        .toFixed(2)}
-                    </td>
-                  </tr>
-                )}
-                {employees
-                  .filter((_, idx) => !hiddenRows[idx])
-                  .map((emp, idx) => {
-                    const actualEmpIdx = employees.findIndex((e) => e === emp);
-                    const row = getEmployeeRow(emp, actualEmpIdx);
-                    const uniqueRowKey = `${
-                      emp.emple.emplId || "emp"
-                    }-${actualEmpIdx}`;
-                    return (
-                      <tr
-                        key={uniqueRowKey}
-                        className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
-                          selectedRowIndex === actualEmpIdx
-                            ? "bg-yellow-100"
-                            : "even:bg-gray-50"
-                        }`}
-                        style={{
-                          height: `${ROW_HEIGHT_DEFAULT}px`,
-                          lineHeight: "normal",
-                          cursor: isEditable ? "pointer" : "default",
-                        }}
-                        onClick={() => handleRowClick(actualEmpIdx)}
-                      >
-                        {EMPLOYEE_COLUMNS.map((col) => {
-                          if (isBudPlan && isEditable) {
-                            if (col.key === "acctId") {
-                              return (
-                                <td
-                                  key={`${uniqueRowKey}-acctId`}
-                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                        </select>
+                      </td>
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        <input
+                          type="text"
+                          name="id"
+                          value={newEntry.id}
+                          onChange={(e) => handleIdChange(e.target.value)}
+                          className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                          list="employee-id-list"
+                          placeholder="Enter ID"
+                        />
+                        {newEntry.idType !== "Other" && (
+                          <datalist id="employee-id-list">
+                            {employeeSuggestions
+                              .filter(
+                                (emp) =>
+                                  emp.emplId && typeof emp.emplId === "string"
+                              )
+                              .map((emp, index) => (
+                                <option
+                                  key={`${emp.emplId}-${index}`}
+                                  value={emp.emplId}
                                 >
-                                  {" "}
-                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                  <input
-                                    type="text"
-                                    value={
-                                      editedRowData[actualEmpIdx]?.acctId !==
-                                      undefined
-                                        ? editedRowData[actualEmpIdx].acctId
-                                        : row.acctId
-                                    }
-                                    onChange={(e) =>
-                                      handleRowFieldChange(
-                                        actualEmpIdx,
-                                        "acctId",
-                                        e.target.value
-                                      )
-                                    }
-                                    onBlur={() =>
-                                      handleRowFieldBlur(actualEmpIdx, emp)
-                                    }
-                                    className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                  />
-                                </td>
-                              );
-                            }
-                            if (col.key === "orgId") {
-                              return (
-                                <td
-                                  key={`${uniqueRowKey}-orgId`}
-                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
-                                >
-                                  {" "}
-                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                  <input
-                                    type="text"
-                                    value={
-                                      editedRowData[actualEmpIdx]?.orgId !==
-                                      undefined
-                                        ? editedRowData[actualEmpIdx].orgId
-                                        : row.orgId
-                                    }
-                                    onChange={(e) =>
-                                      handleRowFieldChange(
-                                        actualEmpIdx,
-                                        "orgId",
-                                        e.target.value
-                                      )
-                                    }
-                                    onBlur={() =>
-                                      handleRowFieldBlur(actualEmpIdx, emp)
-                                    }
-                                    className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                  />
-                                </td>
-                              );
-                            }
-                            if (col.key === "isRev") {
-                              return (
-                                <td
-                                  key={`${uniqueRowKey}-isRev`}
-                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
-                                >
-                                  {" "}
-                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                  <input
-                                    type="checkbox"
-                                    checked={
-                                      editedRowData[actualEmpIdx]?.isRev !==
-                                      undefined
-                                        ? editedRowData[actualEmpIdx].isRev
-                                        : emp.emple.isRev
-                                    }
-                                    onChange={(e) =>
-                                      handleRowFieldChange(
-                                        actualEmpIdx,
-                                        "isRev",
-                                        e.target.checked
-                                      )
-                                    }
-                                    onBlur={() =>
-                                      handleRowFieldBlur(actualEmpIdx, emp)
-                                    }
-                                    className="w-4 h-4"
-                                  />
-                                </td>
-                              );
-                            }
-                            if (col.key === "isBrd") {
-                              return (
-                                <td
-                                  key={`${uniqueRowKey}-isBrd`}
-                                  className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
-                                >
-                                  {" "}
-                                  {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                  <input
-                                    type="checkbox"
-                                    checked={
-                                      editedRowData[actualEmpIdx]?.isBrd !==
-                                      undefined
-                                        ? editedRowData[actualEmpIdx].isBrd
-                                        : emp.emple.isBrd
-                                    }
-                                    onChange={(e) =>
-                                      handleRowFieldChange(
-                                        actualEmpIdx,
-                                        "isBrd",
-                                        e.target.checked
-                                      )
-                                    }
-                                    onBlur={() =>
-                                      handleRowFieldBlur(actualEmpIdx, emp)
-                                    }
-                                    className="w-4 h-4"
-                                  />
-                                </td>
-                              );
-                            }
+                                  {emp.lastName && emp.firstName
+                                    ? `${emp.lastName}, ${emp.firstName}`
+                                    : emp.lastName ||
+                                      emp.firstName ||
+                                      emp.emplId}
+                                </option>
+                              ))}
+                          </datalist>
+                        )}
+                      </td>
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        <input
+                          type="text"
+                          name="name"
+                          value={
+                            newEntry.lastName && newEntry.firstName
+                              ? `${newEntry.lastName}, ${newEntry.firstName}`
+                              : newEntry.lastName || newEntry.firstName || ""
                           }
-                          return (
-                            <td
-                              key={`${uniqueRowKey}-${col.key}`}
-                              className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                          readOnly
+                          className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
+                          placeholder="Name (auto-filled)"
+                        />
+                      </td>
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+                        {" "}
+                        <input
+                          type="text"
+                          name="acctId"
+                          value={newEntry.acctId}
+                          onChange={(e) =>
+                            isBudPlan &&
+                            setNewEntry({ ...newEntry, acctId: e.target.value })
+                          }
+                          onBlur={(e) => {
+                            const val = e.target.value.trim();
+
+                            // Build valid accounts list
+                            const validAccounts =
+                              newEntry.idType === "Vendor" ||
+                              newEntry.idType === "Vendor Employee"
+                                ? subContractorNonLaborAccounts.map(
+                                    (a) => a.id || a.accountId || ""
+                                  )
+                                : employeeNonLaborAccounts.map(
+                                    (a) => a.id || a.accountId || ""
+                                  );
+
+                            if (val !== "" && !validAccounts.includes(val)) {
+                              toast.error(
+                                "Please select a valid account from suggestions"
+                              );
+                              setNewEntry((prev) => ({ ...prev, acctId: "" })); // reset
+                            }
+                          }}
+                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+                          }`}
+                          list="account-list"
+                          placeholder="Enter Account"
+                          readOnly={!isBudPlan}
+                        />
+                        <datalist id="account-list">
+                          {(newEntry.idType === "Vendor" ||
+                          newEntry.idType === "Vendor Employee"
+                            ? subContractorNonLaborAccounts
+                            : employeeNonLaborAccounts
+                          ).map((account, index) => {
+                            const valueText =
+                              account.id || account.accountId || "";
+                            // const displayText =
+                            //   account.name ||
+                            //   account.acctName ||
+                            //   account.accountId ||
+                            //   valueText;
+                            return (
+                              <option
+                                key={`${valueText}-${index}`}
+                                value={valueText}
+                              >
+                                {/* {displayText} */}
+                              </option>
+                            );
+                          })}
+                        </datalist>
+                        {/* Changed px-2 to px-1.5 */}
+                        {/* <input
+                          type="text"
+                          name="acctId"
+                          value={newEntry.acctId}
+                          onChange={(e) =>
+                            isBudPlan &&
+                            setNewEntry({ ...newEntry, acctId: e.target.value })
+                          }
+                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+                          }`}
+                          list="account-list"
+                          placeholder="Enter Account"
+                          readOnly={!isBudPlan}
+                        /> */}
+                        {/* <datalist id="account-list">
+                            {nonLaborAccounts.map((account, index) => (
+                              <option
+                                key={`${account.id}-${index}`}
+                                value={account.id}
+                              >
+                                {account.id}
+                              </option>
+                            ))}
+                          </datalist> */}
+                        {/* <datalist id="account-list">
+                          {(newEntry.idType === "Vendor" ||
+                          newEntry.idType === "Vendor Employee"
+                            ? subContractorNonLaborAccounts
+                            : employeeNonLaborAccounts
+                          ).map((account, index) => {
+                            const valueText =
+                              account.id || account.accountId || ""; // safe fallback
+                            const displayText =
+                              account.name ||
+                              account.acctName ||
+                              account.accountId ||
+                              valueText;
+
+                            return (
+                              <option
+                                key={`${valueText}-${index}`}
+                                value={valueText}
+                              >
+                                {displayText}
+                              </option>
+                            );
+                          })}
+                        </datalist> */}
+                      </td>
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        {/* <input
+                          type="text"
+                          name="orgId"
+                          value={newEntry.orgId}
+                          onChange={(e) =>
+                            isBudPlan &&
+                            setNewEntry({ ...newEntry, orgId: e.target.value })
+                          }
+                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+                          }`}
+                          placeholder="Enter Organization"
+                          list="organization-list"
+                          readOnly={!isBudPlan}
+                        />
+                        <datalist id="organization-list">
+                          {organizationOptions.map((org, index) => (
+                            <option
+                              key={`${org.value}-${index}`}
+                              value={org.value}
                             >
-                              {" "}
-                              {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                              {row[col.key]}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          </div>
-          <div className="synchronized-table-scroll">
-            <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
-              <thead className="sticky-thead">
-                <tr
-                  style={{
-                    height: `${ROW_HEIGHT_DEFAULT}px`,
-                    lineHeight: "normal",
-                  }}
-                >
-                  {sortedDurations.map((duration) => {
-                    const uniqueKey = `${duration.monthNo}_${duration.year}`;
-                    return (
-                      <th
-                        key={uniqueKey}
-                        className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
-                          /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
-                          selectedColumnKey === uniqueKey ? "bg-yellow-100" : ""
-                        }`}
-                        style={{ cursor: isEditable ? "pointer" : "default" }}
-                        onClick={() => handleColumnHeaderClick(uniqueKey)}
-                      >
-                        <div className="flex flex-col items-center justify-center h-full">
-                          <span className="whitespace-nowrap text-xs text-gray-900 font-normal">
-                            {duration.month}
-                          </span>
-                        </div>
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {showNewForm && (
+                              {org.label}
+                            </option>
+                          ))}
+                        </datalist> */}
+                        <input
+                          type="text"
+                          name="orgId"
+                          value={newEntry.orgId}
+                          onChange={(e) =>
+                            isBudPlan &&
+                            setNewEntry({ ...newEntry, orgId: e.target.value })
+                          }
+                          onBlur={(e) => {
+                            const val = e.target.value.trim();
+                            const validOrgs = organizationOptions.map(
+                              (org) => org.value
+                            );
+
+                            if (val !== "" && !validOrgs.includes(val)) {
+                              toast.error(
+                                "Please select a valid organization from suggestions"
+                              );
+                              setNewEntry((prev) => ({ ...prev, orgId: "" })); // reset
+                            }
+                          }}
+                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+                          }`}
+                          placeholder="Enter Organization"
+                          list="organization-list"
+                          readOnly={!isBudPlan}
+                        />
+                        <datalist id="organization-list">
+                          {organizationOptions.map((org, index) => (
+                            <option
+                              key={`${org.value}-${index}`}
+                              value={org.value}
+                            >
+                              {org.label}
+                            </option>
+                          ))}
+                        </datalist>
+                      </td>
+
+                      <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        <input
+                          type="checkbox"
+                          name="isRev"
+                          checked={newEntry.isRev}
+                          onChange={(e) =>
+                            isBudPlan &&
+                            setNewEntry({
+                              ...newEntry,
+                              isRev: e.target.checked,
+                            })
+                          }
+                          className={`w-4 h-4 ${
+                            !isBudPlan ? "cursor-not-allowed" : ""
+                          }`}
+                          disabled={!isBudPlan}
+                        />
+                      </td>
+                      <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        <input
+                          type="checkbox"
+                          name="isBrd"
+                          checked={newEntry.isBrd}
+                          onChange={(e) =>
+                            isBudPlan &&
+                            setNewEntry({
+                              ...newEntry,
+                              isBrd: e.target.checked,
+                            })
+                          }
+                          className={`w-4 h-4 ${
+                            !isBudPlan ? "cursor-not-allowed" : ""
+                          }`}
+                          disabled={!isBudPlan}
+                        />
+                      </td>
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        <input
+                          type="text"
+                          name="status"
+                          value={newEntry.status}
+                          onChange={(e) =>
+                            setNewEntry({ ...newEntry, status: e.target.value })
+                          }
+                          className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                          placeholder="Enter Status"
+                        />
+                      </td>
+                      <td className="border border-gray-300 px-1.5 py-0.5">
+                        {" "}
+                        {/* Changed px-2 to px-1.5 */}
+                        {Object.values(newEntryPeriodAmounts)
+                          .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
+                          .toFixed(2)}
+                      </td>
+                    </tr>
+                  )}
+                  {employees
+                    .filter((_, idx) => !hiddenRows[idx])
+                    .map((emp, idx) => {
+                      const actualEmpIdx = employees.findIndex(
+                        (e) => e === emp
+                      );
+                      const row = getEmployeeRow(emp, actualEmpIdx);
+                      const uniqueRowKey = `${
+                        emp.emple.emplId || "emp"
+                      }-${actualEmpIdx}`;
+                      return (
+                        <tr
+                          key={uniqueRowKey}
+                          className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+                            selectedRowIndex === actualEmpIdx
+                              ? "bg-yellow-100"
+                              : "even:bg-gray-50"
+                          }`}
+                          style={{
+                            height: `${ROW_HEIGHT_DEFAULT}px`,
+                            lineHeight: "normal",
+                            cursor: isEditable ? "pointer" : "default",
+                          }}
+                          onClick={() => handleRowClick(actualEmpIdx)}
+                        >
+                          {EMPLOYEE_COLUMNS.map((col) => {
+                            if (isBudPlan && isEditable) {
+                              if (col.key === "acctId") {
+                                return (
+                                  // <td
+                                  //   key={`${uniqueRowKey}-acctId`}
+                                  //   className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                                  // >
+                                  //   {" "}
+                                  //   {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                  //   <input
+                                  //     type="text"
+                                  //     value={
+                                  //       editedRowData[actualEmpIdx]?.acctId !==
+                                  //       undefined
+                                  //         ? editedRowData[actualEmpIdx].acctId
+                                  //         : row.acctId
+                                  //     }
+                                  //     onChange={(e) => {
+                                  //       // if (/^[0-9-]*$/.test(e.target.value)) {
+                                  //       handleRowFieldChange(
+                                  //         actualEmpIdx,
+                                  //         "acctId",
+                                  //         e.target.value
+                                  //       );
+                                  //       // }
+                                  //     }}
+                                  //     onBlur={() =>
+                                  //       handleRowFieldBlur(actualEmpIdx, emp)
+                                  //     }
+                                  //     // onBlur={(e) => {
+                                  //     //   const val = e.target.value;
+
+                                  //     //   // build valid account list
+                                  //     //   const validAccounts =
+                                  //     //     emp.idType === "Vendor" ||
+                                  //     //     emp.idType === "Vendor Employee"
+                                  //     //       ? subContractorNonLaborAccounts.map(
+                                  //     //           (a) => a.id || a.accountId || ""
+                                  //     //         )
+                                  //     //       : employeeNonLaborAccounts.map(
+                                  //     //           (a) => a.id || a.accountId || ""
+                                  //     //         );
+
+                                  //     //   if (
+                                  //     //     !validAccounts.includes(val) &&
+                                  //     //     val !== ""
+                                  //     //   ) {
+                                  //     //     toast.error(
+                                  //     //       "Please select a valid account from suggestions"
+                                  //     //     );
+                                  //     //     handleRowFieldChange(
+                                  //     //       actualEmpIdx,
+                                  //     //       "acctId",
+                                  //     //       ""
+                                  //     //     ); // reset to blank
+                                  //     //   }
+
+                                  //     //   handleRowFieldBlur(actualEmpIdx, emp);
+                                  //     // }}
+                                  //     list={`account-list-${actualEmpIdx}`}
+                                  //     className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                                  //   />
+                                  //   <datalist
+                                  //     id={`account-list-${actualEmpIdx}`}
+                                  //   >
+                                  //     {(emp.idType === "Vendor" ||
+                                  //     emp.idType === "Vendor Employee"
+                                  //       ? subContractorNonLaborAccounts
+                                  //       : employeeNonLaborAccounts
+                                  //     ).map((account, index) => {
+                                  //       const valueText =
+                                  //         account.id || account.accountId || ""; // safe fallback
+                                  //       const displayText =
+                                  //         account.name ||
+                                  //         account.acctName ||
+                                  //         account.accountId ||
+                                  //         valueText;
+
+                                  //       return (
+                                  //         <option
+                                  //           key={`${valueText}-${index}`}
+                                  //           value={valueText}
+                                  //         >
+                                  //           {displayText}
+                                  //         </option>
+                                  //       );
+                                  //     })}
+                                  //   </datalist>
+                                  // </td>
+                                  <td
+                                    key={`${uniqueRowKey}-acctId`}
+                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                                  >
+                                    <input
+                                      type="text"
+                                      value={
+                                        editedRowData[actualEmpIdx]?.acctId !==
+                                        undefined
+                                          ? editedRowData[actualEmpIdx].acctId
+                                          : row.acctId
+                                      }
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        // ✅ Allow datalist selection + numbers/dash typing
+                                        {
+                                          handleRowFieldChange(
+                                            actualEmpIdx,
+                                            "acctId",
+                                            val
+                                          );
+                                        }
+                                      }}
+                                      // onBlur={(e) => {
+                                      //   const val = e.target.value.trim();
+
+                                      //   // Build valid account list
+                                      //   const validAccounts =
+                                      //     emp.idType === "Vendor" ||
+                                      //     emp.idType === "Vendor Employee"
+                                      //       ? subContractorNonLaborAccounts.map(
+                                      //           (a) => a.id || a.accountId || ""
+                                      //         )
+                                      //       : employeeNonLaborAccounts.map(
+                                      //           (a) => a.id || a.accountId || ""
+                                      //         );
+
+                                      //   if (
+                                      //     val !== "" &&
+                                      //     !validAccounts.includes(val)
+                                      //   ) {
+                                      //     toast.error(
+                                      //       "Please select a valid account from suggestions"
+                                      //     );
+                                      //     handleRowFieldChange(
+                                      //       actualEmpIdx,
+                                      //       "acctId",
+                                      //       ""
+                                      //     ); // reset to blank
+                                      //   }
+
+                                      //   handleRowFieldBlur(actualEmpIdx, emp);
+                                      // }}
+
+                                      onBlur={(e) => {
+                                        const val = e.target.value.trim();
+
+                                        // Build valid account list
+                                        const validAccounts =
+                                          emp.idType === "Vendor" ||
+                                          emp.idType === "Vendor Employee"
+                                            ? subContractorNonLaborAccounts.map(
+                                                (a) => a.id || a.accountId || ""
+                                              )
+                                            : employeeNonLaborAccounts.map(
+                                                (a) => a.id || a.accountId || ""
+                                              );
+
+                                        if (
+                                          val !== "" &&
+                                          !validAccounts.includes(val)
+                                        ) {
+                                          toast.error(
+                                            "Please select a valid account from suggestions"
+                                          );
+                                          handleRowFieldChange(
+                                            actualEmpIdx,
+                                            "acctId",
+                                            ""
+                                          );
+                                          return; // 🚫 stop → don’t call handleRowFieldBlur
+                                        }
+
+                                        // ✅ only call when valid
+                                        handleRowFieldBlur(actualEmpIdx, emp);
+                                      }}
+                                      list={`account-list-${actualEmpIdx}`}
+                                      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                                    />
+
+                                    <datalist
+                                      id={`account-list-${actualEmpIdx}`}
+                                    >
+                                      {(emp.idType === "Vendor" ||
+                                      emp.idType === "Vendor Employee"
+                                        ? subContractorNonLaborAccounts
+                                        : employeeNonLaborAccounts
+                                      ).map((account, index) => {
+                                        const valueText =
+                                          account.id || account.accountId || "";
+                                        // const displayText =
+                                        //   account.name ||
+                                        //   account.acctName ||
+                                        //   account.accountId ||
+                                        //   valueText;
+
+                                        return (
+                                          <option
+                                            key={`${valueText}-${index}`}
+                                            value={valueText}
+                                          >
+                                            {/* {displayText} */}
+                                          </option>
+                                        );
+                                      })}
+                                    </datalist>
+                                  </td>
+                                );
+                              }
+                              if (col.key === "orgId") {
+                                return (
+                                  // <td
+                                  //   key={`${uniqueRowKey}-orgId`}
+                                  //   className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                                  // >
+                                  //   {" "}
+                                  //   {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                  //   <input
+                                  //     type="text"
+                                  //     value={
+                                  //       editedRowData[actualEmpIdx]?.orgId !==
+                                  //       undefined
+                                  //         ? editedRowData[actualEmpIdx].orgId
+                                  //         : row.orgId
+                                  //     }
+                                  //     onChange={(e) =>
+                                  //       handleRowFieldChange(
+                                  //         actualEmpIdx,
+                                  //         "orgId",
+                                  //         e.target.value
+                                  //       )
+                                  //     }
+                                  //     onBlur={() =>
+                                  //       handleRowFieldBlur(actualEmpIdx, emp)
+                                  //     }
+                                  //     list={`organization-list-${actualEmpIdx}`}
+                                  //     className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                                  //   />
+                                  //   <datalist
+                                  //     id={`organization-list-${actualEmpIdx}`}
+                                  //   >
+                                  //     {organizationOptions.map((org, index) => (
+                                  //       <option
+                                  //         key={`${org.value}-${index}`}
+                                  //         value={org.value}
+                                  //       >
+                                  //         {org.label}
+                                  //       </option>
+                                  //     ))}
+                                  //   </datalist>
+                                  // </td>
+                                  <td
+                                    key={`${uniqueRowKey}-orgId`}
+                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                                  >
+                                    <input
+                                      type="text"
+                                      value={
+                                        editedRowData[actualEmpIdx]?.orgId !==
+                                        undefined
+                                          ? editedRowData[actualEmpIdx].orgId
+                                          : row.orgId
+                                      }
+                                      onChange={(e) =>
+                                        handleRowFieldChange(
+                                          actualEmpIdx,
+                                          "orgId",
+                                          e.target.value
+                                        )
+                                      }
+                                      onBlur={(e) => {
+                                        const val = e.target.value.trim();
+                                        const validOrgs =
+                                          organizationOptions.map(
+                                            (org) => org.value
+                                          );
+
+                                        if (
+                                          val !== "" &&
+                                          !validOrgs.includes(val)
+                                        ) {
+                                          toast.error(
+                                            "Please select a valid organization from suggestions"
+                                          );
+                                          handleRowFieldChange(
+                                            actualEmpIdx,
+                                            "orgId",
+                                            ""
+                                          ); // reset
+                                          return; // 🚫 don't call handleRowFieldBlur
+                                        }
+
+                                        // ✅ only save when valid
+                                        handleRowFieldBlur(actualEmpIdx, emp);
+                                      }}
+                                      list={`organization-list-${actualEmpIdx}`}
+                                      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                                    />
+                                    <datalist
+                                      id={`organization-list-${actualEmpIdx}`}
+                                    >
+                                      {organizationOptions.map((org, index) => (
+                                        <option
+                                          key={`${org.value}-${index}`}
+                                          value={org.value}
+                                        >
+                                          {org.label}
+                                        </option>
+                                      ))}
+                                    </datalist>
+                                  </td>
+                                );
+                              }
+                              if (col.key === "isRev") {
+                                return (
+                                  <td
+                                    key={`${uniqueRowKey}-isRev`}
+                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+                                  >
+                                    {" "}
+                                    {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                    <input
+                                      type="checkbox"
+                                      checked={
+                                        editedRowData[actualEmpIdx]?.isRev !==
+                                        undefined
+                                          ? editedRowData[actualEmpIdx].isRev
+                                          : emp.emple.isRev
+                                      }
+                                      onChange={(e) =>
+                                        handleRowFieldChange(
+                                          actualEmpIdx,
+                                          "isRev",
+                                          e.target.checked
+                                        )
+                                      }
+                                      onBlur={() =>
+                                        handleRowFieldBlur(actualEmpIdx, emp)
+                                      }
+                                      className="w-4 h-4"
+                                    />
+                                  </td>
+                                );
+                              }
+                              if (col.key === "isBrd") {
+                                return (
+                                  <td
+                                    key={`${uniqueRowKey}-isBrd`}
+                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+                                  >
+                                    {" "}
+                                    {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                    <input
+                                      type="checkbox"
+                                      checked={
+                                        editedRowData[actualEmpIdx]?.isBrd !==
+                                        undefined
+                                          ? editedRowData[actualEmpIdx].isBrd
+                                          : emp.emple.isBrd
+                                      }
+                                      onChange={(e) =>
+                                        handleRowFieldChange(
+                                          actualEmpIdx,
+                                          "isBrd",
+                                          e.target.checked
+                                        )
+                                      }
+                                      onBlur={() =>
+                                        handleRowFieldBlur(actualEmpIdx, emp)
+                                      }
+                                      className="w-4 h-4"
+                                    />
+                                  </td>
+                                );
+                              }
+                            }
+                            return (
+                              <td
+                                key={`${uniqueRowKey}-${col.key}`}
+                                className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+                              >
+                                {" "}
+                                {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
+                                {row[col.key]}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
+            <div className="synchronized-table-scroll" ref={vlastTableRef}>
+              <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
+                <thead className="sticky-thead">
                   <tr
-                    key="new-entry"
-                    className="bg-gray-50"
                     style={{
                       height: `${ROW_HEIGHT_DEFAULT}px`,
                       lineHeight: "normal",
@@ -7525,134 +9030,171 @@ const handleSaveNewEntry = async () => {
                   >
                     {sortedDurations.map((duration) => {
                       const uniqueKey = `${duration.monthNo}_${duration.year}`;
-                      const isInputEditable =
-                        isEditable &&
-                        isMonthEditable(duration, closedPeriod, planType);
                       return (
-                        <td
-                          key={`new-${uniqueKey}`}
-                          className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+                        <th
+                          key={uniqueKey}
+                          className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
                             /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
-                            planType === "EAC"
-                              ? isInputEditable
-                                ? "bg-green-50"
-                                : "bg-gray-200"
+                            selectedColumnKey === uniqueKey
+                              ? "bg-yellow-100"
                               : ""
                           }`}
+                          style={{ cursor: isEditable ? "pointer" : "default" }}
+                          onClick={() => handleColumnHeaderClick(uniqueKey)}
                         >
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={newEntryPeriodAmounts[uniqueKey] || ""}
-                            onChange={(e) =>
-                              isInputEditable &&
-                              setNewEntryPeriodAmounts((prev) => ({
-                                ...prev,
-                                [uniqueKey]: e.target.value.replace(
-                                  /[^0-9.]/g,
-                                  ""
-                                ),
-                              }))
-                            }
-                            className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
-                              /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
-                              !isInputEditable
-                                ? "cursor-not-allowed text-gray-400"
-                                : "text-gray-700"
-                            }`}
-                            disabled={!isInputEditable}
-                            placeholder="Enter Amount"
-                          />
-                        </td>
+                          <div className="flex flex-col items-center justify-center h-full">
+                            <span className="whitespace-nowrap text-xs text-gray-900 font-normal">
+                              {duration.month}
+                            </span>
+                          </div>
+                        </th>
                       );
                     })}
                   </tr>
-                )}
-                {employees
-                  .filter((_, idx) => !hiddenRows[idx])
-                  .map((emp, idx) => {
-                    const actualEmpIdx = employees.findIndex((e) => e === emp);
-                    const monthAmounts = getMonthAmounts(emp);
-                    const uniqueRowKey = `${
-                      emp.emple.emplId || "emp"
-                    }-${actualEmpIdx}`;
-                    return (
-                      <tr
-                        key={uniqueRowKey}
-                        className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
-                          selectedRowIndex === actualEmpIdx
-                            ? "bg-yellow-100"
-                            : "even:bg-gray-50"
-                        }`}
-                        style={{
-                          height: `${ROW_HEIGHT_DEFAULT}px`,
-                          lineHeight: "normal",
-                          cursor: isEditable ? "pointer" : "default",
-                        }}
-                        onClick={() => handleRowClick(actualEmpIdx)}
-                      >
-                        {sortedDurations.map((duration) => {
-                          const uniqueKey = `${duration.monthNo}_${duration.year}`;
-                          const forecast = monthAmounts[uniqueKey];
-                          const value =
-                            inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
-                            (forecast?.value !== undefined
-                              ? forecast.value
-                              : "0");
-                          const isInputEditable =
-                            isEditable &&
-                            isMonthEditable(duration, closedPeriod, planType);
-                          return (
-                            <td
-                              key={`${uniqueRowKey}-${uniqueKey}`}
-                              className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
-                                /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
-                                selectedColumnKey === uniqueKey
-                                  ? "bg-yellow-100"
-                                  : ""
-                              } ${
-                                planType === "EAC"
-                                  ? isInputEditable
-                                    ? "bg-green-50"
-                                    : "bg-gray-200"
-                                  : ""
+                </thead>
+                <tbody>
+                  {showNewForm && (
+                    <tr
+                      key="new-entry"
+                      className="bg-gray-50"
+                      style={{
+                        height: `${ROW_HEIGHT_DEFAULT}px`,
+                        lineHeight: "normal",
+                      }}
+                    >
+                      {sortedDurations.map((duration) => {
+                        const uniqueKey = `${duration.monthNo}_${duration.year}`;
+                        const isInputEditable =
+                          isEditable &&
+                          isMonthEditable(duration, closedPeriod, planType);
+                        return (
+                          <td
+                            key={`new-${uniqueKey}`}
+                            className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+                              /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+                              planType === "EAC"
+                                ? isInputEditable
+                                  ? "bg-green-50"
+                                  : "bg-gray-200"
+                                : ""
+                            }`}
+                          >
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={newEntryPeriodAmounts[uniqueKey] || ""}
+                              onChange={(e) =>
+                                isInputEditable &&
+                                setNewEntryPeriodAmounts((prev) => ({
+                                  ...prev,
+                                  [uniqueKey]: e.target.value.replace(
+                                    /[^0-9.]/g,
+                                    ""
+                                  ),
+                                }))
+                              }
+                              className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+                                /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
+                                !isInputEditable
+                                  ? "cursor-not-allowed text-gray-400"
+                                  : "text-gray-700"
                               }`}
-                            >
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
-                                  /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
-                                  !isInputEditable
-                                    ? "cursor-not-allowed text-gray-400"
-                                    : "text-gray-700"
+                              disabled={!isInputEditable}
+                              placeholder="Enter Amount"
+                            />
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  )}
+                  {employees
+                    .filter((_, idx) => !hiddenRows[idx])
+                    .map((emp, idx) => {
+                      const actualEmpIdx = employees.findIndex(
+                        (e) => e === emp
+                      );
+                      const monthAmounts = getMonthAmounts(emp);
+                      const uniqueRowKey = `${
+                        emp.emple.emplId || "emp"
+                      }-${actualEmpIdx}`;
+                      return (
+                        <tr
+                          key={uniqueRowKey}
+                          className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+                            selectedRowIndex === actualEmpIdx
+                              ? "bg-yellow-100"
+                              : "even:bg-gray-50"
+                          }`}
+                          style={{
+                            height: `${ROW_HEIGHT_DEFAULT}px`,
+                            lineHeight: "normal",
+                            cursor: isEditable ? "pointer" : "default",
+                          }}
+                          onClick={() => handleRowClick(actualEmpIdx)}
+                        >
+                          {sortedDurations.map((duration) => {
+                            const uniqueKey = `${duration.monthNo}_${duration.year}`;
+                            const forecast = monthAmounts[uniqueKey];
+                            const value =
+                              inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
+                              (forecast?.value !== undefined
+                                ? forecast.value
+                                : "0");
+                            const isInputEditable =
+                              isEditable &&
+                              isMonthEditable(duration, closedPeriod, planType);
+                            return (
+                              <td
+                                key={`${uniqueRowKey}-${uniqueKey}`}
+                                className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+                                  /* Changed py-2 px-3 to px-2 py-1.5, min-w-[100px] to min-w-[80px] */
+                                  selectedColumnKey === uniqueKey
+                                    ? "bg-yellow-100"
+                                    : ""
+                                } ${
+                                  planType === "EAC"
+                                    ? isInputEditable
+                                      ? "bg-green-50"
+                                      : "bg-gray-200"
+                                    : ""
                                 }`}
-                                value={value}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    actualEmpIdx,
-                                    uniqueKey,
-                                    e.target.value.replace(/[^0-9.]/g, "")
-                                  )
-                                }
-                                onBlur={(e) =>
-                                  handleForecastAmountBlur(
-                                    actualEmpIdx,
-                                    uniqueKey,
-                                    e.target.value
-                                  )
-                                }
-                                disabled={!isInputEditable}
-                                placeholder="Enter Amount"
-                              />
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
+                              >
+                                <input
+                                  type="text"
+                                  inputMode="numeric"
+                                  className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+                                    /* Changed w-[55px] h-[20px] to w-[50px] h-[18px] */
+                                    !isInputEditable
+                                      ? "cursor-not-allowed text-gray-400"
+                                      : "text-gray-700"
+                                  }`}
+                                  value={value}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      actualEmpIdx,
+                                      uniqueKey,
+                                      e.target.value.replace(/[^0-9.]/g, "")
+                                    )
+                                  }
+                                  onBlur={(e) =>
+                                    handleForecastAmountBlur(
+                                      actualEmpIdx,
+                                      uniqueKey,
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={!isInputEditable}
+                                  placeholder="Enter Amount"
+                                />
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -7779,6 +9321,9 @@ const handleSaveNewEntry = async () => {
       )}
     </div>
   );
+
+
+
 };
 
 export default ProjectAmountsTable;
