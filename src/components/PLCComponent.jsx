@@ -3452,24 +3452,36 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
       );
 
       // Check for duplicate IDs
-      const seenKeys = new Set();
-      const uniqueData = filteredData.map((item, index) => {
-        const id =
-          item.id ||
-          `${item.projId}-${item.laborCategoryCode}-${item.effectiveDate}-${index}`;
-        if (seenKeys.has(id)) {
-          console.warn(
-            `Duplicate key detected in billingRatesSchedule: ${id}. Using composite key.`
-          );
-          return { ...item, id: `${id}-${index}` };
-        }
-        seenKeys.add(id);
-        return { ...item, id };
-      });
+      // const seenKeys = new Set();
+      // const uniqueData = filteredData.map((item, index) => {
+      //   const id =
+      //     item.id ||
+      //     `${item.projId}-${item.laborCategoryCode}-${item.effectiveDate}-${index}`;
+      //   if (seenKeys.has(id)) {
+      //     console.warn(
+      //       `Duplicate key detected in billingRatesSchedule: ${id}. Using composite key.`
+      //     );
+      //     return { ...item, id: `${id}-${index}` };
+      //   }
+      //   seenKeys.add(id);
+      //   return { ...item, id };
+      // });
+
+      // ✅ ALWAYS generate unique IDs, store original for API calls
+    const uniqueData = filteredData.map((item, index) => {
+      const uniqueId = `plc-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      return { 
+        ...item, 
+        id: uniqueId,
+        originalId: item.id // Store original for API calls
+      };
+    });
+
 
       setBillingRatesSchedule(
         uniqueData.map((item) => ({
           id: item.id,
+          originalId: item.originalId,
           plc: item.laborCategoryCode,
           billRate: item.billingRate,
           // rateType: item.rateType || "Select",
@@ -3626,26 +3638,37 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
             .startsWith(selectedProjectId.toLowerCase()) && item.emplId
       );
 
-      // Check for duplicate IDs
-      const seenKeys = new Set();
-      const uniqueData = filteredData.map((item, index) => {
-        const id =
-          item.projEmplRtKey ||
-          item.id ||
-          `${item.projId}-${item.emplId}-${item.startDt}-${index}`;
-        if (seenKeys.has(id)) {
-          console.warn(
-            `Duplicate key detected in employeeBillingRates: ${id}. Using composite key.`
-          );
-          return { ...item, id: `${id}-${index}` };
-        }
-        seenKeys.add(id);
-        return { ...item, id };
-      });
+      // // Check for duplicate IDs
+      // const seenKeys = new Set();
+      // const uniqueData = filteredData.map((item, index) => {
+      //   const id =
+      //     item.projEmplRtKey ||
+      //     item.id ||
+      //     `${item.projId}-${item.emplId}-${item.startDt}-${index}`;
+      //   if (seenKeys.has(id)) {
+      //     console.warn(
+      //       `Duplicate key detected in employeeBillingRates: ${id}. Using composite key.`
+      //     );
+      //     return { ...item, id: `${id}-${index}` };
+      //   }
+      //   seenKeys.add(id);
+      //   return { ...item, id };
+      // });
+
+      // ✅ Always generate unique IDs
+    const uniqueData = filteredData.map((item, index) => {
+      const uniqueId = `emp-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      return { 
+        ...item, 
+        id: uniqueId,
+        originalId: item.projEmplRtKey || item.id // Keep original for API calls
+      };
+    });
 
       setEmployeeBillingRates(
         uniqueData.map((item) => ({
           id: item.id,
+          originalId: item.originalId,
           lookupType: item.type || "Select",
           empId: item.emplId,
           employeeName:
@@ -3939,26 +3962,43 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
       );
 
-      // Check for duplicate IDs
-      const seenKeys = new Set();
-      const uniqueData = filteredData.map((item, index) => {
-        const id =
-          item.projVendRtKey ||
-          item.id ||
-          `${item.projId}-${item.vendId}-${item.startDt}-${index}`;
-        if (seenKeys.has(id)) {
-          console.warn(
-            `Duplicate key detected in vendorBillingRates: ${id}. Using composite key.`
-          );
-          return { ...item, id: `${id}-${index}` };
-        }
-        seenKeys.add(id);
-        return { ...item, id };
-      });
+      // // Check for duplicate IDs
+      // const seenKeys = new Set();
+      // const uniqueData = filteredData.map((item, index) => {
+      //   const id =
+      //     item.projVendRtKey ||
+      //     item.id ||
+      //     `${item.projId}-${item.vendId}-${item.startDt}-${index}`;
+      //   if (seenKeys.has(id)) {
+      //     console.warn(
+      //       `Duplicate key detected in vendorBillingRates: ${id}. Using composite key.`
+      //     );
+      //     return { ...item, id: `${id}-${index}` };
+      //   }
+      //   seenKeys.add(id);
+      //   return { ...item, id };
+      // });
+
+    //   // ✅ Generate truly unique IDs
+    // const uniqueData = filteredData.map((item, index) => {
+    //   const uniqueId = item.projVendRtKey || item.id || `vendor-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+    //   return { ...item, id: uniqueId };
+    // });
+
+    // ✅ ALWAYS generate unique IDs
+    const uniqueData = filteredData.map((item, index) => {
+      const uniqueId = `vendor-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      return { 
+        ...item, 
+        id: uniqueId,
+        originalId: item.projVendRtKey || item.id // Store original for API calls
+      };
+    });
 
       setVendorBillingRates(
         uniqueData.map((item) => ({
           id: item.id,
+          originalId: item.originalId,
           projVendRtKey: item.projVendRtKey,
           lookupType: item.type || "Select",
           vendorId: item.vendId || "",
@@ -4011,72 +4051,139 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   //   fetchVendorBillingRates();
   // }, [fetchVendorBillingRates]);
 
+  // const handleUpdate = async (id) => {
+  //   // setLoading(true);
+  //   setLoadingAction((prev) => ({ ...prev, [id]: true })); // ← Only specific row loading
+  //   const updatedData = {
+  //     plc: billingRatesSchedule.find((item) => item.id === id)?.plc, // PLC is not editable
+  //     billRate: editBillRate[id],
+  //     rateType: editProjectPlcFields[id]?.rateType,
+  //     startDate: editProjectPlcFields[id]?.startDate,
+  //     endDate: editProjectPlcFields[id]?.endDate,
+  //   };
+
+  //   if (
+  //     updatedData.startDate &&
+  //     updatedData.endDate &&
+  //     new Date(updatedData.startDate) > new Date(updatedData.endDate)
+  //   ) {
+  //     toast.error("End Date cannot be before Start Date.");
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     await axios.put(
+  //       `https://test-api-3tmq.onrender.com/api/ProjectPlcRates/${id}`,
+  //       {
+  //         id,
+  //         projId: selectedProjectId,
+  //         laborCategoryCode: updatedData.plc,
+  //         costRate: parseFloat(updatedData.billRate) * 0.65,
+  //         billingRate: parseFloat(updatedData.billRate),
+  //         effectiveDate: updatedData.startDate,
+  //         endDate: updatedData.endDate || null,
+  //         // rateType: updatedData.rateType,
+  //         sBillRtTypeCd: updatedData.rateType,
+  //         isActive: true,
+  //         modifiedBy: "admin",
+  //         createdAt: new Date().toISOString(),
+  //         updatedAt: new Date().toISOString(),
+  //       }
+  //     );
+  //     setBillingRatesSchedule((prev) =>
+  //       prev.map((rate) =>
+  //         rate.id === id
+  //           ? {
+  //               ...rate,
+  //               billRate: parseFloat(updatedData.billRate),
+  //               rateType: updatedData.rateType,
+  //               startDate: updatedData.startDate,
+  //               endDate: updatedData.endDate || null,
+  //             }
+  //           : rate
+  //       )
+  //     );
+  //     setEditingProjectPlcRowId(null);
+  //     toast.success("Billing rate updated successfully!");
+  //   } catch (error) {
+  //     console.error("Error updating billing rate:", error);
+  //     toast.error(
+  //       `Failed to update billing rate: ${
+  //         error.response?.data?.message || error.message
+  //       }`
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleUpdate = async (id) => {
-    // setLoading(true);
-    setLoadingAction((prev) => ({ ...prev, [id]: true })); // ← Only specific row loading
-    const updatedData = {
-      plc: billingRatesSchedule.find((item) => item.id === id)?.plc, // PLC is not editable
-      billRate: editBillRate[id],
-      rateType: editProjectPlcFields[id]?.rateType,
-      startDate: editProjectPlcFields[id]?.startDate,
-      endDate: editProjectPlcFields[id]?.endDate,
-    };
-
-    if (
-      updatedData.startDate &&
-      updatedData.endDate &&
-      new Date(updatedData.startDate) > new Date(updatedData.endDate)
-    ) {
-      toast.error("End Date cannot be before Start Date.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      await axios.put(
-        `https://test-api-3tmq.onrender.com/api/ProjectPlcRates/${id}`,
-        {
-          id,
-          projId: selectedProjectId,
-          laborCategoryCode: updatedData.plc,
-          costRate: parseFloat(updatedData.billRate) * 0.65,
-          billingRate: parseFloat(updatedData.billRate),
-          effectiveDate: updatedData.startDate,
-          endDate: updatedData.endDate || null,
-          // rateType: updatedData.rateType,
-          sBillRtTypeCd: updatedData.rateType,
-          isActive: true,
-          modifiedBy: "admin",
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }
-      );
-      setBillingRatesSchedule((prev) =>
-        prev.map((rate) =>
-          rate.id === id
-            ? {
-                ...rate,
-                billRate: parseFloat(updatedData.billRate),
-                rateType: updatedData.rateType,
-                startDate: updatedData.startDate,
-                endDate: updatedData.endDate || null,
-              }
-            : rate
-        )
-      );
-      setEditingProjectPlcRowId(null);
-      toast.success("Billing rate updated successfully!");
-    } catch (error) {
-      console.error("Error updating billing rate:", error);
-      toast.error(
-        `Failed to update billing rate: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    } finally {
-      setLoading(false);
-    }
+  setLoadingAction((prev) => ({ ...prev, [id]: true })); // ✅ Fixed
+  
+  const currentItem = billingRatesSchedule.find((item) => item.id === id);
+  const originalId = currentItem?.originalId || id; // ✅ Use original ID for API
+  
+  const updatedData = {
+    plc: currentItem?.plc,
+    billRate: editBillRate[id],
+    rateType: editProjectPlcFields[id]?.rateType,
+    startDate: editProjectPlcFields[id]?.startDate,
+    endDate: editProjectPlcFields[id]?.endDate,
   };
+
+  if (
+    updatedData.startDate &&
+    updatedData.endDate &&
+    new Date(updatedData.startDate) > new Date(updatedData.endDate)
+  ) {
+    toast.error("End Date cannot be before Start Date.");
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // ✅ Fixed
+    return;
+  }
+
+  try {
+    await axios.put(
+      `https://test-api-3tmq.onrender.com/api/ProjectPlcRates/${originalId}`, // ✅ Use original ID
+      {
+        id: originalId, // ✅ Use original ID
+        projId: selectedProjectId,
+        laborCategoryCode: updatedData.plc,
+        costRate: parseFloat(updatedData.billRate) * 0.65,
+        billingRate: parseFloat(updatedData.billRate),
+        effectiveDate: updatedData.startDate,
+        endDate: updatedData.endDate || null,
+        sBillRtTypeCd: updatedData.rateType,
+        isActive: true,
+        modifiedBy: "admin",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }
+    );
+    
+    setBillingRatesSchedule((prev) =>
+      prev.map((rate) =>
+        rate.id === id
+          ? {
+              ...rate,
+              billRate: parseFloat(updatedData.billRate),
+              rateType: updatedData.rateType,
+              startDate: updatedData.startDate,
+              endDate: updatedData.endDate || null,
+            }
+          : rate
+      )
+    );
+    setEditingProjectPlcRowId(null);
+    toast.success("Billing rate updated successfully!");
+  } catch (error) {
+    console.error("Error updating billing rate:", error);
+    toast.error(`Failed to update billing rate: ${error.response?.data?.message || error.message}`);
+  } finally {
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // ✅ Fixed
+  }
+};
+
 
   // useEffect(() => {
   //   if (!selectedProjectId) {
@@ -4612,81 +4719,153 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     }));
   };
  
+  // const handleUpdateEmployee = async (id) => {
+  //   if (!id) {
+  //     console.error("Invalid ID for update");
+  //     return;
+  //   }
+  //   // setLoading(true);
+  //   setLoadingAction((prev) => ({ ...prev, [id]: false })); // Individual row loading
+  //   const updatedData = employeeBillingRates.find((item) => item.id === id);
+  //   const fields = editEmployeeFields[id] || {};
+
+  //   if (
+  //     fields.startDate &&
+  //     fields.endDate &&
+  //     new Date(fields.startDate) > new Date(fields.endDate)
+  //   ) {
+  //     toast.error("End Date cannot be before Start Date.");
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     await axios.put(`https://test-api-3tmq.onrender.com/ProjEmplRt/${id}`, {
+  //       projEmplRtKey: id,
+  //       projId: selectedProjectId,
+  //       emplId: fields.empId || updatedData.empId,
+  //       employeeName: fields.employeeName || updatedData.employeeName,
+  //       billLabCatCd: fields.plc || updatedData.plc,
+  //       billRtAmt: parseFloat(editEmployeeBillRate[id] ?? updatedData.billRate),
+  //       startDt: fields.startDate || updatedData.startDate,
+  //       endDt: fields.endDate || updatedData.endDate || null,
+  //       sBillRtTypeCd: fields.rateType || updatedData.rateType,
+  //       type: fields.lookupType || updatedData.lookupType,
+  //       isActive: true,
+  //       modifiedBy: "admin",
+  //     });
+  //     // Update local state with the saved changes
+  //     setEmployeeBillingRates((prev) =>
+  //       prev.map((rate) =>
+  //         rate.id === id
+  //           ? {
+  //               ...rate,
+  //               lookupType: fields.lookupType || updatedData.lookupType,
+  //               empId: fields.empId || updatedData.empId,
+  //               employeeName: fields.employeeName || updatedData.employeeName,
+  //               plc: fields.plc || updatedData.plc,
+  //               plcDescription:
+  //                 plcs.find(
+  //                   (plc) =>
+  //                     plc.laborCategoryCode === (fields.plc || updatedData.plc)
+  //                 )?.description ||
+  //                 fields.plcDescription ||
+  //                 updatedData.plcDescription,
+  //               billRate: parseFloat(
+  //                 editEmployeeBillRate[id] ?? updatedData.billRate
+  //               ),
+  //               rateType: fields.rateType || updatedData.rateType,
+  //               startDate: fields.startDate || updatedData.startDate,
+  //               endDate: fields.endDate || updatedData.endDate || null,
+  //             }
+  //           : rate
+  //       )
+  //     );
+  //     setEditingEmployeeRowId(null);
+  //     toast.success("Employee billing rate updated successfully!");
+  //   } catch (error) {
+  //     console.error("Error updating employee billing rate:", error);
+  //     toast.error(
+  //       `Failed to update employee billing rate: ${
+  //         error.response?.data?.message || error.message
+  //       }`
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+  
   const handleUpdateEmployee = async (id) => {
-    if (!id) {
-      console.error("Invalid ID for update");
-      return;
-    }
-    // setLoading(true);
-    setLoadingAction((prev) => ({ ...prev, [id]: false })); // Individual row loading
-    const updatedData = employeeBillingRates.find((item) => item.id === id);
-    const fields = editEmployeeFields[id] || {};
+  if (!id) {
+    console.error("Invalid ID for update");
+    return;
+  }
+  
+  setLoadingAction((prev) => ({ ...prev, [id]: true })); // ✅ Fixed
+  
+  const updatedData = employeeBillingRates.find((item) => item.id === id);
+  const originalId = updatedData?.originalId || id; // ✅ Use original ID
+  const fields = editEmployeeFields[id] || {};
 
-    if (
-      fields.startDate &&
-      fields.endDate &&
-      new Date(fields.startDate) > new Date(fields.endDate)
-    ) {
-      toast.error("End Date cannot be before Start Date.");
-      setLoading(false);
-      return;
-    }
+  if (
+    fields.startDate &&
+    fields.endDate &&
+    new Date(fields.startDate) > new Date(fields.endDate)
+  ) {
+    toast.error("End Date cannot be before Start Date.");
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // ✅ Fixed
+    return;
+  }
 
-    try {
-      await axios.put(`https://test-api-3tmq.onrender.com/ProjEmplRt/${id}`, {
-        projEmplRtKey: id,
-        projId: selectedProjectId,
-        emplId: fields.empId || updatedData.empId,
-        employeeName: fields.employeeName || updatedData.employeeName,
-        billLabCatCd: fields.plc || updatedData.plc,
-        billRtAmt: parseFloat(editEmployeeBillRate[id] ?? updatedData.billRate),
-        startDt: fields.startDate || updatedData.startDate,
-        endDt: fields.endDate || updatedData.endDate || null,
-        sBillRtTypeCd: fields.rateType || updatedData.rateType,
-        type: fields.lookupType || updatedData.lookupType,
-        isActive: true,
-        modifiedBy: "admin",
-      });
-      // Update local state with the saved changes
-      setEmployeeBillingRates((prev) =>
-        prev.map((rate) =>
-          rate.id === id
-            ? {
-                ...rate,
-                lookupType: fields.lookupType || updatedData.lookupType,
-                empId: fields.empId || updatedData.empId,
-                employeeName: fields.employeeName || updatedData.employeeName,
-                plc: fields.plc || updatedData.plc,
-                plcDescription:
-                  plcs.find(
-                    (plc) =>
-                      plc.laborCategoryCode === (fields.plc || updatedData.plc)
-                  )?.description ||
-                  fields.plcDescription ||
-                  updatedData.plcDescription,
-                billRate: parseFloat(
-                  editEmployeeBillRate[id] ?? updatedData.billRate
-                ),
-                rateType: fields.rateType || updatedData.rateType,
-                startDate: fields.startDate || updatedData.startDate,
-                endDate: fields.endDate || updatedData.endDate || null,
-              }
-            : rate
-        )
-      );
-      setEditingEmployeeRowId(null);
-      toast.success("Employee billing rate updated successfully!");
-    } catch (error) {
-      console.error("Error updating employee billing rate:", error);
-      toast.error(
-        `Failed to update employee billing rate: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await axios.put(`https://test-api-3tmq.onrender.com/ProjEmplRt/${originalId}`, { // ✅ Use original ID
+      projEmplRtKey: originalId, // ✅ Use original ID
+      projId: selectedProjectId,
+      emplId: fields.empId || updatedData.empId,
+      employeeName: fields.employeeName || updatedData.employeeName,
+      billLabCatCd: fields.plc || updatedData.plc,
+      billRtAmt: parseFloat(editEmployeeBillRate[id] ?? updatedData.billRate),
+      startDt: fields.startDate || updatedData.startDate,
+      endDt: fields.endDate || updatedData.endDate || null,
+      sBillRtTypeCd: fields.rateType || updatedData.rateType,
+      type: fields.lookupType || updatedData.lookupType,
+      isActive: true,
+      modifiedBy: "admin",
+    });
+    
+    // Update local state with the saved changes
+    setEmployeeBillingRates((prev) =>
+      prev.map((rate) =>
+        rate.id === id
+          ? {
+              ...rate,
+              lookupType: fields.lookupType || updatedData.lookupType,
+              empId: fields.empId || updatedData.empId,
+              employeeName: fields.employeeName || updatedData.employeeName,
+              plc: fields.plc || updatedData.plc,
+              plcDescription:
+                plcs.find(
+                  (plc) => plc.laborCategoryCode === (fields.plc || updatedData.plc)
+                )?.description ||
+                fields.plcDescription ||
+                updatedData.plcDescription,
+              billRate: parseFloat(editEmployeeBillRate[id] ?? updatedData.billRate),
+              rateType: fields.rateType || updatedData.rateType,
+              startDate: fields.startDate || updatedData.startDate,
+              endDate: fields.endDate || updatedData.endDate || null,
+            }
+          : rate
+      )
+    );
+    setEditingEmployeeRowId(null);
+    toast.success("Employee billing rate updated successfully!");
+  } catch (error) {
+    console.error("Error updating employee billing rate:", error);
+    toast.error(`Failed to update employee billing rate: ${error.response?.data?.message || error.message}`);
+  } finally {
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // ✅ Fixed
+  }
+};
 
   const handleDeleteEmployee = async (id) => {
     if (
@@ -5426,87 +5605,163 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     }));
   };
 
-
   const handleUpdateVendor = async (id) => {
-    // setLoading(true);
-    setLoadingAction((prev) => ({ ...prev, [id]: false })); // Individual row loading
-    const row = vendorBillingRates.find((r) => r.id === id);
-    const projVendRtKey = row?.projVendRtKey || id;
-    const fields = editVendorFields[id] || {};
+  setLoadingAction((prev) => ({ ...prev, [id]: true })); // ✅ Fixed
+  
+  const row = vendorBillingRates.find((r) => r.id === id);
+  const originalId = row?.originalId || row?.projVendRtKey || id; // ✅ Use original ID
+  const fields = editVendorFields[id] || {};
 
-    if (
-      fields.startDate &&
-      fields.endDate &&
-      new Date(fields.startDate) > new Date(fields.endDate)
-    ) {
-      toast.error("End Date cannot be before Start Date.");
-      setLoading(false);
-      return;
-    }
+  if (
+    fields.startDate &&
+    fields.endDate &&
+    new Date(fields.startDate) > new Date(fields.endDate)
+  ) {
+    toast.error("End Date cannot be before Start Date.");
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // ✅ Fixed
+    return;
+  }
 
-    try {
-      await axios.put(
-        `https://test-api-3tmq.onrender.com/ProjVendRt/${projVendRtKey}`,
-        {
-          projVendRtKey: projVendRtKey,
-          projId: selectedProjectId,
-          vendId: fields.vendorId || row.vendorId,
-          vendEmplId: fields.vendorEmployee || row.vendorEmployee,
-          billLabCatCd: fields.plc || row.plc,
-          billDiscRt: 0,
-          companyId: "1",
-          billRtAmt: parseFloat(editVendorBillRate[id] ?? row.billRate),
-          startDt: new Date(fields.startDate || row.startDate).toISOString(),
-          endDt: fields.endDate
-            ? new Date(fields.endDate).toISOString()
-            : row.endDate
-            ? new Date(row.endDate).toISOString()
-            : null,
-          sBillRtTypeCd: fields.rateType || row.rateType,
-          type: fields.lookupType || row.lookupType,
-          modifiedBy: "admin",
-          timeStamp: new Date().toISOString(),
-        }
-      );
-      setVendorBillingRates((prev) =>
-        prev.map((rate) =>
-          rate.id === id
-            ? {
-                ...rate,
-                lookupType: fields.lookupType || rate.lookupType,
-                vendorId: fields.vendorId || rate.vendorId,
-                vendorName: fields.vendorName || rate.vendorName,
-                vendorEmployee: fields.vendorEmployee || rate.vendorEmployee,
-                vendorEmployeeName:
-                  fields.vendorEmployeeName || rate.vendorEmployeeName,
-                plc: fields.plc || rate.plc,
-                plcDescription:
-                  plcs.find(
-                    (plc) => plc.laborCategoryCode === (fields.plc || rate.plc)
-                  )?.description ||
-                  fields.plcDescription ||
-                  rate.plcDescription,
-                billRate: parseFloat(editVendorBillRate[id] ?? rate.billRate),
-                rateType: fields.rateType || rate.rateType,
-                startDate: fields.startDate || rate.startDate,
-                endDate: fields.endDate || rate.endDate || null,
-              }
-            : rate
-        )
-      );
-      setEditingVendorRowId(null);
-      toast.success("Vendor billing rate updated successfully!");
-    } catch (error) {
-      console.error("Error updating vendor billing rate:", error);
-      toast.error(
-        `Failed to update vendor billing rate: ${
-          error.response?.data?.message || error.message
-        }`
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    await axios.put(
+      `https://test-api-3tmq.onrender.com/ProjVendRt/${originalId}`, // ✅ Use original ID
+      {
+        projVendRtKey: originalId, // ✅ Use original ID
+        projId: selectedProjectId,
+        vendId: fields.vendorId || row.vendorId,
+        vendEmplId: fields.vendorEmployee || row.vendorEmployee,
+        billLabCatCd: fields.plc || row.plc,
+        billDiscRt: 0,
+        companyId: "1",
+        billRtAmt: parseFloat(editVendorBillRate[id] ?? row.billRate),
+        startDt: new Date(fields.startDate || row.startDate).toISOString(),
+        endDt: fields.endDate
+          ? new Date(fields.endDate).toISOString()
+          : row.endDate
+          ? new Date(row.endDate).toISOString()
+          : null,
+        sBillRtTypeCd: fields.rateType || row.rateType,
+        type: fields.lookupType || row.lookupType,
+        modifiedBy: "admin",
+        timeStamp: new Date().toISOString(),
+      }
+    );
+    
+    setVendorBillingRates((prev) =>
+      prev.map((rate) =>
+        rate.id === id
+          ? {
+              ...rate,
+              lookupType: fields.lookupType || rate.lookupType,
+              vendorId: fields.vendorId || rate.vendorId,
+              vendorName: fields.vendorName || rate.vendorName,
+              vendorEmployee: fields.vendorEmployee || rate.vendorEmployee,
+              vendorEmployeeName: fields.vendorEmployeeName || rate.vendorEmployeeName,
+              plc: fields.plc || rate.plc,
+              plcDescription:
+                plcs.find((plc) => plc.laborCategoryCode === (fields.plc || rate.plc))?.description ||
+                fields.plcDescription ||
+                rate.plcDescription,
+              billRate: parseFloat(editVendorBillRate[id] ?? rate.billRate),
+              rateType: fields.rateType || rate.rateType,
+              startDate: fields.startDate || rate.startDate,
+              endDate: fields.endDate || rate.endDate || null,
+            }
+          : rate
+      )
+    );
+    setEditingVendorRowId(null);
+    toast.success("Vendor billing rate updated successfully!");
+  } catch (error) {
+    console.error("Error updating vendor billing rate:", error);
+    toast.error(`Failed to update vendor billing rate: ${error.response?.data?.message || error.message}`);
+  } finally {
+    setLoadingAction((prev) => ({ ...prev, [id]: false })); // ✅ Fixed
+  }
+};
+
+
+
+  // const handleUpdateVendor = async (id) => {
+  //   // setLoading(true);
+  //   setLoadingAction((prev) => ({ ...prev, [id]: false })); // Individual row loading
+  //   const row = vendorBillingRates.find((r) => r.id === id);
+  //   const projVendRtKey = row?.projVendRtKey || id;
+  //   const fields = editVendorFields[id] || {};
+
+  //   if (
+  //     fields.startDate &&
+  //     fields.endDate &&
+  //     new Date(fields.startDate) > new Date(fields.endDate)
+  //   ) {
+  //     toast.error("End Date cannot be before Start Date.");
+  //     setLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     await axios.put(
+  //       `https://test-api-3tmq.onrender.com/ProjVendRt/${projVendRtKey}`,
+  //       {
+  //         projVendRtKey: projVendRtKey,
+  //         projId: selectedProjectId,
+  //         vendId: fields.vendorId || row.vendorId,
+  //         vendEmplId: fields.vendorEmployee || row.vendorEmployee,
+  //         billLabCatCd: fields.plc || row.plc,
+  //         billDiscRt: 0,
+  //         companyId: "1",
+  //         billRtAmt: parseFloat(editVendorBillRate[id] ?? row.billRate),
+  //         startDt: new Date(fields.startDate || row.startDate).toISOString(),
+  //         endDt: fields.endDate
+  //           ? new Date(fields.endDate).toISOString()
+  //           : row.endDate
+  //           ? new Date(row.endDate).toISOString()
+  //           : null,
+  //         sBillRtTypeCd: fields.rateType || row.rateType,
+  //         type: fields.lookupType || row.lookupType,
+  //         modifiedBy: "admin",
+  //         timeStamp: new Date().toISOString(),
+  //       }
+  //     );
+  //     setVendorBillingRates((prev) =>
+  //       prev.map((rate) =>
+  //         rate.id === id
+  //           ? {
+  //               ...rate,
+  //               lookupType: fields.lookupType || rate.lookupType,
+  //               vendorId: fields.vendorId || rate.vendorId,
+  //               vendorName: fields.vendorName || rate.vendorName,
+  //               vendorEmployee: fields.vendorEmployee || rate.vendorEmployee,
+  //               vendorEmployeeName:
+  //                 fields.vendorEmployeeName || rate.vendorEmployeeName,
+  //               plc: fields.plc || rate.plc,
+  //               plcDescription:
+  //                 plcs.find(
+  //                   (plc) => plc.laborCategoryCode === (fields.plc || rate.plc)
+  //                 )?.description ||
+  //                 fields.plcDescription ||
+  //                 rate.plcDescription,
+  //               billRate: parseFloat(editVendorBillRate[id] ?? rate.billRate),
+  //               rateType: fields.rateType || rate.rateType,
+  //               startDate: fields.startDate || rate.startDate,
+  //               endDate: fields.endDate || rate.endDate || null,
+  //             }
+  //           : rate
+  //       )
+  //     );
+  //     setEditingVendorRowId(null);
+  //     toast.success("Vendor billing rate updated successfully!");
+  //   } catch (error) {
+  //     console.error("Error updating vendor billing rate:", error);
+  //     toast.error(
+  //       `Failed to update vendor billing rate: ${
+  //         error.response?.data?.message || error.message
+  //       }`
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   // const handleDeleteVendor = async (id) => {
   //    setLoading(true);

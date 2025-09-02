@@ -10692,7 +10692,7 @@ const handleCheckboxChange = async (idx, field) => {
   if (field === "isCompleted" && !updated.isCompleted) {
     const isEAC = updated.plType === "EAC";
     const inProgressCount = plans.filter(
-      (p) => p.status === "In Progress" && p.plType === updated.plType
+      (p) => p.status === "In Progress" && p.plType === updated.plType && p.projId === updated.projId  // ADD THIS LINE
     ).length;
     if (inProgressCount > 0 && updated.status === "In Progress") {
       toast.error(
@@ -10717,7 +10717,7 @@ const handleCheckboxChange = async (idx, field) => {
   // "In Progress" handling for exclusivity
   if (updated.status === "In Progress") {
     newPlans = newPlans.map((p, i) =>
-      i !== idx && p.status === "In Progress" && p.plType === updated.plType
+      i !== idx && p.status === "In Progress" && p.plType === updated.plType && p.projId === updated.projId
         ? { ...p, status: "Submitted", isCompleted: true }
         : p
     );

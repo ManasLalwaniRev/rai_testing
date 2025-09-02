@@ -22969,19 +22969,33 @@ if (isDuplicate) {
       }
       fetchEmployees();
     } catch (err) {
-      setSuccessMessageText("Failed to save entry.");
-      setShowSuccessMessage(true);
-      toast.error(
-        "Failed to save new entry: " +
-          (err?.response?.data?.message ||
-            JSON.stringify(err?.response?.data?.errors) ||
-            err?.message),
-        { toastId: "save-entry-error", autoClose: 5000 }
-      );
-    } finally {
-      setIsDurationLoading(false);
-      setTimeout(() => setShowSuccessMessage(false), 2000);
-    }
+  setSuccessMessageText("Failed to save entry.");
+  setShowSuccessMessage(true);
+  
+  // Simple error extraction
+  let errorMessage = "Failed to save new entry: ";
+  
+  if (err?.response?.data?.error) {
+    errorMessage += err.response.data.error;
+  } else if (err?.response?.data?.message) {
+    errorMessage += err.response.data.message;
+  } else if (err?.message) {
+    errorMessage += err.message;
+  } else {
+    errorMessage += "Unknown error occurred";
+  }
+  
+  toast.error(errorMessage, {
+    toastId: "save-entry-error",
+    autoClose: 5000,
+  });
+  
+  // Optional: Log for debugging
+  console.error("API Error:", err?.response?.data || err);
+} finally {
+  setIsDurationLoading(false);
+  setTimeout(() => setShowSuccessMessage(false), 2000);
+}
   };
 
   const handleFindReplace = async () => {

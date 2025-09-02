@@ -6889,7 +6889,11 @@ const handleSaveNewEntry = async () => {
     acctId: newEntry.acctId || "",
     orgId: newEntry.orgId || "",
     notes: "",
-    category: newEntry.name || "",
+    // category: newEntry.name || "",
+    category: newEntry.lastName && newEntry.firstName
+  ? `${newEntry.lastName}, ${newEntry.firstName}`
+  : newEntry.lastName || newEntry.firstName || "",
+
     amountType: "",
     id: newEntry.id,
     type: newEntry.idType || "Employee",
@@ -6926,6 +6930,9 @@ const handleSaveNewEntry = async () => {
         isBrd: newEntry.isBrd || false,
         status: newEntry.status || "Act",
         type: newEntry.idType || "Employee",
+         category: newEntry.lastName && newEntry.firstName
+      ? `${newEntry.lastName}, ${newEntry.firstName}`
+      : newEntry.lastName || newEntry.firstName || "", // Add this line
         plForecasts: payloadForecasts.map((forecast) => ({
           ...forecast,
           forecastid:
