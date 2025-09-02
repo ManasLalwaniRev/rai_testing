@@ -5662,6 +5662,7 @@ const ProjectAmountsTable = ({
   const projectId = initialData.projId;
   const closedPeriod = initialData.closedPeriod;
   const isBudPlan = planType && planType.toUpperCase() === "BUD";
+  const isFieldEditable = planType && (planType.toUpperCase() === "BUD" || planType.toUpperCase() === "EAC");
 
    const verticalScrollRef = useRef(null);
   const vfirstTableRef = useRef(null);
@@ -6255,8 +6256,19 @@ const handleIdChange = (value) => {
 };
 
 
-  const handleRowFieldChange = (rowIdx, field, value) => {
-    if (!isBudPlan || !isEditable) return;
+  // const handleRowFieldChange = (rowIdx, field, value) => {
+  //   if (!isBudPlan || !isEditable) return;
+  //   setEditedRowData((prev) => ({
+  //     ...prev,
+  //     [rowIdx]: {
+  //       ...prev[rowIdx],
+  //       [field]: value,
+  //     },
+  //   }));
+  // };
+
+   const handleRowFieldChange = (rowIdx, field, value) => {
+    if (!isFieldEditable || !isEditable) return;
     setEditedRowData((prev) => ({
       ...prev,
       [rowIdx]: {
@@ -6330,8 +6342,89 @@ const handleIdChange = (value) => {
   //   }
   // };
   
-  const handleRowFieldBlur = async (rowIdx, emp) => {
-    if (!isBudPlan || !isEditable) return;
+  // const handleRowFieldBlur = async (rowIdx, emp) => {
+  //   if (!isBudPlan || !isEditable) return;
+  //   if (!emp || !emp.emple) {
+  //     toast.error("Employee data is missing for update.");
+  //     return;
+  //   }
+ 
+  //   const edited = editedRowData[rowIdx] || {};
+  //   if (
+  //     edited.acctId === undefined &&
+  //     edited.orgId === undefined &&
+  //     edited.isRev === undefined &&
+  //     edited.isBrd === undefined
+  //   )
+  //     return;
+ 
+  //   const payload = {
+  //     dctId: emp.emple.dctId || 0,
+  //     plId: emp.emple.plId || 0,
+  //     accId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId,
+  //     orgId: edited.orgId !== undefined ? edited.orgId : emp.emple.orgId,
+  //     type: emp.emple.type || "",
+  //     category: emp.emple.category || "",
+  //     amountType: emp.emple.amountType || "",
+  //     id: emp.emple.emplId || "",
+  //     isRev: edited.isRev !== undefined ? edited.isRev : emp.emple.isRev,
+  //     isBrd: edited.isBrd !== undefined ? edited.isBrd : emp.emple.isBrd,
+  //     createdBy: emp.emple.createdBy || "System",
+  //     lastModifiedBy: "System",
+  //   };
+ 
+  //   // ✅ Add validation BEFORE saving
+  //   const validAccounts =
+  //     emp.idType === "Vendor" || emp.idType === "Vendor Employee"
+  //       ? subContractorNonLaborAccounts.map((a) => a.id || a.accountId || "")
+  //       : employeeNonLaborAccounts.map((a) => a.id || a.accountId || "");
+ 
+  //   if (payload.accId && !validAccounts.includes(payload.accId)) {
+  //     toast.error("Please select a valid account from suggestions");
+  //     return; // 🚫 stop here, don't call API or show success
+  //   }
+  //   // ✅ Validate orgId against organizationOptions
+  //   const validOrgs = organizationOptions.map((org) => org.value);
+  //   if (payload.orgId && !validOrgs.includes(payload.orgId)) {
+  //     toast.error("Please select a valid organization from suggestions");
+  //     return; // 🚫 block update
+  //   }
+ 
+  //   try {
+  //     await axios.put(
+  //       "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
+  //       { ...payload, acctId: payload.accId },
+  //       { headers: { "Content-Type": "application/json" } }
+  //     );
+  //     setEditedRowData((prev) => {
+  //       const newData = { ...prev };
+  //       delete newData[rowIdx];
+  //       return newData;
+  //     });
+  //     setEmployees((prev) => {
+  //       const updated = [...prev];
+  //       updated[rowIdx] = {
+  //         ...updated[rowIdx],
+  //         emple: {
+  //           ...updated[rowIdx].emple,
+  //           ...payload,
+  //         },
+  //       };
+  //       return updated;
+  //     });
+  //     toast.success("Employee updated successfully!", {
+  //       toastId: `employee-update-${rowIdx}`,
+  //       autoClose: 2000,
+  //     });
+  //   } catch (err) {
+  //     toast.error(
+  //       "Failed to update row: " + (err.response?.data?.message || err.message)
+  //     );
+  //   }
+  // };
+  
+    const handleRowFieldBlur = async (rowIdx, emp) => {
+    if (!isFieldEditable || !isEditable) return;
     if (!emp || !emp.emple) {
       toast.error("Employee data is missing for update.");
       return;
@@ -6410,6 +6503,7 @@ const handleIdChange = (value) => {
       );
     }
   };
+
 
   const getEmployeeRow = (emp, idx) => {
     const monthAmounts = getMonthAmounts(emp);
@@ -8371,10 +8465,17 @@ const handleSaveNewEntry = async () => {
                           type="text"
                           name="acctId"
                           value={newEntry.acctId}
+                          // onChange={(e) =>
+                          //   isBudPlan &&
+                          //   setNewEntry({ ...newEntry, acctId: e.target.value })
+                          // }
                           onChange={(e) =>
-                            isBudPlan &&
-                            setNewEntry({ ...newEntry, acctId: e.target.value })
-                          }
+  isFieldEditable &&
+  setNewEntry({ ...newEntry, acctId: e.target.value })
+}
+className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+  !isFieldEditable ? "bg-gray-100 cursor-not-allowed" : ""
+}`}
                           onBlur={(e) => {
                             const val = e.target.value.trim();
 
@@ -8396,12 +8497,11 @@ const handleSaveNewEntry = async () => {
                               setNewEntry((prev) => ({ ...prev, acctId: "" })); // reset
                             }
                           }}
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
-                          }`}
+                          
                           list="account-list"
                           placeholder="Enter Account"
-                          readOnly={!isBudPlan}
+                          // readOnly={!isBudPlan}
+                          readOnly={!isFieldEditable}
                         />
                         <datalist id="account-list">
                           {(newEntry.idType === "Vendor" ||
@@ -8509,10 +8609,17 @@ const handleSaveNewEntry = async () => {
                           type="text"
                           name="orgId"
                           value={newEntry.orgId}
+                          // onChange={(e) =>
+                          //   isBudPlan &&
+                          //   setNewEntry({ ...newEntry, orgId: e.target.value })
+                          // }
                           onChange={(e) =>
-                            isBudPlan &&
-                            setNewEntry({ ...newEntry, orgId: e.target.value })
-                          }
+  isFieldEditable &&
+  setNewEntry({ ...newEntry, orgId: e.target.value })
+}
+className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+  !isFieldEditable ? "bg-gray-100 cursor-not-allowed" : ""
+}`}
                           onBlur={(e) => {
                             const val = e.target.value.trim();
                             const validOrgs = organizationOptions.map(
@@ -8526,12 +8633,11 @@ const handleSaveNewEntry = async () => {
                               setNewEntry((prev) => ({ ...prev, orgId: "" })); // reset
                             }
                           }}
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
-                          }`}
+                         
                           placeholder="Enter Organization"
                           list="organization-list"
-                          readOnly={!isBudPlan}
+                          // readOnly={!isBudPlan}
+                          readOnly={!isFieldEditable}
                         />
                         <datalist id="organization-list">
                           {organizationOptions.map((org, index) => (
@@ -8552,17 +8658,28 @@ const handleSaveNewEntry = async () => {
                           type="checkbox"
                           name="isRev"
                           checked={newEntry.isRev}
+                          // onChange={(e) =>
+                          //   isBudPlan &&
+                          //   setNewEntry({
+                          //     ...newEntry,
+                          //     isRev: e.target.checked,
+                          //   })
+                          // }
                           onChange={(e) =>
-                            isBudPlan &&
-                            setNewEntry({
-                              ...newEntry,
-                              isRev: e.target.checked,
-                            })
-                          }
-                          className={`w-4 h-4 ${
-                            !isBudPlan ? "cursor-not-allowed" : ""
-                          }`}
-                          disabled={!isBudPlan}
+  isFieldEditable &&
+  setNewEntry({
+    ...newEntry,
+    isRev: e.target.checked,
+  })
+}
+className={`w-4 h-4 ${
+  !isFieldEditable ? "cursor-not-allowed" : ""
+}`}
+                          // className={`w-4 h-4 ${
+                          //   !isBudPlan ? "cursor-not-allowed" : ""
+                          // }`}
+                          // disabled={!isBudPlan}
+                          disabled={!isFieldEditable}
                         />
                       </td>
                       <td className="border border-gray-300 px-1.5 py-0.5 text-center">
@@ -8572,17 +8689,29 @@ const handleSaveNewEntry = async () => {
                           type="checkbox"
                           name="isBrd"
                           checked={newEntry.isBrd}
+                          // onChange={(e) =>
+                          //   isBudPlan &&
+                          //   setNewEntry({
+                          //     ...newEntry,
+                          //     isBrd: e.target.checked,
+                          //   })
+                          // }
                           onChange={(e) =>
-                            isBudPlan &&
-                            setNewEntry({
-                              ...newEntry,
-                              isBrd: e.target.checked,
-                            })
-                          }
-                          className={`w-4 h-4 ${
-                            !isBudPlan ? "cursor-not-allowed" : ""
-                          }`}
-                          disabled={!isBudPlan}
+  isFieldEditable &&
+  setNewEntry({
+    ...newEntry,
+    isBrd: e.target.checked,
+  })
+}
+className={`w-4 h-4 ${
+  !isFieldEditable ? "cursor-not-allowed" : ""
+}`}
+                          // className={`w-4 h-4 ${
+                          //   !isBudPlan ? "cursor-not-allowed" : ""
+                          // }`}
+                          // disabled={!isBudPlan}
+                          disabled={!isFieldEditable}
+
                         />
                       </td>
                       <td className="border border-gray-300 px-1.5 py-0.5">
@@ -8634,7 +8763,7 @@ const handleSaveNewEntry = async () => {
                           onClick={() => handleRowClick(actualEmpIdx)}
                         >
                           {EMPLOYEE_COLUMNS.map((col) => {
-                            if (isBudPlan && isEditable) {
+                            if (isFieldEditable && isEditable) {
                               if (col.key === "acctId") {
                                 return (
                                   // <td
