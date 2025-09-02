@@ -9010,10 +9010,10 @@ const ProjectBudgetStatus = () => {
           setPrefixes(new Set([prefix]));
           setFilteredProjects([project]);
           setRevenueAccount(planData.revenueAccount || "");
-          toast.info("Project data fetched from plans.", {
-            toastId: "fallback-project-fetch",
-            autoClose: 3000,
-          });
+          // toast.info("Project data fetched from plans.", {
+          //   toastId: "fallback-project-fetch",
+          //   autoClose: 3000,
+          // });
         } else {
           throw new Error("No valid plan data found.");
         }

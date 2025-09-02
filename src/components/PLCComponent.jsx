@@ -3467,16 +3467,35 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
       //   return { ...item, id };
       // });
 
-      // ✅ ALWAYS generate unique IDs, store original for API calls
-    const uniqueData = filteredData.map((item, index) => {
-      // const uniqueId = `plc-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
-      const uniqueId = `plc-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
-      return { 
-        ...item, 
-        id: uniqueId,
-        originalId: item.id // Store original for API calls
-      };
-    });
+    //   // ✅ ALWAYS generate unique IDs, store original for API calls
+    // const uniqueData = filteredData.map((item, index) => {
+    //   // const uniqueId = `plc-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+    //   const uniqueId = `plc-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
+    //   return { 
+    //     ...item, 
+    //     id: uniqueId,
+    //     originalId: item.id // Store original for API calls
+    //   };
+    // });
+
+//     const uniqueData = filteredData.map((item, index) => {
+//   const uniqueId = `plc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${index}-${uuidv4()}`;
+//   return { 
+//     ...item, 
+//     id: uniqueId,
+//     originalId: item.id // Store original for API calls
+//   };
+// });
+
+const uniqueData = filteredData.map((item, index) => {
+    const uniqueId = `plc-${uuidv4()}-${index}`;
+    return { 
+      ...item, 
+      id: uniqueId,
+      originalId: item.id
+    };
+  });
+
 
 
       setBillingRatesSchedule(
@@ -3657,15 +3676,34 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
       // });
 
       // ✅ Always generate unique IDs
-    const uniqueData = filteredData.map((item, index) => {
-      // const uniqueId = `emp-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
-      const uniqueId = `emp-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
-      return { 
-        ...item, 
-        id: uniqueId,
-        originalId: item.projEmplRtKey || item.id // Keep original for API calls
-      };
-    });
+    // const uniqueData = filteredData.map((item, index) => {
+    //   // const uniqueId = `emp-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+    //   const uniqueId = `emp-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
+    //   return { 
+    //     ...item, 
+    //     id: uniqueId,
+    //     originalId: item.projEmplRtKey || item.id // Keep original for API calls
+    //   };
+    // });
+
+//     const uniqueData = filteredData.map((item, index) => {
+//   const uniqueId = `emp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${index}-${uuidv4()}`;
+//   return { 
+//     ...item, 
+//     id: uniqueId,
+//     originalId: item.projEmplRtKey || item.id
+//   };
+// });
+
+const uniqueData = filteredData.map((item, index) => {
+    const uniqueId = `emp-${uuidv4()}-${index}`;
+    return { 
+      ...item, 
+      id: uniqueId,
+      originalId: item.projEmplRtKey || item.id
+    };
+  });
+
 
       setEmployeeBillingRates(
         uniqueData.map((item) => ({
@@ -3988,15 +4026,33 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     // });
 
     // ✅ ALWAYS generate unique IDs
-    const uniqueData = filteredData.map((item, index) => {
-      // const uniqueId = `vendor-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
-      const uniqueId = `vendor-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
-      return { 
-        ...item, 
-        id: uniqueId,
-        originalId: item.projVendRtKey || item.id // Store original for API calls
-      };
-    });
+    // const uniqueData = filteredData.map((item, index) => {
+    //   // const uniqueId = `vendor-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+    //   const uniqueId = `vendor-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
+    //   return { 
+    //     ...item, 
+    //     id: uniqueId,
+    //     originalId: item.projVendRtKey || item.id // Store original for API calls
+    //   };
+    // });
+
+//     const uniqueData = filteredData.map((item, index) => {
+//   const uniqueId = `vendor-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${index}-${uuidv4()}`;
+//   return { 
+//     ...item, 
+//     id: uniqueId,
+//     originalId: item.projVendRtKey || item.id
+//   };
+// });
+
+const uniqueData = filteredData.map((item, index) => {
+    const uniqueId = `vendor-${uuidv4()}-${index}`;
+    return { 
+      ...item, 
+      id: uniqueId,
+      originalId: item.projVendRtKey || item.id
+    };
+  });
 
       setVendorBillingRates(
         uniqueData.map((item) => ({
@@ -7558,10 +7614,12 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                     <datalist
                       id="plc-list"
                       style={dropdownStyles.noBorderDropdown}
+
                     >
-                      {plcs.map((plc) => (
+                      {plcs.map((plc, index) => (
                         <option
-                          key={plc.laborCategoryCode}
+                           key={`${plc.laborCategoryCode}-${index}`} // ✅ Make key unique
+                          // key={plc.laborCategoryCode}
                           value={plc.laborCategoryCode}
                           style={dropdownStyles.noBorderDropdown}
                         >
@@ -7978,8 +8036,8 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
                       disabled={employees.length === 0}
                     />
                     <datalist id="employee-list">
-                      {employees.map((emp) => (
-                        <option key={emp.empId} value={emp.empId}>
+                      {employees.map((emp, index) => (
+                        <option key={`${emp.empId}-${index}`}  value={emp.empId}>
                           {emp.employeeName}
                         </option>
                       ))}

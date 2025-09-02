@@ -12059,13 +12059,13 @@ return (
                 BUD/EAC
               </button>
 
-              <button
+              {/* <button
                 onClick={() => setShowNewBusinessPopup(true)}
                 className="bg-green-600 text-white hover:bg-green-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap"
                 title="New Business"
               >
                 New Business
-              </button>
+              </button> */}
             </>
           )}
         </div>
