@@ -8224,7 +8224,7 @@ const handleSaveNewEntry = async () => {
   return (
     <div className="relative p-4 font-inter w-full synchronized-tables-outer">
       {/* <h2 className="text-xs font-semibold mb-3 text-gray-800">Amounts</h2> */}
-      <div className="w-full flex justify-between mb-4 gap-2">
+      {/* <div className="w-full flex justify-between mb-4 gap-2">
         <div className="flex-grow">
           <div className="flex gap-2">
             {Object.values(hiddenRows).some(Boolean) && (
@@ -8285,7 +8285,69 @@ const handleSaveNewEntry = async () => {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
+      <div className="w-full flex justify-between mb-4 gap-2">
+  <div className="flex-grow"></div>
+  <div className="flex gap-2">
+    {Object.values(hiddenRows).some(Boolean) && (
+      <button
+        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+        onClick={showHiddenRows}
+      >
+        Show Hidden Rows
+      </button>
+    )}
+    {isEditable && (
+      <>
+        <button
+          onClick={() => setShowNewForm((prev) => !prev)}
+          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+        >
+          {showNewForm ? "Cancel" : "New"}
+        </button>
+        {!showNewForm && (
+          <>
+            <button
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+              onClick={() => isEditable && setShowFindReplace(true)}
+            >
+              Find / Replace
+            </button>
+            <button
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition text-xs font-medium"
+              onClick={() => {
+                if (!selectedEmployeeId) {
+                  toast.error("Please select an employee to delete");
+                  return;
+                }
+                handleDeleteEmployee(selectedEmployeeId);
+              }}
+            >
+              Delete
+            </button>
+          </>
+        )}
+        {showNewForm && (
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs font-medium"
+            onClick={() => isEditable && setShowFillValues(true)}
+          >
+            Fill Values
+          </button>
+        )}
+      </>
+    )}
+    {showNewForm && (
+      <button
+        onClick={handleSaveNewEntry}
+        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+      >
+        Save Entry
+      </button>
+    )}
+  </div>
+</div>
+
 
       {showFillValues && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">

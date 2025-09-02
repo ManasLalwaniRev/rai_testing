@@ -23486,7 +23486,7 @@ const handleRowClick = (actualEmpIdx) => {
           No forecast data available for this plan.
         </div>
       ) : (
-        <div className="vertical-scroll-wrapper" ref={verticalScrollRef}>
+        <div className="vertical-scroll-wrapper " ref={verticalScrollRef}>
           <div className="synchronized-tables-container flex">
             <div className="synchronized-table-scroll first">
               <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">

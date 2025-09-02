@@ -10757,34 +10757,72 @@ const handleCheckboxChange = async (idx, field) => {
   }
 };
 
-  const handleVersionCodeChange = async (idx, value) => {
-    const prevPlans = [...plans];
-    const planId = plans[idx].plId;
-    let updated = { ...plans[idx], versionCode: value };
-    const newPlans = plans.map((plan) =>
-      plan.plId === planId ? updated : plan
-    );
-    setPlans(newPlans);
-    if (planId && Number(planId) > 0) {
-      const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
-      toast.info("Updating version code...", { toastId: "version-code-info" });
-      try {
-        setIsActionLoading(true);
-        await axios.put(updateUrl, updated);
-      } catch (err) {
-        setPlans(prevPlans);
-        toast.error(
-          "Error updating version code: " +
-            (err.response?.data?.message || err.message),
-          { toastId: "version-code-error" }
-        );
-      } finally {
-        setIsActionLoading(false);
-      }
-    }
-  };
+//   const handleVersionCodeChange = async (idx, value) => {
+//     const prevPlans = [...plans];
+//     const planId = plans[idx].plId;
+//     let updated = { ...plans[idx], versionCode: value };
+//     const newPlans = plans.map((plan) =>
+//       plan.plId === planId ? updated : plan
+//     );
+//     setPlans(newPlans);
+//     if (planId && Number(planId) > 0) {
+//       const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+//       toast.info("Updating version code...", { toastId: "version-code-info" });
+//       try {
+//         setIsActionLoading(true);
+//         await axios.put(updateUrl, updated);
+//       } catch (err) {
+//         setPlans(prevPlans);
+//         toast.error(
+//           "Error updating version code: " +
+//             (err.response?.data?.message || err.message),
+//           { toastId: "version-code-error" }
+//         );
+//       } finally {
+//         setIsActionLoading(false);
+//       }
+//     }
+//   };
 
   // FIXED: Updated handleActionSelect to use the full project ID
+
+  const handleVersionCodeChange = async (idx, value) => {
+  const prevPlans = [...plans];
+  const currentPlan = plans[idx];
+  const planId = currentPlan.plId;
+  
+  // Check if value actually changed
+  if (currentPlan.versionCode === value) {
+    return; // No change, don't call API
+  }
+  
+  let updated = { ...currentPlan, versionCode: value };
+  const newPlans = plans.map((plan) =>
+    plan.plId === planId ? updated : plan
+  );
+  setPlans(newPlans);
+  
+  if (planId && Number(planId) > 0) {
+    const updateUrl = `https://test-api-3tmq.onrender.com/Project/UpdateProjectPlan`;
+    toast.info("Updating version code...", { toastId: "version-code-info" });
+    try {
+      setIsActionLoading(true);
+      await axios.put(updateUrl, updated);
+      toast.success("Version code updated successfully!", { toastId: "version-code-success" });
+    } catch (err) {
+      setPlans(prevPlans);
+      toast.error(
+        "Error updating version code: " +
+          (err.response?.data?.message || err.message),
+        { toastId: "version-code-error" }
+      );
+    } finally {
+      setIsActionLoading(false);
+    }
+  }
+};
+
+
   const handleActionSelect = async (idx, action) => {
     const plan = plans[idx];
 
@@ -11863,270 +11901,260 @@ return (
 
     {/* Your existing content with blur effect when popup is open */}
     <div className={`transition-all duration-200 ${showNewBusinessPopup ? 'blur-sm pointer-events-none' : ''}`}>
-      <div className="flex justify-between items-center mb-2">
-        <div className="flex gap-1 flex-wrap">
-          {plans.length > 0 && (
-            <>
-              <button
-                onClick={() => {
-                  setIsActionLoading(true);
-                  handleActionSelect(
-                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                    "Create Budget"
-                  );
-                }}
-                disabled={
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Budget") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Budget") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Create Budget"
-              >
-                New Budget
-              </button>
+      <div className="flex justify-between items-center mb-2 gap-1">
+  <div className="flex gap-0.5 flex-nowrap items-center overflow-x-auto">
+    {plans.length > 0 && (
+      <>
+        <button
+          onClick={() => {
+            setIsActionLoading(true);
+            handleActionSelect(
+              plans.findIndex((p) => p.plId === selectedPlan?.plId),
+              "Create Budget"
+            );
+          }}
+          disabled={
+            !selectedPlan ||
+            !getButtonAvailability(selectedPlan, "Create Budget") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+          }
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            !selectedPlan ||
+            !getButtonAvailability(selectedPlan, "Create Budget") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title="Create Budget"
+        >
+          New Budget
+        </button>
 
-              <button
-                onClick={() => {
-                  setIsActionLoading(true);
-                  handleActionSelect(
-                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                    "Create Blank Budget"
-                  );
-                }}
-                disabled={
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Create Blank Budget"
-              >
-                New Blank Budget
-              </button>
+        <button
+          onClick={() => {
+            setIsActionLoading(true);
+            handleActionSelect(
+              plans.findIndex((p) => p.plId === selectedPlan?.plId),
+              "Create Blank Budget"
+            );
+          }}
+          disabled={
+            !selectedPlan ||
+            !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+          }
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            !selectedPlan ||
+            !getButtonAvailability(selectedPlan, "Create Blank Budget") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title="Create Blank Budget"
+        >
+          New Blank Budget
+        </button>
 
-              <button
-                onClick={() => {
-                  setIsActionLoading(true);
-                  handleActionSelect(
-                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                    "Create EAC"
-                  );
-                }}
-                disabled={
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create EAC") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Create EAC") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Create EAC"
-              >
-                New EAC
-              </button>
+        <button
+          onClick={() => {
+            setIsActionLoading(true);
+            handleActionSelect(
+              plans.findIndex((p) => p.plId === selectedPlan?.plId),
+              "Create EAC"
+            );
+          }}
+          disabled={
+            !selectedPlan ||
+            !getButtonAvailability(selectedPlan, "Create EAC") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+          }
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            !selectedPlan ||
+            !getButtonAvailability(selectedPlan, "Create EAC") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title="Create EAC"
+        >
+          New EAC
+        </button>
 
-              <button
-                onClick={() => {
-                  setIsActionLoading(true);
-                  handleActionSelect(
-                    plans.findIndex((p) => p.plId === selectedPlan?.plId),
-                    "Delete"
-                  );
-                }}
-                disabled={
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Delete") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  !selectedPlan ||
-                  !getButtonAvailability(selectedPlan, "Delete") ||
-                  !getMasterAndRelatedProjects(plans, selectedPlan?.projId)
-                    .sameLevelBud
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
-                }`}
-                title="Delete Selected Plan"
-              >
-                Delete
-              </button>
+        <button
+          onClick={() => {
+            setIsActionLoading(true);
+            handleActionSelect(
+              plans.findIndex((p) => p.plId === selectedPlan?.plId),
+              "Delete"
+            );
+          }}
+          disabled={
+            !selectedPlan ||
+            selectedPlan.isApproved ||
+            !getButtonAvailability(selectedPlan, "Delete") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+          }
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            !selectedPlan ||
+            selectedPlan.isApproved ||
+            !getButtonAvailability(selectedPlan, "Delete") ||
+            !getMasterAndRelatedProjects(plans, selectedPlan?.projId).sameLevelBud
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-red-600 text-white hover:bg-red-700 cursor-pointer"
+          }`}
+          title="Delete Selected Plan"
+        >
+          Delete
+        </button>
 
-              <button
-                onClick={() => handleTopButtonToggle("isCompleted")}
-                disabled={
-                  getTopButtonDisabled("isCompleted") || isActionLoading
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  getTopButtonDisabled("isCompleted") || isActionLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title={
-                  selectedPlan?.status === "Submitted" ? "Unsubmit" : "Submit"
-                }
-              >
-                {isActionLoading
-                  ? "Processing..."
-                  : selectedPlan?.status === "Submitted"
-                  ? "Unsubmit"
-                  : "Submit"}
-              </button>
+        <button
+          onClick={() => handleTopButtonToggle("isCompleted")}
+          disabled={getTopButtonDisabled("isCompleted") || isActionLoading}
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            getTopButtonDisabled("isCompleted") || isActionLoading
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : selectedPlan?.status === "Submitted"
+              ? "bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title={selectedPlan?.status === "Submitted" ? "Unsubmit" : "Submit"}
+        >
+          {isActionLoading
+            ? "Processing..."
+            : selectedPlan?.status === "Submitted"
+            ? "Unsubmit"
+            : "Submit"}
+        </button>
 
-              <button
-                onClick={() => handleTopButtonToggle("isApproved")}
-                disabled={getTopButtonDisabled("isApproved") || isActionLoading}
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  getTopButtonDisabled("isApproved") || isActionLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title={
-                  selectedPlan?.status === "Approved" ? "Unapprove" : "Approve"
-                }
-              >
-                {isActionLoading
-                  ? "Processing..."
-                  : selectedPlan?.status === "Approved" ||
-                    selectedPlan?.finalVersion
-                  ? "Unapprove"
-                  : "Approve"}
-              </button>
+        <button
+          onClick={() => handleTopButtonToggle("isApproved")}
+          disabled={getTopButtonDisabled("isApproved") || isActionLoading}
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            getTopButtonDisabled("isApproved") || isActionLoading
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : selectedPlan?.status === "Approved" || selectedPlan?.finalVersion
+              ? "bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title={selectedPlan?.status === "Approved" ? "Unapprove" : "Approve"}
+        >
+          {isActionLoading
+            ? "Processing..."
+            : selectedPlan?.status === "Approved" || selectedPlan?.finalVersion
+            ? "Unapprove"
+            : "Approve"}
+        </button>
 
-              <button
-                onClick={() => handleTopButtonToggle("finalVersion")}
-                disabled={
-                  getTopButtonDisabled("finalVersion") || isActionLoading
-                }
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  getTopButtonDisabled("finalVersion") || isActionLoading
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title={selectedPlan?.finalVersion ? "Unconclude" : "Conclude"}
-              >
-                {isActionLoading
-                  ? "Processing..."
-                  : selectedPlan?.finalVersion
-                  ? "Unconclude"
-                  : "Conclude"}
-              </button>
+        <button
+          onClick={() => handleTopButtonToggle("finalVersion")}
+          disabled={getTopButtonDisabled("finalVersion") || isActionLoading}
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            getTopButtonDisabled("finalVersion") || isActionLoading
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : selectedPlan?.finalVersion
+              ? "bg-orange-600 text-white hover:bg-orange-700 cursor-pointer"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title={selectedPlan?.finalVersion ? "Unconclude" : "Conclude"}
+        >
+          {isActionLoading
+            ? "Processing..."
+            : selectedPlan?.finalVersion
+            ? "Unconclude"
+            : "Conclude"}
+        </button>
 
-              <button
-                onClick={() => {
-                  setIsActionLoading(true);
-                  handleCalc();
-                }}
-                disabled={getCalcButtonDisabled()}
-                className={`px-2 py-1 rounded text-xs flex items-center whitespace-nowrap ${
-                  getCalcButtonDisabled()
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
-                }`}
-                title="Calculate"
-              >
-                Calc
-              </button>
+        <button
+          onClick={() => {
+            setIsActionLoading(true);
+            handleCalc();
+          }}
+          disabled={getCalcButtonDisabled()}
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            getCalcButtonDisabled()
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title="Calculate"
+        >
+          Calc
+        </button>
 
-              <button
-                onClick={() => setBudEacFilter(!budEacFilter)}
-                className="bg-blue-600 text-white hover:bg-blue-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap"
-                title="Filter BUD/EAC Plans"
-              >
-                BUD/EAC
-              </button>
+        <button
+          onClick={() => setBudEacFilter(!budEacFilter)}
+          className={`px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 ${
+            budEacFilter
+              ? "bg-gray-300 text-gray-500 cursor-pointer"
+              : "bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+          }`}
+          title={budEacFilter ? "Show All Plans" : "Filter BUD/EAC Plans"}
+        >
+          {budEacFilter ? "Show All" : "BUD/EAC"}
+        </button>
+      </>
+    )}
+  </div>
 
-              {/* <button
-                onClick={() => setShowNewBusinessPopup(true)}
-                className="bg-green-600 text-white hover:bg-green-700 cursor-pointer px-2 py-1 rounded text-xs flex items-center whitespace-nowrap"
-                title="New Business"
-              >
-                New Business
-              </button> */}
-            </>
-          )}
-        </div>
+  {/* Right side controls - Import and Fiscal Year */}
+  <div className="flex items-center gap-1 flex-shrink-0">
+    <button
+      onClick={() => {
+        fileInputRef.current.click();
+      }}
+      className="bg-blue-600 text-white px-1 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer whitespace-nowrap"
+      title="Import Plan"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-3 w-3 mr-0.5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+        />
+      </svg>
+      Import
+    </button>
+    <input
+      type="file"
+      ref={fileInputRef}
+      onChange={(e) => {
+        handleImportPlan(e);
+      }}
+      accept=".xlsx,.xls"
+      className="hidden"
+    />
 
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => {
-              fileInputRef.current.click();
-            }}
-            className="bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 flex items-center text-xs cursor-pointer whitespace-nowrap"
-            title="Import Plan"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 mr-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-              />
-            </svg>
-            Import
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={(e) => {
-              handleImportPlan(e);
-            }}
-            accept=".xlsx,.xls"
-            className="hidden"
-          />
+    <div className="flex items-center gap-1">
+      <label
+        htmlFor="fiscalYear"
+        className="font-semibold text-xs whitespace-nowrap"
+      >
+        Fiscal Year:
+      </label>
+      <select
+        id="fiscalYear"
+        value={fiscalYear}
+        onChange={(e) => setFiscalYear(e.target.value)}
+        className="border border-gray-300 rounded px-1 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+        disabled={fiscalYearOptions?.length === 0}
+      >
+        {fiscalYearOptions?.map((year) => (
+          <option key={year} value={year}>
+            {year}
+          </option>
+        ))}
+      </select>
+    </div>
+  </div>
+</div>
 
-          <div className="flex items-center gap-2">
-            <label
-              htmlFor="fiscalYear"
-              className="font-semibold text-xs sm:text-sm whitespace-nowrap"
-            >
-              Fiscal Year:
-            </label>
-            <select
-              id="fiscalYear"
-              value={fiscalYear}
-              onChange={(e) => setFiscalYear(e.target.value)}
-              className="border border-gray-300 rounded px-2 py-1 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={fiscalYearOptions?.length === 0}
-            >
-              {fiscalYearOptions?.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+
 
       {filteredPlans.length === 0 ? (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
@@ -12238,50 +12266,97 @@ return (
                         ) : col === "createdAt" || col === "updatedAt" ? (
                           formatDateWithTime(plan[col])
                         ) : col === "versionCode" ? (
-                          <input
-                            type="text"
-                            value={
-                              editingVersionCodeIdx === idx
-                                ? editingVersionCodeValue
-                                : plan.versionCode || ""
-                            }
-                            autoFocus={editingVersionCodeIdx === idx}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingVersionCodeIdx(idx);
-                              setEditingVersionCodeValue(plan.versionCode || "");
-                            }}
-                            onChange={(e) =>
-                              setEditingVersionCodeValue(e.target.value)
-                            }
-                            onBlur={() => {
-                              if (editingVersionCodeIdx === idx) {
-                                handleVersionCodeChange(
-                                  idx,
-                                  editingVersionCodeValue
-                                );
-                                setEditingVersionCodeIdx(null);
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                handleVersionCodeChange(
-                                  idx,
-                                  editingVersionCodeValue
-                                );
-                                setEditingVersionCodeIdx(null);
-                              } else if (e.key === "Escape") {
-                                setEditingVersionCodeIdx(null);
-                              }
-                            }}
-                            className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
-                              !plan.plType || !plan.version
-                                ? "bg-gray-100 cursor-not-allowed"
-                                : "bg-white"
-                            }`}
-                            style={{ minWidth: 60, maxWidth: 120 }}
-                            disabled={!plan.plType || !plan.version}
-                          />
+                        //   <input
+                        //     type="text"
+                        //     value={
+                        //       editingVersionCodeIdx === idx
+                        //         ? editingVersionCodeValue
+                        //         : plan.versionCode || ""
+                        //     }
+                        //     autoFocus={editingVersionCodeIdx === idx}
+                        //     onClick={(e) => {
+                        //       e.stopPropagation();
+                        //       setEditingVersionCodeIdx(idx);
+                        //       setEditingVersionCodeValue(plan.versionCode || "");
+                        //     }}
+                        //     onChange={(e) =>
+                        //       setEditingVersionCodeValue(e.target.value)
+                        //     }
+                        //     onBlur={() => {
+                        //       if (editingVersionCodeIdx === idx) {
+                        //         handleVersionCodeChange(
+                        //           idx,
+                        //           editingVersionCodeValue
+                        //         );
+                        //         setEditingVersionCodeIdx(null);
+                        //       }
+                        //     }}
+                        //     onKeyDown={(e) => {
+                        //       if (e.key === "Enter") {
+                        //         handleVersionCodeChange(
+                        //           idx,
+                        //           editingVersionCodeValue
+                        //         );
+                        //         setEditingVersionCodeIdx(null);
+                        //       } else if (e.key === "Escape") {
+                        //         setEditingVersionCodeIdx(null);
+                        //       }
+                        //     }}
+                        //     className={`border border-gray-300 rounded px-2 py-1 w-24 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+                        //       !plan.plType || !plan.version
+                        //         ? "bg-gray-100 cursor-not-allowed"
+                        //         : "bg-white"
+                        //     }`}
+                        //     style={{ minWidth: 60, maxWidth: 120 }}
+                        //     disabled={!plan.plType || !plan.version}
+                        //   />
+                        // In the table cell for versionCode
+<input
+  type="text"
+  value={
+    editingVersionCodeIdx === idx
+      ? editingVersionCodeValue
+      : plan.versionCode || ""
+  }
+  autoFocus={editingVersionCodeIdx === idx}
+  onClick={(e) => {
+    e.stopPropagation();
+    setEditingVersionCodeIdx(idx);
+    setEditingVersionCodeValue(plan.versionCode || "");
+  }}
+  onChange={(e) =>
+    setEditingVersionCodeValue(e.target.value)
+  }
+  onBlur={() => {
+    if (editingVersionCodeIdx === idx) {
+      // Only call API if value actually changed
+      if (editingVersionCodeValue !== plan.versionCode) {
+        handleVersionCodeChange(idx, editingVersionCodeValue);
+      }
+      setEditingVersionCodeIdx(null);
+    }
+  }}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      // Only call API if value actually changed
+      if (editingVersionCodeValue !== plan.versionCode) {
+        handleVersionCodeChange(idx, editingVersionCodeValue);
+      }
+      setEditingVersionCodeIdx(null);
+    } else if (e.key === "Escape") {
+      setEditingVersionCodeIdx(null);
+      setEditingVersionCodeValue(plan.versionCode || ""); // Reset to original value
+    }
+  }}
+  className={`border border-gray-300 rounded px-2 py-1 w-20 text-xs hover:border-blue-500 focus:border-blue-500 focus:outline-none ${
+    !plan.plType || !plan.version
+      ? "bg-gray-100 cursor-not-allowed"
+      : "bg-white"
+  }`}
+  style={{ minWidth: 50, maxWidth: 100 }}
+  disabled={!plan.plType || !plan.version}
+/>
+
                         ) : typeof plan[col] === "boolean" ? (
                           <input
                             type="checkbox"
