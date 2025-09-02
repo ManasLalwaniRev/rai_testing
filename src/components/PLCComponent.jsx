@@ -3469,7 +3469,8 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
 
       // ✅ ALWAYS generate unique IDs, store original for API calls
     const uniqueData = filteredData.map((item, index) => {
-      const uniqueId = `plc-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      // const uniqueId = `plc-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      const uniqueId = `plc-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
       return { 
         ...item, 
         id: uniqueId,
@@ -3657,7 +3658,8 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
 
       // ✅ Always generate unique IDs
     const uniqueData = filteredData.map((item, index) => {
-      const uniqueId = `emp-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      // const uniqueId = `emp-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      const uniqueId = `emp-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
       return { 
         ...item, 
         id: uniqueId,
@@ -3987,7 +3989,8 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
 
     // ✅ ALWAYS generate unique IDs
     const uniqueData = filteredData.map((item, index) => {
-      const uniqueId = `vendor-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      // const uniqueId = `vendor-${Date.now()}-${index}-${uuidv4().substring(0, 8)}`;
+      const uniqueId = `vendor-${Date.now()}-${Math.random()}-${index}-${uuidv4()}`;
       return { 
         ...item, 
         id: uniqueId,

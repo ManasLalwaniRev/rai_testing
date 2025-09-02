@@ -20641,6 +20641,7 @@ const ProjectHoursDetails = ({
 
   const isEditable = status === "In Progress";
   const isBudPlan = planType === "BUD";
+  const isFieldEditable = planType === "BUD" || planType === "EAC"; // Add this line
 
   // Clear all fields when ID type changes
   useEffect(() => {
@@ -23657,7 +23658,8 @@ const handleRowClick = (actualEmpIdx) => {
                           }`}
                           list="account-list"
                           placeholder="Enter Account"
-                          disabled={!isBudPlan}
+                        //   disabled={!isBudPlan}
+                        disabled={!isFieldEditable} 
                         />
                         <datalist id="account-list">
                           {laborAccounts.map((account, index) => (
@@ -23696,7 +23698,8 @@ const handleRowClick = (actualEmpIdx) => {
     }`}
     list="organization-list"
     placeholder="Enter Organization ID (numeric)"
-    disabled={!isBudPlan}
+    // disabled={!isBudPlan}
+    disabled={!isFieldEditable}
   />
   <datalist id="organization-list">
     {organizationOptions.map((org, index) => (
@@ -23771,15 +23774,24 @@ const handleRowClick = (actualEmpIdx) => {
                           type="checkbox"
                           name="isRev"
                           checked={newEntry.isRev}
-                          onChange={(e) =>
-                            isBudPlan &&
-                            setNewEntry({
-                              ...newEntry,
-                              isRev: e.target.checked,
-                            })
-                          }
-                          className="w-4 h-4"
-                          disabled={!isBudPlan}
+                        //   onChange={(e) =>
+                        //     isBudPlan &&
+                        //     setNewEntry({
+                        //       ...newEntry,
+                        //       isRev: e.target.checked,
+                        //     })
+                        //   }
+                        // CHANGE TO:
+onChange={(e) =>
+  isFieldEditable &&
+  setNewEntry({
+    ...newEntry,
+    isRev: e.target.checked,
+  })
+}
+disabled={!isFieldEditable}
+                       
+
                         />
                       </td>
                       <td className="border border-gray-300 px-1.5 py-0.5 text-center">
@@ -23787,15 +23799,24 @@ const handleRowClick = (actualEmpIdx) => {
                           type="checkbox"
                           name="isBrd"
                           checked={newEntry.isBrd}
-                          onChange={(e) =>
-                            isBudPlan &&
-                            setNewEntry({
-                              ...newEntry,
-                              isBrd: e.target.checked,
-                            })
-                          }
-                          className="w-4 h-4"
-                          disabled={!isBudPlan}
+                        //   onChange={(e) =>
+                        //     isBudPlan &&
+                        //     setNewEntry({
+                        //       ...newEntry,
+                        //       isBrd: e.target.checked,
+                        //     })
+                        //   }
+                        //   className="w-4 h-4"
+                        //   disabled={!isBudPlan}
+                        // CHANGE TO:
+onChange={(e) =>
+  isFieldEditable &&
+  setNewEntry({
+    ...newEntry,
+    isBrd: e.target.checked,
+  })
+}
+disabled={!isFieldEditable}
                         />
                       </td>
                       <td className="border border-gray-300 px-1.5 py-0.5">
@@ -23815,21 +23836,33 @@ const handleRowClick = (actualEmpIdx) => {
                           type="text"
                           name="perHourRate"
                           value={newEntry.perHourRate}
-                          onChange={(e) =>
-                            isBudPlan &&
-                            setNewEntry({
-                              ...newEntry,
-                              perHourRate: e.target.value.replace(
-                                /[^0-9.]/g,
-                                ""
-                              ),
-                            })
-                          }
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
-                          }`}
-                          placeholder="Enter Hour Rate"
-                          disabled={!isBudPlan}
+                        //   onChange={(e) =>
+                        //     isBudPlan &&
+                        //     setNewEntry({
+                        //       ...newEntry,
+                        //       perHourRate: e.target.value.replace(
+                        //         /[^0-9.]/g,
+                        //         ""
+                        //       ),
+                        //     })
+                        //   }
+                        //   className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                        //     !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+                        //   }`}
+                        //   placeholder="Enter Hour Rate"
+                        //   disabled={!isBudPlan}
+                        // CHANGE TO:
+onChange={(e) =>
+  isFieldEditable &&
+  setNewEntry({
+    ...newEntry,
+    perHourRate: e.target.value.replace(/[^0-9.]/g, ""),
+  })
+}
+className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+  !isFieldEditable ? "bg-gray-100 cursor-not-allowed" : ""
+}`}
+disabled={!isFieldEditable}
                         />
                       </td>
                       <td className="border border-gray-300 px-1.5 py-0.5">
