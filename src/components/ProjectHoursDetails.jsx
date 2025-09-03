@@ -22519,7 +22519,18 @@ const handleOrgBlur = (val) => {
         emp.emple.accId ||
         (laborAccounts.length > 0 ? laborAccounts[0].id : "-"),
       orgId: emp.emple.orgId || "-",
-      glcPlc: emp.emple.plcGlcCode || "-",
+    //   glcPlc: emp.emple.plcGlcCode || "-",
+    glcPlc: (() => {
+  const plcCode = emp.emple.plcGlcCode || "";
+  if (!plcCode) return "-";
+  
+  // Try to find the full description from available PLC options
+  const plcOption = plcOptions.find(option => option.value === plcCode) || 
+                   updatePlcOptions.find(option => option.value === plcCode);
+  
+  return plcOption ? plcOption.label : plcCode; // Show full description if found, otherwise just code
+})(),
+
       isRev: emp.emple.isRev ? (
         <span className="text-green-600 font-sm text-lg">✓</span>
       ) : (
