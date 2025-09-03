@@ -20934,6 +20934,82 @@ useEffect(() => {
 }, [showNewForm]);
 
 // Add this useEffect to initialize update options when employees are loaded
+// useEffect(() => {
+//   const initializeUpdateOptions = async () => {
+//     if (localEmployees.length === 0) return;
+    
+//     try {
+//       // Load organizations for updates
+//       const orgResponse = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//       );
+//       const orgOptions = Array.isArray(orgResponse.data)
+//         ? orgResponse.data.map((org) => ({
+//             value: org.orgId,
+//             label: org.orgId,
+//           }))
+//         : [];
+      
+//       // Load PLC options from project data for updates
+//       if (projectId) {
+//         try {
+//           const response = await axios.get(
+//             `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//           );
+//           const data = Array.isArray(response.data) ? response.data[0] : response.data;
+          
+//           let plcOptionsForUpdate = [];
+//           if (data.plc && Array.isArray(data.plc)) {
+//             plcOptionsForUpdate = data.plc.map(plc => ({
+//               value: plc.laborCategoryCode,
+//               label: `${plc.laborCategoryCode} - ${plc.description}`,
+//             }));
+//           }
+          
+//           // Load account options for updates
+//           let accountsForUpdate = [];
+//           if (data.employeeLaborAccounts && Array.isArray(data.employeeLaborAccounts)) {
+//             accountsForUpdate = data.employeeLaborAccounts.map(account => ({ id: account.accountId }));
+//           }
+//           if (data.sunContractorLaborAccounts && Array.isArray(data.sunContractorLaborAccounts)) {
+//             const vendorAccounts = data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }));
+//             accountsForUpdate = [...accountsForUpdate, ...vendorAccounts];
+//           }
+          
+//           // Remove duplicates from accounts
+//           const uniqueAccountsMap = new Map();
+//           accountsForUpdate.forEach(acc => {
+//             if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//               uniqueAccountsMap.set(acc.id, acc);
+//             }
+//           });
+//           const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+          
+//           // Initialize all update options
+//           setUpdateAccountOptions(uniqueAccounts);
+//           setUpdateOrganizationOptions(orgOptions);
+//           setUpdatePlcOptions(plcOptionsForUpdate);
+//         } catch (err) {
+//           console.error("Failed to load project data for updates:", err);
+//           setUpdateAccountOptions(laborAccounts);
+//           setUpdateOrganizationOptions(orgOptions);
+//           setUpdatePlcOptions(plcOptions);
+//         }
+//       } else {
+//         // Fallback to existing options
+//         setUpdateAccountOptions(laborAccounts);
+//         setUpdateOrganizationOptions(orgOptions);
+//         setUpdatePlcOptions(plcOptions);
+//       }
+      
+//     } catch (err) {
+//       console.error("Failed to initialize update options:", err);
+//     }
+//   };
+  
+//   initializeUpdateOptions();
+// }, [localEmployees.length, projectId,  plcOptions]); // Add projectId as dependency
+
 useEffect(() => {
   const initializeUpdateOptions = async () => {
     if (localEmployees.length === 0) return;
@@ -20988,18 +21064,25 @@ useEffect(() => {
           // Initialize all update options
           setUpdateAccountOptions(uniqueAccounts);
           setUpdateOrganizationOptions(orgOptions);
-          setUpdatePlcOptions(plcOptionsForUpdate);
+          setUpdatePlcOptions(plcOptionsForUpdate); // Make sure this is set properly
+          
+          // ALSO update the main plcOptions if they're empty
+          if (plcOptions.length === 0) {
+            setPlcOptions(plcOptionsForUpdate);
+            setFilteredPlcOptions(plcOptionsForUpdate);
+          }
         } catch (err) {
           console.error("Failed to load project data for updates:", err);
+          // Fallback to existing options
           setUpdateAccountOptions(laborAccounts);
           setUpdateOrganizationOptions(orgOptions);
-          setUpdatePlcOptions(plcOptions);
+          setUpdatePlcOptions(plcOptions.length > 0 ? plcOptions : []);
         }
       } else {
         // Fallback to existing options
         setUpdateAccountOptions(laborAccounts);
         setUpdateOrganizationOptions(orgOptions);
-        setUpdatePlcOptions(plcOptions);
+        setUpdatePlcOptions(plcOptions.length > 0 ? plcOptions : []);
       }
       
     } catch (err) {
@@ -21008,7 +21091,8 @@ useEffect(() => {
   };
   
   initializeUpdateOptions();
-}, [localEmployees.length, projectId,  plcOptions]); // Add projectId as dependency
+}, [localEmployees.length, projectId]); // Remove plcOptions from dependencies to avoid circular updates
+
 
 
 // useEffect(() => {
@@ -24273,7 +24357,7 @@ disabled={!isFieldEditable}
     ))}
   </datalist>
 </td> */}
-<td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+{/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
   {isBudPlan && isEditable ? (
     <input
       type="text"
@@ -24313,7 +24397,51 @@ disabled={!isFieldEditable}
       </option>
     ))}
   </datalist>
+</td> */}
+
+<td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+  {isBudPlan && isEditable ? (
+    <input
+      type="text"
+      value={
+        editedData.glcPlc !== undefined
+          ? editedData.glcPlc
+          : row.glcPlc
+      }
+      onChange={(e) => handlePlcInputChangeForUpdate(e.target.value, actualEmpIdx)}
+      onBlur={(e) => {
+        const val = e.target.value;
+        const originalValue = row.glcPlc;
+        
+        // Only validate if the value has actually changed
+        if (val !== originalValue && val && !isValidPlcForUpdate(val, updatePlcOptions)) {
+          toast.error("Please enter a valid PLC from the available list.", {
+            autoClose: 3000,
+          });
+        } else {
+          handleEmployeeDataBlur(actualEmpIdx, emp);
+        }
+      }}
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+      list={`plc-list-${actualEmpIdx}`}
+      placeholder="Enter PLC"
+    />
+  ) : (
+    row.glcPlc
+  )}
+  <datalist id={`plc-list-${actualEmpIdx}`}>
+    {/* Use updatePlcOptions if available, otherwise fallback to plcOptions */}
+    {(updatePlcOptions.length > 0 ? updatePlcOptions : plcOptions).map((plc, index) => (
+      <option
+        key={`${plc.value}-${index}`}
+        value={plc.value}
+      >
+        {plc.label}
+      </option>
+    ))}
+  </datalist>
 </td>
+
 
 
 
