@@ -424,29 +424,65 @@ const RevenueSetupComponent = ({ selectedPlan, revenueAccount }) => {
   };
 
   // Function to handle fee rate validation
-  const handleFeeRateChange = (value, setter) => {
-    // Allow empty string or valid numbers
+  // const handleFeeRateChange = (value, setter) => {
+  //   // Allow empty string or valid numbers
+  //   if (value === "") {
+  //     setter("");
+  //     return;
+  //   }
+
+  //   // Parse the value as float
+  //   const numValue = parseFloat(value);
+    
+  //   // Check if it's a valid number and within 0-100 range
+  //   if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
+  //     setter(value);
+  //   } else if (!isNaN(numValue) && numValue > 100) {
+  //     // If value exceeds 100, show toast notification and don't update
+  //     toast.warning("Fee Rate % cannot exceed 100%", {
+  //       toastId: "fee-rate-limit-warning",
+  //       autoClose: 3000,
+  //     });
+  //     // Don't update the state, keep the previous valid value
+  //   }
+  //   // If invalid number or negative, don't update the state (ignore the input)
+  // };
+
+   const handleFeeRateChange = (value, setter) => {
+    // Allow empty string
     if (value === "") {
       setter("");
       return;
     }
-
-    // Parse the value as float
+ 
+    // 🚫 Block negatives, plus signs, or stray characters like "-"
+    if (/[^\d.]/.test(value)) {
+      return; // reject if contains anything except digits or dot
+    }
+ 
+    // 🚫 Prevent multiple dots
+    if ((value.match(/\./g) || []).length > 1) {
+      return;
+    }
+ 
+    // 🚫 Prevent leading zeros like "00" unless it's "0.something"
+    if (/^0\d/.test(value)) {
+      return;
+    }
+ 
+    // Now safe to parse
     const numValue = parseFloat(value);
-    
-    // Check if it's a valid number and within 0-100 range
+ 
     if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
-      setter(value);
+      setter(value); // ✅ valid
     } else if (!isNaN(numValue) && numValue > 100) {
-      // If value exceeds 100, show toast notification and don't update
       toast.warning("Fee Rate % cannot exceed 100%", {
         toastId: "fee-rate-limit-warning",
         autoClose: 3000,
       });
-      // Don't update the state, keep the previous valid value
     }
-    // If invalid number or negative, don't update the state (ignore the input)
   };
+ 
 
   useEffect(() => {
     setRevenueAccountState(revenueAccount || "");
@@ -727,7 +763,7 @@ const RevenueSetupComponent = ({ selectedPlan, revenueAccount }) => {
               </td>
               <td className="border p-2">
                 <input
-                  type="number"
+                  type="string"
                   step="any"
                   min="0"
                   max="100"
@@ -782,7 +818,7 @@ const RevenueSetupComponent = ({ selectedPlan, revenueAccount }) => {
               </td>
               <td className="border p-2">
                 <input
-                  type="number"
+                  type="string"
                   step="any"
                   min="0"
                   max="100"

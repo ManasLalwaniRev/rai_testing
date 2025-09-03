@@ -23323,12 +23323,47 @@ const handleRowClick = (actualEmpIdx) => {
           )}
           {isEditable && (
             <>
-              <button
+              {/* <button
                 onClick={() => setShowNewForm((prev) => !prev)}
                 className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
               >
                 {showNewForm ? "Cancel" : "New"}
-              </button>
+              </button> */}
+              <button
+  onClick={() => {
+    if (showNewForm) {
+      // Reset all form fields when canceling
+      setNewEntry({
+        id: "",
+        firstName: "",
+        lastName: "",
+        isRev: false,
+        isBrd: false,
+        idType: "",
+        acctId: "",
+        orgId: "",
+        plcGlcCode: "",
+        perHourRate: "",
+        status: "Act",
+      });
+      setNewEntryPeriodHours({});
+      setEmployeeSuggestions([]);
+      setLaborAccounts([]);
+      setPlcOptions([]);
+      setFilteredPlcOptions([]);
+      setPlcSearch("");
+      setOrgSearch("");
+      setAutoPopulatedPLC(false);
+      setShowNewForm(false);
+    } else {
+      setShowNewForm(true);
+    }
+  }}
+  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+>
+  {showNewForm ? "Cancel" : "New"}
+</button>
+
               {!showNewForm && (
                 <>
                 <button
@@ -23654,7 +23689,7 @@ const handleRowClick = (actualEmpIdx) => {
                           onChange={(e) => handleAccountChange(e.target.value)}
                           onBlur={(e) => handleAccountBlur(e.target.value)}
                           className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+                            !isFieldEditable ? "bg-gray-100 cursor-not-allowed" : ""
                           }`}
                           list="account-list"
                           placeholder="Enter Account"
@@ -23694,7 +23729,7 @@ const handleRowClick = (actualEmpIdx) => {
     onChange={(e) => handleOrgInputChange(e.target.value)}
     onBlur={(e) => handleOrgBlur(e.target.value)}
     className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-      !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+      !isFieldEditable ? "bg-gray-100 cursor-not-allowed" : ""
     }`}
     list="organization-list"
     placeholder="Enter Organization ID (numeric)"

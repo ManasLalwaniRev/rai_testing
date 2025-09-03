@@ -5581,7 +5581,7 @@ const EMPLOYEE_COLUMNS = [
 ];
 
 const ID_TYPE_OPTIONS = [
-  { value: "", label: "None" },
+  { value: "", label: "Select ID Type" },
   { value: "Employee", label: "Employee" },
   { value: "Vendor", label: "Vendor" },
   { value: "Vendor Employee", label: "Vendor Employee" },
@@ -8299,12 +8299,43 @@ const handleSaveNewEntry = async () => {
     )}
     {isEditable && (
       <>
-        <button
+        {/* <button
           onClick={() => setShowNewForm((prev) => !prev)}
           className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
         >
           {showNewForm ? "Cancel" : "New"}
-        </button>
+        </button> */}
+        <button
+  onClick={() => {
+    if (showNewForm) {
+      // Cancel: clear form and hide
+      setShowNewForm(false);
+      setNewEntry({
+        id: "",
+        firstName: "",
+        lastName: "",
+        isRev: false,
+        isBrd: false,
+        idType: "",
+        acctId: "",
+        orgId: "",
+        perHourRate: "",
+        status: "Act",
+      });
+      setNewEntryPeriodAmounts({});
+      setEmployeeSuggestions([]);
+      setEmployeeNonLaborAccounts([]);
+      setSubContractorNonLaborAccounts([]);
+    } else {
+      // Show new form
+      setShowNewForm(true);
+    }
+  }}
+  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-xs font-medium"
+>
+  {showNewForm ? "Cancel" : "New"}
+</button>
+
         {!showNewForm && (
           <>
             <button
