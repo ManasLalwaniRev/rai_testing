@@ -1435,7 +1435,8 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
       useFixedRevenue: useFixedRevenue,
       overrideSystemAdjustment: overrideAdjustments,
       revAmt: parseFloat(period.revAmt) || 0,
-      revAdj: period.revAdj || "",
+      // revAdj: period.revAdj || "",
+      revAdj: parseFloat((period.revAdj || "").toString().replace(/,/g, "")) || 0,
       fiscalYear: period.fiscalYear || "",
     };
 

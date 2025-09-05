@@ -93,8 +93,15 @@ const PoolRate = ({ userName = 'User' }) => {
       try {
         const poolsResponse = await axios.get(`https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByTemplateId?templateId=${selectedTemplate}`);
         console.log('Pools API Response:', poolsResponse.data);
-        const poolList = poolsResponse.data || [];
-        setPools(poolList);
+        // const poolList = poolsResponse.data || [];
+        const rawPoolList = poolsResponse.data || [];
+
+       // Filter out specific poolIds that shouldn't show on UI
+       const poolList = rawPoolList.filter(pool => 
+                        !['FRINGEONGNA', 'OVERHEADONGNA', 'FRINGEONOVERHEAD'].includes(pool.poolId)
+                        );
+       
+       setPools(poolList);
 
         if (poolList.length === 0) {
           setError('No pools found for the selected template.');

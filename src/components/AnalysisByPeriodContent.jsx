@@ -6315,19 +6315,70 @@ const AnalysisByPeriodContent = ({
   };
  
  
-  const expandAll = () => {
-    // Expand all staff rows
+  // const expandAll = () => {
+  //   // Expand all staff rows
+  //   const staffRowsToExpand = financialData
+  //     .filter(
+  //       (row) =>
+  //         row.type === "expandable" && row.id.startsWith("total-staff-cost")
+  //     )
+  //     .map((row) => row.id);
+  //   setExpandedStaffRows((prev) => [
+  //     ...new Set([...prev, ...staffRowsToExpand]),
+  //   ]);
+ 
+  //   // Expand all employee details
+  //   const employeeDetailsToExpand = [];
+  //   financialData.forEach((row) => {
+  //     if (
+  //       row.type === "expandable" &&
+  //       row.id.startsWith("total-staff-cost") &&
+  //       row.employees
+  //     ) {
+  //       row.employees.forEach((employee) =>
+  //         employeeDetailsToExpand.push(`${row.id}-${employee.id}`)
+  //       );
+  //     }
+  //   });
+  //   setExpandedEmployeeDetails((prev) => [
+  //     ...new Set([...prev, ...employeeDetailsToExpand]),
+  //   ]);
+ 
+  //   // Expand all non-labor account rows
+  //   const nonLaborAcctRowsToExpand = [];
+  //   financialData.forEach((row) => {
+  //     if (
+  //       row.type === "expandable" &&
+  //       row.id.startsWith("non-labor-staff-cost") &&
+  //       row.nonLaborAccts
+  //     ) {
+  //       row.nonLaborAccts.forEach((acct) =>
+  //         nonLaborAcctRowsToExpand.push(`${row.id}-${acct.id}`)
+  //       );
+  //     }
+  //   });
+  //   setExpandedNonLaborAcctRows((prev) => [
+  //     ...new Set([...prev, ...nonLaborAcctRowsToExpand]),
+  //   ]);
+  // };
+ 
+  // const collapseAll = () => {
+  //   setExpandedStaffRows([]);
+  //   setExpandedEmployeeDetails([]);
+  //   setExpandedNonLaborAcctRows([]);
+  // };
+ 
+   const expandAll = () => {
+    // ✅ Expand all staff rows (parents)
     const staffRowsToExpand = financialData
       .filter(
         (row) =>
           row.type === "expandable" && row.id.startsWith("total-staff-cost")
       )
       .map((row) => row.id);
-    setExpandedStaffRows((prev) => [
-      ...new Set([...prev, ...staffRowsToExpand]),
-    ]);
+    setExpandedStaffRows(staffRowsToExpand);
  
-    // Expand all employee details
+    // ✅ Expand all employee details (children under staff)
     const employeeDetailsToExpand = [];
     financialData.forEach((row) => {
       if (
@@ -6340,11 +6391,19 @@ const AnalysisByPeriodContent = ({
         );
       }
     });
-    setExpandedEmployeeDetails((prev) => [
-      ...new Set([...prev, ...employeeDetailsToExpand]),
-    ]);
+    setExpandedEmployeeDetails(employeeDetailsToExpand);
  
-    // Expand all non-labor account rows
+    // ✅ Expand all non-labor parent rows (FIXED typo + separate state)
+    const nonLaborParentRowsToExpand = financialData
+      .filter(
+        (row) =>
+          row.type === "expandable" && row.id.startsWith("non-labor-staff-cost") // 🔥 FIXED typo
+      )
+      .map((row) => row.id);
+ 
+    setExpandedNonLaborAcctRows(nonLaborParentRowsToExpand); // 🔥 now expands parents
+ 
+    // ✅ Expand all non-labor child account rows
     const nonLaborAcctRowsToExpand = [];
     financialData.forEach((row) => {
       if (
@@ -6358,14 +6417,18 @@ const AnalysisByPeriodContent = ({
       }
     });
     setExpandedNonLaborAcctRows((prev) => [
-      ...new Set([...prev, ...nonLaborAcctRowsToExpand]),
-    ]);
+      ...new Set([
+        ...prev,
+        ...nonLaborParentRowsToExpand,
+        ...nonLaborAcctRowsToExpand,
+      ]),
+    ]); //  merge parent + children
   };
  
   const collapseAll = () => {
     setExpandedStaffRows([]);
     setExpandedEmployeeDetails([]);
-    setExpandedNonLaborAcctRows([]);
+    setExpandedNonLaborAcctRows([]); // clears both parent + child IDs
   };
  
 
@@ -6721,7 +6784,7 @@ const AnalysisByPeriodContent = ({
                                 <td className="py-2 pl-8 pr-4 whitespace-nowrap sticky left-0 z-10 bg-inherit flex items-center text-gray-800">
                                   <span className="mr-2">
                                     {expandedNonLaborAcctRows.includes(
-                                      `${acctGroup.id}`
+                                       `${row.id}-${acctGroup.id}` 
                                     ) ? (
                                       <ChevronUpIcon className="h-5 w-5 text-gray-600 group-hover:text-gray-900" />
                                     ) : (
