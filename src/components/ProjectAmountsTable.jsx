@@ -11482,9 +11482,17 @@ const handleSaveNewEntry = async () => {
   setIsLoading(true);
 
   const payloadForecasts = durations.map((duration) => ({
-    forecastedamt:
-      Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) ||
-      0,
+    // forecastedamt:
+    //   Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) ||
+    //   0,
+    ...(planType === "EAC" 
+    ? { 
+        actualamt: Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) || 0 
+      } 
+    : { 
+        forecastedamt: Number(newEntryPeriodAmounts[`${duration.monthNo}_${duration.year}`]) || 0 
+      }
+  ),
     forecastid: 0,
     projId: projectId,
     plId: planId,
