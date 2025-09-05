@@ -1700,7 +1700,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
                           disabled={isRevAdjDisabled}
                         />
                       </td> */}
-                      <td className="border p-2">
+                      {/* <td className="border p-2">
                         <input
                           type="text"
                           className={`w-full p-1 border rounded text-sm font-normal ${
@@ -1721,7 +1721,46 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
                           onBlur={() => !isNewRow && handleRevAdjBlur(index)}
                           disabled={isRevAdjDisabled}
                         />
+                      </td> */}
+
+                      <td className="border p-2">
+                        <input
+                          type="text"
+                          className={`w-full p-1 border rounded text-sm font-normal ${
+                            isRevAdjDisabled ? "bg-gray-200" : "bg-white"
+                          }`}
+                          value={period.revAdj ?? ""}
+                          onChange={(e) => {
+                            let raw = e.target.value.replace(/,/g, ""); // remove commas
+                            if (raw === "") {
+                              handleInputChange(index, "revAdj", "");
+                              return;
+                            }
+ 
+                            // ✅ allow integers & decimals (like 4.5, 1234.56)
+                            if (!/^\d*\.?\d*$/.test(raw)) return;
+ 
+                            // split integer and decimal part
+                            const [intPart, decimalPart] = raw.split(".");
+ 
+                            // format integer part with commas
+                            const formattedInt = intPart
+                              ? Number(intPart).toLocaleString("en-US")
+                              : "";
+ 
+                            // rebuild with decimal part if exists
+                            const formatted =
+                              decimalPart !== undefined
+                                ? `${formattedInt}.${decimalPart}`
+                                : formattedInt;
+ 
+                            handleInputChange(index, "revAdj", formatted);
+                          }}
+                          onBlur={() => !isNewRow && handleRevAdjBlur(index)}
+                          disabled={isRevAdjDisabled}
+                        />
                       </td>
+ 
 
                       <td className="border p-2">
                         <input

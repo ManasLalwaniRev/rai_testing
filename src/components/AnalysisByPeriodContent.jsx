@@ -5683,7 +5683,7 @@ const AnalysisByPeriodContent = ({
               // 🔥 Changed from emplId → compositeKey
               id: compositeKey,
               // 🔥 Changed: display emplId + plcCode for clarity
-              name: `${empSummary.name} (${empSummary.plcCode})`,
+              name: `${empSummary.name} (${empSummary.emplId}) (${empSummary.plcCode})`,
               cost: 0,
               accountId: empSummary.accID || "",
               orgId: empSummary.orgId || "",
@@ -6308,8 +6308,83 @@ const AnalysisByPeriodContent = ({
     );
   }
 
+  const toggleRow = (id) => {
+    setExpandedRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
+  };
+ 
+ 
+  const expandAll = () => {
+    // Expand all staff rows
+    const staffRowsToExpand = financialData
+      .filter(
+        (row) =>
+          row.type === "expandable" && row.id.startsWith("total-staff-cost")
+      )
+      .map((row) => row.id);
+    setExpandedStaffRows((prev) => [
+      ...new Set([...prev, ...staffRowsToExpand]),
+    ]);
+ 
+    // Expand all employee details
+    const employeeDetailsToExpand = [];
+    financialData.forEach((row) => {
+      if (
+        row.type === "expandable" &&
+        row.id.startsWith("total-staff-cost") &&
+        row.employees
+      ) {
+        row.employees.forEach((employee) =>
+          employeeDetailsToExpand.push(`${row.id}-${employee.id}`)
+        );
+      }
+    });
+    setExpandedEmployeeDetails((prev) => [
+      ...new Set([...prev, ...employeeDetailsToExpand]),
+    ]);
+ 
+    // Expand all non-labor account rows
+    const nonLaborAcctRowsToExpand = [];
+    financialData.forEach((row) => {
+      if (
+        row.type === "expandable" &&
+        row.id.startsWith("non-labor-staff-cost") &&
+        row.nonLaborAccts
+      ) {
+        row.nonLaborAccts.forEach((acct) =>
+          nonLaborAcctRowsToExpand.push(`${row.id}-${acct.id}`)
+        );
+      }
+    });
+    setExpandedNonLaborAcctRows((prev) => [
+      ...new Set([...prev, ...nonLaborAcctRowsToExpand]),
+    ]);
+  };
+ 
+  const collapseAll = () => {
+    setExpandedStaffRows([]);
+    setExpandedEmployeeDetails([]);
+    setExpandedNonLaborAcctRows([]);
+  };
+ 
+
   return (
     <div className="min-h-full bg-gradient-to-br from-blue-200 via-blue-100 to-indigo-50 p-8 text-gray-800 font-inter">
+
+      <button
+        onClick={expandAll}
+        className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 mb-1"
+      >
+        Expand All
+      </button>
+      <button
+        onClick={collapseAll}
+        className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors duration-200 ml-2 mb-1"
+      >
+        Collapse All
+      </button>
+ 
       <div className={`p-6 ${getGlassmorphismClasses()}`}>
         <div className="mb-8 flex flex-wrap justify-center items-center gap-4 hidden"></div>
 
@@ -6332,8 +6407,8 @@ const AnalysisByPeriodContent = ({
                 <th className="py-3 px-4 text-right text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">
                   Hrly Rate
                 </th>
-                <th className="py-3 px-4 text-right text-sm font-semibold text-blue-700 uppercase tracking-wider">
-                  Total
+                <th className="py-3 px-4 text-right text-sm font-semibold text-blue-700 uppercase tracking-wider whitespace-nowrap">
+                  CTD Total
                 </th>
                 {dynamicDateRanges.length > 0 &&
                   dynamicDateRanges.map((range) => {
