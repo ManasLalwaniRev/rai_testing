@@ -888,7 +888,7 @@ const NavigationSidebar = () => {
                   >
                     Project Planning
                   </Link>
-                  {/* <Link
+                  <Link
                     to="/dashboard/new-business"
                     className={`block text-xs text-gray-200 hover:text-white hover:bg-gray-800 px-2 py-1 rounded transition ease-in-out duration-200 ${
                       selectedPage === "/dashboard/new-business" ? "bg-gray-800 underline" : ""
@@ -899,7 +899,7 @@ const NavigationSidebar = () => {
                     }}
                   >
                     New Business
-                  </Link> */}
+                  </Link>
                 </div>
               )}
 

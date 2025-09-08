@@ -10217,14 +10217,15 @@ const ProjectPlanTable = ({
   };
 
   const fetchPlans = async () => {
-    if (!projectId) {
-      setPlans([]);
-      setFilteredPlans([]);
-      setLoading(false);
-      lastFetchedProjectId.current = null;
-      fullProjectId.current = null;
-      return;
-    }
+
+    // if (!projectId) {
+    //   setPlans([]);
+    //   setFilteredPlans([]);
+    //   setLoading(false);
+    //   lastFetchedProjectId.current = null;
+    //   fullProjectId.current = null;
+    //   return;
+    // }
 
     // Prevent unnecessary API calls for the same project
     if (lastFetchedProjectId.current === projectId) {
@@ -10869,7 +10870,8 @@ const handleCheckboxChange = async (idx, field) => {
       } else if (
         action === "Create Budget" ||
         action === "Create Blank Budget" ||
-        action === "Create EAC"
+        action === "Create EAC" ||
+        action === "Create NB BUD"
       ) {
         // Use the full project ID from the ref, fallback to plan.projId if not available
         const actionProjId = fullProjectId.current || plan.projId;
@@ -10878,9 +10880,10 @@ const handleCheckboxChange = async (idx, field) => {
           projId: selectedPlan.projId,
           plId: plan.plId || 0,
           plType:
-            action === "Create Budget" || action === "Create Blank Budget"
-              ? "BUD"
-              : "EAC",
+  action === "Create NB BUD" ? "NBBUD" :
+  (action === "Create Budget" || action === "Create Blank Budget") ? "BUD" : 
+  "EAC",
+
           source: plan.source || "",
           type: isChildProjectId(actionProjId) ? "SYSTEM" : plan.type || "",
           version: plan.version,
@@ -10914,14 +10917,17 @@ const handleCheckboxChange = async (idx, field) => {
         );
         await refreshPlans();
         toast.success(
-          `${
-            action === "Create Budget"
-              ? "Budget"
-              : action === "Create Blank Budget"
-              ? "Blank Budget"
-              : "EAC"
-          } created successfully!`
-        );
+  `${
+    action === "Create Budget"
+      ? "Budget"
+      : action === "Create Blank Budget"
+      ? "Blank Budget"
+      : action === "Create NB BUD"
+      ? "NB BUD"
+      : "EAC"
+  } created successfully!`
+);
+
       } else {
         toast.info(`Action "${action}" selected (API call not implemented)`);
       }
@@ -11902,7 +11908,7 @@ return (
     {/* Your existing content with blur effect when popup is open */}
     <div className={`transition-all duration-200 ${showNewBusinessPopup ? 'blur-sm pointer-events-none' : ''}`}>
       <div className="flex justify-between items-center mb-2 gap-1">
-  <div className="flex gap-0.5 flex-nowrap items-center overflow-x-auto">
+  <div className="flex gap-0.5 flex-wrap items-center ">
     {plans.length > 0 && (
       <>
         <button
@@ -11979,6 +11985,25 @@ return (
         >
           New EAC
         </button>
+
+        {/* new bud */}
+      {selectedPlan && selectedPlan.plType === "NBBUD" && (
+  <button
+    onClick={() => {
+      setIsActionLoading(true);
+      handleActionSelect(
+        plans.findIndex((p) => p.plId === selectedPlan?.plId),
+        "Create NB BUD"
+      );
+    }}
+    className="px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0 bg-blue-600 text-white hover:bg-blue-700 cursor-pointer"
+    title="Create BUD"
+  >
+    CREATE NB BUD
+  </button>
+)}
+
+
 
         <button
           onClick={() => {
@@ -12156,14 +12181,7 @@ return (
 
 
 
-      {filteredPlans.length === 0 ? (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-          {plans.length === 0 
-            ? `No project plans found for project ID: ${projectId}`
-            : "No plans match the current filter criteria"
-          }
-        </div>
-      ) : (
+       
         <div className="w-full border border-gray-300 rounded-lg bg-white overflow-hidden">
           <div
             className="w-full overflow-auto"
@@ -12383,7 +12401,7 @@ return (
             </table>
           </div>
         </div>
-      )}
+      
 
       {showForm && (
         <ProjectPlanForm

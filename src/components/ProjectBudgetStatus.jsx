@@ -8947,13 +8947,13 @@ const ProjectBudgetStatus = () => {
     setSearched(true);
     setErrorMessage("");
 
-    if (!term) {
-      setFilteredProjects([]);
-      setSelectedPlan(null);
-      setRevenueAccount("");
-      setPrefixes(new Set());
-      return;
-    }
+    // if (!term) {
+    //   setFilteredProjects([]);
+    //   setSelectedPlan(null);
+    //   setRevenueAccount("");
+    //   setPrefixes(new Set());
+    //   return;
+    // }
 
     setLoading(true);
     try {
