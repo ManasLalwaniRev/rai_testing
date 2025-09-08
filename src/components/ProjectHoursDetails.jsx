@@ -5980,7 +5980,7 @@ const handleRowClick = (actualEmpIdx) => {
                           placeholder="Name (auto-filled)"
                         />
                       </td> */}
-                      <td className="border border-gray-300 px-1.5 py-0.5">
+                      {/* <td className="border border-gray-300 px-1.5 py-0.5">
   <input
     type="text"
     name="name"
@@ -6020,7 +6020,61 @@ const handleRowClick = (actualEmpIdx) => {
         : "Name (auto-filled)"
     }
   />
+</td> */}
+<td className="border border-gray-300 px-1.5 py-0.5">
+  {newEntry.idType === "PLC" ? (
+    // PLC Name field - automatically show selected PLC description
+    <input
+      type="text"
+      name="name"
+      value={newEntry.firstName || ""}  // This will contain the PLC description
+      readOnly
+      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
+      // placeholder="PLC description will appear here"
+    />
+  ) : (
+    // Existing logic for other ID types
+    <input
+      type="text"
+      name="name"
+      value={
+        newEntry.idType === "Other" || planType === "NBBUD"
+          ? `${newEntry.firstName || ""} ${newEntry.lastName || ""}`.trim()
+          : newEntry.idType === "Vendor"
+          ? newEntry.lastName || newEntry.firstName || ""
+          : newEntry.lastName && newEntry.firstName
+          ? `${newEntry.lastName}, ${newEntry.firstName}`
+          : newEntry.lastName || newEntry.firstName || ""
+      }
+      readOnly={planType !== "NBBUD" && newEntry.idType !== "Other"}
+      onChange={(e) => {
+        if (newEntry.idType === "Other" || planType === "NBBUD") {
+          const fullName = e.target.value.trim();
+          const nameParts = fullName.split(" ");
+          const firstName = nameParts[0] || "";
+          const lastName = nameParts.slice(1).join(" ") || "";
+          
+          setNewEntry(prev => ({
+            ...prev,
+            firstName: firstName,
+            lastName: lastName
+          }));
+        }
+      }}
+      className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+        newEntry.idType === "Other" || planType === "NBBUD"
+          ? "bg-white" 
+          : "bg-gray-100 cursor-not-allowed"
+      }`}
+      placeholder={
+        newEntry.idType === "Other" || planType === "NBBUD" 
+          ? "Enter name" 
+          : "Name (auto-filled)"
+      }
+    />
+  )}
 </td>
+
 
                       <td className="border border-gray-300 px-1.5 py-0.5">
                         <input
@@ -6091,60 +6145,50 @@ const handleRowClick = (actualEmpIdx) => {
 
 
                       <td className="border border-gray-300 px-1.5 py-0.5">
-                        {/* <input
-                          type="text"
-                          name="plcGlcCode"
-                          value={newEntry.plcGlcCode}
-                          onChange={(e) =>
-                            isBudPlan && handlePlcInputChange(e.target.value)
-                          }
-                          onBlur={(e) => handlePlcBlur(e.target.value)}
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isBudPlan || autoPopulatedPLC
-                              ? "bg-gray-100 cursor-not-allowed"
-                              : ""
-                          }`}
-                          list="plc-list"
-                          placeholder="Enter Plc"
-                          disabled={!isBudPlan || autoPopulatedPLC}
-                          readOnly={autoPopulatedPLC}
-                        /> */}
-                        <input
-  type="text"
-  name="plcGlcCode"
-  value={newEntry.plcGlcCode}
-  onChange={(e) => handlePlcInputChange(e.target.value)}
-  onBlur={(e) => handlePlcBlur(e.target.value)}
-  className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-    autoPopulatedPLC ? "bg-gray-100 cursor-not-allowed" : ""
-  }`}
-  list="plc-list"
-  placeholder="Enter Plc"
-//   disabled={autoPopulatedPLC}
-//   readOnly={autoPopulatedPLC}
-/>
-                        {/* <datalist id="plc-list">
-                          {plcOptions.map((plc, index) => (
-                            <option
-                              key={`${plc.value}-${index}`}
-                              value={plc.value}
-                            >
-                              {plc.label}
-                            </option>
-                          ))}
-                        </datalist> */}
-                        <datalist id="plc-list">
-  {filteredPlcOptions.map((plc, index) => (
-    <option
-      key={`${plc.value}-${index}`}
-      value={plc.value}
-    >
-      {plc.label}
-    </option>
-  ))}
-</datalist>
+  <input
+    type="text"
+    name="plcGlcCode"
+    value={newEntry.plcGlcCode}
+    onChange={(e) => {
+      if (newEntry.idType === "PLC") {
+        // For PLC type, auto-populate the name field with PLC description
+        const selectedPlc = plcOptions.find(plc => plc.value === e.target.value);
+        handlePlcInputChange(e.target.value);
+        
+        // Automatically set the firstName to the full PLC description
+        if (selectedPlc) {
 
-                      </td>
+          const description = selectedPlc.label.split(' - ')[1] || selectedPlc.label;
+
+          setNewEntry(prev => ({
+            ...prev,
+            firstName: description, // Store full description in firstName
+            lastName: "", // Clear lastName for PLC
+          }));
+        }
+      } else {
+        handlePlcInputChange(e.target.value);
+      }
+    }}
+    onBlur={(e) => handlePlcBlur(e.target.value)}
+    className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+      autoPopulatedPLC ? "bg-gray-100 cursor-not-allowed" : ""
+    }`}
+    list="plc-list"
+    placeholder="Enter Plc"
+  />
+  <datalist id="plc-list">
+    {filteredPlcOptions.map((plc, index) => (
+      <option
+        key={`${plc.value}-${index}`}
+        value={plc.value}
+      >
+        {plc.label}
+      </option>
+    ))}
+  </datalist>
+</td>
+
                       <td className="border border-gray-300 px-1.5 py-0.5 text-center">
                         <input
                           type="checkbox"
