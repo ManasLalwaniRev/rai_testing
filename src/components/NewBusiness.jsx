@@ -923,7 +923,7 @@ const SavedBusinessTableDisplay = ({ allBusinessBudgets, onNewBusiness, onEditCl
   );
 };
 
-const NewBusiness = () => {
+const NewBusiness = ({ onClose }) => {
   const [form, setForm] = useState({
     businessBudgetId: "",
     description: "",
@@ -994,22 +994,40 @@ const NewBusiness = () => {
       return;
     }
 
+    // const payload = {
+    //   businessBudgetId: form.businessBudgetId,
+    //   description: form.description,
+    //   level: parseInt(form.level) || 0,
+    //   isActive: form.active, // Map form.active to API's isActive
+    //   version: parseInt(form.version) || 0,
+    //   versionCode: form.versionCode,
+    //   winningProbability: parseFloat(form.winningProbability) || 0,
+    //   startDate: form.startDate ? `${form.startDate}T00:00:00` : "0001-01-01T00:00:00", // Ensure valid default if empty
+    //   endDate: form.endDate ? `${form.endDate}T00:00:00` : "0001-01-01T00:00:00",     // Ensure valid default if empty
+    //   escalationRate: parseFloat(form.escalationRate) || 0,
+    //   orgId: parseInt(form.orgId) || 0,
+    //   accountGroup: form.accountGrp, // Map form.accountGrp to API's accountGroup
+    //   burdenTemplateId: parseInt(form.burdenTemplateId) || 0,
+    //   modifiedBy: "admin", // Hardcoded
+    // };
+    
     const payload = {
-      businessBudgetId: form.businessBudgetId,
-      description: form.description,
-      level: parseInt(form.level) || 0,
-      isActive: form.active, // Map form.active to API's isActive
-      version: parseInt(form.version) || 0,
-      versionCode: form.versionCode,
-      winningProbability: parseFloat(form.winningProbability) || 0,
-      startDate: form.startDate ? `${form.startDate}T00:00:00` : "0001-01-01T00:00:00", // Ensure valid default if empty
-      endDate: form.endDate ? `${form.endDate}T00:00:00` : "0001-01-01T00:00:00",     // Ensure valid default if empty
-      escalationRate: parseFloat(form.escalationRate) || 0,
-      orgId: parseInt(form.orgId) || 0,
-      accountGroup: form.accountGrp, // Map form.accountGrp to API's accountGroup
-      burdenTemplateId: parseInt(form.burdenTemplateId) || 0,
-      modifiedBy: "admin", // Hardcoded
-    };
+  projId: form.businessBudgetId, // Map businessBudgetId to projId
+  plId: 0,
+  plType: "NBBUD",
+  source: "",
+  type: "", // Empty string as requested
+  version: parseInt(form.version) || 0,
+  versionCode: form.versionCode || "",
+  finalVersion: false,
+  isCompleted: false,
+  isApproved: false,
+  status: "In Progress",
+  createdBy: "User",
+  modifiedBy: "User",
+  approvedBy: "",
+  templateId: parseInt(form.burdenTemplateId) || 1 // Map burdenTemplateId to templateId with default 1
+};
 
     console.log("Sending payload:", payload);
 
@@ -1028,7 +1046,7 @@ const NewBusiness = () => {
         toast.success("Budget details updated successfully!");
       } else {
         response = await axios.post(
-          "https://test-api-3tmq.onrender.com/AddNewBusiness",
+          "https://test-api-3tmq.onrender.com/Project/AddProjectPlan",
           payload,
           {
             headers: {
@@ -1041,8 +1059,8 @@ const NewBusiness = () => {
 
       console.log("API response:", response.data);
       // After save/update, show the updated single item in table view
-      setAllBusinessBudgets([response.data]); // Show the newly saved/updated item in table
-      setViewMode('table'); // Go to table view after save/update
+      // setAllBusinessBudgets([response.data]); // Show the newly saved/updated item in table
+      // setViewMode('table'); // Go to table view after save/update
       // Reset form and mode for next operation
       setIsUpdateMode(false);
       setForm({
@@ -1151,10 +1169,18 @@ const NewBusiness = () => {
               <button
                 type="button"
                 onClick={handleSave}
-                className="bg-blue-600 text-white px-3 py-1 rounded text-[11px] sm:text-xs hover:bg-blue-700 transition"
+                className="bg-blue-600 text-white px-3 py-1 rounded text-[11px] sm:text-xs hover:bg-blue-700 transition cursor-pointer"
               >
                 {isUpdateMode ? "Update" : "Save"}
               </button>
+               <button
+      type="button"
+      onClick={onClose}
+      className="text-gray-500 hover:text-gray-700 text-lg font-bold leading-none hover:bg-gray-200 rounded px-2 py-1 ml-2 cursor-pointer"
+      title="Close"
+    >
+      ×
+    </button>
             </div>
           </div>
           <div className="flex items-center gap-1 mb-2">
@@ -1231,7 +1257,7 @@ const NewBusiness = () => {
               </FormField>
             </div>
             <div className="space-y-2">
-              <FormField label="Start Date">
+              {/* <FormField label="Start Date">
                 <input
                   name="startDate"
                   value={form.startDate}
@@ -1239,8 +1265,19 @@ const NewBusiness = () => {
                   className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
                   type="date"
                 />
-              </FormField>
-              <FormField label="End Date">
+              </FormField> */}
+              <FormField label="Start Date">
+  <input
+    name="startDate"
+    value={form.startDate}
+    onChange={handleChange}
+    className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
+    type="date"
+    placeholder=""
+  />
+</FormField>
+
+              {/* <FormField label="End Date">
                 <input
                   name="endDate"
                   value={form.endDate}
@@ -1248,7 +1285,18 @@ const NewBusiness = () => {
                   className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
                   type="date"
                 />
-              </FormField>
+              </FormField> */}
+              <FormField label="End Date">
+  <input
+    name="endDate"
+    value={form.endDate}
+    onChange={handleChange}
+    className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
+    type="date"
+    placeholder=""
+  />
+</FormField>
+
               <FormField label="Period">
                 <input
                   name="period"
@@ -1283,7 +1331,7 @@ const NewBusiness = () => {
                   value={form.orgId}
                   onChange={handleChange}
                   className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                  type="number"
+                  type="text"
                 />
               </FormField>
               <FormField label="Account Group">

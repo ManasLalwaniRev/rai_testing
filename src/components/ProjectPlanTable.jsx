@@ -11876,32 +11876,26 @@ return (
     {/* New Business Popup Overlay - positioned specifically over the table area */}
     
     {showNewBusinessPopup && (
-      <div className="absolute inset-0 z-30">
-        {/* Blur overlay */}
-        <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm"></div>
+  <div className="absolute inset-0 z-30">
+    {/* Blur overlay */}
+    <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm"></div>
+    
+    {/* Popup container */}
+    <div className="absolute inset-0 flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
         
-        {/* Popup container */}
-        <div className="absolute inset-0 flex items-start justify-center pt-2 ">
-          <div className="bg-white rounded-lg shadow-2xl border border-gray-300 w-full max-w-none mx-4 max-h-[calc(100%-2rem)] overflow-hidden">
-            {/* Header */}
-            <div className="bg-gray-100 px-4 py-2 border-b flex justify-between items-center">
-              <h3 className="text-sm font-semibold text-gray-800">New Business</h3>
-              <button
-                onClick={() => setShowNewBusinessPopup(false)}
-                className="text-gray-500 hover:text-gray-700 text-lg font-bold leading-none hover:bg-gray-200 rounded px-1"
-              >
-                ×
-              </button>
-            </div>
-            
-            {/* Content */}
-            <div className="overflow-y-auto max-h-[calc(100vh-8rem)]">
-              <NewBusiness />
-            </div>
-          </div>
+       
+        {/* Content - with proper scrolling */}
+        <div className="flex-1 overflow-y-auto p-4">
+           <NewBusiness onClose={() => setShowNewBusinessPopup(false)} />
+ 
         </div>
       </div>
-    )}
+    </div>
+  </div>
+)}
+
+
 
     
 
@@ -12116,6 +12110,15 @@ return (
         >
           {budEacFilter ? "Show All" : "BUD/EAC"}
         </button>
+
+         <button
+        onClick={() => setShowNewBusinessPopup(true)}
+        className="bg-green-600 text-white hover:bg-green-700 cursor-pointer px-1 py-1 rounded text-xs flex items-center whitespace-nowrap flex-shrink-0"
+        title="New Business"
+      >
+        New Business
+      </button>
+      
       </>
     )}
   </div>

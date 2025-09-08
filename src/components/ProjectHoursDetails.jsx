@@ -3898,8 +3898,90 @@ useEffect(() => {
 
   
 
-const fetchLaborAccounts = async () => {
+// const fetchLaborAccounts = async () => {
 
+//   if (planType === "NBBUD") return;
+
+//   if (!projectId || !showNewForm) return;
+//   try {
+//     const response = await axios.get(
+//       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//     );
+//     const data = Array.isArray(response.data) ? response.data[0] : response.data;
+
+//     let accounts = [];
+
+//     // **NEW LOGIC: Show all accounts for PLC type**
+//     if (newEntry.idType === "PLC") {
+//       // Combine both employee and vendor accounts for PLC
+//       const employeeAccounts = Array.isArray(data.employeeLaborAccounts)
+//         ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+      
+//       const vendorAccounts = Array.isArray(data.sunContractorLaborAccounts)
+//         ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+
+//       accounts = [...employeeAccounts, ...vendorAccounts];
+//     }
+
+//     if (newEntry.idType === "Employee") {
+//       accounts = Array.isArray(data.employeeLaborAccounts)
+//         ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+//     } else if (newEntry.idType === "Vendor") {
+//       accounts = Array.isArray(data.sunContractorLaborAccounts)
+//         ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
+//         : [];
+//     } else {
+//       accounts = [];
+//     }
+
+//     // Remove duplicates
+//     const uniqueAccountsMap = new Map();
+//     accounts.forEach(acc => {
+//       if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//         uniqueAccountsMap.set(acc.id, acc);
+//       }
+//     });
+//     const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+//     setLaborAccounts(uniqueAccounts);
+
+//     // **FIX: Set PLC options from project data**
+//     if (data.plc && Array.isArray(data.plc)) {
+//       const plcOptionsFromApi = data.plc.map(plc => ({
+//         value: plc.laborCategoryCode,
+//         label: `${plc.laborCategoryCode} - ${plc.description}`,
+//       }));
+//       console.log('PLC Options loaded:', plcOptionsFromApi); // DEBUG LOG
+//       setPlcOptions(plcOptionsFromApi);
+//       setFilteredPlcOptions(plcOptionsFromApi); // Initialize filtered options
+//     } else {
+//       console.log('No PLC data found in API response:', data); // DEBUG LOG
+//       setPlcOptions([]);
+//       setFilteredPlcOptions([]);
+//     }
+
+//     // Auto-populate organization for Vendor Employees if present
+//     if (newEntry.idType === "Vendor" && data.orgId) {
+//       setNewEntry(prev => ({
+//         ...prev,
+//         orgId: data.orgId,
+//       }));
+//     }
+//   } catch (err) {
+//     console.error('Error fetching labor accounts:', err); // DEBUG LOG
+//     setLaborAccounts([]);
+//     setPlcOptions([]);
+//     setFilteredPlcOptions([]);
+//     toast.error("Failed to fetch labor accounts", {
+//       toastId: "labor-accounts-error",
+//       autoClose: 3000,
+//     });
+//   }
+// };
+
+const fetchLaborAccounts = async () => {
   if (planType === "NBBUD") return;
 
   if (!projectId || !showNewForm) return;
@@ -3911,7 +3993,19 @@ const fetchLaborAccounts = async () => {
 
     let accounts = [];
 
-    if (newEntry.idType === "Employee") {
+    // **FIXED LOGIC: Use if-else-if instead of separate if blocks**
+    if (newEntry.idType === "PLC") {
+      // Combine both employee and vendor accounts for PLC
+      const employeeAccounts = Array.isArray(data.employeeLaborAccounts)
+        ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
+        : [];
+      
+      const vendorAccounts = Array.isArray(data.sunContractorLaborAccounts)
+        ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
+        : [];
+
+      accounts = [...employeeAccounts, ...vendorAccounts];
+    } else if (newEntry.idType === "Employee") {
       accounts = Array.isArray(data.employeeLaborAccounts)
         ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
         : [];
@@ -3966,6 +4060,7 @@ const fetchLaborAccounts = async () => {
     });
   }
 };
+
 
 
 
