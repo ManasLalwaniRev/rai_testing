@@ -4553,7 +4553,7 @@ const LaborForm = () => {
         setLaborEscalationMonth("");
         setLaborEscalationValue("");
         setWorkforceRule("");
-        setClosingPeriod("");
+         
         setConfigValues([]);
         setLoading(false);
         return;
