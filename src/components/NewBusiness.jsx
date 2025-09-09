@@ -994,6 +994,16 @@ const NewBusiness = ({ onClose }) => {
       return;
     }
 
+    if (form.startDate && form.endDate) {
+    const startDate = new Date(form.startDate);
+    const endDate = new Date(form.endDate);
+    
+    if (endDate < startDate) {
+      toast.error("End Date cannot be earlier than Start Date. Please select a valid date range.");
+      return;
+    }
+  }
+
     // const payload = {
     //   businessBudgetId: form.businessBudgetId,
     //   description: form.description,
@@ -1311,9 +1321,19 @@ const NewBusiness = ({ onClose }) => {
   />
 </FormField> */}
 
+<FormField label="End Date">
+  <input
+    name="endDate"
+    value={form.endDate}
+    onChange={handleChange}
+    className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
+    type="date"
+    min={form.startDate} // NEW: This prevents selecting dates before start date
+  />
+</FormField>
 
 
-              <FormField label="End Date">
+              {/* <FormField label="End Date">
                 <input
                   name="endDate"
                   value={form.endDate}
@@ -1321,7 +1341,7 @@ const NewBusiness = ({ onClose }) => {
                   className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
                   type="date"
                 />
-              </FormField>
+              </FormField> */}
               {/* <FormField label="End Date">
   <input
     name="endDate"

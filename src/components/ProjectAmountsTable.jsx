@@ -11015,139 +11015,407 @@ const handleIdChange = (value) => {
     }
   };
 
+  // const handleForecastAmountBlur = async (empIdx, uniqueKey, value) => {
+  //   if (!isEditable) return;
+  //   const newValue = value === "" ? 0 : Number(value);
+  //   const emp = employees[empIdx];
+  //   const monthAmounts = getMonthAmounts(emp);
+  //   const forecast = monthAmounts[uniqueKey];
+  //   const originalForecastedAmount = forecast?.forecastedamt ?? 0;
+  //   const currentDuration = sortedDurations.find(
+  //     (d) => `${d.monthNo}_${d.year}` === uniqueKey
+  //   );
+
+  //   console.log(
+  //     `handleForecastAmountBlur: empIdx=${empIdx}, uniqueKey=${uniqueKey}, newValue=${newValue}, original=${originalForecastedAmount}, month=${currentDuration?.monthNo}, year=${currentDuration?.year}`
+  //   );
+
+  //   if (newValue === originalForecastedAmount) {
+  //     console.log("No change in forecast amount, skipping API call");
+  //     return;
+  //   }
+
+  //   if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
+  //     console.log(`Cannot edit ${uniqueKey}: period closed`);
+  //     setInputValues((prev) => ({
+  //       ...prev,
+  //       [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
+  //     }));
+  //     toast.warn("Cannot edit amounts for a closed period.", {
+  //       toastId: "closed-period-warning",
+  //       autoClose: 3000,
+  //     });
+  //     return;
+  //   }
+
+  //   const payload = {
+  //     forecastedamt: Number(newValue) || 0,
+  //     forecastid: Number(forecast?.forecastid ?? 0),
+  //     projId: forecast?.projId ?? projectId,
+  //     plId: forecast?.plId ?? planId,
+  //     emplId: forecast?.emplId ?? emp.emple.emplId,
+  //     dctId: forecast?.dctId ?? 0,
+  //     month: forecast?.month ?? currentDuration.monthNo,
+  //     year: forecast?.year ?? currentDuration.year,
+  //     totalBurdenCost: forecast?.totalBurdenCost ?? 0,
+  //     burden: forecast?.burden ?? 0,
+  //     ccffRevenue: forecast?.ccffRevenue ?? 0,
+  //     tnmRevenue: forecast?.tnmRevenue ?? 0,
+  //     cost: forecast?.cost ?? 0,
+  //     fringe: forecast?.fringe ?? 0,
+  //     overhead: forecast?.overhead ?? 0,
+  //     gna: forecast?.gna ?? 0,
+  //     ...(planType === "EAC"
+  //       ? { actualamt: Number(newValue) || 0 }
+  //       : { forecastedamt: Number(newValue) || 0 }),
+  //     createdat: forecast?.createdat ?? new Date(0).toISOString(),
+  //     updatedat: new Date().toISOString().split("T")[0],
+  //     displayText: forecast?.displayText ?? "",
+  //   };
+
+  //   console.log("UpdateForecastAmount payload:", payload);
+
+  //   try {
+  //     const response = await axios.put(
+  //       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
+  //       payload,
+  //       { headers: { "Content-Type": "application/json" } }
+  //     );
+  //     setSuccessMessageText("Forecast updated!");
+  //     setShowSuccessMessage(true);
+  //     toast.success("Forecast amount updated successfully!", {
+  //       toastId: "forecast-update-success",
+  //       autoClose: 3000,
+  //     });
+
+  //     // Update local state with the response data for consistency
+  //     setEmployees((prev) => {
+  //       const updated = [...prev];
+  //       const updatedEmp = { ...updated[empIdx] };
+  //       const updatedForecasts = [...(updatedEmp.emple.plForecasts || [])];
+  //       const forecastIndex = updatedForecasts.findIndex(
+  //         (f) => f.month === payload.month && f.year === payload.year
+  //       );
+  //       const updatedForecast = response.data; // Assume API returns the updated forecast
+  //       if (forecastIndex >= 0) {
+  //         updatedForecasts[forecastIndex] = {
+  //           ...updatedForecasts[forecastIndex],
+  //           ...updatedForecast,
+  //           value: planType === "EAC" ? updatedForecast.actualamt : updatedForecast.forecastedamt,
+  //         };
+  //       } else {
+  //         updatedForecasts.push({
+  //           ...updatedForecast,
+  //           value: planType === "EAC" ? updatedForecast.actualamt : updatedForecast.forecastedamt,
+  //         });
+  //       }
+  //       updatedEmp.emple = {
+  //         ...updatedEmp.emple,
+  //         plForecasts: updatedForecasts,
+  //       };
+  //       updated[empIdx] = updatedEmp;
+  //       return updated;
+  //     });
+
+  //     // Clear the input value after successful update
+  //     setInputValues((prev) => {
+  //       const newInputs = { ...prev };
+  //       delete newInputs[`${empIdx}_${uniqueKey}`];
+  //       return newInputs;
+  //     });
+
+  //     // Trigger refetch to ensure UI syncs with server (like in ProjectHoursDetails)
+  //     if (onSaveSuccess) {
+  //       onSaveSuccess();
+  //     }
+  //   } catch (err) {
+  //     console.error("API error:", err.response?.data || err);
+  //     setInputValues((prev) => ({
+  //       ...prev,
+  //       [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
+  //     }));
+  //     setSuccessMessageText("Failed to update forecast.");
+  //     setShowSuccessMessage(true);
+  //     toast.error(
+  //       "Failed to update forecast amount: " +
+  //         (err.response?.data?.message || err.message),
+  //       {
+  //         toastId: "forecast-update-error",
+  //         autoClose: 3000,
+  //       }
+  //     );
+  //   } finally {
+  //     setTimeout(() => setShowSuccessMessage(false), 2000);
+  //   }
+  // };
+  
+//   const handleForecastAmountBlur = async (empIdx, uniqueKey, value) => {
+//   if (!isEditable) return;
+//   const newValue = value === "" ? 0 : Number(value);
+//   const emp = employees[empIdx];
+//   const monthAmounts = getMonthAmounts(emp);
+//   const forecast = monthAmounts[uniqueKey];
+//   const originalForecastedAmount = forecast?.forecastedamt ?? 0;
+//   const currentDuration = sortedDurations.find(
+//     (d) => `${d.monthNo}_${d.year}` === uniqueKey
+//   );
+
+//   console.log(
+//     `handleForecastAmountBlur: empIdx=${empIdx}, uniqueKey=${uniqueKey}, newValue=${newValue}, original=${originalForecastedAmount}, month=${currentDuration?.monthNo}, year=${currentDuration?.year}`
+//   );
+
+//   if (newValue === originalForecastedAmount) {
+//     console.log("No change in forecast amount, skipping API call");
+//     return;
+//   }
+
+//   if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
+//     console.log(`Cannot edit ${uniqueKey}: period closed`);
+//     setInputValues((prev) => ({
+//       ...prev,
+//       [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
+//     }));
+//     toast.warn("Cannot edit amounts for a closed period.", {
+//       toastId: "closed-period-warning",
+//       autoClose: 3000,
+//     });
+//     return;
+//   }
+
+//   const payload = {
+//     forecastedamt: Number(newValue) || 0,
+//     forecastid: Number(forecast?.forecastid ?? 0),
+//     projId: forecast?.projId ?? projectId,
+//     plId: forecast?.plId ?? planId,
+//     emplId: forecast?.emplId ?? emp.emple.emplId,
+//     dctId: forecast?.dctId ?? 0,
+//     month: forecast?.month ?? currentDuration.monthNo,
+//     year: forecast?.year ?? currentDuration.year,
+//     totalBurdenCost: forecast?.totalBurdenCost ?? 0,
+//     burden: forecast?.burden ?? 0,
+//     ccffRevenue: forecast?.ccffRevenue ?? 0,
+//     tnmRevenue: forecast?.tnmRevenue ?? 0,
+//     cost: forecast?.cost ?? 0,
+//     fringe: forecast?.fringe ?? 0,
+//     overhead: forecast?.overhead ?? 0,
+//     gna: forecast?.gna ?? 0,
+//     ...(planType === "EAC"
+//       ? { actualamt: Number(newValue) || 0 }
+//       : { forecastedamt: Number(newValue) || 0 }),
+//     createdat: forecast?.createdat ?? new Date(0).toISOString(),
+//     updatedat: new Date().toISOString().split("T")[0],
+//     displayText: forecast?.displayText ?? "",
+//   };
+
+//   console.log("UpdateForecastAmount payload:", payload);
+
+//   try {
+//     const response = await axios.put(
+//       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
+//       payload,
+//       { headers: { "Content-Type": "application/json" } }
+//     );
+
+//     // Update local state immediately for better UX
+//     setEmployees((prev) => {
+//       const updated = [...prev];
+//       if (updated[empIdx] && updated[empIdx].emple && updated[empIdx].emple.plForecasts) {
+//         const forecastIndex = updated[empIdx].emple.plForecasts.findIndex(
+//           (f) => f.month === payload.month && f.year === payload.year
+//         );
+        
+//         if (forecastIndex >= 0) {
+//           // Update existing forecast
+//           if (planType === "EAC") {
+//             updated[empIdx].emple.plForecasts[forecastIndex].actualamt = newValue;
+//           } else {
+//             updated[empIdx].emple.plForecasts[forecastIndex].forecastedamt = newValue;
+//           }
+//           // Update the value property used for display
+//           updated[empIdx].emple.plForecasts[forecastIndex].value = newValue;
+//         } else {
+//           // Create new forecast entry if it doesn't exist
+//           const newForecast = {
+//             ...payload,
+//             value: newValue,
+//           };
+//           updated[empIdx].emple.plForecasts.push(newForecast);
+//         }
+//       }
+//       return updated;
+//     });
+
+//     // Clear the input value after successful update
+//     setInputValues((prev) => {
+//       const newInputs = { ...prev };
+//       delete newInputs[`${empIdx}_${uniqueKey}`];
+//       return newInputs;
+//     });
+
+//     setSuccessMessageText("Forecast updated!");
+//     setShowSuccessMessage(true);
+//     toast.success("Forecast amount updated successfully!", {
+//       toastId: "forecast-update-success",
+//       autoClose: 3000,
+//     });
+
+//     // REMOVED: onSaveSuccess() call to prevent component reload
+//     // if (onSaveSuccess) {
+//     //   onSaveSuccess();
+//     // }
+
+//   } catch (err) {
+//     console.error("API error:", err.response?.data || err);
+//     setInputValues((prev) => ({
+//       ...prev,
+//       [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
+//     }));
+//     setSuccessMessageText("Failed to update forecast.");
+//     setShowSuccessMessage(true);
+//     toast.error(
+//       "Failed to update forecast amount: " +
+//         (err.response?.data?.message || err.message),
+//       {
+//         toastId: "forecast-update-error",
+//         autoClose: 3000,
+//       }
+//     );
+//   } finally {
+//     setTimeout(() => setShowSuccessMessage(false), 2000);
+//   }
+// };
+  
   const handleForecastAmountBlur = async (empIdx, uniqueKey, value) => {
-    if (!isEditable) return;
-    const newValue = value === "" ? 0 : Number(value);
-    const emp = employees[empIdx];
-    const monthAmounts = getMonthAmounts(emp);
-    const forecast = monthAmounts[uniqueKey];
-    const originalForecastedAmount = forecast?.forecastedamt ?? 0;
-    const currentDuration = sortedDurations.find(
-      (d) => `${d.monthNo}_${d.year}` === uniqueKey
-    );
+  if (!isEditable) return;
+  const newValue = value === "" ? 0 : Number(value);
+  const emp = employees[empIdx];
+  const monthAmounts = getMonthAmounts(emp);
+  const forecast = monthAmounts[uniqueKey];
+  
+  // Check if forecast exists and has required data (same validation as hours function)
+  if (!forecast || !forecast.forecastid) {
+    console.warn("No forecast data found for this employee/month combination");
+    return;
+  }
+  
+  const originalForecastedAmount = forecast?.forecastedamt ?? 0;
+  
+  console.log(
+    `handleForecastAmountBlur: empIdx=${empIdx}, uniqueKey=${uniqueKey}, newValue=${newValue}, original=${originalForecastedAmount}`
+  );
 
-    console.log(
-      `handleForecastAmountBlur: empIdx=${empIdx}, uniqueKey=${uniqueKey}, newValue=${newValue}, original=${originalForecastedAmount}, month=${currentDuration?.monthNo}, year=${currentDuration?.year}`
-    );
+  if (newValue === originalForecastedAmount) {
+    console.log("No change in forecast amount, skipping API call");
+    return;
+  }
 
-    if (newValue === originalForecastedAmount) {
-      console.log("No change in forecast amount, skipping API call");
-      return;
-    }
+  const currentDuration = sortedDurations.find(
+    (d) => `${d.monthNo}_${d.year}` === uniqueKey
+  );
 
-    if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
-      console.log(`Cannot edit ${uniqueKey}: period closed`);
-      setInputValues((prev) => ({
-        ...prev,
-        [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
-      }));
-      toast.warn("Cannot edit amounts for a closed period.", {
-        toastId: "closed-period-warning",
-        autoClose: 3000,
-      });
-      return;
-    }
+  if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
+    console.log(`Cannot edit ${uniqueKey}: period closed`);
+    setInputValues((prev) => ({
+      ...prev,
+      [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
+    }));
+    toast.warn("Cannot edit amounts for a closed period.", {
+      toastId: "closed-period-warning",
+      autoClose: 3000,
+    });
+    return;
+  }
 
-    const payload = {
-      forecastedamt: Number(newValue) || 0,
-      forecastid: Number(forecast?.forecastid ?? 0),
-      projId: forecast?.projId ?? projectId,
-      plId: forecast?.plId ?? planId,
-      emplId: forecast?.emplId ?? emp.emple.emplId,
-      dctId: forecast?.dctId ?? 0,
-      month: forecast?.month ?? currentDuration.monthNo,
-      year: forecast?.year ?? currentDuration.year,
-      totalBurdenCost: forecast?.totalBurdenCost ?? 0,
-      burden: forecast?.burden ?? 0,
-      ccffRevenue: forecast?.ccffRevenue ?? 0,
-      tnmRevenue: forecast?.tnmRevenue ?? 0,
-      cost: forecast?.cost ?? 0,
-      fringe: forecast?.fringe ?? 0,
-      overhead: forecast?.overhead ?? 0,
-      gna: forecast?.gna ?? 0,
-      ...(planType === "EAC"
-        ? { actualamt: Number(newValue) || 0 }
-        : { forecastedamt: Number(newValue) || 0 }),
-      createdat: forecast?.createdat ?? new Date(0).toISOString(),
-      updatedat: new Date().toISOString().split("T")[0],
-      displayText: forecast?.displayText ?? "",
-    };
-
-    console.log("UpdateForecastAmount payload:", payload);
-
-    try {
-      const response = await axios.put(
-        `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
-        payload,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      setSuccessMessageText("Forecast updated!");
-      setShowSuccessMessage(true);
-      toast.success("Forecast amount updated successfully!", {
-        toastId: "forecast-update-success",
-        autoClose: 3000,
-      });
-
-      // Update local state with the response data for consistency
-      setEmployees((prev) => {
-        const updated = [...prev];
-        const updatedEmp = { ...updated[empIdx] };
-        const updatedForecasts = [...(updatedEmp.emple.plForecasts || [])];
-        const forecastIndex = updatedForecasts.findIndex(
-          (f) => f.month === payload.month && f.year === payload.year
-        );
-        const updatedForecast = response.data; // Assume API returns the updated forecast
-        if (forecastIndex >= 0) {
-          updatedForecasts[forecastIndex] = {
-            ...updatedForecasts[forecastIndex],
-            ...updatedForecast,
-            value: planType === "EAC" ? updatedForecast.actualamt : updatedForecast.forecastedamt,
-          };
-        } else {
-          updatedForecasts.push({
-            ...updatedForecast,
-            value: planType === "EAC" ? updatedForecast.actualamt : updatedForecast.forecastedamt,
-          });
-        }
-        updatedEmp.emple = {
-          ...updatedEmp.emple,
-          plForecasts: updatedForecasts,
-        };
-        updated[empIdx] = updatedEmp;
-        return updated;
-      });
-
-      // Clear the input value after successful update
-      setInputValues((prev) => {
-        const newInputs = { ...prev };
-        delete newInputs[`${empIdx}_${uniqueKey}`];
-        return newInputs;
-      });
-
-      // Trigger refetch to ensure UI syncs with server (like in ProjectHoursDetails)
-      if (onSaveSuccess) {
-        onSaveSuccess();
-      }
-    } catch (err) {
-      console.error("API error:", err.response?.data || err);
-      setInputValues((prev) => ({
-        ...prev,
-        [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
-      }));
-      setSuccessMessageText("Failed to update forecast.");
-      setShowSuccessMessage(true);
-      toast.error(
-        "Failed to update forecast amount: " +
-          (err.response?.data?.message || err.message),
-        {
-          toastId: "forecast-update-error",
-          autoClose: 3000,
-        }
-      );
-    } finally {
-      setTimeout(() => setShowSuccessMessage(false), 2000);
-    }
+  // Create payload with safe fallbacks (matching the hours function structure)
+  const payload = {
+    forecastedamt: Number(newValue) || 0, // This is the key field being updated
+    forecastid: Number(forecast?.forecastid ?? 0),
+    projId: forecast?.projId ?? projectId ?? "",
+    plId: forecast?.plId ?? planId ?? 0,
+    emplId: forecast?.emplId ?? emp?.emple?.emplId ?? "",
+    dctId: forecast?.dctId ?? 0,
+    month: forecast?.month ?? currentDuration?.monthNo ?? 0,
+    year: forecast?.year ?? currentDuration?.year ?? 0,
+    totalBurdenCost: forecast?.totalBurdenCost ?? 0,
+    burden: forecast?.burden ?? 0,
+    ccffRevenue: forecast?.ccffRevenue ?? 0,
+    tnmRevenue: forecast?.tnmRevenue ?? 0,
+    cost: forecast?.cost ?? 0,
+    fringe: forecast?.fringe ?? 0,
+    overhead: forecast?.overhead ?? 0,
+    gna: forecast?.gna ?? 0,
+    ...(planType === "EAC"
+      ? { actualamt: Number(newValue) || 0 }
+      : { forecastedamt: Number(newValue) || 0 }),
+    createdat: forecast?.createdat ?? new Date().toISOString(),
+    updatedat: new Date().toISOString().split("T")[0],
+    displayText: forecast?.displayText ?? "",
   };
+
+  console.log("UpdateForecastAmount payload:", payload);
+
+  try {
+
+    const apiPlanType = planType === "NBBUD" ? "BUD" : planType;
+
+    await axios.put(
+    `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${apiPlanType}`,
+    payload,
+    { headers: { "Content-Type": "application/json" } }
+  );
+
+    // Update local state to reflect the change (matching hours function pattern)
+    setEmployees((prev) => {
+      const updated = [...prev];
+      if (updated[empIdx] && updated[empIdx].emple && updated[empIdx].emple.plForecasts) {
+        const forecastIndex = updated[empIdx].emple.plForecasts.findIndex(
+          f => f.month === payload.month && f.year === payload.year
+        );
+        if (forecastIndex !== -1) {
+          if (planType === "EAC") {
+            updated[empIdx].emple.plForecasts[forecastIndex].actualamt = newValue;
+          } else {
+            updated[empIdx].emple.plForecasts[forecastIndex].forecastedamt = newValue;
+          }
+          // Also update the value property used for display
+          updated[empIdx].emple.plForecasts[forecastIndex].value = newValue;
+        }
+      }
+      return updated;
+    });
+
+    // Clear the input value after successful update
+    setInputValues((prev) => {
+      const newInputs = { ...prev };
+      delete newInputs[`${empIdx}_${uniqueKey}`];
+      return newInputs;
+    });
+
+    toast.success("Forecast amount updated successfully!", {
+      toastId: "forecast-update-success",
+      autoClose: 2000,
+    });
+
+  } catch (err) {
+    console.error("Update forecast amount error:", err);
+    // Reset the input value on error
+    setInputValues((prev) => ({
+      ...prev,
+      [`${empIdx}_${uniqueKey}`]: String(originalForecastedAmount),
+    }));
+    
+    toast.error(
+      "Failed to update forecast amount: " +
+        (err.response?.data?.message || err.message),
+      {
+        toastId: "forecast-update-error",
+        autoClose: 3000,
+      }
+    );
+  }
+};
+  
+  
 
   const resetNewEntry = (newIdType) => {
     setNewEntry({
@@ -11926,22 +12194,39 @@ const handleSaveNewEntry = async () => {
               displayText: forecast.displayText || "",
               [planType === "EAC" ? "actualamt" : "forecastedamt"]: newNumericValue,
             };
+
+            const apiPlanType = planType === "NBBUD" ? "BUD" : planType;
             
+            // updates.push(
+            //   axios
+            //     .put(
+            //       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
+            //       payload,
+            //       { headers: { "Content-Type": "application/json" } }
+            //     )
+            //     .catch((err) => {
+            //       console.error(
+            //         "Failed update for payload:",
+            //         payload,
+            //         err?.response?.data || err.message
+            //       );
+            //     })
+            // );
             updates.push(
-              axios
-                .put(
-                  `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
-                  payload,
-                  { headers: { "Content-Type": "application/json" } }
-                )
-                .catch((err) => {
-                  console.error(
-                    "Failed update for payload:",
-                    payload,
-                    err?.response?.data || err.message
-                  );
-                })
-            );
+  axios
+    .put(
+      `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${apiPlanType}`,
+      payload,
+      { headers: { "Content-Type": "application/json" } }
+    )
+    .catch((err) => {
+      console.error(
+        "Failed update for payload:",
+        payload,
+        err?.response?.data || err.message
+      );
+    })
+);
           }
         } else {
           // Skip cells without existing forecasts and count them

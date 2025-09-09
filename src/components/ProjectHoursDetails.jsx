@@ -4925,84 +4925,84 @@ const handlePlcBlur = (val) => {
     }
   };
 
-  const handleForecastHoursBlur = async (empIdx, uniqueKey, value) => {
-    if (!isEditable) return;
-    const newValue = value === "" ? 0 : Number(value);
-    const emp = localEmployees[empIdx];
-    const monthHours = getMonthHours(emp);
-    const forecast = monthHours[uniqueKey];
-    const originalForecastedHours = forecast?.forecastedhours ?? 0;
+  // const handleForecastHoursBlur = async (empIdx, uniqueKey, value) => {
+  //   if (!isEditable) return;
+  //   const newValue = value === "" ? 0 : Number(value);
+  //   const emp = localEmployees[empIdx];
+  //   const monthHours = getMonthHours(emp);
+  //   const forecast = monthHours[uniqueKey];
+  //   const originalForecastedHours = forecast?.forecastedhours ?? 0;
 
-    if (newValue === originalForecastedHours) {
-      return;
-    }
+  //   if (newValue === originalForecastedHours) {
+  //     return;
+  //   }
 
-    const currentDuration = sortedDurations.find(
-      (d) => `${d.monthNo}_${d.year}` === uniqueKey
-    );
+  //   const currentDuration = sortedDurations.find(
+  //     (d) => `${d.monthNo}_${d.year}` === uniqueKey
+  //   );
 
-    if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
-      setInputValues((prev) => ({
-        ...prev,
-        [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
-      }));
-      toast.warn("Cannot edit hours for a closed period.", {
-        toastId: "closed-period-warning",
-        autoClose: 3000,
-      });
-      return;
-    }
+  //   if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
+  //     setInputValues((prev) => ({
+  //       ...prev,
+  //       [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
+  //     }));
+  //     toast.warn("Cannot edit hours for a closed period.", {
+  //       toastId: "closed-period-warning",
+  //       autoClose: 3000,
+  //     });
+  //     return;
+  //   }
 
-    const payload = {
-      forecastedamt: forecast.forecastedamt ?? 0,
-      forecastid: Number(forecast.forecastid),
-      projId: forecast.projId ?? "",
-      plId: forecast.plId ?? 0,
-      emplId: forecast.emplId ?? "",
-      dctId: forecast.dctId ?? 0,
-      month: forecast.month ?? 0,
-      year: forecast.year ?? 0,
-      totalBurdenCost: forecast.totalBurdenCost ?? 0,
-      burden: forecast.burden ?? 0,
-      ccffRevenue: forecast.ccffRevenue ?? 0,
-      tnmRevenue: forecast.tnmRevenue ?? 0,
-      cost: forecast.cost ?? 0,
-      fringe: forecast.fringe ?? 0,
-      overhead: forecast.overhead ?? 0,
-      gna: forecast.gna ?? 0,
-      ...(planType === "EAC"
-        ? { actualhours: Number(newValue) || 0 }
-        : { forecastedhours: Number(newValue) || 0 }),
-      createdat: forecast.createdat ?? new Date(0).toISOString(),
-      updatedat: new Date().toISOString().split("T")[0],
-      displayText: forecast.displayText ?? "",
-    };
+  //   const payload = {
+  //     forecastedamt: forecast.forecastedamt ?? 0,
+  //     forecastid: Number(forecast.forecastid),
+  //     projId: forecast.projId ?? "",
+  //     plId: forecast.plId ?? 0,
+  //     emplId: forecast.emplId ?? "",
+  //     dctId: forecast.dctId ?? 0,
+  //     month: forecast.month ?? 0,
+  //     year: forecast.year ?? 0,
+  //     totalBurdenCost: forecast.totalBurdenCost ?? 0,
+  //     burden: forecast.burden ?? 0,
+  //     ccffRevenue: forecast.ccffRevenue ?? 0,
+  //     tnmRevenue: forecast.tnmRevenue ?? 0,
+  //     cost: forecast.cost ?? 0,
+  //     fringe: forecast.fringe ?? 0,
+  //     overhead: forecast.overhead ?? 0,
+  //     gna: forecast.gna ?? 0,
+  //     ...(planType === "EAC"
+  //       ? { actualhours: Number(newValue) || 0 }
+  //       : { forecastedhours: Number(newValue) || 0 }),
+  //     createdat: forecast.createdat ?? new Date(0).toISOString(),
+  //     updatedat: new Date().toISOString().split("T")[0],
+  //     displayText: forecast.displayText ?? "",
+  //   };
 
-    try {
-      await axios.put(
-        `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${planType}`,
-        payload,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      toast.success("Employee updated successfully!", {
-        toastId: `employee-update-${empIdx}`,
-        autoClose: 2000,
-      });
-    } catch (err) {
-      setInputValues((prev) => ({
-        ...prev,
-        [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
-      }));
-      toast.error(
-        "Failed to update forecast: " +
-          (err.response?.data?.message || err.message),
-        {
-          toastId: "forecast-update-error",
-          autoClose: 3000,
-        }
-      );
-    }
-  };
+  //   try {
+  //     await axios.put(
+  //       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${planType}`,
+  //       payload,
+  //       { headers: { "Content-Type": "application/json" } }
+  //     );
+  //     toast.success("Employee updated successfully!", {
+  //       toastId: `employee-update-${empIdx}`,
+  //       autoClose: 2000,
+  //     });
+  //   } catch (err) {
+  //     setInputValues((prev) => ({
+  //       ...prev,
+  //       [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
+  //     }));
+  //     toast.error(
+  //       "Failed to update forecast: " +
+  //         (err.response?.data?.message || err.message),
+  //       {
+  //         toastId: "forecast-update-error",
+  //         autoClose: 3000,
+  //       }
+  //     );
+  //   }
+  // };
 
 //   const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
 //   // Real-time validation
@@ -5083,6 +5083,234 @@ const handlePlcBlur = (val) => {
 //     }
 //   }
 // };
+
+// const handleForecastHoursBlur = async (empIdx, uniqueKey, value) => {
+//   if (!isEditable) return;
+//   const newValue = value === "" ? 0 : Number(value);
+//   const emp = localEmployees[empIdx];
+//   const monthHours = getMonthHours(emp);
+//   const forecast = monthHours[uniqueKey];
+  
+//   // Check if forecast exists and has required data
+//   if (!forecast || !forecast.forecastid) {
+//     console.warn("No forecast data found for this employee/month combination");
+//     return;
+//   }
+  
+//   const originalForecastedHours = forecast?.forecastedhours ?? 0;
+
+//   if (newValue === originalForecastedHours) {
+//     return;
+//   }
+
+//   const currentDuration = sortedDurations.find(
+//     (d) => `${d.monthNo}_${d.year}` === uniqueKey
+//   );
+
+//   if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
+//     setInputValues((prev) => ({
+//       ...prev,
+//       [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
+//     }));
+//     toast.warn("Cannot edit hours for a closed period.", {
+//       toastId: "closed-period-warning",
+//       autoClose: 3000,
+//     });
+//     return;
+//   }
+
+//   // Create payload with safe fallbacks
+//   const payload = {
+//     forecastedamt: forecast?.forecastedamt ?? 0,
+//     forecastid: Number(forecast?.forecastid ?? 0),
+//     projId: forecast?.projId ?? projectId ?? "",
+//     plId: forecast?.plId ?? planId ?? 0,
+//     emplId: forecast?.emplId ?? emp?.emple?.emplId ?? "",
+//     dctId: forecast?.dctId ?? 0,
+//     month: forecast?.month ?? currentDuration?.monthNo ?? 0,
+//     year: forecast?.year ?? currentDuration?.year ?? 0,
+//     totalBurdenCost: forecast?.totalBurdenCost ?? 0,
+//     burden: forecast?.burden ?? 0,
+//     ccffRevenue: forecast?.ccffRevenue ?? 0,
+//     tnmRevenue: forecast?.tnmRevenue ?? 0,
+//     cost: forecast?.cost ?? 0,
+//     fringe: forecast?.fringe ?? 0,
+//     overhead: forecast?.overhead ?? 0,
+//     gna: forecast?.gna ?? 0,
+//     ...(planType === "EAC"
+//       ? { actualhours: Number(newValue) || 0 }
+//       : { forecastedhours: Number(newValue) || 0 }),
+//     createdat: forecast?.createdat ?? new Date().toISOString(),
+//     updatedat: new Date().toISOString().split("T")[0],
+//     displayText: forecast?.displayText ?? "",
+//   };
+
+//   try {
+//     await axios.put(
+//       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${planType}`,
+//       payload,
+//       { headers: { "Content-Type": "application/json" } }
+//     );
+    
+//     // Update local state to reflect the change
+//     setLocalEmployees((prev) => {
+//       const updated = [...prev];
+//       if (updated[empIdx] && updated[empIdx].emple && updated[empIdx].emple.plForecasts) {
+//         const forecastIndex = updated[empIdx].emple.plForecasts.findIndex(
+//           f => f.month === payload.month && f.year === payload.year
+//         );
+//         if (forecastIndex !== -1) {
+//           if (planType === "EAC") {
+//             updated[empIdx].emple.plForecasts[forecastIndex].actualhours = newValue;
+//           } else {
+//             updated[empIdx].emple.plForecasts[forecastIndex].forecastedhours = newValue;
+//           }
+//         }
+//       }
+//       return updated;
+//     });
+    
+//     toast.success("Employee updated successfully!", {
+//       toastId: `employee-update-${empIdx}`,
+//       autoClose: 2000,
+//     });
+//   } catch (err) {
+//     // Reset the input value on error
+//     setInputValues((prev) => ({
+//       ...prev,
+//       [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
+//     }));
+    
+//     console.error("Update forecast error:", err);
+//     toast.error(
+//       "Failed to update forecast: " +
+//         (err.response?.data?.message || err.message),
+//       {
+//         toastId: "forecast-update-error",
+//         autoClose: 3000,
+//       }
+//     );
+//   }
+// };
+
+const handleForecastHoursBlur = async (empIdx, uniqueKey, value) => {
+  if (!isEditable) return;
+  const newValue = value === "" ? 0 : Number(value);
+  const emp = localEmployees[empIdx];
+  const monthHours = getMonthHours(emp);
+  const forecast = monthHours[uniqueKey];
+  
+  // Check if forecast exists and has required data
+  if (!forecast || !forecast.forecastid) {
+    console.warn("No forecast data found for this employee/month combination");
+    return;
+  }
+  
+  const originalForecastedHours = forecast?.forecastedhours ?? 0;
+
+  if (newValue === originalForecastedHours) {
+    return;
+  }
+
+  const currentDuration = sortedDurations.find(
+    (d) => `${d.monthNo}_${d.year}` === uniqueKey
+  );
+
+  if (!isMonthEditable(currentDuration, closedPeriod, planType)) {
+    setInputValues((prev) => ({
+      ...prev,
+      [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
+    }));
+    toast.warn("Cannot edit hours for a closed period.", {
+      toastId: "closed-period-warning",
+      autoClose: 3000,
+    });
+    return;
+  }
+
+  // Create payload with safe fallbacks
+  const payload = {
+    forecastedamt: forecast?.forecastedamt ?? 0,
+    forecastid: Number(forecast?.forecastid ?? 0),
+    projId: forecast?.projId ?? projectId ?? "",
+    plId: forecast?.plId ?? planId ?? 0,
+    emplId: forecast?.emplId ?? emp?.emple?.emplId ?? "",
+    dctId: forecast?.dctId ?? 0,
+    month: forecast?.month ?? currentDuration?.monthNo ?? 0,
+    year: forecast?.year ?? currentDuration?.year ?? 0,
+    totalBurdenCost: forecast?.totalBurdenCost ?? 0,
+    burden: forecast?.burden ?? 0,
+    ccffRevenue: forecast?.ccffRevenue ?? 0,
+    tnmRevenue: forecast?.tnmRevenue ?? 0,
+    cost: forecast?.cost ?? 0,
+    fringe: forecast?.fringe ?? 0,
+    overhead: forecast?.overhead ?? 0,
+    gna: forecast?.gna ?? 0,
+    ...(planType === "EAC"
+      ? { actualhours: Number(newValue) || 0 }
+      : { forecastedhours: Number(newValue) || 0 }),
+    createdat: forecast?.createdat ?? new Date().toISOString(),
+    updatedat: new Date().toISOString().split("T")[0],
+    displayText: forecast?.displayText ?? "",
+  };
+
+  try {
+    // **KEY CHANGE**: Handle NBBUD by sending "BUD" as the plan type parameter
+    const apiPlanType = planType === "NBBUD" ? "BUD" : planType;
+    
+    console.log('Forecast update payload:', payload); // DEBUG LOG
+    console.log('API Plan Type being sent:', apiPlanType); // DEBUG LOG
+    console.log('Original Plan Type:', planType); // DEBUG LOG
+    
+    await axios.put(
+      `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${apiPlanType}`,
+      payload,
+      { headers: { "Content-Type": "application/json" } }
+    );
+    
+    // Update local state to reflect the change
+    setLocalEmployees((prev) => {
+      const updated = [...prev];
+      if (updated[empIdx] && updated[empIdx].emple && updated[empIdx].emple.plForecasts) {
+        const forecastIndex = updated[empIdx].emple.plForecasts.findIndex(
+          f => f.month === payload.month && f.year === payload.year
+        );
+        if (forecastIndex !== -1) {
+          if (planType === "EAC") {
+            updated[empIdx].emple.plForecasts[forecastIndex].actualhours = newValue;
+          } else {
+            updated[empIdx].emple.plForecasts[forecastIndex].forecastedhours = newValue;
+          }
+        }
+      }
+      return updated;
+    });
+    
+    toast.success("Employee updated successfully!", {
+      toastId: `employee-update-${empIdx}`,
+      autoClose: 2000,
+    });
+  } catch (err) {
+    // Reset the input value on error
+    setInputValues((prev) => ({
+      ...prev,
+      [`${empIdx}_${uniqueKey}`]: String(originalForecastedHours),
+    }));
+    
+    console.error("Update forecast error:", err);
+    console.error("Failed API Plan Type:", planType === "NBBUD" ? "BUD" : planType); // DEBUG LOG
+    
+    toast.error(
+      "Failed to update forecast: " +
+        (err.response?.data?.message || err.message),
+      {
+        toastId: "forecast-update-error",
+        autoClose: 3000,
+      }
+    );
+  }
+};
+
 
 const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
   handleEmployeeDataChange(actualEmpIdx, "acctId", value);
@@ -5710,10 +5938,13 @@ const handleSaveNewEntry = async () => {
                 updatedat: new Date().toISOString().split("T")[0],
                 displayText: forecast.displayText ?? "",
               };
+
+              const apiPlanType = planType === "NBBUD" ? "BUD" : planType;
+
               updates.push(
                 axios
                   .put(
-                    `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${planType}`,
+                    `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastHours/${apiPlanType}`,
                     payload,
                     { headers: { "Content-Type": "application/json" } }
                   )
