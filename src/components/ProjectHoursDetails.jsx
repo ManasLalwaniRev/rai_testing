@@ -3462,7 +3462,9 @@ const ProjectHoursDetails = ({
   const vlastTableRef = useRef(null);
 
   const isEditable = status === "In Progress";
-  const isBudPlan = planType === "BUD";
+  // const isBudPlan = planType === "BUD";
+  const isBudPlan = planType === "BUD" || planType === "NBBUD";
+
   // const isFieldEditable = planType === "BUD" || planType === "EAC"; // Add this line
   const isFieldEditable = planType === "BUD" || planType === "EAC" || planType === "NBBUD";
 
@@ -3754,6 +3756,187 @@ useEffect(() => {
 
 
 
+// useEffect(() => {
+//   const initializeUpdateOptions = async () => {
+//     if (localEmployees.length === 0) return;
+    
+//     try {
+//       // Load organizations for updates
+//       const orgResponse = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//       );
+//       const orgOptions = Array.isArray(orgResponse.data)
+//         ? orgResponse.data.map((org) => ({
+//             value: org.orgId,
+//             label: org.orgId,
+//           }))
+//         : [];
+      
+//       // Load PLC options from project data for updates
+//       if (projectId) {
+//         try {
+//           const response = await axios.get(
+//             `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//           );
+//           const data = Array.isArray(response.data) ? response.data[0] : response.data;
+          
+//           let plcOptionsForUpdate = [];
+//           if (data.plc && Array.isArray(data.plc)) {
+//             plcOptionsForUpdate = data.plc.map(plc => ({
+//               value: plc.laborCategoryCode,
+//               label: `${plc.laborCategoryCode} - ${plc.description}`,
+//             }));
+//           }
+          
+//           // Load account options for updates
+//           let accountsForUpdate = [];
+//           if (data.employeeLaborAccounts && Array.isArray(data.employeeLaborAccounts)) {
+//             accountsForUpdate = data.employeeLaborAccounts.map(account => ({ id: account.accountId }));
+//           }
+//           if (data.sunContractorLaborAccounts && Array.isArray(data.sunContractorLaborAccounts)) {
+//             const vendorAccounts = data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }));
+//             accountsForUpdate = [...accountsForUpdate, ...vendorAccounts];
+//           }
+          
+//           // Remove duplicates from accounts
+//           const uniqueAccountsMap = new Map();
+//           accountsForUpdate.forEach(acc => {
+//             if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//               uniqueAccountsMap.set(acc.id, acc);
+//             }
+//           });
+//           const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+          
+//           // Initialize all update options
+//           setUpdateAccountOptions(uniqueAccounts);
+//           setUpdateOrganizationOptions(orgOptions);
+//           setUpdatePlcOptions(plcOptionsForUpdate); // Make sure this is set properly
+          
+//           // ALSO update the main plcOptions if they're empty
+//           if (plcOptions.length === 0) {
+//             setPlcOptions(plcOptionsForUpdate);
+//             setFilteredPlcOptions(plcOptionsForUpdate);
+//           }
+//         } catch (err) {
+//           console.error("Failed to load project data for updates:", err);
+//           // Fallback to existing options
+//           setUpdateAccountOptions(laborAccounts);
+//           setUpdateOrganizationOptions(orgOptions);
+//           setUpdatePlcOptions(plcOptions.length > 0 ? plcOptions : []);
+//         }
+//       } else {
+//         // Fallback to existing options
+//         setUpdateAccountOptions(laborAccounts);
+//         setUpdateOrganizationOptions(orgOptions);
+//         setUpdatePlcOptions(plcOptions.length > 0 ? plcOptions : []);
+//       }
+      
+//     } catch (err) {
+//       console.error("Failed to initialize update options:", err);
+//     }
+//   };
+  
+//   initializeUpdateOptions();
+// }, [localEmployees.length, projectId]); // Remove plcOptions from dependencies to avoid circular updates
+
+// useEffect(() => {
+//   const initializeUpdateOptions = async () => {
+//     if (localEmployees.length === 0) return;
+    
+//     try {
+//       // Load organizations for updates
+//       const orgResponse = await axios.get(
+//         `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+//       );
+//       const orgOptions = Array.isArray(orgResponse.data)
+//         ? orgResponse.data.map((org) => ({
+//             value: org.orgId,
+//             label: org.orgId,
+//           }))
+//         : [];
+      
+//       // Load project data for accounts and PLC options
+//       if (projectId) {
+//         try {
+//           const response = await axios.get(
+//             `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//           );
+//           const data = Array.isArray(response.data) ? response.data[0] : response.data;
+          
+//           // Load ALL account types for updates (since we have mixed employee types)
+//           let allAccounts = [];
+          
+//           // Employee accounts
+//           if (data.employeeLaborAccounts && Array.isArray(data.employeeLaborAccounts)) {
+//             const employeeAccounts = data.employeeLaborAccounts.map(account => ({ 
+//               id: account.accountId,
+//               type: 'employee'
+//             }));
+//             allAccounts.push(...employeeAccounts);
+//           }
+          
+//           // Vendor accounts
+//           if (data.sunContractorLaborAccounts && Array.isArray(data.sunContractorLaborAccounts)) {
+//             const vendorAccounts = data.sunContractorLaborAccounts.map(account => ({ 
+//               id: account.accountId,
+//               type: 'vendor'
+//             }));
+//             allAccounts.push(...vendorAccounts);
+//           }
+          
+//           // Other accounts
+//           if (data.otherDirectCostLaborAccounts && Array.isArray(data.otherDirectCostLaborAccounts)) {
+//             const otherAccounts = data.otherDirectCostLaborAccounts.map(account => ({ 
+//               id: account.accountId,
+//               type: 'other'
+//             }));
+//             allAccounts.push(...otherAccounts);
+//           }
+          
+//           // Remove duplicates
+//           const uniqueAccountsMap = new Map();
+//           allAccounts.forEach(acc => {
+//             if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+//               uniqueAccountsMap.set(acc.id, { id: acc.id });
+//             }
+//           });
+//           const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+          
+//           // Load PLC options
+//           let plcOptionsForUpdate = [];
+//           if (data.plc && Array.isArray(data.plc)) {
+//             plcOptionsForUpdate = data.plc.map(plc => ({
+//               value: plc.laborCategoryCode,
+//               label: `${plc.laborCategoryCode} - ${plc.description}`,
+//             }));
+//           }
+          
+//           // Initialize all update options
+//           setUpdateAccountOptions(uniqueAccounts);
+//           setUpdateOrganizationOptions(orgOptions);
+//           setUpdatePlcOptions(plcOptionsForUpdate);
+          
+//           // Also update main options if they're empty
+//           if (plcOptions.length === 0) {
+//             setPlcOptions(plcOptionsForUpdate);
+//             setFilteredPlcOptions(plcOptionsForUpdate);
+//           }
+//         } catch (err) {
+//           console.error("Failed to load project data for updates:", err);
+//           setUpdateAccountOptions(laborAccounts);
+//           setUpdateOrganizationOptions(orgOptions);
+//           setUpdatePlcOptions(plcOptions.length > 0 ? plcOptions : []);
+//         }
+//       }
+      
+//     } catch (err) {
+//       console.error("Failed to initialize update options:", err);
+//     }
+//   };
+  
+//   initializeUpdateOptions();
+// }, [localEmployees.length, projectId]);
+
 useEffect(() => {
   const initializeUpdateOptions = async () => {
     if (localEmployees.length === 0) return;
@@ -3770,7 +3953,7 @@ useEffect(() => {
           }))
         : [];
       
-      // Load PLC options from project data for updates
+      // Load project data for accounts and PLC options
       if (projectId) {
         try {
           const response = await axios.get(
@@ -3778,6 +3961,46 @@ useEffect(() => {
           );
           const data = Array.isArray(response.data) ? response.data[0] : response.data;
           
+          // Load ALL account types for updates (including PLC and Other types)
+          let allAccounts = [];
+          
+          // Employee accounts
+          if (data.employeeLaborAccounts && Array.isArray(data.employeeLaborAccounts)) {
+            const employeeAccounts = data.employeeLaborAccounts.map(account => ({ 
+              id: account.accountId,
+              type: 'employee'
+            }));
+            allAccounts.push(...employeeAccounts);
+          }
+          
+          // Vendor accounts  
+          if (data.sunContractorLaborAccounts && Array.isArray(data.sunContractorLaborAccounts)) {
+            const vendorAccounts = data.sunContractorLaborAccounts.map(account => ({ 
+              id: account.accountId,
+              type: 'vendor'
+            }));
+            allAccounts.push(...vendorAccounts);
+          }
+          
+          // Other Direct Cost accounts (for "Other" ID type)
+          if (data.otherDirectCostLaborAccounts && Array.isArray(data.otherDirectCostLaborAccounts)) {
+            const otherAccounts = data.otherDirectCostLaborAccounts.map(account => ({ 
+              id: account.accountId,
+              type: 'other'
+            }));
+            allAccounts.push(...otherAccounts);
+          }
+          
+          // Remove duplicates
+          const uniqueAccountsMap = new Map();
+          allAccounts.forEach(acc => {
+            if (acc.id && !uniqueAccountsMap.has(acc.id)) {
+              uniqueAccountsMap.set(acc.id, { id: acc.id });
+            }
+          });
+          const uniqueAccounts = Array.from(uniqueAccountsMap.values());
+          
+          // Load PLC options
           let plcOptionsForUpdate = [];
           if (data.plc && Array.isArray(data.plc)) {
             plcOptionsForUpdate = data.plc.map(plc => ({
@@ -3786,47 +4009,22 @@ useEffect(() => {
             }));
           }
           
-          // Load account options for updates
-          let accountsForUpdate = [];
-          if (data.employeeLaborAccounts && Array.isArray(data.employeeLaborAccounts)) {
-            accountsForUpdate = data.employeeLaborAccounts.map(account => ({ id: account.accountId }));
-          }
-          if (data.sunContractorLaborAccounts && Array.isArray(data.sunContractorLaborAccounts)) {
-            const vendorAccounts = data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }));
-            accountsForUpdate = [...accountsForUpdate, ...vendorAccounts];
-          }
-          
-          // Remove duplicates from accounts
-          const uniqueAccountsMap = new Map();
-          accountsForUpdate.forEach(acc => {
-            if (acc.id && !uniqueAccountsMap.has(acc.id)) {
-              uniqueAccountsMap.set(acc.id, acc);
-            }
-          });
-          const uniqueAccounts = Array.from(uniqueAccountsMap.values());
-          
-          // Initialize all update options
+          // Initialize all update options with ALL available accounts
           setUpdateAccountOptions(uniqueAccounts);
           setUpdateOrganizationOptions(orgOptions);
-          setUpdatePlcOptions(plcOptionsForUpdate); // Make sure this is set properly
+          setUpdatePlcOptions(plcOptionsForUpdate);
           
-          // ALSO update the main plcOptions if they're empty
+          // Also update main options if they're empty
           if (plcOptions.length === 0) {
             setPlcOptions(plcOptionsForUpdate);
             setFilteredPlcOptions(plcOptionsForUpdate);
           }
         } catch (err) {
           console.error("Failed to load project data for updates:", err);
-          // Fallback to existing options
           setUpdateAccountOptions(laborAccounts);
           setUpdateOrganizationOptions(orgOptions);
           setUpdatePlcOptions(plcOptions.length > 0 ? plcOptions : []);
         }
-      } else {
-        // Fallback to existing options
-        setUpdateAccountOptions(laborAccounts);
-        setUpdateOrganizationOptions(orgOptions);
-        setUpdatePlcOptions(plcOptions.length > 0 ? plcOptions : []);
       }
       
     } catch (err) {
@@ -3835,8 +4033,7 @@ useEffect(() => {
   };
   
   initializeUpdateOptions();
-}, [localEmployees.length, projectId]); // Remove plcOptions from dependencies to avoid circular updates
-
+}, [localEmployees.length, projectId]);
 
 
 
@@ -4641,7 +4838,7 @@ const handlePlcBlur = (val) => {
   };
 
   const handleEmployeeDataChange = (empIdx, field, value) => {
-    if (!isEditable || !isBudPlan) return;
+    if (!isEditable || !isFieldEditable) return;
     setEditedEmployeeData((prev) => ({
       ...prev,
       [empIdx]: {
@@ -4844,22 +5041,69 @@ const handlePlcBlur = (val) => {
 //   }
 // };
 
+// const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "acctId", value);
+  
+//   // Filter accounts based on input
+//   if (value.length >= 1) {
+//     const filtered = updateAccountOptions.filter(acc => 
+//       acc.id.toLowerCase().includes(value.toLowerCase())
+//     );
+//     setUpdateAccountOptions(filtered);
+//   } else {
+//     // Reset to all available accounts when input is empty
+//     if (laborAccounts.length > 0) {
+//       setUpdateAccountOptions(laborAccounts);
+//     }
+//   }
+// };
+
+// const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
+//   handleEmployeeDataChange(actualEmpIdx, "acctId", value);
+  
+//   // Filter accounts based on input - use the correct base array
+//   if (value.length >= 1) {
+//     const baseAccounts = updateAccountOptions.length > 0 ? updateAccountOptions : laborAccounts;
+//     const filtered = baseAccounts.filter(acc => 
+//       acc.id.toLowerCase().includes(value.toLowerCase())
+//     );
+//     setUpdateAccountOptions(filtered);
+//   } else {
+//     // Reset to all available accounts when input is empty
+//     // Make sure we have the right base accounts loaded
+//     if (updateAccountOptions.length === 0 && laborAccounts.length > 0) {
+//       setUpdateAccountOptions(laborAccounts);
+//     } else if (updateAccountOptions.length > 0) {
+//       // Reset to the original full list that was loaded for updates
+//       const emp = localEmployees[actualEmpIdx];
+//       if (emp?.emple?.type) {
+//         // Reload the correct accounts based on the employee's type
+//         loadAccountsForEmployeeType(emp.emple.type);
+//       }
+//     }
+//   }
+// };
+
 const handleAccountInputChangeForUpdate = (value, actualEmpIdx) => {
   handleEmployeeDataChange(actualEmpIdx, "acctId", value);
   
-  // Filter accounts based on input
+  // Filter accounts based on input - ensure we're using all available accounts
   if (value.length >= 1) {
-    const filtered = updateAccountOptions.filter(acc => 
+    const baseAccounts = updateAccountOptions.length > 0 ? updateAccountOptions : laborAccounts;
+    const filtered = baseAccounts.filter(acc => 
       acc.id.toLowerCase().includes(value.toLowerCase())
     );
-    setUpdateAccountOptions(filtered);
+    // Don't update the state here, just use the filtered results for display
+    // The datalist will automatically show filtered options
   } else {
-    // Reset to all available accounts when input is empty
-    if (laborAccounts.length > 0) {
+    // When input is empty, ensure all accounts are available
+    if (updateAccountOptions.length === 0 && laborAccounts.length > 0) {
       setUpdateAccountOptions(laborAccounts);
     }
   }
 };
+
+
 
 
   const handleFillValues = async () => {
@@ -6360,7 +6604,7 @@ disabled={!isFieldEditable}
 </td> */}
 
 <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-  {isBudPlan && isEditable ? (
+  {isFieldEditable  && isEditable ? (
     <input
       type="text"
       value={
@@ -6372,7 +6616,9 @@ disabled={!isFieldEditable}
       onBlur={(e) => {
   if (planType === "NBBUD") return; // Add this line
   const val = e.target.value;
-  if (val && !isValidAccountForUpdate(val, updateAccountOptions)) {
+  const originalValue = row.acctId;
+
+  if (val !== originalValue && !isValidAccountForUpdate(val, updateAccountOptions)) {
     toast.error("Please enter a valid Account from the available list.", {
       autoClose: 3000,
     });
@@ -6756,7 +7002,7 @@ disabled={!isFieldEditable}
 
 
                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
-                            {isBudPlan && isEditable ? (
+                            {isFieldEditable && isEditable ? (
                               <input
                                 type="checkbox"
                                 checked={
@@ -6781,7 +7027,7 @@ disabled={!isFieldEditable}
                             )}
                           </td>
                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
-                            {isBudPlan && isEditable ? (
+                            {isFieldEditable && isEditable ? (
                               <input
                                 type="checkbox"
                                 checked={
@@ -6809,7 +7055,7 @@ disabled={!isFieldEditable}
                             {row.status}
                           </td>
                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {isBudPlan && isEditable ? (
+                            {isFieldEditable && isEditable ? (
                               <input
                                 type="text"
                                 value={
