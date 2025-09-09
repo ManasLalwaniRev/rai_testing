@@ -4743,10 +4743,10 @@ const LaborForm = () => {
   // ]);
 
   const handleSaveOrganizationSettings = useCallback(async () => {
-    if (!selectedProjectId) {
-      alert("Please select a Project ID first.");
-      return;
-    }
+    // if (!selectedProjectId) {
+    //   alert("Please select a Project ID first.");
+    //   return;
+    // }
 
     console.log("Attempting to save Closing Period...");
 
