@@ -126,3 +126,16 @@
   }
 }
 
+.date-input-clean::-webkit-datetime-edit-text,
+.date-input-clean::-webkit-datetime-edit-month-field,
+.date-input-clean::-webkit-datetime-edit-day-field,
+.date-input-clean::-webkit-datetime-edit-year-field {
+  opacity: 0;
+}
+
+.date-input-clean:focus::-webkit-datetime-edit-text,
+.date-input-clean:focus::-webkit-datetime-edit-month-field,
+.date-input-clean:focus::-webkit-datetime-edit-day-field,
+.date-input-clean:focus::-webkit-datetime-edit-year-field {
+  opacity: 1;
+}

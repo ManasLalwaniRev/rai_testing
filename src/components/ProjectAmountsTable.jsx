@@ -9629,6 +9629,7 @@ const ProjectAmountsTable = ({
     id: "",
     firstName: "",
     lastName: "",
+    name: "", // ADD THIS LINE
     isRev: false,
     isBrd: false,
     idType: "",
@@ -9653,6 +9654,8 @@ const ProjectAmountsTable = ({
   const [employeeNonLaborAccounts, setEmployeeNonLaborAccounts] = useState([]);
   const [subContractorNonLaborAccounts, setSubContractorNonLaborAccounts] = useState([]);
   const [organizationOptions, setOrganizationOptions] = useState([]);
+  const [otherDirectCostNonLaborAccounts, setOtherDirectCostNonLaborAccounts] = useState([]);
+
 
 
   const isEditable = initialData.status === "In Progress";
@@ -10072,74 +10075,168 @@ useEffect(() => {
     }
   };
 
+  // const fetchNonLaborAccounts = async () => {
+  //   if (!projectId || !formOpen) {
+  //     setEmployeeNonLaborAccounts([]);
+  //     setSubContractorNonLaborAccounts([]);
+  //     setOtherDirectCostNonLaborAccounts([]); // Add this line
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await axios.get(
+  //       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+  //     );
+
+  //     const data = Array.isArray(response.data)
+  //       ? response.data[0]
+  //       : response.data;
+
+  //     // -------------------------
+  //     // Employee Non-Labor Accounts
+  //     // -------------------------
+  //     let employeeAccounts = Array.isArray(data.employeeNonLaborAccounts)
+  //       ? data.employeeNonLaborAccounts.map((account) => ({
+  //           id: account.accountId || account, // handle both object/string
+  //           name: account.acctName || account.accountId || String(account),
+  //         }))
+  //       : [];
+
+  //     // Deduplicate employee accounts
+  //     const uniqueEmployeeMap = new Map();
+  //     employeeAccounts.forEach((acc) => {
+  //       if (acc.id && !uniqueEmployeeMap.has(acc.id)) {
+  //         uniqueEmployeeMap.set(acc.id, acc);
+  //       }
+  //     });
+  //     const uniqueEmployeeAccounts = Array.from(uniqueEmployeeMap.values());
+  //     setEmployeeNonLaborAccounts(uniqueEmployeeAccounts);
+
+  //     // -------------------------
+  //     // SubContractor Non-Labor Accounts
+  //     // -------------------------
+  //     let subAccounts = Array.isArray(data.subContractorNonLaborAccounts)
+  //       ? data.subContractorNonLaborAccounts.map((account) => ({
+  //           id: account.accountId || account,
+  //           name: account.acctName || account.accountId || String(account),
+  //         }))
+  //       : [];
+
+  //     // Deduplicate subcontractor accounts
+  //     const uniqueSubMap = new Map();
+  //     subAccounts.forEach((acc) => {
+  //       if (acc.id && !uniqueSubMap.has(acc.id)) {
+  //         uniqueSubMap.set(acc.id, acc);
+  //       }
+  //     });
+  //     const uniqueSubAccounts = Array.from(uniqueSubMap.values());
+  //     setSubContractorNonLaborAccounts(uniqueSubAccounts);
+  //   } catch (err) {
+  //     console.error("Error fetching non-labor accounts:", err);
+  //     setEmployeeNonLaborAccounts([]);
+  //     setSubContractorNonLaborAccounts([]);
+  //     // Only show error if not NBBUD plan type
+  //     if (planType && planType.toUpperCase() !== "NBBUD") {
+  //       toast.error("Failed to fetch non-labor accounts", {
+  //         toastId: "non-labor-accounts-error",
+  //         autoClose: 3000,
+  //       });
+  //     }
+  //   }
+  // };
+
   const fetchNonLaborAccounts = async () => {
-    if (!projectId || !formOpen) {
-      setEmployeeNonLaborAccounts([]);
-      setSubContractorNonLaborAccounts([]);
-      return;
-    }
+  if (!projectId || !formOpen) {
+    setEmployeeNonLaborAccounts([]);
+    setSubContractorNonLaborAccounts([]);
+    setOtherDirectCostNonLaborAccounts([]); // Add this line
+    return;
+  }
 
-    try {
-      const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
-      );
+  try {
+    const response = await axios.get(
+      `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+    );
 
-      const data = Array.isArray(response.data)
-        ? response.data[0]
-        : response.data;
+    const data = Array.isArray(response.data)
+      ? response.data[0]
+      : response.data;
 
-      // -------------------------
-      // Employee Non-Labor Accounts
-      // -------------------------
-      let employeeAccounts = Array.isArray(data.employeeNonLaborAccounts)
-        ? data.employeeNonLaborAccounts.map((account) => ({
-            id: account.accountId || account, // handle both object/string
-            name: account.acctName || account.accountId || String(account),
-          }))
-        : [];
+    // -------------------------
+    // Employee Non-Labor Accounts
+    // -------------------------
+    let employeeAccounts = Array.isArray(data.employeeNonLaborAccounts)
+      ? data.employeeNonLaborAccounts.map((account) => ({
+          id: account.accountId || account, // handle both object/string
+          name: account.acctName || account.accountId || String(account),
+        }))
+      : [];
 
-      // Deduplicate employee accounts
-      const uniqueEmployeeMap = new Map();
-      employeeAccounts.forEach((acc) => {
-        if (acc.id && !uniqueEmployeeMap.has(acc.id)) {
-          uniqueEmployeeMap.set(acc.id, acc);
-        }
-      });
-      const uniqueEmployeeAccounts = Array.from(uniqueEmployeeMap.values());
-      setEmployeeNonLaborAccounts(uniqueEmployeeAccounts);
-
-      // -------------------------
-      // SubContractor Non-Labor Accounts
-      // -------------------------
-      let subAccounts = Array.isArray(data.subContractorNonLaborAccounts)
-        ? data.subContractorNonLaborAccounts.map((account) => ({
-            id: account.accountId || account,
-            name: account.acctName || account.accountId || String(account),
-          }))
-        : [];
-
-      // Deduplicate subcontractor accounts
-      const uniqueSubMap = new Map();
-      subAccounts.forEach((acc) => {
-        if (acc.id && !uniqueSubMap.has(acc.id)) {
-          uniqueSubMap.set(acc.id, acc);
-        }
-      });
-      const uniqueSubAccounts = Array.from(uniqueSubMap.values());
-      setSubContractorNonLaborAccounts(uniqueSubAccounts);
-    } catch (err) {
-      console.error("Error fetching non-labor accounts:", err);
-      setEmployeeNonLaborAccounts([]);
-      setSubContractorNonLaborAccounts([]);
-      // Only show error if not NBBUD plan type
-      if (planType && planType.toUpperCase() !== "NBBUD") {
-        toast.error("Failed to fetch non-labor accounts", {
-          toastId: "non-labor-accounts-error",
-          autoClose: 3000,
-        });
+    // Deduplicate employee accounts
+    const uniqueEmployeeMap = new Map();
+    employeeAccounts.forEach((acc) => {
+      if (acc.id && !uniqueEmployeeMap.has(acc.id)) {
+        uniqueEmployeeMap.set(acc.id, acc);
       }
+    });
+    const uniqueEmployeeAccounts = Array.from(uniqueEmployeeMap.values());
+    setEmployeeNonLaborAccounts(uniqueEmployeeAccounts);
+
+    // -------------------------
+    // SubContractor Non-Labor Accounts
+    // -------------------------
+    let subAccounts = Array.isArray(data.subContractorNonLaborAccounts)
+      ? data.subContractorNonLaborAccounts.map((account) => ({
+          id: account.accountId || account,
+          name: account.acctName || account.accountId || String(account),
+        }))
+      : [];
+
+    // Deduplicate subcontractor accounts
+    const uniqueSubMap = new Map();
+    subAccounts.forEach((acc) => {
+      if (acc.id && !uniqueSubMap.has(acc.id)) {
+        uniqueSubMap.set(acc.id, acc);
+      }
+    });
+    const uniqueSubAccounts = Array.from(uniqueSubMap.values());
+    setSubContractorNonLaborAccounts(uniqueSubAccounts);
+
+    // -------------------------
+    // Other Direct Cost Non-Labor Accounts (NEW)
+    // -------------------------
+    let otherAccounts = Array.isArray(data.otherDirectCostNonLaborAccounts)
+      ? data.otherDirectCostNonLaborAccounts.map((account) => ({
+          id: account.accountId || account,
+          name: account.acctName || account.accountId || String(account),
+        }))
+      : [];
+
+    // Deduplicate other direct cost accounts
+    const uniqueOtherMap = new Map();
+    otherAccounts.forEach((acc) => {
+      if (acc.id && !uniqueOtherMap.has(acc.id)) {
+        uniqueOtherMap.set(acc.id, acc);
+      }
+    });
+    const uniqueOtherAccounts = Array.from(uniqueOtherMap.values());
+    setOtherDirectCostNonLaborAccounts(uniqueOtherAccounts);
+
+  } catch (err) {
+    console.error("Error fetching non-labor accounts:", err);
+    setEmployeeNonLaborAccounts([]);
+    setSubContractorNonLaborAccounts([]);
+    setOtherDirectCostNonLaborAccounts([]); // Add this line
+    // Only show error if not NBBUD plan type
+    if (planType && planType.toUpperCase() !== "NBBUD") {
+      toast.error("Failed to fetch non-labor accounts", {
+        toastId: "non-labor-accounts-error",
+        autoClose: 3000,
+      });
     }
-  };
+  }
+};
+
 
   if (formOpen) {
     fetchEmployees();
@@ -10147,6 +10244,7 @@ useEffect(() => {
   } else {
     setEmployeeNonLaborAccounts([]);
     setSubContractorNonLaborAccounts([]);
+    setOtherDirectCostNonLaborAccounts([]); // ADD THIS LINE
     setEmployeeSuggestions([]);
   }
 }, [projectId, showNewForm, newEntry.idType, isEditable, planType]); // Add planType to dependencies
@@ -10750,108 +10848,93 @@ const handleIdChange = (value) => {
   //   }
   // };
   
-    const handleRowFieldBlur = async (rowIdx, emp) => {
-    if (!isFieldEditable || !isEditable) return;
-    if (!emp || !emp.emple) {
-      toast.error("Employee data is missing for update.");
-      return;
-    }
- 
-    const edited = editedRowData[rowIdx] || {};
-    if (
-      edited.acctId === undefined &&
-      edited.orgId === undefined &&
-      edited.isRev === undefined &&
-      edited.isBrd === undefined
-    )
-      return;
- 
-    const payload = {
-      dctId: emp.emple.dctId || 0,
-      plId: emp.emple.plId || 0,
-      accId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId,
-      orgId: edited.orgId !== undefined ? edited.orgId : emp.emple.orgId,
-      type: emp.emple.type || "",
-      category: emp.emple.category || "",
-      amountType: emp.emple.amountType || "",
-      id: emp.emple.emplId || "",
-      isRev: edited.isRev !== undefined ? edited.isRev : emp.emple.isRev,
-      isBrd: edited.isBrd !== undefined ? edited.isBrd : emp.emple.isBrd,
-      createdBy: emp.emple.createdBy || "System",
-      lastModifiedBy: "System",
-    };
- 
-    // ✅ Add validation BEFORE saving
-    // const validAccounts =
-    //   emp.idType === "Vendor" || emp.idType === "Vendor Employee"
-    //     ? subContractorNonLaborAccounts.map((a) => a.id || a.accountId || "")
-    //     : employeeNonLaborAccounts.map((a) => a.id || a.accountId || "");
- 
-    // if (payload.accId && !validAccounts.includes(payload.accId)) {
-    //   toast.error("Please select a valid account from suggestions");
-    //   return; // 🚫 stop here, don't call API or show success
-    // }
-    // // ✅ Validate orgId against organizationOptions
-    // const validOrgs = organizationOptions.map((org) => org.value);
-    // if (payload.orgId && !validOrgs.includes(payload.orgId)) {
-    //   toast.error("Please select a valid organization from suggestions");
-    //   return; // 🚫 block update
-    // }
-
-    // Skip validations if planType is NBBUD
-if (planType && planType.toUpperCase() !== "NBBUD") {
-  // ✅ Add validation BEFORE saving
-  const validAccounts =
-    emp.idType === "Vendor" || emp.idType === "Vendor Employee"
-      ? subContractorNonLaborAccounts.map((a) => a.id || a.accountId || "")
-      : employeeNonLaborAccounts.map((a) => a.id || a.accountId || "");
-
-  if (payload.accId && !validAccounts.includes(payload.accId)) {
-    toast.error("Please select a valid account from suggestions");
-    return; // 🚫 stop here, don't call API or show success
+  const handleRowFieldBlur = async (rowIdx, emp) => {
+  if (!isFieldEditable || !isEditable) return;
+  if (!emp || !emp.emple) {
+    toast.error("Employee data is missing for update.");
+    return;
   }
-  // ✅ Validate orgId against organizationOptions
-  const validOrgs = organizationOptions.map((org) => org.value);
-  if (payload.orgId && !validOrgs.includes(payload.orgId)) {
-    toast.error("Please select a valid organization from suggestions");
-    return; // 🚫 block update
-  }
-}
 
- 
-    try {
-      await axios.put(
-        "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
-        { ...payload, acctId: payload.accId },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      setEditedRowData((prev) => {
-        const newData = { ...prev };
-        delete newData[rowIdx];
-        return newData;
-      });
-      setEmployees((prev) => {
-        const updated = [...prev];
-        updated[rowIdx] = {
-          ...updated[rowIdx],
-          emple: {
-            ...updated[rowIdx].emple,
-            ...payload,
-          },
-        };
-        return updated;
-      });
-      toast.success("Employee updated successfully!", {
-        toastId: `employee-update-${rowIdx}`,
-        autoClose: 2000,
-      });
-    } catch (err) {
-      toast.error(
-        "Failed to update row: " + (err.response?.data?.message || err.message)
-      );
-    }
+  const edited = editedRowData[rowIdx] || {};
+  if (
+    edited.acctId === undefined &&
+    edited.orgId === undefined &&
+    edited.isRev === undefined &&
+    edited.isBrd === undefined &&
+    edited.category === undefined  // ADD THIS LINE
+  )
+    return;
+
+  const payload = {
+    dctId: emp.emple.dctId || 0,
+    plId: emp.emple.plId || 0,
+    accId: edited.acctId !== undefined ? edited.acctId : emp.emple.accId,
+    orgId: edited.orgId !== undefined ? edited.orgId : emp.emple.orgId,
+    type: emp.emple.type || "",
+    category: edited.category !== undefined ? edited.category : emp.emple.category, // ADD THIS LINE
+    amountType: emp.emple.amountType || "",
+    id: emp.emple.emplId || "",
+    isRev: edited.isRev !== undefined ? edited.isRev : emp.emple.isRev,
+    isBrd: edited.isBrd !== undefined ? edited.isBrd : emp.emple.isBrd,
+    createdBy: emp.emple.createdBy || "System",
+    lastModifiedBy: "System",
   };
 
+  // Skip validations if planType is NBBUD
+  if (planType && planType.toUpperCase() !== "NBBUD") {
+    const validAccounts =
+      emp.emple.type === "Vendor" || emp.emple.type === "Vendor Employee"
+        ? subContractorNonLaborAccounts.map((a) => a.id || a.accountId || "")
+        : emp.emple.type === "Other"
+        ? otherDirectCostNonLaborAccounts.map((a) => a.id || a.accountId || "")
+        : employeeNonLaborAccounts.map((a) => a.id || a.accountId || "");
+
+    if (payload.accId && !validAccounts.includes(payload.accId)) {
+      toast.error("Please select a valid account from suggestions");
+      return;
+    }
+    
+    const validOrgs = organizationOptions.map((org) => org.value);
+    if (payload.orgId && !validOrgs.includes(payload.orgId)) {
+      toast.error("Please select a valid organization from suggestions");
+      return;
+    }
+  }
+
+  try {
+    await axios.put(
+      "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
+      { ...payload, acctId: payload.accId },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    setEditedRowData((prev) => {
+      const newData = { ...prev };
+      delete newData[rowIdx];
+      return newData;
+    });
+    setEmployees((prev) => {
+      const updated = [...prev];
+      updated[rowIdx] = {
+        ...updated[rowIdx],
+        emple: {
+          ...updated[rowIdx].emple,
+          ...payload,
+        },
+      };
+      return updated;
+    });
+    toast.success("Employee updated successfully!", {
+      toastId: `employee-update-${rowIdx}`,
+      autoClose: 2000,
+    });
+  } catch (err) {
+    toast.error(
+      "Failed to update row: " + (err.response?.data?.message || err.message)
+    );
+  }
+};
+
+   
 
   const getEmployeeRow = (emp, idx) => {
     const monthAmounts = getMonthAmounts(emp);
@@ -11071,6 +11154,7 @@ if (planType && planType.toUpperCase() !== "NBBUD") {
       id: "",
       firstName: "",
       lastName: "",
+       name: "", // ADD THIS LINE
       isRev: false,
       isBrd: false,
       idType: newIdType || "", // preserve new idType
@@ -11528,11 +11612,17 @@ const handleSaveNewEntry = async () => {
     // category: newEntry.lastName && newEntry.firstName
     //   ? `${newEntry.lastName}, ${newEntry.firstName}`
     //   : newEntry.lastName || newEntry.firstName || "",
-    category: planType && planType.toUpperCase() === "NBBUD"
+  //   category: planType && planType.toUpperCase() === "NBBUD"
+  // ? newEntry.name || ""
+  // : newEntry.lastName && newEntry.firstName
+  //   ? `${newEntry.lastName}, ${newEntry.firstName}`
+  //   : newEntry.lastName || newEntry.firstName || "",
+  category: (newEntry.idType === "Other" || (planType && planType.toUpperCase() === "NBBUD"))
   ? newEntry.name || ""
   : newEntry.lastName && newEntry.firstName
     ? `${newEntry.lastName}, ${newEntry.firstName}`
     : newEntry.lastName || newEntry.firstName || "",
+
 
     amountType: "",
     id: newEntry.id,
@@ -11570,9 +11660,15 @@ const handleSaveNewEntry = async () => {
         isBrd: newEntry.isBrd || false,
         status: newEntry.status || "Act",
         type: newEntry.idType || "Employee",
-        category: newEntry.lastName && newEntry.firstName
-          ? `${newEntry.lastName}, ${newEntry.firstName}`
-          : newEntry.lastName || newEntry.firstName || "",
+        // category: newEntry.lastName && newEntry.firstName
+        //   ? `${newEntry.lastName}, ${newEntry.firstName}`
+        //   : newEntry.lastName || newEntry.firstName || "",
+        category: (newEntry.idType === "Other" || (planType && planType.toUpperCase() === "NBBUD"))
+  ? newEntry.name || ""
+  : newEntry.lastName && newEntry.firstName
+    ? `${newEntry.lastName}, ${newEntry.firstName}`
+    : newEntry.lastName || newEntry.firstName || "",
+
         plForecasts: payloadForecasts.map((forecast) => ({
           ...forecast,
           forecastid:
@@ -11601,6 +11697,7 @@ const handleSaveNewEntry = async () => {
       id: "",
       firstName: "",
       lastName: "",
+      name: "", // ADD THIS LINE
       isRev: false,
       isBrd: false,
       idType: "",
@@ -12873,6 +12970,7 @@ const handleSaveNewEntry = async () => {
       setEmployeeSuggestions([]);
       setEmployeeNonLaborAccounts([]);
       setSubContractorNonLaborAccounts([]);
+      setOtherDirectCostNonLaborAccounts([]); // ADD THIS LINE
     } else {
       // Show new form
       setShowNewForm(true);
@@ -13114,29 +13212,29 @@ const handleSaveNewEntry = async () => {
                           </datalist>
                         )}
                       </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5">
+                     <td className="border border-gray-300 px-1.5 py-0.5">
   <input
     type="text"
     name="name"
     value={
-      planType && planType.toUpperCase() === "NBBUD"
+      newEntry.idType === "Other" || (planType && planType.toUpperCase() === "NBBUD")
         ? newEntry.name || ""
         : newEntry.lastName && newEntry.firstName
         ? `${newEntry.lastName}, ${newEntry.firstName}`
         : newEntry.lastName || newEntry.firstName || ""
     }
     onChange={(e) => 
-      planType && planType.toUpperCase() === "NBBUD" &&
+      (newEntry.idType === "Other" || (planType && planType.toUpperCase() === "NBBUD")) &&
       setNewEntry({ ...newEntry, name: e.target.value })
     }
-    readOnly={planType && planType.toUpperCase() !== "NBBUD"}
+    readOnly={newEntry.idType !== "Other" && planType && planType.toUpperCase() !== "NBBUD"}
     className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-      planType && planType.toUpperCase() === "NBBUD"
-        ? ""
-        : "bg-gray-100 cursor-not-allowed"
+      newEntry.idType !== "Other" && planType && planType.toUpperCase() !== "NBBUD"
+        ? "bg-gray-100 cursor-not-allowed"
+        : ""
     }`}
     placeholder={
-      planType && planType.toUpperCase() === "NBBUD" 
+      newEntry.idType === "Other" || (planType && planType.toUpperCase() === "NBBUD")
         ? "Enter Name" 
         : "Name (auto-filled)"
     }
@@ -13160,31 +13258,57 @@ const handleSaveNewEntry = async () => {
 className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
   !isFieldEditable ? "bg-gray-100 cursor-not-allowed" : ""
 }`}
-                          onBlur={(e) => {
+onBlur={(e) => {
   // Skip validation if planType is NBBUD
   if (planType && planType.toUpperCase() === "NBBUD") {
     return;
   }
   
   const val = e.target.value.trim();
-  // Build valid accounts list
-  const validAccounts =
-    newEntry.idType === "Vendor" ||
-    newEntry.idType === "Vendor Employee"
-      ? subContractorNonLaborAccounts.map(
-          (a) => a.id || a.accountId || ""
-        )
-      : employeeNonLaborAccounts.map(
-          (a) => a.id || a.accountId || ""
-        );
+  
+  // Build valid accounts list based on ID type
+  let validAccounts = [];
+  
+  if (newEntry.idType === "Other") {
+    // For "Other" type, use only otherDirectCostNonLaborAccounts
+    validAccounts = otherDirectCostNonLaborAccounts.map(a => a.id || a.accountId || "");
+  } else if (newEntry.idType === "Vendor" || newEntry.idType === "Vendor Employee") {
+    validAccounts = subContractorNonLaborAccounts.map(a => a.id || a.accountId || "");
+  } else {
+    validAccounts = employeeNonLaborAccounts.map(a => a.id || a.accountId || "");
+  }
 
   if (val !== "" && !validAccounts.includes(val)) {
-    toast.error(
-      "Please select a valid account from suggestions"
-    );
+    toast.error("Please select a valid account from suggestions");
     setNewEntry((prev) => ({ ...prev, acctId: "" })); // reset
   }
 }}
+
+//                           onBlur={(e) => {
+//   // Skip validation if planType is NBBUD
+//   if (planType && planType.toUpperCase() === "NBBUD") {
+//     return;
+//   }
+  
+//   const val = e.target.value.trim();
+//   // Build valid accounts list
+//   const validAccounts =
+//     newEntry.idType === "Vendor" ||
+//     newEntry.idType === "Vendor Employee"
+//       ? subContractorNonLaborAccounts.map(
+//           (a) => a.id || a.accountId || ""
+//         )
+//       : employeeNonLaborAccounts.map(
+//           (a) => a.id || a.accountId || ""
+//         );
+
+//   if (val !== "" && !validAccounts.includes(val)) {
+//     toast.error(
+//       "Please select a valid account from suggestions"
+//     );
+//     setNewEntry((prev) => ({ ...prev, acctId: "" })); // reset
+//   }
+// }}
 
                           
                           list="account-list"
@@ -13192,29 +13316,27 @@ className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
                           // readOnly={!isBudPlan}
                           readOnly={!isFieldEditable}
                         />
-                        <datalist id="account-list">
-                          {(newEntry.idType === "Vendor" ||
-                          newEntry.idType === "Vendor Employee"
-                            ? subContractorNonLaborAccounts
-                            : employeeNonLaborAccounts
-                          ).map((account, index) => {
-                            const valueText =
-                              account.id || account.accountId || "";
-                            // const displayText =
-                            //   account.name ||
-                            //   account.acctName ||
-                            //   account.accountId ||
-                            //   valueText;
-                            return (
-                              <option
-                                key={`${valueText}-${index}`}
-                                value={valueText}
-                              >
-                                {/* {displayText} */}
-                              </option>
-                            );
-                          })}
-                        </datalist>
+                       <datalist id="account-list">
+  {(newEntry.idType === "Vendor" ||
+  newEntry.idType === "Vendor Employee"
+    ? subContractorNonLaborAccounts
+    : newEntry.idType === "Other"  // ADD THIS CONDITION
+    ? otherDirectCostNonLaborAccounts
+    : employeeNonLaborAccounts
+  ).map((account, index) => {
+    const valueText =
+      account.id || account.accountId || "";
+    return (
+      <option
+        key={`${valueText}-${index}`}
+        value={valueText}
+      >
+      </option>
+    );
+  })}
+</datalist>
+
+
                         {/* Changed px-2 to px-1.5 */}
                         {/* <input
                           type="text"
@@ -13458,406 +13580,269 @@ className={`w-4 h-4 ${
                           onClick={() => handleRowClick(actualEmpIdx)}
                         >
                           {EMPLOYEE_COLUMNS.map((col) => {
-                            if (isFieldEditable && isEditable) {
-                              if (col.key === "acctId") {
-                                return (
-                                  // <td
-                                  //   key={`${uniqueRowKey}-acctId`}
-                                  //   className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
-                                  // >
-                                  //   {" "}
-                                  //   {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                  //   <input
-                                  //     type="text"
-                                  //     value={
-                                  //       editedRowData[actualEmpIdx]?.acctId !==
-                                  //       undefined
-                                  //         ? editedRowData[actualEmpIdx].acctId
-                                  //         : row.acctId
-                                  //     }
-                                  //     onChange={(e) => {
-                                  //       // if (/^[0-9-]*$/.test(e.target.value)) {
-                                  //       handleRowFieldChange(
-                                  //         actualEmpIdx,
-                                  //         "acctId",
-                                  //         e.target.value
-                                  //       );
-                                  //       // }
-                                  //     }}
-                                  //     onBlur={() =>
-                                  //       handleRowFieldBlur(actualEmpIdx, emp)
-                                  //     }
-                                  //     // onBlur={(e) => {
-                                  //     //   const val = e.target.value;
+  if (isFieldEditable && isEditable) {
+    // ADD THIS: Handle name field for "Other" ID type
+    if (col.key === "name" && emp.emple.type === "Other") {
+      return (
+        <td
+          key={`${uniqueRowKey}-name`}
+          className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+        >
+          <input
+            type="text"
+            value={
+              editedRowData[actualEmpIdx]?.category !== undefined
+                ? editedRowData[actualEmpIdx].category
+                : emp.emple.category || ""
+            }
+            onChange={(e) =>
+              handleRowFieldChange(
+                actualEmpIdx,
+                "category",
+                e.target.value
+              )
+            }
+            onBlur={() =>
+              handleRowFieldBlur(actualEmpIdx, emp)
+            }
+            className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+            placeholder="Enter Name"
+          />
+        </td>
+      );
+    }
+    
+    if (col.key === "acctId") {
+      return (
+        <td
+          key={`${uniqueRowKey}-acctId`}
+          className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+        >
+          <input
+            type="text"
+            value={
+              editedRowData[actualEmpIdx]?.acctId !==
+              undefined
+                ? editedRowData[actualEmpIdx].acctId
+                : row.acctId
+            }
+            onChange={(e) => {
+              const val = e.target.value;
+              handleRowFieldChange(
+                actualEmpIdx,
+                "acctId",
+                val
+              );
+            }}
+            onBlur={(e) => {
+              // Skip validation if planType is NBBUD
+              if (planType && planType.toUpperCase() === "NBBUD") {
+                handleRowFieldBlur(actualEmpIdx, emp);
+                return;
+              }
+              
+              const val = e.target.value.trim();
 
-                                  //     //   // build valid account list
-                                  //     //   const validAccounts =
-                                  //     //     emp.idType === "Vendor" ||
-                                  //     //     emp.idType === "Vendor Employee"
-                                  //     //       ? subContractorNonLaborAccounts.map(
-                                  //     //           (a) => a.id || a.accountId || ""
-                                  //     //         )
-                                  //     //       : employeeNonLaborAccounts.map(
-                                  //     //           (a) => a.id || a.accountId || ""
-                                  //     //         );
+              // Build valid account list based on emp.emple.type (not emp.idType)
+              const validAccounts =
+                emp.emple.type === "Vendor" ||
+                emp.emple.type === "Vendor Employee"
+                  ? subContractorNonLaborAccounts.map(
+                      (a) => a.id || a.accountId || ""
+                    )
+                  : emp.emple.type === "Other"
+                  ? otherDirectCostNonLaborAccounts.map(
+                      (a) => a.id || a.accountId || ""
+                    )
+                  : employeeNonLaborAccounts.map(
+                      (a) => a.id || a.accountId || ""
+                    );
 
-                                  //     //   if (
-                                  //     //     !validAccounts.includes(val) &&
-                                  //     //     val !== ""
-                                  //     //   ) {
-                                  //     //     toast.error(
-                                  //     //       "Please select a valid account from suggestions"
-                                  //     //     );
-                                  //     //     handleRowFieldChange(
-                                  //     //       actualEmpIdx,
-                                  //     //       "acctId",
-                                  //     //       ""
-                                  //     //     ); // reset to blank
-                                  //     //   }
+              if (
+                val !== "" &&
+                !validAccounts.includes(val)
+              ) {
+                toast.error(
+                  "Please select a valid account from suggestions"
+                );
+                handleRowFieldChange(
+                  actualEmpIdx,
+                  "acctId",
+                  ""
+                );
+                return;
+              }
 
-                                  //     //   handleRowFieldBlur(actualEmpIdx, emp);
-                                  //     // }}
-                                  //     list={`account-list-${actualEmpIdx}`}
-                                  //     className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                  //   />
-                                  //   <datalist
-                                  //     id={`account-list-${actualEmpIdx}`}
-                                  //   >
-                                  //     {(emp.idType === "Vendor" ||
-                                  //     emp.idType === "Vendor Employee"
-                                  //       ? subContractorNonLaborAccounts
-                                  //       : employeeNonLaborAccounts
-                                  //     ).map((account, index) => {
-                                  //       const valueText =
-                                  //         account.id || account.accountId || ""; // safe fallback
-                                  //       const displayText =
-                                  //         account.name ||
-                                  //         account.acctName ||
-                                  //         account.accountId ||
-                                  //         valueText;
+              handleRowFieldBlur(actualEmpIdx, emp);
+            }}
+            list={`account-list-${actualEmpIdx}`}
+            className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+          />
 
-                                  //       return (
-                                  //         <option
-                                  //           key={`${valueText}-${index}`}
-                                  //           value={valueText}
-                                  //         >
-                                  //           {displayText}
-                                  //         </option>
-                                  //       );
-                                  //     })}
-                                  //   </datalist>
-                                  // </td>
-                                  <td
-                                    key={`${uniqueRowKey}-acctId`}
-                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
-                                  >
-                                    <input
-                                      type="text"
-                                      value={
-                                        editedRowData[actualEmpIdx]?.acctId !==
-                                        undefined
-                                          ? editedRowData[actualEmpIdx].acctId
-                                          : row.acctId
-                                      }
-                                      onChange={(e) => {
-                                        const val = e.target.value;
-                                        // ✅ Allow datalist selection + numbers/dash typing
-                                        {
-                                          handleRowFieldChange(
-                                            actualEmpIdx,
-                                            "acctId",
-                                            val
-                                          );
-                                        }
-                                      }}
-                                      // onBlur={(e) => {
-                                      //   const val = e.target.value.trim();
+          <datalist id={`account-list-${actualEmpIdx}`}>
+            {(emp.emple.type === "Vendor" ||
+            emp.emple.type === "Vendor Employee"
+              ? subContractorNonLaborAccounts
+              : emp.emple.type === "Other"
+              ? otherDirectCostNonLaborAccounts
+              : employeeNonLaborAccounts
+            ).map((account, index) => {
+              const valueText =
+                account.id || account.accountId || "";
+              return (
+                <option
+                  key={`${valueText}-${index}`}
+                  value={valueText}
+                >
+                </option>
+              );
+            })}
+          </datalist>
+        </td>
+      );
+    }
+    
+    if (col.key === "orgId") {
+      return (
+        <td
+          key={`${uniqueRowKey}-orgId`}
+          className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+        >
+          <input
+            type="text"
+            value={
+              editedRowData[actualEmpIdx]?.orgId !==
+              undefined
+                ? editedRowData[actualEmpIdx].orgId
+                : row.orgId
+            }
+            onChange={(e) =>
+              handleRowFieldChange(
+                actualEmpIdx,
+                "orgId",
+                e.target.value
+              )
+            }
+            onBlur={(e) => {
+              // Skip validation if planType is NBBUD
+              if (planType && planType.toUpperCase() === "NBBUD") {
+                handleRowFieldBlur(actualEmpIdx, emp);
+                return;
+              }
+              
+              const val = e.target.value.trim();
+              const validOrgs =
+                organizationOptions.map(
+                  (org) => org.value
+                );
 
-                                      //   // Build valid account list
-                                      //   const validAccounts =
-                                      //     emp.idType === "Vendor" ||
-                                      //     emp.idType === "Vendor Employee"
-                                      //       ? subContractorNonLaborAccounts.map(
-                                      //           (a) => a.id || a.accountId || ""
-                                      //         )
-                                      //       : employeeNonLaborAccounts.map(
-                                      //           (a) => a.id || a.accountId || ""
-                                      //         );
+              if (
+                val !== "" &&
+                !validOrgs.includes(val)
+              ) {
+                toast.error(
+                  "Please select a valid organization from suggestions"
+                );
+                handleRowFieldChange(
+                  actualEmpIdx,
+                  "orgId",
+                  ""
+                );
+                return;
+              }
 
-                                      //   if (
-                                      //     val !== "" &&
-                                      //     !validAccounts.includes(val)
-                                      //   ) {
-                                      //     toast.error(
-                                      //       "Please select a valid account from suggestions"
-                                      //     );
-                                      //     handleRowFieldChange(
-                                      //       actualEmpIdx,
-                                      //       "acctId",
-                                      //       ""
-                                      //     ); // reset to blank
-                                      //   }
-
-                                      //   handleRowFieldBlur(actualEmpIdx, emp);
-                                      // }}
-
-                                     onBlur={(e) => {
-  // Skip validation if planType is NBBUD
-  if (planType && planType.toUpperCase() === "NBBUD") {
-    handleRowFieldBlur(actualEmpIdx, emp);
-    return;
+              handleRowFieldBlur(actualEmpIdx, emp);
+            }}
+            list={`organization-list-${actualEmpIdx}`}
+            className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+          />
+          <datalist
+            id={`organization-list-${actualEmpIdx}`}
+          >
+            {organizationOptions.map((org, index) => (
+              <option
+                key={`${org.value}-${index}`}
+                value={org.value}
+              >
+                {org.label}
+              </option>
+            ))}
+          </datalist>
+        </td>
+      );
+    }
+    
+    if (col.key === "isRev") {
+      return (
+        <td
+          key={`${uniqueRowKey}-isRev`}
+          className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+        >
+          <input
+            type="checkbox"
+            checked={
+              editedRowData[actualEmpIdx]?.isRev !==
+              undefined
+                ? editedRowData[actualEmpIdx].isRev
+                : emp.emple.isRev
+            }
+            onChange={(e) =>
+              handleRowFieldChange(
+                actualEmpIdx,
+                "isRev",
+                e.target.checked
+              )
+            }
+            onBlur={() =>
+              handleRowFieldBlur(actualEmpIdx, emp)
+            }
+            className="w-4 h-4"
+          />
+        </td>
+      );
+    }
+    
+    if (col.key === "isBrd") {
+      return (
+        <td
+          key={`${uniqueRowKey}-isBrd`}
+          className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
+        >
+          <input
+            type="checkbox"
+            checked={
+              editedRowData[actualEmpIdx]?.isBrd !==
+              undefined
+                ? editedRowData[actualEmpIdx].isBrd
+                : emp.emple.isBrd
+            }
+            onChange={(e) =>
+              handleRowFieldChange(
+                actualEmpIdx,
+                "isBrd",
+                e.target.checked
+              )
+            }
+            onBlur={() =>
+              handleRowFieldBlur(actualEmpIdx, emp)
+            }
+            className="w-4 h-4"
+          />
+        </td>
+      );
+    }
   }
   
-  const val = e.target.value.trim();
+  return (
+    <td
+      key={`${uniqueRowKey}-${col.key}`}
+      className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
+    >
+      {row[col.key]}
+    </td>
+  );
+})}
 
-  // Build valid account list
-  const validAccounts =
-    emp.idType === "Vendor" ||
-    emp.idType === "Vendor Employee"
-      ? subContractorNonLaborAccounts.map(
-          (a) => a.id || a.accountId || ""
-        )
-      : employeeNonLaborAccounts.map(
-          (a) => a.id || a.accountId || ""
-        );
-
-  if (
-    val !== "" &&
-    !validAccounts.includes(val)
-  ) {
-    toast.error(
-      "Please select a valid account from suggestions"
-    );
-    handleRowFieldChange(
-      actualEmpIdx,
-      "acctId",
-      ""
-    );
-    return; // 🚫 stop → don't call handleRowFieldBlur
-  }
-
-  // ✅ only call when valid
-  handleRowFieldBlur(actualEmpIdx, emp);
-}}
-
-                                      list={`account-list-${actualEmpIdx}`}
-                                      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                    />
-
-                                    <datalist
-                                      id={`account-list-${actualEmpIdx}`}
-                                    >
-                                      {(emp.idType === "Vendor" ||
-                                      emp.idType === "Vendor Employee"
-                                        ? subContractorNonLaborAccounts
-                                        : employeeNonLaborAccounts
-                                      ).map((account, index) => {
-                                        const valueText =
-                                          account.id || account.accountId || "";
-                                        // const displayText =
-                                        //   account.name ||
-                                        //   account.acctName ||
-                                        //   account.accountId ||
-                                        //   valueText;
-
-                                        return (
-                                          <option
-                                            key={`${valueText}-${index}`}
-                                            value={valueText}
-                                          >
-                                            {/* {displayText} */}
-                                          </option>
-                                        );
-                                      })}
-                                    </datalist>
-                                  </td>
-                                );
-                              }
-                              if (col.key === "orgId") {
-                                return (
-                                  // <td
-                                  //   key={`${uniqueRowKey}-orgId`}
-                                  //   className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
-                                  // >
-                                  //   {" "}
-                                  //   {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                  //   <input
-                                  //     type="text"
-                                  //     value={
-                                  //       editedRowData[actualEmpIdx]?.orgId !==
-                                  //       undefined
-                                  //         ? editedRowData[actualEmpIdx].orgId
-                                  //         : row.orgId
-                                  //     }
-                                  //     onChange={(e) =>
-                                  //       handleRowFieldChange(
-                                  //         actualEmpIdx,
-                                  //         "orgId",
-                                  //         e.target.value
-                                  //       )
-                                  //     }
-                                  //     onBlur={() =>
-                                  //       handleRowFieldBlur(actualEmpIdx, emp)
-                                  //     }
-                                  //     list={`organization-list-${actualEmpIdx}`}
-                                  //     className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                  //   />
-                                  //   <datalist
-                                  //     id={`organization-list-${actualEmpIdx}`}
-                                  //   >
-                                  //     {organizationOptions.map((org, index) => (
-                                  //       <option
-                                  //         key={`${org.value}-${index}`}
-                                  //         value={org.value}
-                                  //       >
-                                  //         {org.label}
-                                  //       </option>
-                                  //     ))}
-                                  //   </datalist>
-                                  // </td>
-                                  <td
-                                    key={`${uniqueRowKey}-orgId`}
-                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
-                                  >
-                                    <input
-                                      type="text"
-                                      value={
-                                        editedRowData[actualEmpIdx]?.orgId !==
-                                        undefined
-                                          ? editedRowData[actualEmpIdx].orgId
-                                          : row.orgId
-                                      }
-                                      onChange={(e) =>
-                                        handleRowFieldChange(
-                                          actualEmpIdx,
-                                          "orgId",
-                                          e.target.value
-                                        )
-                                      }
-                                      onBlur={(e) => {
-  // Skip validation if planType is NBBUD
-  if (planType && planType.toUpperCase() === "NBBUD") {
-    handleRowFieldBlur(actualEmpIdx, emp);
-    return;
-  }
-  
-  const val = e.target.value.trim();
-  const validOrgs =
-    organizationOptions.map(
-      (org) => org.value
-    );
-
-  if (
-    val !== "" &&
-    !validOrgs.includes(val)
-  ) {
-    toast.error(
-      "Please select a valid organization from suggestions"
-    );
-    handleRowFieldChange(
-      actualEmpIdx,
-      "orgId",
-      ""
-    ); // reset
-    return; // 🚫 don't call handleRowFieldBlur
-  }
-
-  // ✅ only save when valid
-  handleRowFieldBlur(actualEmpIdx, emp);
-}}
-
-                                      list={`organization-list-${actualEmpIdx}`}
-                                      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                    />
-                                    <datalist
-                                      id={`organization-list-${actualEmpIdx}`}
-                                    >
-                                      {organizationOptions.map((org, index) => (
-                                        <option
-                                          key={`${org.value}-${index}`}
-                                          value={org.value}
-                                        >
-                                          {org.label}
-                                        </option>
-                                      ))}
-                                    </datalist>
-                                  </td>
-                                );
-                              }
-                              if (col.key === "isRev") {
-                                return (
-                                  <td
-                                    key={`${uniqueRowKey}-isRev`}
-                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
-                                  >
-                                    {" "}
-                                    {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                    <input
-                                      type="checkbox"
-                                      checked={
-                                        editedRowData[actualEmpIdx]?.isRev !==
-                                        undefined
-                                          ? editedRowData[actualEmpIdx].isRev
-                                          : emp.emple.isRev
-                                      }
-                                      onChange={(e) =>
-                                        handleRowFieldChange(
-                                          actualEmpIdx,
-                                          "isRev",
-                                          e.target.checked
-                                        )
-                                      }
-                                      onBlur={() =>
-                                        handleRowFieldBlur(actualEmpIdx, emp)
-                                      }
-                                      className="w-4 h-4"
-                                    />
-                                  </td>
-                                );
-                              }
-                              if (col.key === "isBrd") {
-                                return (
-                                  <td
-                                    key={`${uniqueRowKey}-isBrd`}
-                                    className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center"
-                                  >
-                                    {" "}
-                                    {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                    <input
-                                      type="checkbox"
-                                      checked={
-                                        editedRowData[actualEmpIdx]?.isBrd !==
-                                        undefined
-                                          ? editedRowData[actualEmpIdx].isBrd
-                                          : emp.emple.isBrd
-                                      }
-                                      onChange={(e) =>
-                                        handleRowFieldChange(
-                                          actualEmpIdx,
-                                          "isBrd",
-                                          e.target.checked
-                                        )
-                                      }
-                                      onBlur={() =>
-                                        handleRowFieldBlur(actualEmpIdx, emp)
-                                      }
-                                      className="w-4 h-4"
-                                    />
-                                  </td>
-                                );
-                              }
-                            }
-                            return (
-                              <td
-                                key={`${uniqueRowKey}-${col.key}`}
-                                className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]"
-                              >
-                                {" "}
-                                {/* Changed p-2 to p-1.5, min-w-[80px] to min-w-[70px] */}
-                                {row[col.key]}
-                              </td>
-                            );
-                          })}
                         </tr>
                       );
                     })}

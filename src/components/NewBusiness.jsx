@@ -1257,7 +1257,7 @@ const NewBusiness = ({ onClose }) => {
               </FormField>
             </div>
             <div className="space-y-2">
-              {/* <FormField label="Start Date">
+              <FormField label="Start Date">
                 <input
                   name="startDate"
                   value={form.startDate}
@@ -1265,8 +1265,8 @@ const NewBusiness = ({ onClose }) => {
                   className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
                   type="date"
                 />
-              </FormField> */}
-              <FormField label="Start Date">
+              </FormField>
+              {/* <FormField label="Start Date">
   <input
     name="startDate"
     value={form.startDate}
@@ -1275,9 +1275,45 @@ const NewBusiness = ({ onClose }) => {
     type="date"
     placeholder=""
   />
-</FormField>
+</FormField> */}
+{/* <FormField label="Start Date">
+  <input
+    name="startDate"
+    value={form.startDate}
+    onChange={handleChange}
+    className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs date-input-clean"
+    type="date"
+    placeholder=""
+  />
+</FormField> */}
+{/* <FormField label="Start Date">
+  <input
+    name="startDate"
+    value={form.startDate}
+    onChange={handleChange}
+    className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs text-transparent focus:text-black cursor-pointer"
+    type="date"
+    onFocus={(e) => {
+      if (e.target.showPicker && typeof e.target.showPicker === 'function') {
+        e.target.showPicker();
+      }
+    }}
+    onClick={(e) => {
+      if (e.target.showPicker && typeof e.target.showPicker === 'function') {
+        e.target.showPicker();
+      }
+    }}
+    onMouseDown={(e) => {
+      if (e.target.showPicker && typeof e.target.showPicker === 'function') {
+        setTimeout(() => e.target.showPicker(), 0);
+      }
+    }}
+  />
+</FormField> */}
 
-              {/* <FormField label="End Date">
+
+
+              <FormField label="End Date">
                 <input
                   name="endDate"
                   value={form.endDate}
@@ -1285,8 +1321,8 @@ const NewBusiness = ({ onClose }) => {
                   className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs"
                   type="date"
                 />
-              </FormField> */}
-              <FormField label="End Date">
+              </FormField>
+              {/* <FormField label="End Date">
   <input
     name="endDate"
     value={form.endDate}
@@ -1295,7 +1331,19 @@ const NewBusiness = ({ onClose }) => {
     type="date"
     placeholder=""
   />
-</FormField>
+</FormField> */}
+{/* <FormField label="End Date">
+  <input
+    name="endDate"
+    value={form.endDate}
+    onChange={handleChange}
+    className="border border-gray-300 rounded px-1 py-0.5 w-full text-[11px] sm:text-xs date-input-clean"
+    type="date"
+    placeholder=""
+  />
+</FormField> */}
+
+
 
               <FormField label="Period">
                 <input

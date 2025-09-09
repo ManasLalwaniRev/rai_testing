@@ -4094,15 +4094,19 @@ const fetchLaborAccounts = async () => {
         : [];
     } else if (newEntry.idType === "Other") {
       // ADD THIS: For "Other" type, show all available accounts (both employee and vendor)
-      const employeeAccounts = Array.isArray(data.employeeLaborAccounts)
-        ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
-        : [];
+      // const employeeAccounts = Array.isArray(data.employeeLaborAccounts)
+      //   ? data.employeeLaborAccounts.map(account => ({ id: account.accountId }))
+      //   : [];
       
-      const vendorAccounts = Array.isArray(data.sunContractorLaborAccounts)
-        ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
-        : [];
+      // const vendorAccounts = Array.isArray(data.sunContractorLaborAccounts)
+      //   ? data.sunContractorLaborAccounts.map(account => ({ id: account.accountId }))
+      //   : [];
 
-      accounts = [...employeeAccounts, ...vendorAccounts];
+      // accounts = [...employeeAccounts, ...vendorAccounts];
+      // For "Other" type, show only otherDirectCostLaborAccounts
+  accounts = Array.isArray(data.otherDirectCostLaborAccounts)
+    ? data.otherDirectCostLaborAccounts.map(account => ({ id: account.accountId }))
+    : [];
     } else {
       accounts = [];
     }
