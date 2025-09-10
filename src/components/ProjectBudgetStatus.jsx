@@ -8768,6 +8768,8 @@ import RevenueSetupComponent from "./RevenueSetupComponent";
 import RevenueCeilingComponent from "./RevenueCeilingComponent";
 import { formatDate } from "./utils";
 import FinancialDashboard from "./FinancialDashboard";
+import Warning from "./Warning"; 
+
 
 const ProjectBudgetStatus = () => {
   const [projects, setProjects] = useState([]);
@@ -8798,6 +8800,8 @@ const ProjectBudgetStatus = () => {
   const fundingRefs = useRef({});
   const inputRef = useRef(null);
   const dashboardRefs = useRef({});
+  const warningRefs = useRef({});
+
 
   const EXTERNAL_API_BASE_URL = "https://test-api-3tmq.onrender.com";
   const CALCULATE_COST_ENDPOINT = "/Forecast/CalculateCost";
@@ -8819,6 +8823,7 @@ const ProjectBudgetStatus = () => {
       funding: fundingRefs,
       plc: hoursRefs,
       dashboard: dashboardRefs,
+      warning: warningRefs
     };
 
     const refObj = refMap[activeTab];
@@ -9329,6 +9334,17 @@ const ProjectBudgetStatus = () => {
                 >
                   Funding
                 </span>
+                <span
+  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors duration-200 cursor-pointer
+    ${
+      activeTab === "warning"
+        ? "bg-blue-600 text-white shadow-sm"
+        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+    }`}
+  onClick={() => handleTabClick("warning")}
+>
+  Warning
+</span>
               </div>
               <div className="flex-1 min-w-0 overflow-hidden">
                 <div className="w-full overflow-hidden">
@@ -9957,6 +9973,69 @@ const ProjectBudgetStatus = () => {
                 />
               </div>
             )}
+
+            {activeTab === "warning" && selectedPlan && (
+  <div
+    className="relative border p-2 sm:p-4 bg-gray-50 rounded shadow min-h-[150px] scroll-mt-16"
+    ref={(el) => (warningRefs.current[searchTerm] = el)}
+  >
+    <div className="bg-green-50 border-l-4 border-green-400 p-3 rounded-lg shadow-sm mb-4 relative">
+      <button
+        className="absolute top-2 right-2 text-green-700 hover:text-red-500 text-xl z-20 cursor-pointer bg-white bg-opacity-80 rounded-full p-0.5 transition-shadow shadow"
+        onClick={handleCloseTab}
+        title="Close project details"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+      <div className="flex flex-wrap gap-x-2 gap-y-2 text-xs">
+        <span>
+          <span className="font-semibold">Project ID: </span>
+          {selectedPlan.projId}
+        </span>
+        <span>
+          <span className="font-semibold">Type: </span>
+          {selectedPlan.plType || "N/A"}
+        </span>
+        <span>
+          <span className="font-semibold">Version: </span>
+          {selectedPlan.version || "N/A"}
+        </span>
+        <span>
+          <span className="font-semibold">Status: </span>
+          {selectedPlan.status || "N/A"}
+        </span>
+        <span>
+          <span className="font-semibold">
+            Period of Performance:{" "}
+          </span>
+          Start Date:{" "}
+          {formatDate(selectedPlan.projStartDt) || "N/A"} | End
+          Date: {formatDate(selectedPlan.projEndDt) || "N/A"}
+        </span>
+      </div>
+    </div>
+    <Warning 
+      planId={selectedPlan.plId}
+      projectId={selectedPlan.projId}
+      templateId={selectedPlan.templateId}
+      planType={selectedPlan.plType}
+    />
+  </div>
+)}
+
           </div>
         )
       )}

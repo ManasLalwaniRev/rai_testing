@@ -10242,7 +10242,7 @@ const ProjectPlanTable = ({
         `https://test-api-3tmq.onrender.com/Project/GetProjectPlans/${projectId}`
       );
 
-      console.log('API response:', response.data);
+    //   console.log('API response:', response.data);
 
       const transformedPlans = response.data.map((plan, idx) => ({
         plId: plan.plId || plan.id || 0,
@@ -10282,7 +10282,7 @@ const ProjectPlanTable = ({
         revenueAccount: plan.revenueAccount || "",
       }));
       
-      console.log(transformedPlans);
+    //   console.log(transformedPlans);
       const sortedPlans = sortPlansByProjIdPlTypeVersion(transformedPlans);
       setPlans(sortedPlans);
       setFilteredPlans(sortedPlans);
@@ -10827,8 +10827,8 @@ const handleCheckboxChange = async (idx, field) => {
   const handleActionSelect = async (idx, action) => {
     const plan = plans[idx];
 
-    console.log('Selected plan object:', plan);
-    console.log('Full project ID from ref:', fullProjectId.current);
+    // console.log('Selected plan object:', plan);
+    // console.log('Full project ID from ref:', fullProjectId.current);
 
     if (action === "None") return;
     try {
@@ -10898,7 +10898,7 @@ const handleCheckboxChange = async (idx, field) => {
           templateId: plan.templateId || 1,
         };
         
-        console.log('Payload for action:', payloadTemplate);
+        // console.log('Payload for action:', payloadTemplate);
         
         toast.info(
           `Creating ${
