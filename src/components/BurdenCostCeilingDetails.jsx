@@ -558,8 +558,6 @@
 
 // // // // export default BurdenCostCeilingDetails;
 
-
-
 // // // // import React, { useState, useEffect } from "react";
 // // // // import axios from "axios";
 // // // // import { FaSave, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
@@ -3592,6 +3590,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaSave, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { backendUrl } from "./config";
 
 const FISCAL_YEAR_START = 2020;
@@ -3895,65 +3895,65 @@ const BurdenCostCeilingDetails = ({
   //     alert("Failed to save. Please check your input and try again.");
   //   }
   // };
-  
+
   const handleSave = async () => {
-  if (
-    !newRow.accountId ||
-    !newRow.poolCode ||
-    !newRow.rateCeiling ||
-    !newRow.ceilingMethodCode ||
-    !newRow.applyToRbaCode ||
-    !newRow.fiscalYear
-  ) {
-    alert("Please fill all fields.");
-    return;
-  }
-  if (!updatedBy) {
-    alert("updatedBy is required. Please provide a user name.");
-    return;
-  }
-  if (!isSearched || !isValidProjectId(projectId)) {
-    alert("Please enter a valid project ID (e.g., PROJ123) and search.");
-    return;
-  }
-  const requestBody = {
-    projectId: lastSearchedProjectId,
-    fiscalYear: newRow.fiscalYear,
-    accountId: newRow.accountId,
-    accountDesc: newRow.accountName || "", // Add this field
-    poolCode: newRow.poolCode,
-    rateCeiling: parseFloat(newRow.rateCeiling) || 0,
-    rateFormat: "%",
-    comCeiling: 0,
-    comFormat: "",
-    ceilingMethodCode: newRow.ceilingMethodCode,
-    applyToRbaCode: newRow.applyToRbaCode,
+    if (
+      !newRow.accountId ||
+      !newRow.poolCode ||
+      !newRow.rateCeiling ||
+      !newRow.ceilingMethodCode ||
+      !newRow.applyToRbaCode ||
+      !newRow.fiscalYear
+    ) {
+      alert("Please fill all fields.");
+      return;
+    }
+    if (!updatedBy) {
+      alert("updatedBy is required. Please provide a user name.");
+      return;
+    }
+    if (!isSearched || !isValidProjectId(projectId)) {
+      alert("Please enter a valid project ID (e.g., PROJ123) and search.");
+      return;
+    }
+    const requestBody = {
+      projectId: lastSearchedProjectId,
+      fiscalYear: newRow.fiscalYear,
+      accountId: newRow.accountId,
+      accountDesc: newRow.accountName || "", // Add this field
+      poolCode: newRow.poolCode,
+      rateCeiling: parseFloat(newRow.rateCeiling) || 0,
+      rateFormat: "%",
+      comCeiling: 0,
+      comFormat: "",
+      ceilingMethodCode: newRow.ceilingMethodCode,
+      applyToRbaCode: newRow.applyToRbaCode,
+    };
+    try {
+      await axios.post(
+        `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+        requestBody
+      );
+      // Refresh
+      const res = await axios.get(
+        `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+      );
+      setBurdenCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
+      setShowNewRow(false);
+      setNewRow({
+        accountId: "",
+        accountName: "",
+        poolCode: "",
+        rateCeiling: "",
+        ceilingMethodCode: "",
+        applyToRbaCode: "",
+        fiscalYear: fiscalYear,
+      });
+    } catch (err) {
+      console.error("Save error:", err.response?.data); // Add this to see detailed error
+      alert("Failed to save. Please check your input and try again.");
+    }
   };
-  try {
-    await axios.post(
-      `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
-      requestBody
-    );
-    // Refresh
-    const res = await axios.get(
-      `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
-    );
-    setBurdenCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
-    setShowNewRow(false);
-    setNewRow({
-      accountId: "",
-      accountName: "",
-      poolCode: "",
-      rateCeiling: "",
-      ceilingMethodCode: "",
-      applyToRbaCode: "",
-      fiscalYear: fiscalYear,
-    });
-  } catch (err) {
-    console.error("Save error:", err.response?.data); // Add this to see detailed error
-    alert("Failed to save. Please check your input and try again.");
-  }
-};
 
   const handleCancelNewRow = () => {
     setShowNewRow(false);
@@ -4022,8 +4022,34 @@ const BurdenCostCeilingDetails = ({
   };
 
   // --- UI-only delete for row (not from API) ---
-  const handleDeleteUI = (index) => {
-    setBurdenCeilings((prev) => prev.filter((_, i) => i !== index));
+  // const handleDeleteUI = (index) => {
+  //   setBurdenCeilings((prev) => prev.filter((_, i) => i !== index));
+  // };
+
+  const handleDelete = async (index) => {
+    const ceiling = burdenCeilings[index]; // get the row to delete
+
+    if (!ceiling) return;
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/Project/DeleteBurdenCeilingForProject/${ceiling.projectId}/${ceiling.fiscalYear}/${ceiling.accountId}/${ceiling.poolCode}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete burden ceiling");
+      }
+
+      // ✅ Update UI after successful backend delete
+      setBurdenCeilings((prev) => prev.filter((_, i) => i !== index));
+      toast.success("Record deleted successfully!");
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Could not delete burden ceiling. Please try again.");
+    }
   };
 
   // Fiscal year filter
@@ -4054,77 +4080,77 @@ const BurdenCostCeilingDetails = ({
   //   };
   // }, []);
   //get pool
-// useEffect(() => {
-//   let active = true;
-//   const fetchPools = async () => {
-//     try {
-//       const res = await axios.get(
-//         "https://test-api-3tmq.onrender.com/Orgnization/GetAllPools"
-//       );
-//       console.log("Pools API response:", res.data); // Debug the response
-//       if (active) {
-//         // Handle different possible response structures
-//         let poolData = [];
-//         if (Array.isArray(res.data)) {
-//           poolData = res.data;
-//         } else if (res.data && Array.isArray(res.data.data)) {
-//           poolData = res.data.data;
-//         }
-//         setPools(poolData);
-//       }
-//     } catch (err) {
-//       console.error("Error fetching pools:", err); // Debug the error
-//       if (active) setPools([]);
-//     }
-//   };
-//   fetchPools();
-//   return () => {
-//     active = false;
-//   };
-// }, []);
+  // useEffect(() => {
+  //   let active = true;
+  //   const fetchPools = async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         "https://test-api-3tmq.onrender.com/Orgnization/GetAllPools"
+  //       );
+  //       console.log("Pools API response:", res.data); // Debug the response
+  //       if (active) {
+  //         // Handle different possible response structures
+  //         let poolData = [];
+  //         if (Array.isArray(res.data)) {
+  //           poolData = res.data;
+  //         } else if (res.data && Array.isArray(res.data.data)) {
+  //           poolData = res.data.data;
+  //         }
+  //         setPools(poolData);
+  //       }
+  //     } catch (err) {
+  //       console.error("Error fetching pools:", err); // Debug the error
+  //       if (active) setPools([]);
+  //     }
+  //   };
+  //   fetchPools();
+  //   return () => {
+  //     active = false;
+  //   };
+  // }, []);
 
-// Fetch pools when project is searched
-useEffect(() => {
-  let active = true;
-  const fetchPools = async () => {
-    try {
-      const res = await axios.get(
-        `${backendUrl}/Orgnization/GetAllPools`
-      );
-      console.log("Pools API response:", res.data); // Keep for debugging
-      if (active) {
-        // Handle different possible response structures
-        let poolData = [];
-        if (Array.isArray(res.data)) {
-          poolData = res.data;
-        } else if (res.data && Array.isArray(res.data.data)) {
-          poolData = res.data.data;
-        } else if (res.data && res.data.pools && Array.isArray(res.data.pools)) {
-          poolData = res.data.pools;
+  // Fetch pools when project is searched
+  useEffect(() => {
+    let active = true;
+    const fetchPools = async () => {
+      try {
+        const res = await axios.get(`${backendUrl}/Orgnization/GetAllPools`);
+        console.log("Pools API response:", res.data); // Keep for debugging
+        if (active) {
+          // Handle different possible response structures
+          let poolData = [];
+          if (Array.isArray(res.data)) {
+            poolData = res.data;
+          } else if (res.data && Array.isArray(res.data.data)) {
+            poolData = res.data.data;
+          } else if (
+            res.data &&
+            res.data.pools &&
+            Array.isArray(res.data.pools)
+          ) {
+            poolData = res.data.pools;
+          }
+
+          console.log("Processed pools data:", poolData); // Keep for debugging
+          setPools(poolData);
         }
-        
-        console.log("Processed pools data:", poolData); // Keep for debugging
-        setPools(poolData);
+      } catch (err) {
+        console.error("Error fetching pools:", err);
+        if (active) setPools([]);
       }
-    } catch (err) {
-      console.error("Error fetching pools:", err);
-      if (active) setPools([]);
+    };
+
+    // Only fetch pools when we have a valid searched project
+    if (isSearched && isValidProjectId(projectId) && hasSearched) {
+      fetchPools();
+    } else {
+      setPools([]);
     }
-  };
-  
-  // Only fetch pools when we have a valid searched project
-  if (isSearched && isValidProjectId(projectId) && hasSearched) {
-    fetchPools();
-  } else {
-    setPools([]);
-  }
-  
-  return () => {
-    active = false;
-  };
-}, [isSearched, projectId, hasSearched, backendUrl]); // Added proper dependencies
 
-
+    return () => {
+      active = false;
+    };
+  }, [isSearched, projectId, hasSearched, backendUrl]); // Added proper dependencies
 
   // --- MESSAGE UI ---
   if (isSearched && !isValidProjectId(projectId)) {
@@ -4269,31 +4295,35 @@ useEffect(() => {
                         ))}
                       </select>
                     </td> */}
-                   <td className="px-2 py-1">
-  <select
-    value={newRow.poolCode}
-    onChange={(e) =>
-      setNewRow((prev) => ({
-        ...prev,
-        poolCode: e.target.value,
-      }))
-    }
-    className="w-full px-2 py-1 border border-gray-300 rounded-md text-xs font-normal"
-  >
-    <option value="">-- Select Pool --</option>
-    {pools.map((pool, idx) => {
-      // Handle different possible pool object structures
-      const poolCode = pool.code || pool.poolCode || pool.poolId || pool;
-      const poolDisplay = pool.name || pool.poolName || poolCode;
-      return (
-        <option key={pool.id || poolCode || idx} value={poolCode}>
-          {poolDisplay}
-        </option>
-      );
-    })}
-  </select>
-</td>
-
+                    <td className="px-2 py-1">
+                      <select
+                        value={newRow.poolCode}
+                        onChange={(e) =>
+                          setNewRow((prev) => ({
+                            ...prev,
+                            poolCode: e.target.value,
+                          }))
+                        }
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-xs font-normal"
+                      >
+                        <option value="">-- Select Pool --</option>
+                        {pools.map((pool, idx) => {
+                          // Handle different possible pool object structures
+                          const poolCode =
+                            pool.code || pool.poolCode || pool.poolId || pool;
+                          const poolDisplay =
+                            pool.name || pool.poolName || poolCode;
+                          return (
+                            <option
+                              key={pool.id || poolCode || idx}
+                              value={poolCode}
+                            >
+                              {poolDisplay}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </td>
 
                     <td className="px-2 py-1 text-center">
                       <input
@@ -4379,9 +4409,24 @@ useEffect(() => {
                       {accounts.find((a) => a.acctId === ceiling.accountId)
                         ?.acctName || "N/A"}
                     </td>
-                    <td className="px-2 py-1 text-xs text-gray-900 font-normal">
+                    {/* <td className="px-2 py-1 text-xs text-gray-900 font-normal">
                       {ceiling.poolCode}
+                    </td> */}
+                    <td className="px-2 py-1 text-xs text-gray-900 font-normal">
+                      {
+                        pools.find(
+                          (pool) =>
+                            pool.code === ceiling.poolCode ||
+                            pool.poolCode === ceiling.poolCode ||
+                            pool.poolId === ceiling.poolCode
+                        )?.name ||
+                          pools.find(
+                            (pool) => pool.poolCode === ceiling.poolCode
+                          )?.poolName ||
+                          ceiling.poolCode // fallback if no match
+                      }
                     </td>
+
                     <td className="px-2 py-1 text-xs text-gray-900 font-normal text-center">
                       {editIndex === index ? (
                         <input
@@ -4440,7 +4485,7 @@ useEffect(() => {
                             <FaTimes size={16} />
                           </button>
                           <button
-                            onClick={() => handleDeleteUI(index)}
+                            onClick={() => handleDelete(index)}
                             className="text-gray-400 hover:text-gray-800"
                             title="Delete"
                             style={{ background: "none", border: "none" }}
@@ -4459,7 +4504,7 @@ useEffect(() => {
                             <FaEdit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDeleteUI(index)}
+                            onClick={() => handleDelete(index)}
                             className="text-gray-400 hover:text-gray-800"
                             title="Delete"
                             style={{ background: "none", border: "none" }}

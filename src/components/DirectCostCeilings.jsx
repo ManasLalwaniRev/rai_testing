@@ -1,4 +1,3 @@
-
 // import React, { useState, useEffect } from "react";
 // import axios from "axios";
 
@@ -26,7 +25,7 @@
 //       if (isSearched && isValidProjectId(projectId)) {
 //         try {
 //           const res = await axios.get(
-//             `https://test-api-3tmq.onrender.com/Project/GetAccountsByProjectId/${projectId}`
+//             `${backendUrl}/Project/GetAccountsByProjectId/${projectId}`
 //           );
 //           if (isMounted) setAccounts(res.data || []);
 //         } catch {
@@ -48,7 +47,7 @@
 //         setIsLoading(true);
 //         try {
 //           const res = await axios.get(
-//             `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
+//             `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
 //           );
 //           if (isMounted) {
 //             setDirectCostCeilings(res.data?.data || []);
@@ -117,11 +116,11 @@
 //     };
 //     try {
 //       await axios.post(
-//         `https://test-api-3tmq.onrender.com/Project/CreateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/CreateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
 //       );
 //       setDirectCostCeilings(res.data?.data || []);
 //       setShowNewRow(false);
@@ -158,11 +157,11 @@
 //     };
 //     try {
 //       await axios.put(
-//         `https://test-api-3tmq.onrender.com/Project/UpdateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/UpdateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
 //       );
 //       setDirectCostCeilings(res.data?.data || []);
 //       setEditIndex(null);
@@ -382,7 +381,7 @@
 //     }
 //     axios
 //       .get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//         `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
 //       )
 //       .then((res) => {
 //         const project = res.data?.[0] || {};
@@ -415,7 +414,7 @@
 //       setIsLoading(true);
 //       axios
 //         .get(
-//           `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
+//           `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
 //         )
 //         .then((res) => {
 //           if (active) {
@@ -483,11 +482,11 @@
 //     };
 //     try {
 //       await axios.post(
-//         `https://test-api-3tmq.onrender.com/Project/CreateCeilingAmtForDirectCost?updatedBy=TEST`,
+//         `${backendUrl}/Project/CreateCeilingAmtForDirectCost?updatedBy=TEST`,
 //         requestBody
 //       );
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
 //       );
 //       setDirectCostCeilings(res.data?.data || []);
 //       setShowNewRow(false);
@@ -526,11 +525,11 @@
 //     };
 //     try {
 //       await axios.put(
-//         `https://test-api-3tmq.onrender.com/Project/UpdateCeilingAmtForDirectCost?updatedBy=test`,
+//         `${backendUrl}/Project/UpdateCeilingAmtForDirectCost?updatedBy=test`,
 //         requestBody
 //       );
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
 //       );
 //       setDirectCostCeilings(res.data?.data || []);
 //       setEditIndex(null);
@@ -780,7 +779,7 @@
 //       }
 //       try {
 //         const res = await axios.get(
-//           `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//           `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
 //         );
 //         const project = Array.isArray(res.data) ? res.data[0] : {};
 //         const labor = Array.isArray(project?.laborAccounts)
@@ -815,7 +814,7 @@
 //         setIsLoading(true);
 //         try {
 //           const res = await axios.get(
-//             `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
+//             `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
 //           );
 //           if (active) {
 //             setDirectCostCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
@@ -897,12 +896,12 @@
 //         applyToRbaCode: newRow.applyToRbaCode,
 //       };
 //       await axios.post(
-//         `https://test-api-3tmq.onrender.com/Project/CreateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/CreateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       toast.success("Saved successfully");
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
 //       );
 //       setDirectCostCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
 //       setShowNewRow(false);
@@ -943,12 +942,12 @@
 //         applyToRbaCode: editRow.applyToRbaCode,
 //       };
 //       await axios.put(
-//         `https://test-api-3tmq.onrender.com/Project/UpdateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/UpdateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       toast.success("Updated successfully");
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
 //       );
 //       setDirectCostCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
 //       setEditIndex(null);
@@ -1232,6 +1231,7 @@ import axios from "axios";
 import { FaSave, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { backendUrl } from "./config";
 
 const applyToRBAOptions = [
   { value: "", label: "Select" },
@@ -1242,7 +1242,7 @@ const applyToRBAOptions = [
 ];
 
 // Accept any non-empty trimmed projectId
-const isValidProjectId = (id) => typeof id === "string" && id.trim().length > 0;
+const isValidProjectId = (id) => !!id;
 
 const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
   const [accounts, setAccounts] = useState([]);
@@ -1261,37 +1261,103 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Don't fetch until a real search and valid projectId.
+  // useEffect(() => {
+  //   let active = true;
+  //   const fetchAccounts = async () => {
+  //     if (!(isSearched && isValidProjectId(projectId))) {
+  //       setAccounts([]);
+  //       return;
+  //     }
+  //     try {
+  //       const res = await axios.get(
+  //         `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
+  //       );
+  //       const project = Array.isArray(res.data) ? res.data[0] : {};
+  //       const labor = Array.isArray(project?.laborAccounts)
+  //         ? project.laborAccounts.map((code) => ({
+  //             acctId: code,
+  //             acctName: code,
+  //           }))
+  //         : [];
+  //       const nonLabor = Array.isArray(project?.nonLaborAccounts)
+  //         ? project.nonLaborAccounts.map((code) => ({
+  //             acctId: code,
+  //             acctName: code,
+  //           }))
+  //         : [];
+  //       if (active) setAccounts([...labor, ...nonLabor]);
+  //     } catch (err) {
+  //       setAccounts([]);
+  //       // Don't toast for search errors!
+  //     }
+  //   };
+  //   fetchAccounts();
+  //   return () => {
+  //     active = false;
+  //   };
+  // }, [isSearched, projectId]);
+
+  // ✅ Fetch accounts for project based on searched projectId
   useEffect(() => {
     let active = true;
+
     const fetchAccounts = async () => {
       if (!(isSearched && isValidProjectId(projectId))) {
         setAccounts([]);
         return;
       }
+
       try {
         const res = await axios.get(
-          `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+          `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
         );
+
         const project = Array.isArray(res.data) ? res.data[0] : {};
-        const labor = Array.isArray(project?.laborAccounts)
-          ? project.laborAccounts.map((code) => ({
-              acctId: code,
-              acctName: code,
+
+        // ✅ Collect accounts from Employee, Subcontractor, and Other Direct Cost NON-LABOR
+        const employeeNonLabor = Array.isArray(
+          project?.employeeNonLaborAccounts
+        )
+          ? project.employeeNonLaborAccounts.map((acc) => ({
+              acctId: acc.accountId,
+              acctName: acc.acctName,
             }))
           : [];
-        const nonLabor = Array.isArray(project?.nonLaborAccounts)
-          ? project.nonLaborAccounts.map((code) => ({
-              acctId: code,
-              acctName: code,
+
+        const subcontractorNonLabor = Array.isArray(
+          project?.subContractorNonLaborAccounts
+        )
+          ? project.subContractorNonLaborAccounts.map((acc) => ({
+              acctId: acc.accountId,
+              acctName: acc.acctName,
             }))
           : [];
-        if (active) setAccounts([...labor, ...nonLabor]);
+
+        const otherDirectCostNonLabor = Array.isArray(
+          project?.otherDirectCostNonLaborAccounts
+        )
+          ? project.otherDirectCostNonLaborAccounts.map((acc) => ({
+              acctId: acc.accountId,
+              acctName: acc.acctName,
+            }))
+          : [];
+
+        // ✅ Merge all NON-LABOR account lists
+        const mergedAccounts = [
+          ...employeeNonLabor,
+          ...subcontractorNonLabor,
+          ...otherDirectCostNonLabor,
+        ];
+
+        if (active) setAccounts(mergedAccounts);
       } catch (err) {
+        console.error("Error fetching accounts:", err);
         setAccounts([]);
-        // Don't toast for search errors!
       }
     };
+
     fetchAccounts();
+
     return () => {
       active = false;
     };
@@ -1304,10 +1370,12 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
         setIsLoading(true);
         try {
           const res = await axios.get(
-            `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
+            `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${projectId}`
           );
           if (active) {
-            setDirectCostCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
+            setDirectCostCeilings(
+              Array.isArray(res.data?.data) ? res.data.data : []
+            );
             setLastSearchedProjectId(projectId);
             setHasSearched(true);
           }
@@ -1335,7 +1403,8 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
     };
   }, [isSearched, projectId]);
 
-  const shouldShowTable = hasSearched && isValidProjectId(lastSearchedProjectId);
+  const shouldShowTable =
+    hasSearched && isValidProjectId(lastSearchedProjectId);
 
   // Account input change for new row (typed suggestion)
   const handleNewAccountInput = (value) => {
@@ -1366,7 +1435,11 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
   };
 
   const handleSave = async () => {
-    if (!newRow.accountId || !newRow.ceilingAmountFunc || !newRow.applyToRbaCode) {
+    if (
+      !newRow.accountId ||
+      !newRow.ceilingAmountFunc ||
+      !newRow.applyToRbaCode
+    ) {
       toast.warning("Please fill all required fields.");
       return;
     }
@@ -1379,12 +1452,12 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
         applyToRbaCode: newRow.applyToRbaCode,
       };
       await axios.post(
-        `https://test-api-3tmq.onrender.com/Project/CreateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
+        `${backendUrl}/Project/CreateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
         requestBody
       );
       toast.success("Saved successfully");
       const res = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+        `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
       );
       setDirectCostCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
       setShowNewRow(false);
@@ -1424,12 +1497,12 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
         applyToRbaCode: editRow.applyToRbaCode,
       };
       await axios.put(
-        `https://test-api-3tmq.onrender.com/Project/UpdateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
+        `${backendUrl}/Project/UpdateCeilingAmtForDirectCost?updatedBy=${updatedBy}`,
         requestBody
       );
       toast.success("Updated successfully");
       const res = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
+        `${backendUrl}/Project/GetAllCeilingAmtForDirectCost?projId=${lastSearchedProjectId}`
       );
       setDirectCostCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
       setEditIndex(null);
@@ -1445,9 +1518,34 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
     toast.info("Edit canceled");
   };
 
-  const handleDeleteUI = (index) => {
-    setDirectCostCeilings((prev) => prev.filter((_, i) => i !== index));
-    toast.info("Row removed (UI only)");
+  // const handleDeleteUI = (index) => {
+  //   setDirectCostCeilings((prev) => prev.filter((_, i) => i !== index));
+  //   toast.info("Row removed (UI only)");
+  // };
+
+  const handleDelete = async (index) => {
+    const ceiling = directCostCeilings[index];
+    if (!ceiling) return;
+
+    try {
+      const response = await fetch(
+        `${backendUrl}/Project/DeleteCeilingAmtForDirectCost/${ceiling.projectId}/${ceiling.accountId}`,
+        { method: "DELETE" }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete direct cost ceiling");
+      }
+
+      // ✅ Update UI after successful API call
+      setDirectCostCeilings((prev) => prev.filter((_, i) => i !== index));
+
+      // ✅ Toast success
+      toast.success("Direct cost ceiling deleted successfully!");
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Could not delete direct cost ceiling. Please try again.");
+    }
   };
 
   const handleCancelNewRow = () => {
@@ -1471,9 +1569,7 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
   }
 
   if (isSearched && !isValidProjectId(projectId)) {
-    return (
-      <div className="text-red-600 font-medium">Invalid project ID.</div>
-    );
+    return <div className="text-red-600 font-medium">Invalid project ID.</div>;
   }
 
   if (!shouldShowTable) {
@@ -1496,7 +1592,9 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
             <label className="text-sm font-medium text-gray-700 mr-2">
               Project:
             </label>
-            <span className="text-sm text-gray-900">{lastSearchedProjectId}</span>
+            <span className="text-sm text-gray-900">
+              {lastSearchedProjectId}
+            </span>
             <span className="ml-4 text-sm text-gray-900">Org ID: 1.02</span>
           </div>
           <button
@@ -1537,7 +1635,7 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
                 {showNewRow && (
                   <tr className="bg-white border-b border-gray-200 hover:bg-gray-50">
                     <td className="px-2 py-1">
-                      <input
+                      {/* <input
                         list="dc-account-suggestions"
                         value={newRow.accountId}
                         onChange={(e) => handleNewAccountInput(e.target.value)}
@@ -1548,6 +1646,21 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
                         {accounts.map((a) => (
                           <option key={a.acctId} value={a.acctId}>
                             {a.acctId}
+                          </option>
+                        ))}
+                      </datalist> */}
+                      <input
+                        list="dc-account-suggestions"
+                        value={newRow.accountId}
+                        onChange={(e) => handleNewAccountInput(e.target.value)}
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-xs"
+                        placeholder="Search account"
+                      />
+                      <datalist id="dc-account-suggestions">
+                        {accounts.map((a) => (
+                          <option key={a.acctId} value={a.acctId}>
+                            {a.acctId} - {a.acctName}{" "}
+                            {/* 👈 Show both ID + Name in dropdown */}
                           </option>
                         ))}
                       </datalist>
@@ -1611,14 +1724,17 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
 
                 {directCostCeilings.map((ceiling, index) => (
                   <tr
-                    key={`${ceiling.accountId}-${ceiling.projectId || "proj"}-${index}`}
+                    key={`${ceiling.accountId}-${
+                      ceiling.projectId || "proj"
+                    }-${index}`}
                     className="bg-white border-b border-gray-200 hover:bg-gray-50"
                   >
                     <td className="px-2 py-1 text-xs text-gray-900">
                       {ceiling.accountId}
                     </td>
                     <td className="px-2 py-1 text-xs text-gray-900">
-                      {accounts.find((a) => a.acctId === ceiling.accountId)?.acctName || "N/A"}
+                      {accounts.find((a) => a.acctId === ceiling.accountId)
+                        ?.acctName || "N/A"}
                     </td>
                     <td className="px-2 py-1 text-xs text-gray-900 text-center">
                       {editIndex === index ? (
@@ -1683,7 +1799,7 @@ const DirectCostCeilings = ({ projectId, isSearched, updatedBy = "TEST" }) => {
                             <FaEdit size={16} />
                           </button>
                           <button
-                            onClick={() => handleDeleteUI(index)}
+                            onClick={() => handleDelete(index)}
                             className="text-gray-400 hover:text-gray-800"
                             title="Delete"
                             style={{ background: "none", border: "none" }}

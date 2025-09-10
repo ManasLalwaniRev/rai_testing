@@ -711,7 +711,7 @@ const PoolRate = ({ userName = "User" }) => {
       setLoading(true);
       try {
         const response = await axios.get(
-          "https://test-api-3tmq.onrender.com/Orgnization/GetAllTemplates"
+          `${backendUrl}/Orgnization/GetAllTemplates`
         );
         console.log("Templates API Response:", response.data);
         setTemplates(response.data || []);
@@ -743,10 +743,20 @@ const PoolRate = ({ userName = "User" }) => {
       setLoading(true);
       try {
         const poolsResponse = await axios.get(
-          `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByTemplateId?templateId=${selectedTemplate}`
+          `${backendUrl}/Orgnization/GetPoolsByTemplateId?templateId=${selectedTemplate}`
         );
         console.log("Pools API Response:", poolsResponse.data);
-        const poolList = poolsResponse.data || [];
+        // const poolList = poolsResponse.data || [];
+        const rawPoolList = poolsResponse.data || [];
+
+        // Filter out specific poolIds that shouldn't show on UI
+        const poolList = rawPoolList.filter(
+          (pool) =>
+            !["FRINGEONGNA", "OVERHEADONGNA", "FRINGEONOVERHEAD"].includes(
+              pool.poolId
+            )
+        );
+
         setPools(poolList);
 
         if (poolList.length === 0) {
@@ -759,7 +769,7 @@ const PoolRate = ({ userName = "User" }) => {
         const ratesPromises = poolList.map((pool) =>
           axios
             .get(
-              `https://test-api-3tmq.onrender.com/Orgnization/GetRatesByPoolsTemplateId?templateId=${selectedTemplate}&poolId=${pool.poolId}&year=${selectedYear}`
+              `${backendUrl}/Orgnization/GetRatesByPoolsTemplateId?templateId=${selectedTemplate}&poolId=${pool.poolId}&year=${selectedYear}`
             )
             .catch((err) => {
               console.error(
@@ -929,54 +939,55 @@ const PoolRate = ({ userName = "User" }) => {
   //     });
   //   }
   // };
-  
+
   const handleTargetRateChange = (month, poolId, value) => {
-  // Check if the value is a negative number
-  if (value !== "" && !isNaN(value) && parseFloat(value) < 0) {
-    toast.error("Negative values are not allowed. Please enter a positive value.", {
-      position: "top-right",
-      autoClose: 3000,
-    });
-    return; // Don't update the state with negative value
-  }
+    // Check if the value is a negative number
+    if (value !== "" && !isNaN(value) && parseFloat(value) < 0) {
+      toast.error(
+        "Negative values are not allowed. Please enter a positive value.",
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
+      return; // Don't update the state with negative value
+    }
 
-  // Allow empty string or valid non-negative number (including decimal points)
-  if (value === "" || !isNaN(value) || value === ".") {
-    setMonthlyData((prev) =>
-      prev.map((item) =>
-        item.month === month
-          ? {
-              ...item,
-              rates: {
-                ...item.rates,
-                [poolId]: { ...item.rates[poolId], targetRate: value },
-              },
-            }
-          : item
-      )
-    );
+    // Allow empty string or valid non-negative number (including decimal points)
+    if (value === "" || !isNaN(value) || value === ".") {
+      setMonthlyData((prev) =>
+        prev.map((item) =>
+          item.month === month
+            ? {
+                ...item,
+                rates: {
+                  ...item.rates,
+                  [poolId]: { ...item.rates[poolId], targetRate: value },
+                },
+              }
+            : item
+        )
+      );
 
-    const monthIndex = months.indexOf(month);
-    const initialValue =
-      initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate ||
-      "0";
-    const hasChanged = value !== initialValue;
-    
-    setEditMonths((prev) => {
-      const newSet = new Set(prev);
-      const key = `${month}_${poolId}`;
-      if (hasChanged) {
-        newSet.add(key);
-      } else {
-        newSet.delete(key);
-      }
-      console.log("EditMonths updated:", Array.from(newSet));
-      return newSet;
-    });
-  }
-};
+      const monthIndex = months.indexOf(month);
+      const initialValue =
+        initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate ||
+        "0";
+      const hasChanged = value !== initialValue;
 
-
+      setEditMonths((prev) => {
+        const newSet = new Set(prev);
+        const key = `${month}_${poolId}`;
+        if (hasChanged) {
+          newSet.add(key);
+        } else {
+          newSet.delete(key);
+        }
+        console.log("EditMonths updated:", Array.from(newSet));
+        return newSet;
+      });
+    }
+  };
   const handleFindAndReplace = () => {
     if (!findValue || !replaceValue || monthlyData.length === 0) {
       toast.error("Please enter both find and replace values.", {
@@ -1084,7 +1095,7 @@ const PoolRate = ({ userName = "User" }) => {
         };
       });
       const response = await axios.post(
-        `https://test-api-3tmq.onrender.com/Orgnization/UpsertPoolRatesForTemplate?updatedBy=${userName}`,
+        `${backendUrl}/Orgnization/UpsertPoolRatesForTemplate?updatedBy=${userName}`,
         payload
       );
       console.log("Save API Response:", response.data);
@@ -1391,40 +1402,52 @@ const PoolRate = ({ userName = "User" }) => {
                                   disabled={loading || isSaving}
                                 /> */}
                                 <input
-  type="text"  // Keep as text to have full control over input
-  className="w-12 px-1 py-0.5 border border-gray-300 rounded-md bg-green-50 focus:outline-none focus:ring-1 focus:ring-blue-400 text-xs shadow-sm hover:border-blue-400 transition-colors"
-  value={data.rates[pool.poolId]?.targetRate || ""}
-  onChange={(e) =>
-    handleTargetRateChange(
-      data.month,
-      pool.poolId,
-      e.target.value
-    )
-  }
-  onInput={(e) => {
-    // Real-time validation during typing
-    const value = e.target.value;
-    if (value.startsWith('-') || (value !== "" && !isNaN(value) && parseFloat(value) < 0)) {
-      toast.error("Negative values are not allowed. Please enter a positive value.", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-    }
-  }}
-  onKeyPress={(e) => {
-    // Prevent minus key from being entered
-    if (e.key === '-') {
-      e.preventDefault();
-      toast.error("Negative values are not allowed for pool rates.", {
-        position: "top-right",
-        autoClose: 2000,
-      });
-    }
-  }}
-  placeholder="0.00"
-  disabled={loading || isSaving}
-/>
-
+                                  type="text" // Keep as text to have full control over input
+                                  className="w-12 px-1 py-0.5 border border-gray-300 rounded-md bg-green-50 focus:outline-none focus:ring-1 focus:ring-blue-400 text-xs shadow-sm hover:border-blue-400 transition-colors"
+                                  value={
+                                    data.rates[pool.poolId]?.targetRate || ""
+                                  }
+                                  onChange={(e) =>
+                                    handleTargetRateChange(
+                                      data.month,
+                                      pool.poolId,
+                                      e.target.value
+                                    )
+                                  }
+                                  onInput={(e) => {
+                                    // Real-time validation during typing
+                                    const value = e.target.value;
+                                    if (
+                                      value.startsWith("-") ||
+                                      (value !== "" &&
+                                        !isNaN(value) &&
+                                        parseFloat(value) < 0)
+                                    ) {
+                                      toast.error(
+                                        "Negative values are not allowed. Please enter a positive value.",
+                                        {
+                                          position: "top-right",
+                                          autoClose: 2000,
+                                        }
+                                      );
+                                    }
+                                  }}
+                                  onKeyPress={(e) => {
+                                    // Prevent minus key from being entered
+                                    if (e.key === "-") {
+                                      e.preventDefault();
+                                      toast.error(
+                                        "Negative values are not allowed for pool rates.",
+                                        {
+                                          position: "top-right",
+                                          autoClose: 2000,
+                                        }
+                                      );
+                                    }
+                                  }}
+                                  placeholder="0.00"
+                                  disabled={loading || isSaving}
+                                />
                               </td>
                             ))}
                           </tr>
