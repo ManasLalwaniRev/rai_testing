@@ -940,54 +940,225 @@ const PoolRate = ({ userName = "User" }) => {
   //   }
   // };
 
-  const handleTargetRateChange = (month, poolId, value) => {
-    // Check if the value is a negative number
-    if (value !== "" && !isNaN(value) && parseFloat(value) < 0) {
-      toast.error(
-        "Negative values are not allowed. Please enter a positive value.",
-        {
+  // const handleTargetRateChange = (month, poolId, value) => {
+  //   // Check if the value is a negative number
+  //   if (value !== "" && !isNaN(value) && parseFloat(value) < 0) {
+  //     toast.error(
+  //       "Negative values are not allowed. Please enter a positive value.",
+  //       {
+  //         position: "top-right",
+  //         autoClose: 3000,
+  //       }
+  //     );
+  //     return; // Don't update the state with negative value
+  //   }
+
+  //   // Allow empty string or valid non-negative number (including decimal points)
+  //   if (value === "" || !isNaN(value) || value === ".") {
+  //     setMonthlyData((prev) =>
+  //       prev.map((item) =>
+  //         item.month === month
+  //           ? {
+  //               ...item,
+  //               rates: {
+  //                 ...item.rates,
+  //                 [poolId]: { ...item.rates[poolId], targetRate: value },
+  //               },
+  //             }
+  //           : item
+  //       )
+  //     );
+
+  //     const monthIndex = months.indexOf(month);
+  //     const initialValue =
+  //       initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate ||
+  //       "0";
+  //     const hasChanged = value !== initialValue;
+
+  //     setEditMonths((prev) => {
+  //       const newSet = new Set(prev);
+  //       const key = `${month}_${poolId}`;
+  //       if (hasChanged) {
+  //         newSet.add(key);
+  //       } else {
+  //         newSet.delete(key);
+  //       }
+  //       console.log("EditMonths updated:", Array.from(newSet));
+  //       return newSet;
+  //     });
+  //   }
+  // };
+
+//   const handleTargetRateChange = (month, poolId, inputValue) => {
+//   let value = inputValue;
+
+//   // Check if the value starts with minus or is negative
+//   if (value.startsWith('-') || (value !== "" && !isNaN(value) && parseFloat(value) < 0)) {
+//     toast.error("Negative values are not allowed. Please enter a positive value.", {
+//       position: "top-right",
+//       autoClose: 2000,
+//     });
+//     return; // Don't update the state with negative value
+//   }
+
+//   // Handle decimal places and format the value
+//   if (value !== "" && value !== ".") {
+//     // Check if it's a valid number
+//     if (!isNaN(value)) {
+//       const numValue = parseFloat(value);
+      
+//       // Split by decimal to check decimal places
+//       const parts = value.split('.');
+      
+//       if (parts.length === 2) {
+//         // Has decimal places
+//         if (parts[1].length > 6) {
+//           // Truncate to 6 decimal places (don't round, just cut off)
+//           value = parts[0] + '.' + parts[1].substring(0, 6);
+//           toast.warning("Maximum 6 decimal places allowed. Value has been truncated.", {
+//             position: "top-right",
+//             autoClose: 2500,
+//           });
+//         }
+//       }
+      
+//       // Handle very large numbers
+//       if (numValue > 999999999) {
+//         // Convert to fixed 6 decimal places and remove trailing zeros
+//         const fixedValue = numValue.toFixed(6);
+//         value = parseFloat(fixedValue).toString();
+//         // toast.warning("Large number has been formatted to maintain precision.", {
+//         //   position: "top-right",
+//         //   autoClose: 3000,
+//         // });
+//       }
+//     } else {
+//       // Invalid number, don't update
+//       return;
+//     }
+//   }
+
+//   // Allow empty string, decimal point, or valid non-negative number
+//   if (value === "" || value === "." || (!isNaN(value) && parseFloat(value) >= 0)) {
+//     setMonthlyData((prev) =>
+//       prev.map((item) =>
+//         item.month === month
+//           ? {
+//               ...item,
+//               rates: {
+//                 ...item.rates,
+//                 [poolId]: { ...item.rates[poolId], targetRate: value },
+//               },
+//             }
+//           : item
+//       )
+//     );
+
+//     const monthIndex = months.indexOf(month);
+//     const initialValue =
+//       initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate ||
+//       "0";
+//     const hasChanged = value !== initialValue;
+    
+//     setEditMonths((prev) => {
+//       const newSet = new Set(prev);
+//       const key = `${month}_${poolId}`;
+//       if (hasChanged) {
+//         newSet.add(key);
+//       } else {
+//         newSet.delete(key);
+//       }
+//       console.log("EditMonths updated:", Array.from(newSet));
+//       return newSet;
+//     });
+//   }
+// };
+
+const handleTargetRateChange = (month, poolId, inputValue) => {
+  let value = inputValue;
+
+  // Check if the value starts with minus or is negative
+  if (value.startsWith('-') || (value !== "" && !isNaN(value) && parseFloat(value) < 0)) {
+    toast.error("Negative values are not allowed. Please enter a positive value.", {
+      position: "top-right",
+      autoClose: 3000,
+    });
+    return; // Don't update the state with negative value
+  }
+
+  // Handle validation for non-empty, non-decimal-point values
+  if (value !== "" && value !== ".") {
+    // Check if it's a valid number
+    if (!isNaN(value)) {
+      const numValue = parseFloat(value);
+      
+      // Check for infinite values
+      if (!isFinite(numValue)) {
+        toast.error("Invalid value. Please enter a finite number.", {
           position: "top-right",
           autoClose: 3000,
-        }
-      );
-      return; // Don't update the state with negative value
-    }
-
-    // Allow empty string or valid non-negative number (including decimal points)
-    if (value === "" || !isNaN(value) || value === ".") {
-      setMonthlyData((prev) =>
-        prev.map((item) =>
-          item.month === month
-            ? {
-                ...item,
-                rates: {
-                  ...item.rates,
-                  [poolId]: { ...item.rates[poolId], targetRate: value },
-                },
-              }
-            : item
-        )
-      );
-
-      const monthIndex = months.indexOf(month);
-      const initialValue =
-        initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate ||
-        "0";
-      const hasChanged = value !== initialValue;
-
-      setEditMonths((prev) => {
-        const newSet = new Set(prev);
-        const key = `${month}_${poolId}`;
-        if (hasChanged) {
-          newSet.add(key);
-        } else {
-          newSet.delete(key);
-        }
-        console.log("EditMonths updated:", Array.from(newSet));
-        return newSet;
+        });
+        return;
+      }
+      
+      // Only restrict decimal places, NOT the whole number part
+      const parts = value.split('.');
+      if (parts.length === 2 && parts[1].length > 6) {
+        // Truncate to 6 decimal places only
+        value = parts[0] + '.' + parts[1].substring(0, 6);
+        toast.warning("Maximum 6 decimal places allowed. Value has been truncated.", {
+          position: "top-right",
+          autoClose: 2500,
+        });
+      }
+      
+    } else {
+      // Invalid number format
+      toast.error("Please enter a valid number.", {
+        position: "top-right",
+        autoClose: 3000,
       });
+      return;
     }
-  };
+  }
+
+  // Allow empty string, decimal point, or any valid positive number
+  if (value === "" || value === "." || (!isNaN(value) && isFinite(parseFloat(value)) && parseFloat(value) >= 0)) {
+    setMonthlyData((prev) =>
+      prev.map((item) =>
+        item.month === month
+          ? {
+              ...item,
+              rates: {
+                ...item.rates,
+                [poolId]: { ...item.rates[poolId], targetRate: value },
+              },
+            }
+          : item
+      )
+    );
+
+    const monthIndex = months.indexOf(month);
+    const initialValue =
+      initialMonthlyData.current[monthIndex]?.rates[poolId]?.targetRate ||
+      "0";
+    const hasChanged = value !== initialValue;
+    
+    setEditMonths((prev) => {
+      const newSet = new Set(prev);
+      const key = `${month}_${poolId}`;
+      if (hasChanged) {
+        newSet.add(key);
+      } else {
+        newSet.delete(key);
+      }
+      console.log("EditMonths updated:", Array.from(newSet));
+      return newSet;
+    });
+  }
+};
+
+
   const handleFindAndReplace = () => {
     if (!findValue || !replaceValue || monthlyData.length === 0) {
       toast.error("Please enter both find and replace values.", {
@@ -1401,7 +1572,7 @@ const PoolRate = ({ userName = "User" }) => {
                                   }
                                   disabled={loading || isSaving}
                                 /> */}
-                                <input
+                                {/* <input
                                   type="text" // Keep as text to have full control over input
                                   className="w-12 px-1 py-0.5 border border-gray-300 rounded-md bg-green-50 focus:outline-none focus:ring-1 focus:ring-blue-400 text-xs shadow-sm hover:border-blue-400 transition-colors"
                                   value={
@@ -1447,7 +1618,187 @@ const PoolRate = ({ userName = "User" }) => {
                                   }}
                                   placeholder="0.00"
                                   disabled={loading || isSaving}
-                                />
+                                /> */}
+                                {/* <input
+  type="text"
+  className="w-12 px-1 py-0.5 border border-gray-300 rounded-md bg-green-50 focus:outline-none focus:ring-1 focus:ring-blue-400 text-xs shadow-sm hover:border-blue-400 transition-colors"
+  value={data.rates[pool.poolId]?.targetRate || ""}
+  onChange={(e) =>
+    handleTargetRateChange(
+      data.month,
+      pool.poolId,
+      e.target.value
+    )
+  }
+  onBlur={(e) => {
+    // Clean up the value on blur (remove trailing decimal point, etc.)
+    let value = e.target.value;
+    if (value.endsWith('.')) {
+      value = value.slice(0, -1);
+      handleTargetRateChange(data.month, pool.poolId, value);
+    }
+  }}
+  onKeyPress={(e) => {
+    // Prevent minus key from being entered
+    if (e.key === '-') {
+      e.preventDefault();
+      toast.error("Negative values are not allowed for pool rates.", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+    }
+    
+    // Allow only numbers, one decimal point, and limit decimal places
+    const value = e.target.value;
+    const char = e.key;
+    
+    // Allow control keys (backspace, delete, etc.)
+    if (char === 'Backspace' || char === 'Delete' || char === 'Tab' || char === 'Enter') {
+      return;
+    }
+    
+    // Allow only digits and one decimal point
+    if (!/[0-9.]/.test(char)) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Prevent multiple decimal points
+    if (char === '.' && value.includes('.')) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Check decimal places limit
+    if (value.includes('.')) {
+      const decimalPart = value.split('.')[1];
+      if (decimalPart && decimalPart.length >= 6 && char !== '.') {
+        e.preventDefault();
+        // toast.warning("Maximum 6 decimal places allowed.", {
+        //   position: "top-right",
+        //   autoClose: 2000,
+        // });
+        return;
+      }
+    }
+  }}
+  placeholder="0.000000"
+  maxLength="15" // Reasonable limit for input length
+  disabled={loading || isSaving}
+/> */}
+<input
+  type="text"
+  className="w-12 px-1 py-0.5 border border-gray-300 rounded-md bg-green-50 focus:outline-none focus:ring-1 focus:ring-blue-400 text-xs shadow-sm hover:border-blue-400 transition-colors"
+  value={data.rates[pool.poolId]?.targetRate || ""}
+  onChange={(e) =>
+    handleTargetRateChange(
+      data.month,
+      pool.poolId,
+      e.target.value
+    )
+  }
+  onBlur={(e) => {
+    // Clean up the value on blur
+    let value = e.target.value;
+    if (value.endsWith('.')) {
+      value = value.slice(0, -1);
+      handleTargetRateChange(data.month, pool.poolId, value);
+    }
+  }}
+  onKeyPress={(e) => {
+    // Prevent minus key from being entered
+    if (e.key === '-') {
+      e.preventDefault();
+      toast.error("Negative values are not allowed.", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      return;
+    }
+    
+    // Allow only numbers, one decimal point, and control keys
+    const char = e.key;
+    const value = e.target.value;
+    
+    // Allow control keys
+    if (char === 'Backspace' || char === 'Delete' || char === 'Tab' || char === 'Enter') {
+      return;
+    }
+    
+    // Allow only digits and one decimal point
+    if (!/[0-9.]/.test(char)) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Prevent multiple decimal points
+    if (char === '.' && value.includes('.')) {
+      e.preventDefault();
+      return;
+    }
+    
+    // Only restrict decimal places (after the decimal point), not whole numbers
+    if (value.includes('.')) {
+      const decimalPart = value.split('.')[1];
+      if (decimalPart && decimalPart.length >= 6 && char !== '.') {
+        e.preventDefault();
+        toast.warning("Maximum 6 decimal places allowed.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+        return;
+      }
+    }
+  }}
+  onPaste={(e) => {
+    // Handle paste events
+    e.preventDefault();
+    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+    
+    if (!isNaN(pastedText)) {
+      const pastedValue = parseFloat(pastedText);
+      
+      if (pastedValue < 0) {
+        toast.error("Negative values are not allowed.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
+      if (!isFinite(pastedValue)) {
+        toast.error("Invalid value. Please paste a finite number.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
+      
+      // Check decimal places only
+      const parts = pastedText.split('.');
+      if (parts.length === 2 && parts[1].length > 6) {
+        const truncatedValue = parts[0] + '.' + parts[1].substring(0, 6);
+        toast.warning("Pasted value truncated to 6 decimal places.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        handleTargetRateChange(data.month, pool.poolId, truncatedValue);
+        return;
+      }
+      
+      // If valid, handle the pasted value
+      handleTargetRateChange(data.month, pool.poolId, pastedText);
+    } else {
+      toast.error("Invalid format. Please paste a valid number.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    }
+  }}
+  placeholder="0.000000"
+  disabled={loading || isSaving}
+/>
+
+
                               </td>
                             ))}
                           </tr>
