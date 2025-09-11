@@ -158,7 +158,7 @@ const LaborFormContent = ({ onSave }) => {
   // --- Handle Form Submission (Saving to API) ---
   const handleSaveSettings = useCallback(async () => {
     if (!selectedProjectId) {
-      alert("Please select a Project ID to save settings.");
+      alert("Please select a Project ID to save settings");
       return;
     }
     console.log(`Attempting to save Project Settings for Project ID: ${selectedProjectId}...`);
