@@ -494,7 +494,7 @@
 
 // const years = Array.from({ length: 2035 - 2020 + 1 }, (_, i) => 2020 + i);
 // const getCurrentYear = () => new Date().getFullYear();
-// const API_BASE = "https://test-api-3tmq.onrender.com/HolidayCalendar";
+// const API_BASE = "${backendUrl}/HolidayCalendar";
 
 // const formatDate = (dateStr) => {
 //   let dateOnly = dateStr;
@@ -843,7 +843,7 @@
 
 // const years = Array.from({ length: 2035 - 2020 + 1 }, (_, i) => 2020 + i);
 // const getCurrentYear = () => new Date().getFullYear();
-// const API_BASE = "https://test-api-3tmq.onrender.com/HolidayCalendar";
+// const API_BASE = "${backendUrl}/HolidayCalendar";
 
 // const formatDate = (dateStr) => {
 //   let dateOnly = dateStr;
@@ -1195,7 +1195,7 @@
 
 // const years = Array.from({ length: 2035 - 2020 + 1 }, (_, i) => 2020 + i);
 // const getCurrentYear = () => new Date().getFullYear();
-// const API_BASE = "https://test-api-3tmq.onrender.com/HolidayCalendar";
+// const API_BASE = "${backendUrl}/HolidayCalendar";
 
 // const formatDate = (dateStr) => {
 //   if (!dateStr) return ''; // Safeguard against undefined or null
@@ -1526,7 +1526,7 @@
 
 // const years = Array.from({ length: 2035 - 2020 + 1 }, (_, i) => 2020 + i);
 // const getCurrentYear = () => new Date().getFullYear();
-// const API_BASE = "https://test-api-3tmq.onrender.com/HolidayCalendar";
+// const API_BASE = "${backendUrl}/HolidayCalendar";
 
 // const formatDate = (dateStr) => {
 //   if (!dateStr) return ''; // Safeguard against undefined or null
@@ -1862,10 +1862,11 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { backendUrl } from "./config";
 
 const years = Array.from({ length: 2035 - 2020 + 1 }, (_, i) => 2020 + i);
 const getCurrentYear = () => new Date().getFullYear();
-const API_BASE = "https://test-api-3tmq.onrender.com/HolidayCalendar";
+const API_BASE = `${backendUrl}/HolidayCalendar`;
 
 const formatDate = (input) => {
   if (!input) return ''; // Safeguard against undefined or null

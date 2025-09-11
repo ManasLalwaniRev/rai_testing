@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { backendUrl } from "./config";
 
 const Warning = ({ planId, projectId, templateId, planType }) => {
   const [warnings, setWarnings] = useState([]);
@@ -16,7 +17,7 @@ const Warning = ({ planId, projectId, templateId, planType }) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetWarningsByPlId/${planId}`
+        `${backendUrl}/Project/GetWarningsByPlId/${planId}`
       );
       
       setWarnings(response.data || []);

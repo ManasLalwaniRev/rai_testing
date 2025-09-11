@@ -2,6 +2,7 @@
 'use client'; // Important for client-side functionality in Next.js App Router
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { backendUrl } from "./config";
 
 const DisplaySettingsContent = () => {
   // Existing states for the fields in the Display Settings form

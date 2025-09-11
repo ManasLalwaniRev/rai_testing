@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { backendUrl } from "./config";
 
 const Template = ({ updatedBy = "User" }) => {
   const [templates, setTemplates] = useState([]);
@@ -17,7 +18,7 @@ const Template = ({ updatedBy = "User" }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch("https://test-api-3tmq.onrender.com/Orgnization/GetAllTemplates");
+      const response = await fetch(`${backendUrl}/Orgnization/GetAllTemplates`);
       if (!response.ok) {
         throw new Error("Failed to fetch templates");
       }
@@ -64,7 +65,7 @@ const Template = ({ updatedBy = "User" }) => {
 
     try {
       const response = await fetch(
-        `https://test-api-3tmq.onrender.com/Orgnization/AddTemplate?updatedBy=${encodeURIComponent(updatedBy)}`,
+        `${backendUrl}/Orgnization/AddTemplate?updatedBy=${encodeURIComponent(updatedBy)}`,
         {
           method: "POST",
           headers: {
@@ -99,7 +100,7 @@ const Template = ({ updatedBy = "User" }) => {
 
     try {
       const response = await fetch(
-        `https://test-api-3tmq.onrender.com/Orgnization/DeleteTemplate?updatedBy=${encodeURIComponent(updatedBy)}`,
+        `${backendUrl}/Orgnization/DeleteTemplate?updatedBy=${encodeURIComponent(updatedBy)}`,
         {
           method: "POST",
           headers: {

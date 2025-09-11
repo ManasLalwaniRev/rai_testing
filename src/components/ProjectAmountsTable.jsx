@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { backendUrl } from "./config";  
+
 
 const EMPLOYEE_COLUMNS = [
   { key: "idType", label: "ID Type" },
@@ -140,7 +142,7 @@ const ProjectAmountsTable = ({
 
       try {
         const durationResponse = await axios.get(
-          `https://test-api-3tmq.onrender.com/Orgnization/GetWorkingDaysForDuration/${startDate}/${endDate}`
+          `${backendUrl}/Orgnization/GetWorkingDaysForDuration/${startDate}/${endDate}`
         );
         if (!Array.isArray(durationResponse.data)) {
           throw new Error("Invalid duration response format");
@@ -149,7 +151,7 @@ const ProjectAmountsTable = ({
         setDurations(fetchedDurations);
 
         const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Project/GetDirectCostForecastDataByPlanId/${planId}`
+          `${backendUrl}/Project/GetDirectCostForecastDataByPlanId/${planId}`
         );
         const apiData = Array.isArray(response.data)
           ? response.data
@@ -214,7 +216,7 @@ const ProjectAmountsTable = ({
     const loadOrganizationOptions = async () => {
       try {
         const response = await axios.get(
-          `https://test-api-3tmq.onrender.com/Orgnization/GetAllOrgs`
+          `${backendUrl}/Orgnization/GetAllOrgs`
         );
         const orgOptions = Array.isArray(response.data)
           ? response.data.map((org) => ({
@@ -261,8 +263,8 @@ useEffect(() => {
     try {
       const endpoint =
         newEntry.idType === "Vendor" || newEntry.idType === "Vendor Employee"
-          ? `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${projectId}`
-          : `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${projectId}`;
+          ? `${backendUrl}/Project/GetVenderEmployeesByProject/${projectId}`
+          : `${backendUrl}/Project/GetEmployeesByProject/${projectId}`;
       const response = await axios.get(endpoint);
       
       const suggestions = Array.isArray(response.data)
@@ -327,7 +329,7 @@ useEffect(() => {
 
   //   try {
   //     const response = await axios.get(
-  //       `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+  //       `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
   //     );
 
   //     const data = Array.isArray(response.data)
@@ -397,7 +399,7 @@ useEffect(() => {
 
   try {
     const response = await axios.get(
-      `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+      `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
     );
 
     const data = Array.isArray(response.data)
@@ -621,7 +623,7 @@ const handleIdChange = (value) => {
 
   //   try {
   //     await axios.put(
-  //       "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
+  //       "${backendUrl}/DirectCost/UpdateDirectCost",
   //       { ...payload, acctId: payload.accId },
   //       { headers: { "Content-Type": "application/json" } }
   //     );
@@ -702,7 +704,7 @@ const handleIdChange = (value) => {
  
   //   try {
   //     await axios.put(
-  //       "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
+  //       "${backendUrl}/DirectCost/UpdateDirectCost",
   //       { ...payload, acctId: payload.accId },
   //       { headers: { "Content-Type": "application/json" } }
   //     );
@@ -788,7 +790,7 @@ const handleIdChange = (value) => {
 
   try {
     await axios.put(
-      "https://test-api-3tmq.onrender.com/DirectCost/UpdateDirectCost",
+      `${backendUrl}/DirectCost/UpdateDirectCost`,
       { ...payload, acctId: payload.accId },
       { headers: { "Content-Type": "application/json" } }
     );
@@ -962,7 +964,7 @@ const handleIdChange = (value) => {
 
   //   try {
   //     const response = await axios.put(
-  //       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
+  //       `${backendUrl}/Forecast/UpdateForecastAmount/${planType}`,
   //       payload,
   //       { headers: { "Content-Type": "application/json" } }
   //     );
@@ -1096,7 +1098,7 @@ const handleIdChange = (value) => {
 
 //   try {
 //     const response = await axios.put(
-//       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
+//       `${backendUrl}/Forecast/UpdateForecastAmount/${planType}`,
 //       payload,
 //       { headers: { "Content-Type": "application/json" } }
 //     );
@@ -1244,7 +1246,7 @@ const handleIdChange = (value) => {
     const apiPlanType = planType === "NBBUD" ? "BUD" : planType;
 
     await axios.put(
-    `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${apiPlanType}`,
+    `${backendUrl}/Forecast/UpdateForecastAmount/${apiPlanType}`,
     payload,
     { headers: { "Content-Type": "application/json" } }
   );
@@ -1459,7 +1461,7 @@ const handleSaveNewEntry = async () => {
 
   try {
     const response = await axios.post(
-      "https://test-api-3tmq.onrender.com/DirectCost/AddNewDirectCost",
+      `${backendUrl}/DirectCost/AddNewDirectCost`,
       payload,
       { headers: { "Content-Type": "application/json" } }
     );
@@ -1600,7 +1602,7 @@ const handleSaveNewEntry = async () => {
  
       // Call delete API
       await axios.delete(
-        `https://test-api-3tmq.onrender.com/DirectCost/DeleteDirectCost/${dctId}`
+        `${backendUrl}/DirectCost/DeleteDirectCost/${dctId}`
       );
  
       // Show success message
@@ -1751,7 +1753,7 @@ const handleSaveNewEntry = async () => {
             // updates.push(
             //   axios
             //     .put(
-            //       `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${planType}`,
+            //       `${backendUrl}/Forecast/UpdateForecastAmount/${planType}`,
             //       payload,
             //       { headers: { "Content-Type": "application/json" } }
             //     )
@@ -1766,7 +1768,7 @@ const handleSaveNewEntry = async () => {
             updates.push(
   axios
     .put(
-      `https://test-api-3tmq.onrender.com/Forecast/UpdateForecastAmount/${apiPlanType}`,
+      `${backendUrl}/Forecast/UpdateForecastAmount/${apiPlanType}`,
       payload,
       { headers: { "Content-Type": "application/json" } }
     )

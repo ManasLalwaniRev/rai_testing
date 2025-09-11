@@ -63,7 +63,7 @@
 //     const fetchTemplates = async () => {
 //       setLoading(true);
 //       try {
-//         const response = await axios.get('https://test-api-3tmq.onrender.com/Orgnization/GetAllTemplates');
+//         const response = await axios.get('${backendUrl}/Orgnization/GetAllTemplates');
 //         console.log('Templates API Response:', response.data);
 //         setTemplates(response.data || []);
 //         setError(null);
@@ -91,7 +91,7 @@
 //     const fetchPoolsAndRates = async () => {
 //       setLoading(true);
 //       try {
-//         const poolsResponse = await axios.get(`https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByTemplateId?templateId=${selectedTemplate}`);
+//         const poolsResponse = await axios.get(`${backendUrl}/Orgnization/GetPoolsByTemplateId?templateId=${selectedTemplate}`);
 //         console.log('Pools API Response:', poolsResponse.data);
 //         // const poolList = poolsResponse.data || [];
 //         const rawPoolList = poolsResponse.data || [];
@@ -111,7 +111,7 @@
 //         }
 
 //         const ratesPromises = poolList.map(pool =>
-//           axios.get(`https://test-api-3tmq.onrender.com/Orgnization/GetRatesByPoolsTemplateId?templateId=${selectedTemplate}&poolId=${pool.poolId}&year=${selectedYear}`)
+//           axios.get(`${backendUrl}/Orgnization/GetRatesByPoolsTemplateId?templateId=${selectedTemplate}&poolId=${pool.poolId}&year=${selectedYear}`)
 //             .catch(err => {
 //               console.error(`Failed to fetch rates for pool ${pool.poolId}:`, err);
 //               return { data: [] };
@@ -350,7 +350,7 @@
 //         };
 //       });
 //       const response = await axios.post(
-//         `https://test-api-3tmq.onrender.com/Orgnization/UpsertPoolRatesForTemplate?updatedBy=${userName}`,
+//         `${backendUrl}/Orgnization/UpsertPoolRatesForTemplate?updatedBy=${userName}`,
 //         payload
 //       );
 //       console.log('Save API Response:', response.data);

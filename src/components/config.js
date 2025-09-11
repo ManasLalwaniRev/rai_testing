@@ -1,1 +1,1 @@
-export const backendUrl = "https://test-api-3tmq.onrender.com";
+export const backendUrl = import.meta.env.VITE_BACKEND_URL;

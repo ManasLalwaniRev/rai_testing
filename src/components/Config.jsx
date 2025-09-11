@@ -1,2 +1,0 @@
-export const backendUrl = "https://test-api-3tmq.onrender.com";
- 

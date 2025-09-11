@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import { backendUrl } from "./config";
 
 // Register Chart.js components
 ChartJS.register(
@@ -129,7 +130,7 @@ const FinancialDashboard = ({ planId, templateId, type }) => {
           templateId: (templateId || 1).toString(),
           type: type || 'TARGET',
         });
-        const response = await fetch(`https://test-api-3tmq.onrender.com/Forecast/CalculateCost?${params.toString()}`);
+        const response = await fetch(`${backendUrl}/Forecast/CalculateCost?${params.toString()}`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

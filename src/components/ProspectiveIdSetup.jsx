@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { backendUrl } from "./config";
 
 // Utility function for combining Tailwind CSS classes
 const cn = (...args) => {

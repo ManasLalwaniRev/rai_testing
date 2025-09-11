@@ -25,7 +25,7 @@
 //   try {
 //     // Call GetAllPools without fiscalYear parameter
 //     const groupResponse = await axios.get(
-//       "https://test-api-3tmq.onrender.com/Orgnization/GetAllPools"
+//       "${backendUrl}/Orgnization/GetAllPools"
 //     );
 //     console.log("Group codes API response:", groupResponse.data);
 
@@ -39,7 +39,7 @@
 
 //     // Call GetAccountPools with fiscalYear parameter
 //     const tableResponse = await axios.get(
-//       `https://test-api-3tmq.onrender.com/Orgnization/GetAccountPools?Year=${fiscalYear}`
+//       `${backendUrl}/Orgnization/GetAccountPools?Year=${fiscalYear}`
 //     );
 //     console.log("Table data API response:", tableResponse.data);
 //     const tableDataRaw = tableResponse.data;
@@ -113,7 +113,7 @@
 //     setIsSaving(true);
 //     try {
 //       const response = await axios.post(
-//         "https://test-api-3tmq.onrender.com/Orgnization/BulkUpSertOrgAccountPoolMapping",
+//         "${backendUrl}/Orgnization/BulkUpSertOrgAccountPoolMapping",
 //         changedRows,
 //         {
 //           headers: {
@@ -296,6 +296,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { backendUrl } from "./config";
 
 const PoolConfigurationTable = () => {
   const [tableData, setTableData] = useState([]);
@@ -317,7 +318,7 @@ const PoolConfigurationTable = () => {
       setLoading(true);
       try {
         const groupResponse = await axios.get(
-          "https://test-api-3tmq.onrender.com/Orgnization/GetAllPools"
+          `${backendUrl}/Orgnization/GetAllPools`
         );
         const codes = groupResponse.data.map((item) => item.code);
         const names = groupResponse.data.reduce((acc, item) => {
@@ -333,7 +334,7 @@ const PoolConfigurationTable = () => {
         setGroupTypes(types);
 
         const tableResponse = await axios.get(
-          `https://test-api-3tmq.onrender.com/Orgnization/GetAccountPools?Year=${fiscalYear}`
+          `${backendUrl}/Orgnization/GetAccountPools?Year=${fiscalYear}`
         );
         const tableDataRaw = tableResponse.data;
 
@@ -429,7 +430,7 @@ const PoolConfigurationTable = () => {
     setIsSaving(true);
     try {
       await axios.post(
-        "https://test-api-3tmq.onrender.com/Orgnization/BulkUpSertOrgAccountPoolMapping",
+        `${backendUrl}/Orgnization/BulkUpSertOrgAccountPoolMapping`,
         changedRows,
         {
           headers: { "Content-Type": "application/json" },

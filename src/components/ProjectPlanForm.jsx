@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { backendUrl } from "./config";
 
 const ProjectPlanForm = ({ projectId, onClose, onPlanCreated, sourcePlan, planType: initialPlanType }) => {
   const [versionCode, setVersionCode] = useState('QTR1');
@@ -15,7 +16,7 @@ const ProjectPlanForm = ({ projectId, onClose, onPlanCreated, sourcePlan, planTy
     const fetchTemplates = async () => {
       try {
         setIsLoadingTemplates(true);
-        const response = await axios.get('https://test-api-3tmq.onrender.com/Orgnization/GetAllTemplates');
+        const response = await axios.get(`${backendUrl}/Orgnization/GetAllTemplates`);
         console.log('GetAllTemplates API response:', response.data);
         if (!Array.isArray(response.data)) {
           throw new Error('Invalid response format from templates API');
@@ -71,7 +72,7 @@ const ProjectPlanForm = ({ projectId, onClose, onPlanCreated, sourcePlan, planTy
       setIsSubmitting(true);
       const toastId = 'create-plan';
       toast.info('Creating plan...', { toastId, autoClose: false });
-      const response = await axios.post('https://test-api-3tmq.onrender.com/Project/AddProjectPlan', newPlan);
+      const response = await axios.post(`${backendUrl}/Project/AddProjectPlan`, newPlan);
       console.log('AddProjectPlan API response:', response.data);
       toast.update(toastId, { render: 'Plan created successfully!', type: 'success', autoClose: 3000 });
       onPlanCreated();

@@ -49,6 +49,7 @@
 
 import React, { useRef, useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import { backendUrl } from "./config";
 
 const Login = () => {
   const navigate = useNavigate();

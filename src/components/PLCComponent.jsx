@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaEdit, FaTrash, FaSave, FaTimes } from "react-icons/fa"; // Importing icons
 import { v4 as uuidv4 } from "uuid"; // For unique IDs
+import { backendUrl } from "./config";
 
 const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
   const [billingRatesSchedule, setBillingRatesSchedule] = useState([]);
@@ -69,7 +70,7 @@ const PLCComponent = ({ selectedProjectId, selectedPlan, showPLC }) => {
     setLoadingPLC(true);
     try {
       const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/api/ProjectPlcRates`
+        `${backendUrl}/api/ProjectPlcRates`
       );
       const filteredData = response.data.filter((item) =>
         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -177,7 +178,7 @@ const uniqueData = filteredData.map((item, index) => {
     setLoadingEmployee(true);
     try {
       const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetEmployeesByProject/${selectedProjectId}`
+        `${backendUrl}/Project/GetEmployeesByProject/${selectedProjectId}`
       );
       setEmployees(
         response.data.map((item) => ({
@@ -208,7 +209,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     }
   //     try {
   //       const response = await axios.get(
-  //         `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${plcSearch}`
+  //         `${backendUrl}/Project/GetAllPlcs/${plcSearch}`
   //       );
   //       const filteredPlcs = response.data
   //         .filter((item) =>
@@ -237,7 +238,7 @@ const uniqueData = filteredData.map((item, index) => {
 
     try {
       const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetAllPlcs/${plcSearch}`
+        `${backendUrl}/Project/GetAllPlcs/${plcSearch}`
       );
       const filteredPlcs = response.data
         .filter((item) =>
@@ -273,7 +274,7 @@ const uniqueData = filteredData.map((item, index) => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/ProjEmplRt`
+        `${backendUrl}/ProjEmplRt`
       );
       const filteredData = response.data.filter(
         (item) =>
@@ -392,7 +393,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     setLoading(true);
   //     try {
   //       const response = await axios.get(
-  //         `https://test-api-3tmq.onrender.com/ProjVendRt`
+  //         `${backendUrl}/ProjVendRt`
   //       );
   //       const filteredData = response.data.filter((item) =>
   //         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -448,7 +449,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     setLoading(true);
   //     try {
   //       const response = await axios.get(
-  //         `https://test-api-3tmq.onrender.com/ProjVendRt`
+  //         `${backendUrl}/ProjVendRt`
   //       );
   //       const filteredData = response.data.filter((item) =>
   //         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -533,7 +534,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     setLoading(true);
   //     try {
   //       const response = await axios.get(
-  //         `https://test-api-3tmq.onrender.com/ProjVendRt`
+  //         `${backendUrl}/ProjVendRt`
   //       );
   //       const filteredData = response.data.filter((item) =>
   //         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -620,7 +621,7 @@ const uniqueData = filteredData.map((item, index) => {
     setLoadingVendor(true);
     try {
       const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/ProjVendRt`
+        `${backendUrl}/ProjVendRt`
       );
       const filteredData = response.data.filter((item) =>
         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -757,7 +758,7 @@ const uniqueData = filteredData.map((item, index) => {
 
   //   try {
   //     await axios.put(
-  //       `https://test-api-3tmq.onrender.com/api/ProjectPlcRates/${id}`,
+  //       `${backendUrl}/api/ProjectPlcRates/${id}`,
   //       {
   //         id,
   //         projId: selectedProjectId,
@@ -827,7 +828,7 @@ const uniqueData = filteredData.map((item, index) => {
 
   try {
     await axios.put(
-      `https://test-api-3tmq.onrender.com/api/ProjectPlcRates/${originalId}`, // ✅ Use original ID
+      `${backendUrl}/api/ProjectPlcRates/${originalId}`, // ✅ Use original ID
       {
         id: originalId, // ✅ Use original ID
         projId: selectedProjectId,
@@ -876,7 +877,7 @@ const uniqueData = filteredData.map((item, index) => {
   //   const fetchVendorEmployees = async () => {
   //     try {
   //       const response = await axios.get(
-  //         `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${selectedProjectId}`
+  //         `${backendUrl}/Project/GetVenderEmployeesByProject/${selectedProjectId}`
   //       );
   //       setVendorEmployees(response.data);
   //     } catch (error) {
@@ -895,7 +896,7 @@ const uniqueData = filteredData.map((item, index) => {
 
     try {
       const response = await axios.get(
-        `https://test-api-3tmq.onrender.com/Project/GetVenderEmployeesByProject/${selectedProjectId}`
+        `${backendUrl}/Project/GetVenderEmployeesByProject/${selectedProjectId}`
       );
       setVendorEmployees(response.data);
     } catch (error) {
@@ -915,7 +916,7 @@ const uniqueData = filteredData.map((item, index) => {
     setLoading(true);
     try {
       await axios.delete(
-        `https://test-api-3tmq.onrender.com/api/ProjectPlcRates/${id}`
+        `${backendUrl}/api/ProjectPlcRates/${id}`
       );
       setBillingRatesSchedule((prev) => prev.filter((rate) => rate.id !== id));
       setEditBillRate((prev) => {
@@ -1017,7 +1018,7 @@ const uniqueData = filteredData.map((item, index) => {
     setLoading(true);
     try {
       await axios.post(
-        `https://test-api-3tmq.onrender.com/api/ProjectPlcRates`,
+        `${backendUrl}/api/ProjectPlcRates`,
         {
           id: 0,
           projId: selectedProjectId,
@@ -1035,7 +1036,7 @@ const uniqueData = filteredData.map((item, index) => {
       );
       setNewRate(null);
       const fetchResponse = await axios.get(
-        `https://test-api-3tmq.onrender.com/api/ProjectPlcRates`
+        `${backendUrl}/api/ProjectPlcRates`
       );
       const filteredData = fetchResponse.data.filter((item) =>
         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -1212,7 +1213,7 @@ const uniqueData = filteredData.map((item, index) => {
 
   //   setLoading(true);
   //   try {
-  //     await axios.post(`https://test-api-3tmq.onrender.com/ProjEmplRt`, {
+  //     await axios.post(`${backendUrl}/ProjEmplRt`, {
   //       id: 0,
   //       projId: selectedProjectId,
   //       emplId: newEmployeeRate.empId,
@@ -1229,7 +1230,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     setNewEmployeeRate(null);
   //     // Refetch employee billing rates to ensure state consistency after adding
   //     const fetchResponse = await axios.get(
-  //       `https://test-api-3tmq.onrender.com/ProjEmplRt`
+  //       `${backendUrl}/ProjEmplRt`
   //     );
   //     const filteredData = fetchResponse.data.filter(
   //       (item) =>
@@ -1304,7 +1305,7 @@ const uniqueData = filteredData.map((item, index) => {
     }
     setLoading(true);
     try {
-      await axios.post(`https://test-api-3tmq.onrender.com/ProjEmplRt`, {
+      await axios.post(`${backendUrl}/ProjEmplRt`, {
         id: 0,
         projId: selectedProjectId,
         emplId: newEmployeeRate.empId,
@@ -1320,7 +1321,7 @@ const uniqueData = filteredData.map((item, index) => {
       });
       setNewEmployeeRate(null);
       const fetchResponse = await axios.get(
-        `https://test-api-3tmq.onrender.com/ProjEmplRt`
+        `${backendUrl}/ProjEmplRt`
       );
       const filteredData = fetchResponse.data.filter(
         (item) =>
@@ -1423,7 +1424,7 @@ const uniqueData = filteredData.map((item, index) => {
   //   }
 
   //   try {
-  //     await axios.put(`https://test-api-3tmq.onrender.com/ProjEmplRt/${id}`, {
+  //     await axios.put(`${backendUrl}/ProjEmplRt/${id}`, {
   //       projEmplRtKey: id,
   //       projId: selectedProjectId,
   //       emplId: fields.empId || updatedData.empId,
@@ -1501,7 +1502,7 @@ const uniqueData = filteredData.map((item, index) => {
   }
 
   try {
-    await axios.put(`https://test-api-3tmq.onrender.com/ProjEmplRt/${originalId}`, { // ✅ Use original ID
+    await axios.put(`${backendUrl}/ProjEmplRt/${originalId}`, { // ✅ Use original ID
       projEmplRtKey: originalId, // ✅ Use original ID
       projId: selectedProjectId,
       emplId: fields.empId || updatedData.empId,
@@ -1564,7 +1565,7 @@ const uniqueData = filteredData.map((item, index) => {
     }
     setLoading(true);
     try {
-      await axios.delete(`https://test-api-3tmq.onrender.com/ProjEmplRt/${id}`);
+      await axios.delete(`${backendUrl}/ProjEmplRt/${id}`);
       setEmployeeBillingRates((prev) => prev.filter((rate) => rate.id !== id));
       setEditEmployeeBillRate((prev) => {
         const newEditEmployeeBillRate = { ...prev };
@@ -1863,7 +1864,7 @@ const uniqueData = filteredData.map((item, index) => {
 
   //   setLoading(true);
   //   try {
-  //     await axios.post(`https://test-api-3tmq.onrender.com/ProjVendRt`, {
+  //     await axios.post(`${backendUrl}/ProjVendRt`, {
   //       id: 0,
   //       projId: selectedPlan?.projId || selectedProjectId,
   //       vendId: newVendorRate.vendorId,
@@ -1883,7 +1884,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     });
   //     setNewVendorRate(null);
   //     const fetchResponse = await axios.get(
-  //       `https://test-api-3tmq.onrender.com/ProjVendRt`
+  //       `${backendUrl}/ProjVendRt`
   //     );
   //     const filteredData = fetchResponse.data.filter((item) =>
   //       item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -1957,7 +1958,7 @@ const uniqueData = filteredData.map((item, index) => {
   //   }
   //   setLoading(true);
   //   try {
-  //     await axios.post(`https://test-api-3tmq.onrender.com/ProjVendRt`, {
+  //     await axios.post(`${backendUrl}/ProjVendRt`, {
   //       id: 0,
   //       projId: selectedPlan?.projId || selectedProjectId,
   //       vendId: newVendorRate.vendorId,
@@ -1977,7 +1978,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     });
   //     setNewVendorRate(null);
   //     const fetchResponse = await axios.get(
-  //       `https://test-api-3tmq.onrender.com/ProjVendRt`
+  //       `${backendUrl}/ProjVendRt`
   //     );
   //     const filteredData = fetchResponse.data.filter((item) =>
   //       item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -2084,7 +2085,7 @@ const uniqueData = filteredData.map((item, index) => {
   //     };
 
   //     const response = await axios.post(
-  //       `https://test-api-3tmq.onrender.com/ProjVendRt`,
+  //       `${backendUrl}/ProjVendRt`,
   //       payload
   //     );
 
@@ -2167,7 +2168,7 @@ const uniqueData = filteredData.map((item, index) => {
     }
     setLoading(true);
     try {
-      await axios.post(`https://test-api-3tmq.onrender.com/ProjVendRt`, {
+      await axios.post(`${backendUrl}/ProjVendRt`, {
         id: 0,
         projId: selectedPlan?.projId || selectedProjectId,
         vendId: newVendorRate.vendorId,
@@ -2187,7 +2188,7 @@ const uniqueData = filteredData.map((item, index) => {
       });
       setNewVendorRate(null);
       const fetchResponse = await axios.get(
-        `https://test-api-3tmq.onrender.com/ProjVendRt`
+        `${backendUrl}/ProjVendRt`
       );
       const filteredData = fetchResponse.data.filter((item) =>
         item.projId.toLowerCase().startsWith(selectedProjectId.toLowerCase())
@@ -2307,7 +2308,7 @@ const uniqueData = filteredData.map((item, index) => {
 
   try {
     await axios.put(
-      `https://test-api-3tmq.onrender.com/ProjVendRt/${originalId}`, // ✅ Use original ID
+      `${backendUrl}/ProjVendRt/${originalId}`, // ✅ Use original ID
       {
         projVendRtKey: originalId, // ✅ Use original ID
         projId: selectedProjectId,
@@ -2384,7 +2385,7 @@ const uniqueData = filteredData.map((item, index) => {
 
   //   try {
   //     await axios.put(
-  //       `https://test-api-3tmq.onrender.com/ProjVendRt/${projVendRtKey}`,
+  //       `${backendUrl}/ProjVendRt/${projVendRtKey}`,
   //       {
   //         projVendRtKey: projVendRtKey,
   //         projId: selectedProjectId,
@@ -2449,7 +2450,7 @@ const uniqueData = filteredData.map((item, index) => {
   // const handleDeleteVendor = async (id) => {
   //    setLoading(true);
   //    try {
-  //      await axios.delete(`https://test-api-3tmq.onrender.com/ProjVendRt/${id}`);
+  //      await axios.delete(`${backendUrl}/ProjVendRt/${id}`);
   //      setVendorBillingRates((prev) => prev.filter((rate) => rate.id !== id));
   //      setEditVendorBillRate((prev) => {
   //        const newEditVendorBillRate = { ...prev };
@@ -2482,7 +2483,7 @@ const uniqueData = filteredData.map((item, index) => {
     setLoadingAction((prev) => ({ ...prev, [id]: true }));
     try {
       await axios.delete(
-        `https://test-api-3tmq.onrender.com/ProjVendRt/${deleteId}`
+        `${backendUrl}/ProjVendRt/${deleteId}`
       );
       setVendorBillingRates((prev) => prev.filter((rate) => rate.id !== id));
       setEditVendorBillRate((prev) => {

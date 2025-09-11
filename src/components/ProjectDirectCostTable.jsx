@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { backendUrl } from "./config";
 
 const DIRECT_COST_COLUMNS = [
   { key: "line", label: "Line" },

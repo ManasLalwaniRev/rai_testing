@@ -58,7 +58,7 @@
 // // // //       if (isSearched && isValidProjectId(projectId)) {
 // // // //         try {
 // // // //           const res = await axios.get(
-// // // //             `https://test-api-3tmq.onrender.com/Project/GetAccountsByProjectId/${projectId}`
+// // // //             `${backendUrl}/Project/GetAccountsByProjectId/${projectId}`
 // // // //           );
 // // // //           if (isMounted) setAccounts(res.data || []);
 // // // //         } catch {
@@ -80,7 +80,7 @@
 // // // //         setIsLoading(true);
 // // // //         try {
 // // // //           const res = await axios.get(
-// // // //             `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
+// // // //             `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
 // // // //           );
 // // // //           if (isMounted) {
 // // // //             setBurdenCeilings(res.data?.data || []);
@@ -127,7 +127,7 @@
 // // // //     }
 // // // //     try {
 // // // //       const res = await axios.get(
-// // // //         `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
+// // // //         `${backendUrl}/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
 // // // //       );
 // // // //       setPools(res.data || []);
 // // // //     } catch {
@@ -188,12 +188,12 @@
 // // // //     };
 // // // //     try {
 // // // //       await axios.post(
-// // // //         `https://test-api-3tmq.onrender.com/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// // // //         `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // // // //         requestBody
 // // // //       );
 // // // //       // Refresh
 // // // //       const res = await axios.get(
-// // // //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// // // //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // // // //       );
 // // // //       setBurdenCeilings(res.data?.data || []);
 // // // //       setShowNewRow(false);
@@ -244,12 +244,12 @@
 // // // //     };
 // // // //     try {
 // // // //       await axios.put(
-// // // //         `https://test-api-3tmq.onrender.com/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// // // //         `${backendUrl}/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // // // //         requestBody
 // // // //       );
 // // // //       // Refresh
 // // // //       const res = await axios.get(
-// // // //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// // // //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // // // //       );
 // // // //       setBurdenCeilings(res.data?.data || []);
 // // // //       setEditIndex(null);
@@ -619,7 +619,7 @@
 // // // //       if (isSearched && isValidProjectId(projectId)) {
 // // // //         try {
 // // // //           const res = await axios.get(
-// // // //             `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+// // // //             `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
 // // // //           );
 // // // //           // Assuming API returns an object with accounts array; filter for Labor and Non-Labor
 // // // //           const allAccounts = res.data?.accounts || []; // Adjust based on actual response structure
@@ -647,7 +647,7 @@
 // // // //         setIsLoading(true);
 // // // //         try {
 // // // //           const res = await axios.get(
-// // // //             `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
+// // // //             `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
 // // // //           );
 // // // //           if (isMounted) {
 // // // //             setBurdenCeilings(res.data?.data || []);
@@ -694,7 +694,7 @@
 // // // //     }
 // // // //     try {
 // // // //       const res = await axios.get(
-// // // //         `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
+// // // //         `${backendUrl}/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
 // // // //       );
 // // // //       setPools(res.data || []);
 // // // //     } catch {
@@ -755,12 +755,12 @@
 // // // //     };
 // // // //     try {
 // // // //       await axios.post(
-// // // //         `https://test-api-3tmq.onrender.com/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// // // //         `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // // // //         requestBody
 // // // //       );
 // // // //       // Refresh
 // // // //       const res = await axios.get(
-// // // //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// // // //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // // // //       );
 // // // //       setBurdenCeilings(res.data?.data || []);
 // // // //       setShowNewRow(false);
@@ -811,12 +811,12 @@
 // // // //     };
 // // // //     try {
 // // // //       await axios.put(
-// // // //         `https://test-api-3tmq.onrender.com/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// // // //         `${backendUrl}/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // // // //         requestBody
 // // // //       );
 // // // //       // Refresh
 // // // //       const res = await axios.get(
-// // // //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// // // //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // // // //       );
 // // // //       setBurdenCeilings(res.data?.data || []);
 // // // //       setEditIndex(null);
@@ -1220,7 +1220,7 @@
 // // //   if (isSearched && isValidProjectId(projectId)) {
 // // //     try {
 // // //       const res = await axios.get(
-// // //         `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+// // //         `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
 // // //       );
 
 // // //       // Your API returns an array, so take first object
@@ -1250,7 +1250,7 @@
 // // //         setIsLoading(true);
 // // //         try {
 // // //           const res = await axios.get(
-// // //             `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
+// // //             `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
 // // //           );
 // // //           if (isMounted) {
 // // //             setBurdenCeilings(res.data?.data || []);
@@ -1297,7 +1297,7 @@
 // // //     }
 // // //     try {
 // // //       const res = await axios.get(
-// // //         `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
+// // //         `${backendUrl}/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
 // // //       );
 // // //       setPools(res.data || []);
 // // //     } catch {
@@ -1357,12 +1357,12 @@
 // // //     };
 // // //     try {
 // // //       await axios.post(
-// // //         `https://test-api-3tmq.onrender.com/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// // //         `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // // //         requestBody
 // // //       );
 // // //       // Refresh
 // // //       const res = await axios.get(
-// // //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// // //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // // //       );
 // // //       setBurdenCeilings(res.data?.data || []);
 // // //       setShowNewRow(false);
@@ -1413,12 +1413,12 @@
 // // //     };
 // // //     try {
 // // //       await axios.put(
-// // //         `https://test-api-3tmq.onrender.com/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// // //         `${backendUrl}/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // // //         requestBody
 // // //       );
 // // //       // Refresh
 // // //       const res = await axios.get(
-// // //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// // //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // // //       );
 // // //       setBurdenCeilings(res.data?.data || []);
 // // //       setEditIndex(null);
@@ -1820,7 +1820,7 @@
 // //       setIsAccountsLoading(true);
 // //       try {
 // //         const res = await axios.get(
-// //           `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+// //           `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
 // //         );
 // //         console.log("Accounts API Response:", res.data); // Log for debugging
 
@@ -1857,7 +1857,7 @@
 // //         setIsLoading(true);
 // //         try {
 // //           const res = await axios.get(
-// //             `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
+// //             `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
 // //           );
 // //           if (isMounted) {
 // //             setBurdenCeilings(res.data?.data || []);
@@ -1904,7 +1904,7 @@
 // //     }
 // //     try {
 // //       const res = await axios.get(
-// //         `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
+// //         `${backendUrl}/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
 // //       );
 // //       setPools(res.data || []);
 // //     } catch {
@@ -1969,12 +1969,12 @@
 // //     };
 // //     try {
 // //       await axios.post(
-// //         `https://test-api-3tmq.onrender.com/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// //         `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // //         requestBody
 // //       );
 // //       // Refresh
 // //       const res = await axios.get(
-// //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // //       );
 // //       setBurdenCeilings(res.data?.data || []);
 // //       setShowNewRow(false);
@@ -2025,12 +2025,12 @@
 // //     };
 // //     try {
 // //       await axios.put(
-// //         `https://test-api-3tmq.onrender.com/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+// //         `${backendUrl}/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 // //         requestBody
 // //       );
 // //       // Refresh
 // //       const res = await axios.get(
-// //         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+// //         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 // //       );
 // //       setBurdenCeilings(res.data?.data || []);
 // //       setEditIndex(null);
@@ -2438,7 +2438,7 @@
 //       if (isSearched && isValidProjectId(projectId)) {
 //         try {
 //           const res = await axios.get(
-//             `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//             `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
 //           );
 
 //           // Your API returns an array, so take first object
@@ -2468,7 +2468,7 @@
 //         setIsLoading(true);
 //         try {
 //           const res = await axios.get(
-//             `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
+//             `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
 //           );
 //           if (isMounted) {
 //             setBurdenCeilings(res.data?.data || []);
@@ -2515,7 +2515,7 @@
 //     }
 //     try {
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
+//         `${backendUrl}/Orgnization/GetPoolsByOrgAccount?accountId=${accountId}&orgId=1.02`
 //       );
 //       setPools(res.data || []);
 //     } catch {
@@ -2575,12 +2575,12 @@
 //     };
 //     try {
 //       await axios.post(
-//         `https://test-api-3tmq.onrender.com/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       // Refresh
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 //       );
 //       setBurdenCeilings(res.data?.data || []);
 //       setShowNewRow(false);
@@ -2631,12 +2631,12 @@
 //     };
 //     try {
 //       await axios.put(
-//         `https://test-api-3tmq.onrender.com/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       // Refresh
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 //       );
 //       setBurdenCeilings(res.data?.data || []);
 //       setEditIndex(null);
@@ -3044,7 +3044,7 @@
 //     }
 //     axios
 //       .get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllProjectByProjId/${projectId}`
+//         `${backendUrl}/Project/GetAllProjectByProjId/${projectId}`
 //       )
 //       .then((res) => {
 //         const project = res.data?.[0] || {};
@@ -3077,7 +3077,7 @@
 //       setIsLoading(true);
 //       axios
 //         .get(
-//           `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
+//           `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${projectId}`
 //         )
 //         .then((res) => {
 //           if (active) {
@@ -3125,7 +3125,7 @@
 //       }));
 //       try {
 //         const res = await axios.get(
-//           `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByOrgAccount?accountId=${selected.acctId}&orgId=1.02`
+//           `${backendUrl}/Orgnization/GetPoolsByOrgAccount?accountId=${selected.acctId}&orgId=1.02`
 //         );
 //         setPools(Array.isArray(res.data) ? res.data : []);
 //       } catch {
@@ -3194,12 +3194,12 @@
 //     };
 //     try {
 //       await axios.post(
-//         `https://test-api-3tmq.onrender.com/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/CreateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       // Refresh
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 //       );
 //       setBurdenCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
 //       setShowNewRow(false);
@@ -3262,12 +3262,12 @@
 //     };
 //     try {
 //       await axios.put(
-//         `https://test-api-3tmq.onrender.com/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
+//         `${backendUrl}/Project/UpdateBurdenCeilingForProject?updatedBy=${updatedBy}`,
 //         requestBody
 //       );
 //       // Refresh
 //       const res = await axios.get(
-//         `https://test-api-3tmq.onrender.com/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
+//         `${backendUrl}/Project/GetAllBurdenCeilingForProject?projId=${lastSearchedProjectId}`
 //       );
 //       setBurdenCeilings(Array.isArray(res.data?.data) ? res.data.data : []);
 //       setEditIndex(null);
@@ -4063,7 +4063,7 @@ const BurdenCostCeilingDetails = ({
   //   const fetchPools = async () => {
   //     try {
   //       const res = await axios.get(
-  //         "https://test-api-3tmq.onrender.com/Orgnization/GetAllPools"
+  //         "${backendUrl}/Orgnization/GetAllPools"
   //       );
   //       console.log("Pools API response:", res.data); // Debug the response
   //       if (active) {
@@ -4085,7 +4085,7 @@ const BurdenCostCeilingDetails = ({
   //   const fetchPools = async () => {
   //     try {
   //       const res = await axios.get(
-  //         "https://test-api-3tmq.onrender.com/Orgnization/GetAllPools"
+  //         "${backendUrl}/Orgnization/GetAllPools"
   //       );
   //       console.log("Pools API response:", res.data); // Debug the response
   //       if (active) {

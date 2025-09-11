@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify"; // Assuming react-toastify is available
+import { backendUrl } from "./config";
 
 const columnLabels = {
   emplId: "Employee ID",
@@ -63,7 +64,7 @@ const ProjectRevenueAnalysisTable = ({ planId, style, onClose }) => {
     setError(null);
     axios
       .get(
-        `https://test-api-3tmq.onrender.com/Forecast/CalculateCost?planID=${planId}&templateId=1&type=TARGET`
+        `${backendUrl}/Forecast/CalculateCost?planID=${planId}&templateId=1&type=TARGET`
       )
       .then((res) => {
         const correctedData = {

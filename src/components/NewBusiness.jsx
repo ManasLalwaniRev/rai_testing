@@ -225,7 +225,7 @@
 //   const fetchAllBusinessBudgets = async () => {
 //     try {
 //       const response = await axios.get(
-//         "https://test-api-3tmq.onrender.com/GetAllNewBusiness"
+//         "${backendUrl}/GetAllNewBusiness"
 //       );
 //       if (response.data && Array.isArray(response.data)) {
 //         // This function no longer populates the search dropdown.
@@ -243,7 +243,7 @@
 //     const fetchBurdenTemplates = async () => {
 //       try {
 //         const response = await axios.get(
-//           "https://test-api-3tmq.onrender.com/Orgnization/GetAllTemplates"
+//           "${backendUrl}/Orgnization/GetAllTemplates"
 //         );
 //         if (response.data && Array.isArray(response.data)) {
 //           setBurdenTemplates(response.data);
@@ -303,7 +303,7 @@
 //       let response;
 //       if (isUpdateMode) {
 //         response = await axios.put(
-//           "https://test-api-3tmq.onrender.com/UpdateNewBusiness",
+//           "${backendUrl}/UpdateNewBusiness",
 //           payload,
 //           {
 //             headers: {
@@ -314,7 +314,7 @@
 //         toast.success("Budget details updated successfully!");
 //       } else {
 //         response = await axios.post(
-//           "https://test-api-3tmq.onrender.com/AddNewBusiness",
+//           "${backendUrl}/AddNewBusiness",
 //           payload,
 //           {
 //             headers: {
@@ -349,7 +349,7 @@
 //     if (window.confirm(`Are you sure you want to delete Business Budget ID: ${budgetId}? This action cannot be undone.`)) {
 //       try {
 //         const response = await axios.delete(
-//           `https://test-api-3tmq.onrender.com/DeleteNewBusiness/${budgetId}`
+//           `${backendUrl}/DeleteNewBusiness/${budgetId}`
 //         );
 //         toast.success(`Business Budget ID ${budgetId} deleted successfully!`);
 //         // After deletion, return to search view
@@ -424,7 +424,7 @@
 //     try {
 //       console.log(`handleSearchById: Attempting to fetch data for Budget ID: ${budgetSearchId}`);
 //       const response = await axios.get(
-//         `https://test-api-3tmq.onrender.com/GetAllNewBusinessByID/${budgetSearchId}`
+//         `${backendUrl}/GetAllNewBusinessByID/${budgetSearchId}`
 //       );
 
 //       if (response.data && Array.isArray(response.data) && response.data.length > 0) {
@@ -771,6 +771,7 @@ import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { backendUrl } from "./config";
 
 // Reusable FormField component for consistent layout
 const FormField = ({ label, children }) => (
@@ -957,7 +958,7 @@ const NewBusiness = ({ onClose }) => {
     const fetchBurdenTemplates = async () => {
       try {
         const response = await axios.get(
-          "https://test-api-3tmq.onrender.com/Orgnization/GetAllTemplates"
+          `${backendUrl}/Orgnization/GetAllTemplates`
         );
         if (response.data && Array.isArray(response.data)) {
           setBurdenTemplates(response.data);
@@ -1045,7 +1046,7 @@ const NewBusiness = ({ onClose }) => {
       let response;
       if (isUpdateMode) {
         response = await axios.put(
-          "https://test-api-3tmq.onrender.com/UpdateNewBusiness",
+          `${backendUrl}/UpdateNewBusiness`,
           payload,
           {
             headers: {
@@ -1056,7 +1057,7 @@ const NewBusiness = ({ onClose }) => {
         toast.success("Budget details updated successfully!");
       } else {
         response = await axios.post(
-          "https://test-api-3tmq.onrender.com/Project/AddProjectPlan",
+          `${backendUrl}/Project/AddProjectPlan`,
           payload,
           {
             headers: {
@@ -1090,7 +1091,7 @@ const NewBusiness = ({ onClose }) => {
     if (window.confirm(`Are you sure you want to delete Business Budget ID: ${budgetId}? This action cannot be undone.`)) {
       try {
         const response = await axios.delete(
-          `https://test-api-3tmq.onrender.com/DeleteNewBusiness/${budgetId}`
+          `${backendUrl}/DeleteNewBusiness/${budgetId}`
         );
         toast.success(`Business Budget ID ${budgetId} deleted successfully!`);
         // After deletion, return to form view

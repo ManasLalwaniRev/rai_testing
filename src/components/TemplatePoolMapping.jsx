@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { backendUrl } from "./config";
 
 const TemplatePoolMapping = () => {
   const [templates, setTemplates] = useState([]);
@@ -18,7 +19,7 @@ const TemplatePoolMapping = () => {
     const fetchTemplates = async () => {
       setLoading(true);
       try {
-        const templateResponse = await axios.get("https://test-api-3tmq.onrender.com/Orgnization/GetAllTemplates");
+        const templateResponse = await axios.get(`${backendUrl}/Orgnization/GetAllTemplates`);
         setTemplates(templateResponse.data || []);
       } catch (err) {
         setError(err.response?.data?.message || err.message || "Failed to fetch templates");
@@ -32,7 +33,7 @@ const TemplatePoolMapping = () => {
   const fetchPoolData = async () => {
     setLoading(true);
     try {
-      const poolResponse = await axios.get("https://test-api-3tmq.onrender.com/Orgnization/GetAllPools");
+      const poolResponse = await axios.get(`${backendUrl}/Orgnization/GetAllPools`);
       const poolList = poolResponse.data.map(item => ({
         poolId: item.code,
         groupName: item.name || item.code
@@ -51,7 +52,7 @@ const TemplatePoolMapping = () => {
 
       if (selectedTemplate) {
         const mappingResponse = await axios.get(
-          `https://test-api-3tmq.onrender.com/Orgnization/GetPoolsByTemplateId?templateId=${selectedTemplate}`
+          `${backendUrl}/Orgnization/GetPoolsByTemplateId?templateId=${selectedTemplate}`
         );
         const mappedPools = mappingResponse.data.reduce((acc, pool) => {
           acc[pool.poolId] = true;
@@ -118,7 +119,7 @@ const TemplatePoolMapping = () => {
       }];
 
       const response = await axios.post(
-        "https://test-api-3tmq.onrender.com/Orgnization/BulkUpSertTemplatePoolMapping",
+        `${backendUrl}/Orgnization/BulkUpSertTemplatePoolMapping`,
         payload,
         { headers: { "Content-Type": "application/json" } }
       );

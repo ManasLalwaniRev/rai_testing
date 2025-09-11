@@ -18,7 +18,7 @@
 //     const fetchData = async () => {
 //       try {
 //         const response = await fetch(
-//           `https://test-api-3tmq.onrender.com/Project/GetFunding/${selectedProjectId}`
+//           `${backendUrl}/Project/GetFunding/${selectedProjectId}`
 //         );
 //         let data = await response.json();
 
@@ -79,6 +79,7 @@
 // export default FundingComponent;
 
 import React, { useEffect, useState } from 'react';
+import { backendUrl } from "./config";
 
 const FundingComponent = ({ selectedProjectId }) => {
   const [fundingData, setFundingData] = useState([
@@ -100,7 +101,7 @@ const FundingComponent = ({ selectedProjectId }) => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `https://test-api-3tmq.onrender.com/Project/GetFunding/${selectedProjectId}`
+          `${backendUrl}/Project/GetFunding/${selectedProjectId}`
         );
         let data = await response.json();
 
