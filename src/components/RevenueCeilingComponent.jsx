@@ -296,7 +296,7 @@ const RevenueCeilingComponent = ({ selectedPlan, revenueAccount }) => {
 
         <div className="max-h-[400px] overflow-x-auto overflow-y-auto">
           <table className="w-full text-sm border-collapse">
-            <thead>
+            <thead className="bg-gray-100 sticky top-0 z-10">
               <tr className="bg-gray-100">
                 <th className="border p-2 font-normal">Fiscal Year</th>
                 <th className="border p-2 font-normal min-w-[60px]">Period</th>

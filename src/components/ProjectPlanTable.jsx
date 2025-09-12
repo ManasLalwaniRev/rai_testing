@@ -2109,7 +2109,7 @@ return (
                       getMasterAndRelatedProjects(plans, plan.projId);
                     }}
                   >
-                    <td className="p-1 border text-center">
+                    {/* <td className="p-1 border text-center">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -2134,7 +2134,74 @@ return (
                           />
                         </svg>
                       </button>
-                    </td>
+                    </td> */}
+                    <td className="p-1 border text-center">
+  <button
+    onClick={(e) => {
+      e.stopPropagation();
+      handleExportPlan(plan);
+    }}
+    className="text-green-600 hover:text-green-800"
+    title="Export to Excel"
+    disabled={!plan.projId || !plan.version || !plan.plType}
+  >
+    <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 cursor-pointer"
+                            viewBox="0 0 48 48"
+                          >
+                            <defs>
+                              <linearGradient
+                                id="grad1"
+                                x1="0%"
+                                y1="0%"
+                                x2="100%"
+                                y2="100%"
+                              >
+                                <stop
+                                  offset="0%"
+                                  style={{ stopColor: "#21A366" }}
+                                />
+                                <stop
+                                  offset="100%"
+                                  style={{ stopColor: "#185C37" }}
+                                />
+                              </linearGradient>
+                            </defs>
+ 
+                            <rect
+                              x="18"
+                              y="6"
+                              width="24"
+                              height="18"
+                              fill="url(#grad1)"
+                            />
+                            <rect
+                              x="18"
+                              y="24"
+                              width="24"
+                              height="18"
+                              fill="#107C41"
+                            />
+ 
+                            <rect
+                              x="6"
+                              y="10"
+                              width="16"
+                              height="28"
+                              rx="2"
+                              fill="#185C37"
+                            />
+ 
+                            <path
+                              fill="#fff"
+                              d="M11.5 29.5L14.2 24l-2.7-5.5h2.9l1.5 3.6 1.5-3.6h2.9L17.2 24l2.7 5.5h-2.9l-1.5-3.6-1.5 3.6z"
+                            />
+                          </svg>
+
+  </button>
+</td>
+
                     {columns.map((col) => (
                       <td
                         key={col}

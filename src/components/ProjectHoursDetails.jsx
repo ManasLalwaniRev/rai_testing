@@ -115,12 +115,34 @@ const ProjectHoursDetails = ({
   const [localWarnings, setLocalWarnings] = useState({});
 
   const debounceTimeout = useRef(null);
-  const horizontalScrollRef = useRef(null);
-  const verticalScrollRef = useRef(null);
+  // const horizontalScrollRef = useRef(null);
+  // const verticalScrollRef = useRef(null);
   const firstTableRef = useRef(null);
-  const lastTableRef = useRef(null);
-  const vfirstTableRef = useRef(null);
-  const vlastTableRef = useRef(null);
+  const secondTableRef = useRef(null);
+  // const vfirstTableRef = useRef(null);
+  // const vlastTableRef = useRef(null);
+  const scrollingLock = useRef(false);
+ 
+  const syncScroll = (sourceRef, targetRef) => {
+    if (!sourceRef.current || !targetRef.current) return;
+    // Only sync if not already in an update
+    if (!scrollingLock.current) {
+      scrollingLock.current = true;
+      targetRef.current.scrollTop = sourceRef.current.scrollTop;
+      // Allow event on next tick
+      setTimeout(() => {
+        scrollingLock.current = false;
+      }, 0);
+    }
+  };
+ 
+  const handleFirstScroll = () => {
+    syncScroll(firstTableRef, secondTableRef);
+  };
+ 
+  const handleSecondScroll = () => {
+    syncScroll(secondTableRef, firstTableRef);
+  };
 
   const isEditable = status === "In Progress";
   // const isBudPlan = planType === "BUD";
@@ -266,39 +288,39 @@ const ProjectHoursDetails = ({
   }, [newEntry, newEntryPeriodHours, inputValues, editedEmployeeData]);
 
   // Vertical sync only
-  useEffect(() => {
-    const container = verticalScrollRef.current;
-    const firstScroll = vfirstTableRef.current;
-    const lastScroll = vlastTableRef.current;
+  // useEffect(() => {
+  //   const container = verticalScrollRef.current;
+  //   const firstScroll = vfirstTableRef.current;
+  //   const lastScroll = vlastTableRef.current;
 
-    if (!container || !firstScroll || !lastScroll) return;
+  //   if (!container || !firstScroll || !lastScroll) return;
 
-    const onScroll = () => {
-      const scrollTop = container.scrollTop;
-      firstScroll.scrollTop = scrollTop;
-      lastScroll.scrollTop = scrollTop;
-    };
+  //   const onScroll = () => {
+  //     const scrollTop = container.scrollTop;
+  //     firstScroll.scrollTop = scrollTop;
+  //     lastScroll.scrollTop = scrollTop;
+  //   };
 
-    container.addEventListener("scroll", onScroll);
-    return () => container.removeEventListener("scroll", onScroll);
-  }, []);
+  //   container.addEventListener("scroll", onScroll);
+  //   return () => container.removeEventListener("scroll", onScroll);
+  // }, []);
 
-  useEffect(() => {
-    const container = horizontalScrollRef.current;
-    const firstScroll = firstTableRef.current;
-    const lastScroll = lastTableRef.current;
+  // useEffect(() => {
+  //   const container = horizontalScrollRef.current;
+  //   const firstScroll = firstTableRef.current;
+  //   const lastScroll = lastTableRef.current;
 
-    if (!container || !firstScroll || !lastScroll) return;
+  //   if (!container || !firstScroll || !lastScroll) return;
 
-    const onScroll = () => {
-      const scrollLeft = container.scrollLeft;
-      firstScroll.scrollLeft = scrollLeft;
-      lastScroll.scrollLeft = scrollLeft;
-    };
+  //   const onScroll = () => {
+  //     const scrollLeft = container.scrollLeft;
+  //     firstScroll.scrollLeft = scrollLeft;
+  //     lastScroll.scrollLeft = scrollLeft;
+  //   };
 
-    container.addEventListener("scroll", onScroll);
-    return () => container.removeEventListener("scroll", onScroll);
-  }, []);
+  //   container.addEventListener("scroll", onScroll);
+  //   return () => container.removeEventListener("scroll", onScroll);
+  // }, []);
 
   const fetchEmployees = async () => {
     if (!planId) return;
@@ -2754,76 +2776,1166 @@ const ProjectHoursDetails = ({
           No forecast data available for this plan.
         </div>
       ) : (
-        <div className="vertical-scroll-wrapper " ref={verticalScrollRef}>
-          <div className="synchronized-tables-container flex">
-            <div className="synchronized-table-scroll first">
-              <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
-                <thead className="sticky-thead">
+         
+//           <div className="synchronized-tables-container flex">
+//             <div className="synchronized-table-scroll first">
+//               <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
+//                 <thead className="sticky-thead">
+//                   <tr
+//                     style={{
+//                       height: `${ROW_HEIGHT_DEFAULT}px`,
+//                       lineHeight: "normal",
+//                     }}
+//                   >
+//                     {EMPLOYEE_COLUMNS.map((col) => (
+//                       <th
+//                         key={col.key}
+//                         className="p-1.5 border border-gray-200 whitespace-nowrap text-xs text-gray-900 font-normal min-w-[70px]"
+//                       >
+//                         {col.label}
+//                       </th>
+//                     ))}
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {showNewForm && (
+//                     <tr
+//                       key="new-entry"
+//                       className="bg-gray-50"
+//                       style={{
+//                         height: `${ROW_HEIGHT_DEFAULT}px`,
+//                         lineHeight: "normal",
+//                       }}
+//                     >
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <select
+//                           name="idType"
+//                           value={newEntry.idType || ""}
+//                           onChange={(e) => handleIdTypeChange(e.target.value)}
+//                           className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                         >
+//                           {ID_TYPE_OPTIONS.map((opt) => (
+//                             <option key={opt.value} value={opt.value}>
+//                               {opt.label}
+//                             </option>
+//                           ))}
+//                         </select>
+//                       </td>
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="id"
+//                           value={newEntry.id}
+//                           onChange={(e) => handleIdChange(e.target.value)}
+//                           disabled={newEntry.idType === "PLC"}
+//                           className={`w-full rounded px-1 py-0.5 text-xs outline-none focus:ring-0 no-datalist-border ${
+//                             newEntry.idType === "PLC"
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : ""
+//                           }`}
+//                           list={
+//                             planType === "NBBUD"
+//                               ? undefined
+//                               : "employee-id-list"
+//                           }
+//                           placeholder={
+//                             newEntry.idType === "PLC"
+//                               ? "Not required for PLC"
+//                               : "Enter ID"
+//                           }
+//                         />
+//                         {/* <datalist id="employee-id-list">
+//                           {employeeSuggestions
+//                             .filter(
+//                               (emp) =>
+//                                 emp.emplId && typeof emp.emplId === "string"
+//                             )
+//                             .map((emp, index) => (
+//                               <option
+//                                 key={`${emp.emplId}-${index}`}
+//                                 value={emp.emplId}
+//                               >
+//                                 {emp.lastName && emp.firstName
+//                                   ? `${emp.lastName}, ${emp.firstName}`
+//                                   : emp.lastName || emp.firstName || emp.emplId}
+//                               </option>
+//                             ))}
+//                         </datalist> */}
+//                         <datalist id="employee-id-list">
+//                           {newEntry.idType !== "Other" &&
+//                             employeeSuggestions
+//                               .filter(
+//                                 (emp) =>
+//                                   emp.emplId && typeof emp.emplId === "string"
+//                               )
+//                               .map((emp, index) => (
+//                                 <option
+//                                   key={`${emp.emplId}-${index}`}
+//                                   value={emp.emplId}
+//                                 >
+//                                   {emp.lastName && emp.firstName
+//                                     ? `${emp.lastName}, ${emp.firstName}`
+//                                     : emp.lastName ||
+//                                       emp.firstName ||
+//                                       emp.emplId}
+//                                 </option>
+//                               ))}
+//                         </datalist>
+//                       </td>
+
+//                       <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+//                         <span className="text-gray-400 text-xs">-</span>
+//                       </td>
+//                       {/* <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="name"
+//                           value={
+//                             newEntry.idType === "Vendor"
+//                               ? newEntry.lastName || newEntry.firstName || ""
+//                               : newEntry.lastName && newEntry.firstName
+//                               ? `${newEntry.lastName}, ${newEntry.firstName}`
+//                               : newEntry.lastName || newEntry.firstName || ""
+//                           }
+//                           readOnly
+//                           className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
+//                           placeholder="Name (auto-filled)"
+//                         />
+//                       </td> */}
+//                       {/* <td className="border border-gray-300 px-1.5 py-0.5">
+//   <input
+//     type="text"
+//     name="name"
+//     value={
+//       newEntry.idType === "Other" || planType === "NBBUD"
+//         ? `${newEntry.firstName || ""} ${newEntry.lastName || ""}`.trim()
+//         : newEntry.idType === "Vendor"
+//         ? newEntry.lastName || newEntry.firstName || ""
+//         : newEntry.lastName && newEntry.firstName
+//         ? `${newEntry.lastName}, ${newEntry.firstName}`
+//         : newEntry.lastName || newEntry.firstName || ""
+//     }
+//     readOnly={planType !== "NBBUD" && newEntry.idType !== "Other"}
+//     onChange={(e) => {
+//       if (newEntry.idType === "Other" || planType === "NBBUD") {
+//         const fullName = e.target.value.trim();
+//         // Split name into first and last (assuming format: "First Last")
+//         const nameParts = fullName.split(" ");
+//         const firstName = nameParts[0] || "";
+//         const lastName = nameParts.slice(1).join(" ") || "";
+        
+//         setNewEntry(prev => ({
+//           ...prev,
+//           firstName: firstName,
+//           lastName: lastName
+//         }));
+//       }
+//     }}
+//     className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//       newEntry.idType === "Other"  || planType === "NBBUD"
+//         ? "bg-white" 
+//         : "bg-gray-100 cursor-not-allowed"
+//     }`}
+//     placeholder={
+//       newEntry.idType === "Other" || planType === "NBBUD" 
+//         ? "Enter name" 
+//         : "Name (auto-filled)"
+//     }
+//   />
+// </td> */}
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         {newEntry.idType === "PLC" ? (
+//                           // PLC Name field - automatically show selected PLC description
+//                           <input
+//                             type="text"
+//                             name="name"
+//                             value={newEntry.firstName || ""} // This will contain the PLC description
+//                             readOnly
+//                             className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
+//                             // placeholder="PLC description will appear here"
+//                           />
+//                         ) : (
+//                           // Existing logic for other ID types
+//                           <input
+//                             type="text"
+//                             name="name"
+//                             value={
+//                               newEntry.idType === "Other" ||
+//                               planType === "NBBUD"
+//                                 ? `${newEntry.firstName || ""} ${
+//                                     newEntry.lastName || ""
+//                                   }`.trim()
+//                                 : newEntry.idType === "Vendor"
+//                                 ? newEntry.lastName || newEntry.firstName || ""
+//                                 : newEntry.lastName && newEntry.firstName
+//                                 ? `${newEntry.lastName}, ${newEntry.firstName}`
+//                                 : newEntry.lastName || newEntry.firstName || ""
+//                             }
+//                             readOnly={
+//                               planType !== "NBBUD" &&
+//                               newEntry.idType !== "Other"
+//                             }
+//                             onChange={(e) => {
+//                               if (
+//                                 newEntry.idType === "Other" ||
+//                                 planType === "NBBUD"
+//                               ) {
+//                                 const fullName = e.target.value.trim();
+//                                 const nameParts = fullName.split(" ");
+//                                 const firstName = nameParts[0] || "";
+//                                 const lastName =
+//                                   nameParts.slice(1).join(" ") || "";
+
+//                                 setNewEntry((prev) => ({
+//                                   ...prev,
+//                                   firstName: firstName,
+//                                   lastName: lastName,
+//                                 }));
+//                               }
+//                             }}
+//                             className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//                               newEntry.idType === "Other" ||
+//                               planType === "NBBUD"
+//                                 ? "bg-white"
+//                                 : "bg-gray-100 cursor-not-allowed"
+//                             }`}
+//                             placeholder={
+//                               newEntry.idType === "Other" ||
+//                               planType === "NBBUD"
+//                                 ? "Enter name"
+//                                 : "Name (auto-filled)"
+//                             }
+//                           />
+//                         )}
+//                       </td>
+
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="acctId"
+//                           value={newEntry.acctId}
+//                           onChange={(e) => handleAccountChange(e.target.value)}
+//                           onBlur={(e) => handleAccountBlur(e.target.value)}
+//                           className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//                             !isFieldEditable
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : ""
+//                           }`}
+//                           list="account-list"
+//                           placeholder="Enter Account"
+//                           //   disabled={!isBudPlan}
+//                           disabled={!isFieldEditable}
+//                         />
+//                         <datalist id="account-list">
+//                           {laborAccounts.map((account, index) => (
+//                             <option
+//                               key={`${account.id}-${index}`}
+//                               value={account.id}
+//                             >
+//                               {account.id}
+//                             </option>
+//                           ))}
+//                         </datalist>
+//                       </td>
+//                       {/* <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="orgId"
+//                           value={newEntry.orgId}
+//                           onChange={(e) => handleOrgChange(e.target.value)}
+//                           onBlur={(e) => handleOrgBlur(e.target.value)}
+//                           className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//                             !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+//                           }`}
+//                           placeholder="Enter Organization"
+//                           disabled={!isBudPlan}
+//                         />
+//                       </td> */}
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="orgId"
+//                           value={newEntry.orgId}
+//                           onChange={(e) => handleOrgInputChange(e.target.value)}
+//                           onBlur={(e) => handleOrgBlur(e.target.value)}
+//                           className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//                             !isFieldEditable
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : ""
+//                           }`}
+//                           list="organization-list"
+//                           placeholder="Enter Organization ID (numeric)"
+//                           // disabled={!isBudPlan}
+//                           disabled={!isFieldEditable}
+//                         />
+//                         <datalist id="organization-list">
+//                           {organizationOptions.map((org, index) => (
+//                             <option
+//                               key={`${org.value}-${index}`}
+//                               value={org.value}
+//                             >
+//                               {org.label}
+//                             </option>
+//                           ))}
+//                         </datalist>
+//                       </td>
+
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="plcGlcCode"
+//                           value={newEntry.plcGlcCode}
+//                           onChange={(e) => {
+//                             if (newEntry.idType === "PLC") {
+//                               // For PLC type, auto-populate the name field with PLC description
+//                               const selectedPlc = plcOptions.find(
+//                                 (plc) => plc.value === e.target.value
+//                               );
+//                               handlePlcInputChange(e.target.value);
+
+//                               // Automatically set the firstName to the full PLC description
+//                               if (selectedPlc) {
+//                                 const description =
+//                                   selectedPlc.label.split(" - ")[1] ||
+//                                   selectedPlc.label;
+
+//                                 setNewEntry((prev) => ({
+//                                   ...prev,
+//                                   firstName: description, // Store full description in firstName
+//                                   lastName: "", // Clear lastName for PLC
+//                                 }));
+//                               }
+//                             } else {
+//                               handlePlcInputChange(e.target.value);
+//                             }
+//                           }}
+//                           onBlur={(e) => handlePlcBlur(e.target.value)}
+//                           className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//                             autoPopulatedPLC
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : ""
+//                           }`}
+//                           list="plc-list"
+//                           placeholder="Enter Plc"
+//                         />
+//                         <datalist id="plc-list">
+//                           {filteredPlcOptions.map((plc, index) => (
+//                             <option
+//                               key={`${plc.value}-${index}`}
+//                               value={plc.value}
+//                             >
+//                               {plc.label}
+//                             </option>
+//                           ))}
+//                         </datalist>
+//                       </td>
+
+//                       <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+//                         <input
+//                           type="checkbox"
+//                           name="isRev"
+//                           checked={newEntry.isRev}
+//                           //   onChange={(e) =>
+//                           //     isBudPlan &&
+//                           //     setNewEntry({
+//                           //       ...newEntry,
+//                           //       isRev: e.target.checked,
+//                           //     })
+//                           //   }
+//                           // CHANGE TO:
+//                           onChange={(e) =>
+//                             isFieldEditable &&
+//                             setNewEntry({
+//                               ...newEntry,
+//                               isRev: e.target.checked,
+//                             })
+//                           }
+//                           disabled={!isFieldEditable}
+//                         />
+//                       </td>
+//                       <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+//                         <input
+//                           type="checkbox"
+//                           name="isBrd"
+//                           checked={newEntry.isBrd}
+//                           //   onChange={(e) =>
+//                           //     isBudPlan &&
+//                           //     setNewEntry({
+//                           //       ...newEntry,
+//                           //       isBrd: e.target.checked,
+//                           //     })
+//                           //   }
+//                           //   className="w-4 h-4"
+//                           //   disabled={!isBudPlan}
+//                           // CHANGE TO:
+//                           onChange={(e) =>
+//                             isFieldEditable &&
+//                             setNewEntry({
+//                               ...newEntry,
+//                               isBrd: e.target.checked,
+//                             })
+//                           }
+//                           disabled={!isFieldEditable}
+//                         />
+//                       </td>
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="status"
+//                           value={newEntry.status}
+//                           onChange={(e) =>
+//                             setNewEntry({ ...newEntry, status: e.target.value })
+//                           }
+//                           className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                           placeholder="Enter Status"
+//                         />
+//                       </td>
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         <input
+//                           type="text"
+//                           name="perHourRate"
+//                           value={newEntry.perHourRate}
+//                           //   onChange={(e) =>
+//                           //     isBudPlan &&
+//                           //     setNewEntry({
+//                           //       ...newEntry,
+//                           //       perHourRate: e.target.value.replace(
+//                           //         /[^0-9.]/g,
+//                           //         ""
+//                           //       ),
+//                           //     })
+//                           //   }
+//                           //   className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//                           //     !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
+//                           //   }`}
+//                           //   placeholder="Enter Hour Rate"
+//                           //   disabled={!isBudPlan}
+//                           // CHANGE TO:
+//                           onChange={(e) =>
+//                             isFieldEditable &&
+//                             setNewEntry({
+//                               ...newEntry,
+//                               perHourRate: e.target.value.replace(
+//                                 /[^0-9.]/g,
+//                                 ""
+//                               ),
+//                             })
+//                           }
+//                           className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+//                             !isFieldEditable
+//                               ? "bg-gray-100 cursor-not-allowed"
+//                               : ""
+//                           }`}
+//                           disabled={!isFieldEditable}
+//                         />
+//                       </td>
+//                       <td className="border border-gray-300 px-1.5 py-0.5">
+//                         {Object.values(newEntryPeriodHours)
+//                           .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
+//                           .toFixed(2)}
+//                       </td>
+//                     </tr>
+//                   )}
+//                   {localEmployees
+//                     .filter((_, idx) => !hiddenRows[idx])
+//                     .map((emp, idx) => {
+//                       const actualEmpIdx = localEmployees.findIndex(
+//                         (e) => e === emp
+//                       );
+//                       const row = getEmployeeRow(emp, actualEmpIdx);
+//                       const editedData = editedEmployeeData[actualEmpIdx] || {};
+//                       return (
+//                         <tr
+//                           key={`employee-${actualEmpIdx}`}
+//                           className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+//                             selectedRowIndex === actualEmpIdx
+//                               ? "bg-yellow-100"
+//                               : "even:bg-gray-50"
+//                           }`}
+//                           style={{
+//                             height: `${ROW_HEIGHT_DEFAULT}px`,
+//                             lineHeight: "normal",
+//                             cursor: isEditable ? "pointer" : "default",
+//                           }}
+//                           onClick={() => handleRowClick(actualEmpIdx)}
+//                         >
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {row.idType}
+//                           </td>
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {row.emplId}
+//                           </td>
+//                           {/* ADD THIS WARNING CELL */}
+//                           {/* <td className="p-1.5 border-r border-gray-200 text-xs text-center min-w-[70px]">
+//   {row.warning ? (
+//     <span className="text-yellow-500 text-lg" title="Warning">
+//       ⚠️
+//     </span>
+//   ) : (
+//     <span className="text-gray-300 text-xs">-</span>
+//   )}
+// </td> */}
+//                           {/* UPDATE THIS WARNING CELL */}
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-center min-w-[70px]">
+//                             {row.warning ? (
+//                               <span
+//                                 className="text-yellow-500 text-lg cursor-pointer hover:text-yellow-600"
+//                                 title="Click to view warnings"
+//                                 onClick={(e) =>
+//                                   handleWarningClick(e, row.emplId)
+//                                 }
+//                               >
+//                                 ⚠️
+//                               </span>
+//                             ) : (
+//                               <span className="text-gray-300 text-xs">-</span>
+//                             )}
+//                           </td>
+
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {row.name}
+//                           </td>
+
+//                           {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//   {isBudPlan && isEditable ? (
+//     <input
+//       type="text"
+//       value={
+//         editedData.acctId !== undefined
+//           ? editedData.acctId
+//           : row.acctId
+//       }
+//       onChange={(e) => handleAccountInputChangeForUpdate(e.target.value, actualEmpIdx)}
+//       onBlur={() => handleEmployeeDataBlur(actualEmpIdx, emp)}
+//       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//       list={`account-list-${actualEmpIdx}`}
+//       placeholder="Enter Account"
+//     />
+//   ) : (
+//     row.acctId
+//   )}
+//   <datalist id={`account-list-${actualEmpIdx}`}>
+//     {updateAccountOptions.map((account, index) => (
+//       <option
+//         key={`${account.id}-${index}`}
+//         value={account.id}
+//       >
+//         {account.id}
+//       </option>
+//     ))}
+//   </datalist>
+// </td> */}
+
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {isFieldEditable && isEditable ? (
+//                               <input
+//                                 type="text"
+//                                 value={
+//                                   editedData.acctId !== undefined
+//                                     ? editedData.acctId
+//                                     : row.acctId
+//                                 }
+//                                 onChange={(e) =>
+//                                   handleAccountInputChangeForUpdate(
+//                                     e.target.value,
+//                                     actualEmpIdx
+//                                   )
+//                                 }
+//                                 onBlur={(e) => {
+//                                   if (planType === "NBBUD") return; // Add this line
+//                                   const val = e.target.value;
+//                                   const originalValue = row.acctId;
+
+//                                   if (
+//                                     val !== originalValue &&
+//                                     !isValidAccountForUpdate(
+//                                       val,
+//                                       updateAccountOptions
+//                                     )
+//                                   ) {
+//                                     toast.error(
+//                                       "Please enter a valid Account from the available list.",
+//                                       {
+//                                         autoClose: 3000,
+//                                       }
+//                                     );
+//                                   } else {
+//                                     handleEmployeeDataBlur(actualEmpIdx, emp);
+//                                   }
+//                                 }}
+//                                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                                 list={`account-list-${actualEmpIdx}`}
+//                                 placeholder="Enter Account"
+//                               />
+//                             ) : (
+//                               row.acctId
+//                             )}
+//                             <datalist id={`account-list-${actualEmpIdx}`}>
+//                               {updateAccountOptions.map((account, index) => (
+//                                 <option
+//                                   key={`${account.id}-${index}`}
+//                                   value={account.id}
+//                                 >
+//                                   {account.id}
+//                                 </option>
+//                               ))}
+//                             </datalist>
+//                           </td>
+
+//                           {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {isBudPlan && isEditable ? (
+//                               <input
+//                                 type="text"
+//                                 value={
+//                                   editedData.acctId !== undefined
+//                                     ? editedData.acctId
+//                                     : row.acctId
+//                                 }
+//                                 onChange={(e) =>
+//                                   handleEmployeeDataChange(
+//                                     actualEmpIdx,
+//                                     "acctId",
+//                                     e.target.value
+//                                   )
+//                                 }
+//                                 onBlur={() =>
+//                                   handleEmployeeDataBlur(actualEmpIdx, emp)
+//                                 }
+//                                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                                 list="account-list"
+//                               />
+//                             ) : (
+//                               row.acctId
+//                             )}
+//                           </td> */}
+
+//                           {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {isBudPlan && isEditable ? (
+//                               <input
+//                                 type="text"
+//                                 value={
+//                                   editedData.orgId !== undefined
+//                                     ? editedData.orgId
+//                                     : row.orgId
+//                                 }
+//                                 onChange={(e) =>
+//                                   handleEmployeeDataChange(
+//                                     actualEmpIdx,
+//                                     "orgId",
+//                                     e.target.value
+//                                   )
+//                                 }
+//                                 onBlur={() =>
+//                                   handleEmployeeDataBlur(actualEmpIdx, emp)
+//                                 }
+//                                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                               />
+//                             ) : (
+//                               row.orgId
+//                             )}
+//                           </td> */}
+//                           {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//   {isBudPlan && isEditable ? (
+//     <input
+//       type="text"
+//       value={
+//         editedData.orgId !== undefined
+//           ? editedData.orgId
+//           : row.orgId
+//       }
+//       onChange={(e) => handleOrgInputChangeForUpdate(e.target.value, actualEmpIdx)}
+//       onBlur={(e) => {
+//         const val = e.target.value;
+//         if (val && val.length >= 3 && !isValidOrg(val)) {
+//           toast.error("Please enter a valid numeric Organization ID from the available list.", {
+//             autoClose: 3000,
+//           });
+//           handleEmployeeDataChange(actualEmpIdx, "orgId", "");
+//         } else {
+//           handleEmployeeDataBlur(actualEmpIdx, emp);
+//         }
+//       }}
+//       className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//       list="organization-list"
+//       placeholder="Enter Organization ID"
+//     />
+//   ) : (
+//     row.orgId
+//   )}
+// </td> */}
+
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {isBudPlan && isEditable ? (
+//                               <input
+//                                 type="text"
+//                                 value={
+//                                   editedData.orgId !== undefined
+//                                     ? editedData.orgId
+//                                     : row.orgId
+//                                 }
+//                                 onChange={(e) =>
+//                                   handleOrgInputChangeForUpdate(
+//                                     e.target.value,
+//                                     actualEmpIdx
+//                                   )
+//                                 }
+//                                 //   onBlur={(e) => {
+//                                 //     const val = e.target.value;
+//                                 //     if (val && !isValidOrg(val)) {
+//                                 //       toast.error("Please enter a valid numeric Organization ID from the available list.", {
+//                                 //         autoClose: 3000,
+//                                 //       });
+//                                 //       // Don't clear the value automatically - let user fix it
+//                                 //     } else {
+//                                 //       handleEmployeeDataBlur(actualEmpIdx, emp);
+//                                 //     }
+//                                 //   }}
+//                                 onBlur={(e) => {
+//                                   if (planType === "NBBUD") return; // Add this line
+//                                   const val = e.target.value;
+//                                   const originalValue = row.orgId;
+
+//                                   if (
+//                                     val !== originalValue &&
+//                                     val &&
+//                                     !isValidOrgForUpdate(
+//                                       val,
+//                                       updateOrganizationOptions
+//                                     )
+//                                   ) {
+//                                     toast.error(
+//                                       "Please enter a valid numeric Organization ID from the available list.",
+//                                       {
+//                                         autoClose: 3000,
+//                                       }
+//                                     );
+//                                   } else {
+//                                     handleEmployeeDataBlur(actualEmpIdx, emp);
+//                                   }
+//                                 }}
+//                                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                                 list={`organization-list-${actualEmpIdx}`}
+//                                 placeholder="Enter Organization ID"
+//                               />
+//                             ) : (
+//                               row.orgId
+//                             )}
+//                             <datalist id={`organization-list-${actualEmpIdx}`}>
+//                               {updateOrganizationOptions.map((org, index) => (
+//                                 <option
+//                                   key={`${org.value}-${index}`}
+//                                   value={org.value}
+//                                 >
+//                                   {org.label}
+//                                 </option>
+//                               ))}
+//                             </datalist>
+//                           </td>
+
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {isBudPlan && isEditable ? (
+//                               <input
+//                                 type="text"
+//                                 value={
+//                                   editedData.glcPlc !== undefined
+//                                     ? editedData.glcPlc
+//                                     : row.glcPlc
+//                                 }
+//                                 onChange={(e) =>
+//                                   handlePlcInputChangeForUpdate(
+//                                     e.target.value,
+//                                     actualEmpIdx
+//                                   )
+//                                 }
+//                                 onBlur={(e) => {
+//                                   if (planType === "NBBUD") return; // Add this line
+//                                   const val = e.target.value;
+//                                   const originalValue = row.glcPlc;
+
+//                                   if (
+//                                     val !== originalValue &&
+//                                     val &&
+//                                     !isValidPlcForUpdate(val, updatePlcOptions)
+//                                   ) {
+//                                     toast.error(
+//                                       "Please enter a valid PLC from the available list.",
+//                                       {
+//                                         autoClose: 3000,
+//                                       }
+//                                     );
+//                                   } else {
+//                                     handleEmployeeDataBlur(actualEmpIdx, emp);
+//                                   }
+//                                 }}
+//                                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                                 list={`plc-list-${actualEmpIdx}`}
+//                                 placeholder="Enter PLC"
+//                               />
+//                             ) : (
+//                               row.glcPlc
+//                             )}
+//                             <datalist id={`plc-list-${actualEmpIdx}`}>
+//                               {/* Use updatePlcOptions if available, otherwise fallback to plcOptions */}
+//                               {(updatePlcOptions.length > 0
+//                                 ? updatePlcOptions
+//                                 : plcOptions
+//                               ).map((plc, index) => (
+//                                 <option
+//                                   key={`${plc.value}-${index}`}
+//                                   value={plc.value}
+//                                 >
+//                                   {plc.label}
+//                                 </option>
+//                               ))}
+//                             </datalist>
+//                           </td>
+
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
+//                             {isFieldEditable && isEditable ? (
+//                               <input
+//                                 type="checkbox"
+//                                 checked={
+//                                   editedData.isRev !== undefined
+//                                     ? editedData.isRev
+//                                     : emp.emple.isRev
+//                                 }
+//                                 onChange={(e) =>
+//                                   handleEmployeeDataChange(
+//                                     actualEmpIdx,
+//                                     "isRev",
+//                                     e.target.checked
+//                                   )
+//                                 }
+//                                 onBlur={() =>
+//                                   handleEmployeeDataBlur(actualEmpIdx, emp)
+//                                 }
+//                                 className="w-4 h-4"
+//                               />
+//                             ) : (
+//                               row.isRev
+//                             )}
+//                           </td>
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
+//                             {isFieldEditable && isEditable ? (
+//                               <input
+//                                 type="checkbox"
+//                                 checked={
+//                                   editedData.isBrd !== undefined
+//                                     ? editedData.isBrd
+//                                     : emp.emple.isBrd
+//                                 }
+//                                 onChange={(e) =>
+//                                   handleEmployeeDataChange(
+//                                     actualEmpIdx,
+//                                     "isBrd",
+//                                     e.target.checked
+//                                   )
+//                                 }
+//                                 onBlur={() =>
+//                                   handleEmployeeDataBlur(actualEmpIdx, emp)
+//                                 }
+//                                 className="w-4 h-4"
+//                               />
+//                             ) : (
+//                               row.isBrd
+//                             )}
+//                           </td>
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {row.status}
+//                           </td>
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {isFieldEditable && isEditable ? (
+//                               <input
+//                                 type="text"
+//                                 value={
+//                                   editedData.perHourRate !== undefined
+//                                     ? editedData.perHourRate
+//                                     : row.perHourRate
+//                                 }
+//                                 onChange={(e) =>
+//                                   handleEmployeeDataChange(
+//                                     actualEmpIdx,
+//                                     "perHourRate",
+//                                     e.target.value.replace(/[^0-9.]/g, "")
+//                                   )
+//                                 }
+//                                 onBlur={() =>
+//                                   handleEmployeeDataBlur(actualEmpIdx, emp)
+//                                 }
+//                                 className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+//                               />
+//                             ) : (
+//                               row.perHourRate
+//                             )}
+//                           </td>
+//                           <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+//                             {row.total}
+//                           </td>
+//                         </tr>
+//                       );
+//                     })}
+//                 </tbody>
+//               </table>
+//             </div>
+//             <div className="synchronized-table-scroll last">
+//               <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
+//                 <thead className="sticky-thead">
+//                   <tr
+//                     style={{
+//                       height: `${ROW_HEIGHT_DEFAULT}px`,
+//                       lineHeight: "normal",
+//                     }}
+//                   >
+//                     {sortedDurations.map((duration) => {
+//                       const uniqueKey = `${duration.monthNo}_${duration.year}`;
+//                       return (
+//                         <th
+//                           key={uniqueKey}
+//                           className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
+//                             selectedColumnKey === uniqueKey
+//                               ? "bg-yellow-100"
+//                               : ""
+//                           }`}
+//                           style={{ cursor: isEditable ? "pointer" : "default" }}
+//                           onClick={() => handleColumnHeaderClick(uniqueKey)}
+//                         >
+//                           <div className="flex flex-col items-center justify-center h-full">
+//                             <span className="whitespace-nowrap text-xs text-gray-900 font-normal">
+//                               {duration.month}
+//                             </span>
+//                             <span className="text-xs text-gray-600 font-normal">
+//                               {duration.workingHours || 0} hrs
+//                             </span>
+//                           </div>
+//                         </th>
+//                       );
+//                     })}
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {showNewForm && (
+//                     <tr
+//                       key="new-entry"
+//                       className="bg-gray-50"
+//                       style={{
+//                         height: `${ROW_HEIGHT_DEFAULT}px`,
+//                         lineHeight: "normal",
+//                       }}
+//                     >
+//                       {sortedDurations.map((duration) => {
+//                         const uniqueKey = `${duration.monthNo}_${duration.year}`;
+//                         const isInputEditable =
+//                           isEditable &&
+//                           isMonthEditable(duration, closedPeriod, planType);
+//                         return (
+//                           <td
+//                             key={`new-${uniqueKey}`}
+//                             className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+//                               planType === "EAC"
+//                                 ? isInputEditable
+//                                   ? "bg-green-50"
+//                                   : "bg-gray-200"
+//                                 : ""
+//                             }`}
+//                           >
+//                             <input
+//                               type="text"
+//                               inputMode="numeric"
+//                               value={newEntryPeriodHours[uniqueKey] ?? "0"}
+//                               onChange={(e) =>
+//                                 isInputEditable &&
+//                                 setNewEntryPeriodHours((prev) => ({
+//                                   ...prev,
+//                                   [uniqueKey]: e.target.value.replace(
+//                                     /[^0-9.]/g,
+//                                     ""
+//                                   ),
+//                                 }))
+//                               }
+//                               className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+//                                 !isInputEditable
+//                                   ? "cursor-not-allowed text-gray-400"
+//                                   : "text-gray-700"
+//                               }`}
+//                               disabled={!isInputEditable}
+//                               placeholder="Enter Hours"
+//                             />
+//                           </td>
+//                         );
+//                       })}
+//                     </tr>
+//                   )}
+//                   {localEmployees
+//                     .filter((_, idx) => !hiddenRows[idx])
+//                     .map((emp, idx) => {
+//                       const actualEmpIdx = localEmployees.findIndex(
+//                         (e) => e === emp
+//                       );
+//                       const monthHours = getMonthHours(emp);
+//                       return (
+//                         <tr
+//                           key={`hours-${actualEmpIdx}`}
+//                           className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+//                             selectedRowIndex === actualEmpIdx
+//                               ? "bg-yellow-100"
+//                               : "even:bg-gray-50"
+//                           }`}
+//                           style={{
+//                             height: `${ROW_HEIGHT_DEFAULT}px`,
+//                             lineHeight: "normal",
+//                             cursor: isEditable ? "pointer" : "default",
+//                           }}
+//                           onClick={() => handleRowClick(actualEmpIdx)}
+//                         >
+//                           {sortedDurations.map((duration) => {
+//                             const uniqueKey = `${duration.monthNo}_${duration.year}`;
+//                             const forecast = monthHours[uniqueKey];
+//                             const value =
+//                               inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
+//                               (forecast?.value !== undefined
+//                                 ? forecast.value
+//                                 : "0");
+//                             const isInputEditable =
+//                               isEditable &&
+//                               isMonthEditable(duration, closedPeriod, planType);
+//                             return (
+//                               <td
+//                                 key={`hours-${actualEmpIdx}-${uniqueKey}`}
+//                                 className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+//                                   selectedColumnKey === uniqueKey
+//                                     ? "bg-yellow-100"
+//                                     : ""
+//                                 } ${
+//                                   planType === "EAC"
+//                                     ? isInputEditable
+//                                       ? "bg-green-50"
+//                                       : "bg-gray-200"
+//                                     : ""
+//                                 }`}
+//                               >
+//                                 <input
+//                                   type="text"
+//                                   inputMode="numeric"
+//                                   className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+//                                     !isInputEditable
+//                                       ? "cursor-not-allowed text-gray-400"
+//                                       : "text-gray-700"
+//                                   }`}
+//                                   value={value}
+//                                   onChange={(e) =>
+//                                     handleInputChange(
+//                                       actualEmpIdx,
+//                                       uniqueKey,
+//                                       e.target.value.replace(/[^0-9.]/g, "")
+//                                     )
+//                                   }
+//                                   onBlur={(e) =>
+//                                     handleForecastHoursBlur(
+//                                       actualEmpIdx,
+//                                       uniqueKey,
+//                                       e.target.value
+//                                     )
+//                                   }
+//                                   disabled={!isInputEditable}
+//                                   placeholder="Enter Hours"
+//                                 />
+//                               </td>
+//                             );
+//                           })}
+//                         </tr>
+//                       );
+//                     })}
+//                 </tbody>
+//               </table>
+//             </div>
+//           </div>
+ <div className="synchronized-tables-container flex">
+          <div
+            ref={firstTableRef}
+            onScroll={handleFirstScroll}
+            style={{
+              maxHeight: "400px",
+              overflowY: "auto",
+              overflowY: "hidden", // show scrollbar
+              overflowX: "auto",
+            }}
+          >
+            {" "}
+            {/* Added maxHeight and overflowY for vertical scrolling */}
+            <table className="table-fixed text-xs text-left min-w-max border border-gray-300 rounded-lg">
+              <thead
+                className="sticky-thead"
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  backgroundColor: "#fff",
+                  zIndex: 1,
+                }}
+              >
+                {" "}
+                {/* Added sticky positioning and background for thead */}
+                <tr
+                  style={{
+                    height: `${ROW_HEIGHT_DEFAULT}px`,
+                    lineHeight: "normal",
+                  }}
+                >
+                  {EMPLOYEE_COLUMNS.map((col) => (
+                    <th
+                      key={col.key}
+                      className="p-1.5 border border-gray-200 whitespace-nowrap text-xs text-gray-900 font-normal min-w-[70px]"
+                    >
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {showNewForm && (
                   <tr
+                    key="new-entry"
+                    className="bg-gray-50"
                     style={{
                       height: `${ROW_HEIGHT_DEFAULT}px`,
                       lineHeight: "normal",
                     }}
                   >
-                    {EMPLOYEE_COLUMNS.map((col) => (
-                      <th
-                        key={col.key}
-                        className="p-1.5 border border-gray-200 whitespace-nowrap text-xs text-gray-900 font-normal min-w-[70px]"
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <select
+                        name="idType"
+                        value={newEntry.idType || ""}
+                        onChange={(e) => handleIdTypeChange(e.target.value)}
+                        className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
                       >
-                        {col.label}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {showNewForm && (
-                    <tr
-                      key="new-entry"
-                      className="bg-gray-50"
-                      style={{
-                        height: `${ROW_HEIGHT_DEFAULT}px`,
-                        lineHeight: "normal",
-                      }}
-                    >
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        <select
-                          name="idType"
-                          value={newEntry.idType || ""}
-                          onChange={(e) => handleIdTypeChange(e.target.value)}
-                          className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                        >
-                          {ID_TYPE_OPTIONS.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="id"
-                          value={newEntry.id}
-                          onChange={(e) => handleIdChange(e.target.value)}
-                          disabled={newEntry.idType === "PLC"}
-                          className={`w-full rounded px-1 py-0.5 text-xs outline-none focus:ring-0 no-datalist-border ${
-                            newEntry.idType === "PLC"
-                              ? "bg-gray-100 cursor-not-allowed"
-                              : ""
-                          }`}
-                          list={
-                            planType === "NBBUD"
-                              ? undefined
-                              : "employee-id-list"
-                          }
-                          placeholder={
-                            newEntry.idType === "PLC"
-                              ? "Not required for PLC"
-                              : "Enter ID"
-                          }
-                        />
-                        {/* <datalist id="employee-id-list">
-                          {employeeSuggestions
+                        {ID_TYPE_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <input
+                        type="text"
+                        name="id"
+                        value={newEntry.id}
+                        onChange={(e) => handleIdChange(e.target.value)}
+                        disabled={newEntry.idType === "PLC"}
+                        className={`w-full rounded px-1 py-0.5 text-xs outline-none focus:ring-0 no-datalist-border ${
+                          newEntry.idType === "PLC"
+                            ? "bg-gray-100 cursor-not-allowed"
+                            : ""
+                        }`}
+                        list="employee-id-list"
+                        placeholder={
+                          newEntry.idType === "PLC"
+                            ? "Not required for PLC"
+                            : "Enter ID"
+                        }
+                      />
+                      <datalist id="employee-id-list">
+                        {newEntry.idType !== "Other" &&
+                          employeeSuggestions
                             .filter(
                               (emp) =>
                                 emp.emplId && typeof emp.emplId === "string"
@@ -2838,827 +3950,538 @@ const ProjectHoursDetails = ({
                                   : emp.lastName || emp.firstName || emp.emplId}
                               </option>
                             ))}
-                        </datalist> */}
-                        <datalist id="employee-id-list">
-                          {newEntry.idType !== "Other" &&
-                            employeeSuggestions
-                              .filter(
-                                (emp) =>
-                                  emp.emplId && typeof emp.emplId === "string"
-                              )
-                              .map((emp, index) => (
-                                <option
-                                  key={`${emp.emplId}-${index}`}
-                                  value={emp.emplId}
-                                >
-                                  {emp.lastName && emp.firstName
-                                    ? `${emp.lastName}, ${emp.firstName}`
-                                    : emp.lastName ||
-                                      emp.firstName ||
-                                      emp.emplId}
-                                </option>
-                              ))}
-                        </datalist>
-                      </td>
+                      </datalist>
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <input
+                        type="text"
+                        name="name"
+                        value={
+                          newEntry.idType === "Other"
+                            ? `${newEntry.firstName || ""} ${
+                                newEntry.lastName || ""
+                              }`.trim()
+                            : newEntry.idType === "Vendor"
+                            ? newEntry.lastName || newEntry.firstName || ""
+                            : newEntry.lastName && newEntry.firstName
+                            ? `${newEntry.lastName}, ${newEntry.firstName}`
+                            : newEntry.lastName || newEntry.firstName || ""
+                        }
+                        readOnly={newEntry.idType !== "Other"}
+                        onChange={(e) => {
+                          if (newEntry.idType === "Other") {
+                            const fullName = e.target.value.trim();
+                            const nameParts = fullName.split(" ");
+                            const firstName = nameParts[0] || "";
+                            const lastName = nameParts.slice(1).join(" ") || "";
 
-                      <td className="border border-gray-300 px-1.5 py-0.5 text-center">
-                        <span className="text-gray-400 text-xs">-</span>
-                      </td>
-                      {/* <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="name"
-                          value={
-                            newEntry.idType === "Vendor"
-                              ? newEntry.lastName || newEntry.firstName || ""
-                              : newEntry.lastName && newEntry.firstName
-                              ? `${newEntry.lastName}, ${newEntry.firstName}`
-                              : newEntry.lastName || newEntry.firstName || ""
+                            setNewEntry((prev) => ({
+                              ...prev,
+                              firstName: firstName,
+                              lastName: lastName,
+                            }));
                           }
-                          readOnly
-                          className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
-                          placeholder="Name (auto-filled)"
-                        />
-                      </td> */}
-                      {/* <td className="border border-gray-300 px-1.5 py-0.5">
-  <input
-    type="text"
-    name="name"
-    value={
-      newEntry.idType === "Other" || planType === "NBBUD"
-        ? `${newEntry.firstName || ""} ${newEntry.lastName || ""}`.trim()
-        : newEntry.idType === "Vendor"
-        ? newEntry.lastName || newEntry.firstName || ""
-        : newEntry.lastName && newEntry.firstName
-        ? `${newEntry.lastName}, ${newEntry.firstName}`
-        : newEntry.lastName || newEntry.firstName || ""
-    }
-    readOnly={planType !== "NBBUD" && newEntry.idType !== "Other"}
-    onChange={(e) => {
-      if (newEntry.idType === "Other" || planType === "NBBUD") {
-        const fullName = e.target.value.trim();
-        // Split name into first and last (assuming format: "First Last")
-        const nameParts = fullName.split(" ");
-        const firstName = nameParts[0] || "";
-        const lastName = nameParts.slice(1).join(" ") || "";
-        
-        setNewEntry(prev => ({
-          ...prev,
-          firstName: firstName,
-          lastName: lastName
-        }));
-      }
-    }}
-    className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-      newEntry.idType === "Other"  || planType === "NBBUD"
-        ? "bg-white" 
-        : "bg-gray-100 cursor-not-allowed"
-    }`}
-    placeholder={
-      newEntry.idType === "Other" || planType === "NBBUD" 
-        ? "Enter name" 
-        : "Name (auto-filled)"
-    }
-  />
-</td> */}
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        {newEntry.idType === "PLC" ? (
-                          // PLC Name field - automatically show selected PLC description
-                          <input
-                            type="text"
-                            name="name"
-                            value={newEntry.firstName || ""} // This will contain the PLC description
-                            readOnly
-                            className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs bg-gray-100 cursor-not-allowed"
-                            // placeholder="PLC description will appear here"
-                          />
-                        ) : (
-                          // Existing logic for other ID types
-                          <input
-                            type="text"
-                            name="name"
-                            value={
-                              newEntry.idType === "Other" ||
-                              planType === "NBBUD"
-                                ? `${newEntry.firstName || ""} ${
-                                    newEntry.lastName || ""
-                                  }`.trim()
-                                : newEntry.idType === "Vendor"
-                                ? newEntry.lastName || newEntry.firstName || ""
-                                : newEntry.lastName && newEntry.firstName
-                                ? `${newEntry.lastName}, ${newEntry.firstName}`
-                                : newEntry.lastName || newEntry.firstName || ""
-                            }
-                            readOnly={
-                              planType !== "NBBUD" &&
-                              newEntry.idType !== "Other"
-                            }
-                            onChange={(e) => {
-                              if (
-                                newEntry.idType === "Other" ||
-                                planType === "NBBUD"
-                              ) {
-                                const fullName = e.target.value.trim();
-                                const nameParts = fullName.split(" ");
-                                const firstName = nameParts[0] || "";
-                                const lastName =
-                                  nameParts.slice(1).join(" ") || "";
-
-                                setNewEntry((prev) => ({
-                                  ...prev,
-                                  firstName: firstName,
-                                  lastName: lastName,
-                                }));
+                        }}
+                        className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                          newEntry.idType === "Other"
+                            ? "bg-white"
+                            : "bg-gray-100 cursor-not-allowed"
+                        }`}
+                        placeholder={
+                          newEntry.idType === "Other"
+                            ? "Enter name"
+                            : "Name (auto-filled)"
+                        }
+                      />
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <input
+                        type="text"
+                        name="acctId"
+                        value={newEntry.acctId}
+                        onChange={(e) => handleAccountChange(e.target.value)}
+                        onBlur={(e) => handleAccountBlur(e.target.value)}
+                        className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                          !isFieldEditable
+                            ? "bg-gray-100 cursor-not-allowed"
+                            : ""
+                        }`}
+                        list="account-list"
+                        placeholder="Enter Account"
+                        disabled={!isFieldEditable}
+                      />
+                      <datalist id="account-list">
+                        {laborAccounts.map((account, index) => (
+                          <option
+                            key={`${account.id}-${index}`}
+                            value={account.id}
+                          >
+                            {account.id}
+                          </option>
+                        ))}
+                      </datalist>
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <input
+                        type="text"
+                        name="orgId"
+                        value={newEntry.orgId}
+                        onChange={(e) => handleOrgInputChange(e.target.value)}
+                        onBlur={(e) => handleOrgBlur(e.target.value)}
+                        className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                          !isFieldEditable
+                            ? "bg-gray-100 cursor-not-allowed"
+                            : ""
+                        }`}
+                        list="organization-list"
+                        placeholder="Enter Organization ID (numeric)"
+                        disabled={!isFieldEditable}
+                      />
+                      <datalist id="organization-list">
+                        {organizationOptions.map((org, index) => (
+                          <option
+                            key={`${org.value}-${index}`}
+                            value={org.value}
+                          >
+                            {org.label}
+                          </option>
+                        ))}
+                      </datalist>
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <input
+                        type="text"
+                        name="plcGlcCode"
+                        value={newEntry.plcGlcCode}
+                        onChange={(e) => handlePlcInputChange(e.target.value)}
+                        onBlur={(e) => handlePlcBlur(e.target.value)}
+                        className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                          autoPopulatedPLC
+                            ? "bg-gray-100 cursor-not-allowed"
+                            : ""
+                        }`}
+                        list="plc-list"
+                        placeholder="Enter Plc"
+                      />
+                      <datalist id="plc-list">
+                        {filteredPlcOptions.map((plc, index) => (
+                          <option
+                            key={`${plc.value}-${index}`}
+                            value={plc.value}
+                          >
+                            {plc.label}
+                          </option>
+                        ))}
+                      </datalist>
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+                      <input
+                        type="checkbox"
+                        name="isRev"
+                        checked={newEntry.isRev}
+                        onChange={(e) =>
+                          isFieldEditable &&
+                          setNewEntry({
+                            ...newEntry,
+                            isRev: e.target.checked,
+                          })
+                        }
+                        disabled={!isFieldEditable}
+                      />
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5 text-center">
+                      <input
+                        type="checkbox"
+                        name="isBrd"
+                        checked={newEntry.isBrd}
+                        onChange={(e) =>
+                          isFieldEditable &&
+                          setNewEntry({
+                            ...newEntry,
+                            isBrd: e.target.checked,
+                          })
+                        }
+                        disabled={!isFieldEditable}
+                      />
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <input
+                        type="text"
+                        name="status"
+                        value={newEntry.status}
+                        onChange={(e) =>
+                          setNewEntry({ ...newEntry, status: e.target.value })
+                        }
+                        className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                        placeholder="Enter Status"
+                      />
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      <input
+                        type="text"
+                        name="perHourRate"
+                        value={newEntry.perHourRate}
+                        onChange={(e) =>
+                          isFieldEditable &&
+                          setNewEntry({
+                            ...newEntry,
+                            perHourRate: e.target.value.replace(/[^0-9.]/g, ""),
+                          })
+                        }
+                        className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
+                          !isFieldEditable
+                            ? "bg-gray-100 cursor-not-allowed"
+                            : ""
+                        }`}
+                        disabled={!isFieldEditable}
+                      />
+                    </td>
+                    <td className="border border-gray-300 px-1.5 py-0.5">
+                      {Object.values(newEntryPeriodHours)
+                        .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
+                        .toFixed(2)}
+                    </td>
+                  </tr>
+                )}
+                {localEmployees
+                  .filter((_, idx) => !hiddenRows[idx])
+                  .map((emp, idx) => {
+                    const actualEmpIdx = localEmployees.findIndex(
+                      (e) => e === emp
+                    );
+                    const row = getEmployeeRow(emp, actualEmpIdx);
+                    const editedData = editedEmployeeData[actualEmpIdx] || {};
+                    return (
+                      <tr
+                        key={`employee-${actualEmpIdx}`}
+                        className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+                          selectedRowIndex === actualEmpIdx
+                            ? "bg-yellow-100"
+                            : "even:bg-gray-50"
+                        }`}
+                        style={{
+                          height: `${ROW_HEIGHT_DEFAULT}px`,
+                          lineHeight: "normal",
+                          cursor: isEditable ? "pointer" : "default",
+                        }}
+                        onClick={() => handleRowClick(actualEmpIdx)}
+                      >
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {row.idType}
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {row.emplId}
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {row.name}
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {isBudPlan && isEditable ? (
+                            <input
+                              type="text"
+                              value={
+                                editedData.acctId !== undefined
+                                  ? editedData.acctId
+                                  : row.acctId
                               }
-                            }}
-                            className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                              newEntry.idType === "Other" ||
-                              planType === "NBBUD"
-                                ? "bg-white"
-                                : "bg-gray-100 cursor-not-allowed"
-                            }`}
-                            placeholder={
-                              newEntry.idType === "Other" ||
-                              planType === "NBBUD"
-                                ? "Enter name"
-                                : "Name (auto-filled)"
-                            }
-                          />
-                        )}
-                      </td>
-
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="acctId"
-                          value={newEntry.acctId}
-                          onChange={(e) => handleAccountChange(e.target.value)}
-                          onBlur={(e) => handleAccountBlur(e.target.value)}
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isFieldEditable
-                              ? "bg-gray-100 cursor-not-allowed"
-                              : ""
-                          }`}
-                          list="account-list"
-                          placeholder="Enter Account"
-                          //   disabled={!isBudPlan}
-                          disabled={!isFieldEditable}
-                        />
-                        <datalist id="account-list">
-                          {laborAccounts.map((account, index) => (
-                            <option
-                              key={`${account.id}-${index}`}
-                              value={account.id}
-                            >
-                              {account.id}
-                            </option>
-                          ))}
-                        </datalist>
-                      </td>
-                      {/* <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="orgId"
-                          value={newEntry.orgId}
-                          onChange={(e) => handleOrgChange(e.target.value)}
-                          onBlur={(e) => handleOrgBlur(e.target.value)}
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
-                          }`}
-                          placeholder="Enter Organization"
-                          disabled={!isBudPlan}
-                        />
-                      </td> */}
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="orgId"
-                          value={newEntry.orgId}
-                          onChange={(e) => handleOrgInputChange(e.target.value)}
-                          onBlur={(e) => handleOrgBlur(e.target.value)}
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isFieldEditable
-                              ? "bg-gray-100 cursor-not-allowed"
-                              : ""
-                          }`}
-                          list="organization-list"
-                          placeholder="Enter Organization ID (numeric)"
-                          // disabled={!isBudPlan}
-                          disabled={!isFieldEditable}
-                        />
-                        <datalist id="organization-list">
-                          {organizationOptions.map((org, index) => (
-                            <option
-                              key={`${org.value}-${index}`}
-                              value={org.value}
-                            >
-                              {org.label}
-                            </option>
-                          ))}
-                        </datalist>
-                      </td>
-
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="plcGlcCode"
-                          value={newEntry.plcGlcCode}
-                          onChange={(e) => {
-                            if (newEntry.idType === "PLC") {
-                              // For PLC type, auto-populate the name field with PLC description
-                              const selectedPlc = plcOptions.find(
-                                (plc) => plc.value === e.target.value
-                              );
-                              handlePlcInputChange(e.target.value);
-
-                              // Automatically set the firstName to the full PLC description
-                              if (selectedPlc) {
-                                const description =
-                                  selectedPlc.label.split(" - ")[1] ||
-                                  selectedPlc.label;
-
-                                setNewEntry((prev) => ({
-                                  ...prev,
-                                  firstName: description, // Store full description in firstName
-                                  lastName: "", // Clear lastName for PLC
-                                }));
+                              onChange={(e) =>
+                                handleAccountInputChangeForUpdate(
+                                  e.target.value,
+                                  actualEmpIdx
+                                )
                               }
-                            } else {
-                              handlePlcInputChange(e.target.value);
-                            }
-                          }}
-                          onBlur={(e) => handlePlcBlur(e.target.value)}
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            autoPopulatedPLC
-                              ? "bg-gray-100 cursor-not-allowed"
-                              : ""
-                          }`}
-                          list="plc-list"
-                          placeholder="Enter Plc"
-                        />
-                        <datalist id="plc-list">
-                          {filteredPlcOptions.map((plc, index) => (
-                            <option
-                              key={`${plc.value}-${index}`}
-                              value={plc.value}
-                            >
-                              {plc.label}
-                            </option>
-                          ))}
-                        </datalist>
-                      </td>
-
-                      <td className="border border-gray-300 px-1.5 py-0.5 text-center">
-                        <input
-                          type="checkbox"
-                          name="isRev"
-                          checked={newEntry.isRev}
-                          //   onChange={(e) =>
-                          //     isBudPlan &&
-                          //     setNewEntry({
-                          //       ...newEntry,
-                          //       isRev: e.target.checked,
-                          //     })
-                          //   }
-                          // CHANGE TO:
-                          onChange={(e) =>
-                            isFieldEditable &&
-                            setNewEntry({
-                              ...newEntry,
-                              isRev: e.target.checked,
-                            })
-                          }
-                          disabled={!isFieldEditable}
-                        />
-                      </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5 text-center">
-                        <input
-                          type="checkbox"
-                          name="isBrd"
-                          checked={newEntry.isBrd}
-                          //   onChange={(e) =>
-                          //     isBudPlan &&
-                          //     setNewEntry({
-                          //       ...newEntry,
-                          //       isBrd: e.target.checked,
-                          //     })
-                          //   }
-                          //   className="w-4 h-4"
-                          //   disabled={!isBudPlan}
-                          // CHANGE TO:
-                          onChange={(e) =>
-                            isFieldEditable &&
-                            setNewEntry({
-                              ...newEntry,
-                              isBrd: e.target.checked,
-                            })
-                          }
-                          disabled={!isFieldEditable}
-                        />
-                      </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="status"
-                          value={newEntry.status}
-                          onChange={(e) =>
-                            setNewEntry({ ...newEntry, status: e.target.value })
-                          }
-                          className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                          placeholder="Enter Status"
-                        />
-                      </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        <input
-                          type="text"
-                          name="perHourRate"
-                          value={newEntry.perHourRate}
-                          //   onChange={(e) =>
-                          //     isBudPlan &&
-                          //     setNewEntry({
-                          //       ...newEntry,
-                          //       perHourRate: e.target.value.replace(
-                          //         /[^0-9.]/g,
-                          //         ""
-                          //       ),
-                          //     })
-                          //   }
-                          //   className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                          //     !isBudPlan ? "bg-gray-100 cursor-not-allowed" : ""
-                          //   }`}
-                          //   placeholder="Enter Hour Rate"
-                          //   disabled={!isBudPlan}
-                          // CHANGE TO:
-                          onChange={(e) =>
-                            isFieldEditable &&
-                            setNewEntry({
-                              ...newEntry,
-                              perHourRate: e.target.value.replace(
-                                /[^0-9.]/g,
-                                ""
-                              ),
-                            })
-                          }
-                          className={`w-full border border-gray-300 rounded px-1 py-0.5 text-xs ${
-                            !isFieldEditable
-                              ? "bg-gray-100 cursor-not-allowed"
-                              : ""
-                          }`}
-                          disabled={!isFieldEditable}
-                        />
-                      </td>
-                      <td className="border border-gray-300 px-1.5 py-0.5">
-                        {Object.values(newEntryPeriodHours)
-                          .reduce((sum, val) => sum + (parseFloat(val) || 0), 0)
-                          .toFixed(2)}
-                      </td>
-                    </tr>
-                  )}
-                  {localEmployees
-                    .filter((_, idx) => !hiddenRows[idx])
-                    .map((emp, idx) => {
-                      const actualEmpIdx = localEmployees.findIndex(
-                        (e) => e === emp
-                      );
-                      const row = getEmployeeRow(emp, actualEmpIdx);
-                      const editedData = editedEmployeeData[actualEmpIdx] || {};
-                      return (
-                        <tr
-                          key={`employee-${actualEmpIdx}`}
-                          className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
-                            selectedRowIndex === actualEmpIdx
-                              ? "bg-yellow-100"
-                              : "even:bg-gray-50"
-                          }`}
-                          style={{
-                            height: `${ROW_HEIGHT_DEFAULT}px`,
-                            lineHeight: "normal",
-                            cursor: isEditable ? "pointer" : "default",
-                          }}
-                          onClick={() => handleRowClick(actualEmpIdx)}
-                        >
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {row.idType}
-                          </td>
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {row.emplId}
-                          </td>
-                          {/* ADD THIS WARNING CELL */}
-                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-center min-w-[70px]">
-  {row.warning ? (
-    <span className="text-yellow-500 text-lg" title="Warning">
-      ⚠️
-    </span>
-  ) : (
-    <span className="text-gray-300 text-xs">-</span>
-  )}
-</td> */}
-                          {/* UPDATE THIS WARNING CELL */}
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-center min-w-[70px]">
-                            {row.warning ? (
-                              <span
-                                className="text-yellow-500 text-lg cursor-pointer hover:text-yellow-600"
-                                title="Click to view warnings"
-                                onClick={(e) =>
-                                  handleWarningClick(e, row.emplId)
+                              onBlur={(e) => {
+                                const val = e.target.value;
+                                if (
+                                  val &&
+                                  !isValidAccountForUpdate(
+                                    val,
+                                    updateAccountOptions
+                                  )
+                                ) {
+                                  toast.error(
+                                    "Please enter a valid Account from the available list.",
+                                    {
+                                      autoClose: 3000,
+                                    }
+                                  );
+                                } else {
+                                  handleEmployeeDataBlur(actualEmpIdx, emp);
                                 }
+                              }}
+                              className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                              list={`account-list-${actualEmpIdx}`}
+                              placeholder="Enter Account"
+                            />
+                          ) : (
+                            row.acctId
+                          )}
+                          <datalist id={`account-list-${actualEmpIdx}`}>
+                            {updateAccountOptions.map((account, index) => (
+                              <option
+                                key={`${account.id}-${index}`}
+                                value={account.id}
                               >
-                                ⚠️
-                              </span>
-                            ) : (
-                              <span className="text-gray-300 text-xs">-</span>
-                            )}
-                          </td>
+                                {account.id}
+                              </option>
+                            ))}
+                          </datalist>
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {isBudPlan && isEditable ? (
+                            <input
+                              type="text"
+                              value={
+                                editedData.orgId !== undefined
+                                  ? editedData.orgId
+                                  : row.orgId
+                              }
+                              onChange={(e) =>
+                                handleOrgInputChangeForUpdate(
+                                  e.target.value,
+                                  actualEmpIdx
+                                )
+                              }
+                              onBlur={(e) => {
+                                const val = e.target.value;
+                                const originalValue = row.orgId;
 
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {row.name}
-                          </td>
-
-                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-  {isBudPlan && isEditable ? (
-    <input
-      type="text"
-      value={
-        editedData.acctId !== undefined
-          ? editedData.acctId
-          : row.acctId
-      }
-      onChange={(e) => handleAccountInputChangeForUpdate(e.target.value, actualEmpIdx)}
-      onBlur={() => handleEmployeeDataBlur(actualEmpIdx, emp)}
-      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-      list={`account-list-${actualEmpIdx}`}
-      placeholder="Enter Account"
-    />
-  ) : (
-    row.acctId
-  )}
-  <datalist id={`account-list-${actualEmpIdx}`}>
-    {updateAccountOptions.map((account, index) => (
-      <option
-        key={`${account.id}-${index}`}
-        value={account.id}
-      >
-        {account.id}
-      </option>
-    ))}
-  </datalist>
-</td> */}
-
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {isFieldEditable && isEditable ? (
-                              <input
-                                type="text"
-                                value={
-                                  editedData.acctId !== undefined
-                                    ? editedData.acctId
-                                    : row.acctId
-                                }
-                                onChange={(e) =>
-                                  handleAccountInputChangeForUpdate(
-                                    e.target.value,
-                                    actualEmpIdx
+                                if (
+                                  val !== originalValue &&
+                                  val &&
+                                  !isValidOrgForUpdate(
+                                    val,
+                                    updateOrganizationOptions
                                   )
+                                ) {
+                                  toast.error(
+                                    "Please enter a valid numeric Organization ID from the available list.",
+                                    {
+                                      autoClose: 3000,
+                                    }
+                                  );
+                                } else {
+                                  handleEmployeeDataBlur(actualEmpIdx, emp);
                                 }
-                                onBlur={(e) => {
-                                  if (planType === "NBBUD") return; // Add this line
-                                  const val = e.target.value;
-                                  const originalValue = row.acctId;
+                              }}
+                              className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                              list={`organization-list-${actualEmpIdx}`}
+                              placeholder="Enter Organization ID"
+                            />
+                          ) : (
+                            row.orgId
+                          )}
+                          <datalist id={`organization-list-${actualEmpIdx}`}>
+                            {updateOrganizationOptions.map((org, index) => (
+                              <option
+                                key={`${org.value}-${index}`}
+                                value={org.value}
+                              >
+                                {org.label}
+                              </option>
+                            ))}
+                          </datalist>
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {isBudPlan && isEditable ? (
+                            <input
+                              type="text"
+                              value={
+                                editedData.glcPlc !== undefined
+                                  ? editedData.glcPlc
+                                  : row.glcPlc
+                              }
+                              onChange={(e) =>
+                                handlePlcInputChangeForUpdate(
+                                  e.target.value,
+                                  actualEmpIdx
+                                )
+                              }
+                              onBlur={(e) => {
+                                const val = e.target.value;
+                                const originalValue = row.glcPlc;
 
-                                  if (
-                                    val !== originalValue &&
-                                    !isValidAccountForUpdate(
-                                      val,
-                                      updateAccountOptions
-                                    )
-                                  ) {
-                                    toast.error(
-                                      "Please enter a valid Account from the available list.",
-                                      {
-                                        autoClose: 3000,
-                                      }
-                                    );
-                                  } else {
-                                    handleEmployeeDataBlur(actualEmpIdx, emp);
-                                  }
-                                }}
-                                className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                list={`account-list-${actualEmpIdx}`}
-                                placeholder="Enter Account"
-                              />
-                            ) : (
-                              row.acctId
-                            )}
-                            <datalist id={`account-list-${actualEmpIdx}`}>
-                              {updateAccountOptions.map((account, index) => (
-                                <option
-                                  key={`${account.id}-${index}`}
-                                  value={account.id}
-                                >
-                                  {account.id}
-                                </option>
-                              ))}
-                            </datalist>
-                          </td>
-
-                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {isBudPlan && isEditable ? (
-                              <input
-                                type="text"
-                                value={
-                                  editedData.acctId !== undefined
-                                    ? editedData.acctId
-                                    : row.acctId
+                                if (
+                                  val !== originalValue &&
+                                  val &&
+                                  !isValidPlcForUpdate(val, updatePlcOptions)
+                                ) {
+                                  toast.error(
+                                    "Please enter a valid PLC from the available list.",
+                                    {
+                                      autoClose: 3000,
+                                    }
+                                  );
+                                } else {
+                                  handleEmployeeDataBlur(actualEmpIdx, emp);
                                 }
-                                onChange={(e) =>
-                                  handleEmployeeDataChange(
-                                    actualEmpIdx,
-                                    "acctId",
-                                    e.target.value
-                                  )
-                                }
-                                onBlur={() =>
-                                  handleEmployeeDataBlur(actualEmpIdx, emp)
-                                }
-                                className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                list="account-list"
-                              />
-                            ) : (
-                              row.acctId
-                            )}
-                          </td> */}
-
-                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {isBudPlan && isEditable ? (
-                              <input
-                                type="text"
-                                value={
-                                  editedData.orgId !== undefined
-                                    ? editedData.orgId
-                                    : row.orgId
-                                }
-                                onChange={(e) =>
-                                  handleEmployeeDataChange(
-                                    actualEmpIdx,
-                                    "orgId",
-                                    e.target.value
-                                  )
-                                }
-                                onBlur={() =>
-                                  handleEmployeeDataBlur(actualEmpIdx, emp)
-                                }
-                                className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                              />
-                            ) : (
-                              row.orgId
-                            )}
-                          </td> */}
-                          {/* <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-  {isBudPlan && isEditable ? (
-    <input
-      type="text"
-      value={
-        editedData.orgId !== undefined
-          ? editedData.orgId
-          : row.orgId
-      }
-      onChange={(e) => handleOrgInputChangeForUpdate(e.target.value, actualEmpIdx)}
-      onBlur={(e) => {
-        const val = e.target.value;
-        if (val && val.length >= 3 && !isValidOrg(val)) {
-          toast.error("Please enter a valid numeric Organization ID from the available list.", {
-            autoClose: 3000,
-          });
-          handleEmployeeDataChange(actualEmpIdx, "orgId", "");
-        } else {
-          handleEmployeeDataBlur(actualEmpIdx, emp);
-        }
-      }}
-      className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-      list="organization-list"
-      placeholder="Enter Organization ID"
-    />
-  ) : (
-    row.orgId
-  )}
-</td> */}
-
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {isBudPlan && isEditable ? (
-                              <input
-                                type="text"
-                                value={
-                                  editedData.orgId !== undefined
-                                    ? editedData.orgId
-                                    : row.orgId
-                                }
-                                onChange={(e) =>
-                                  handleOrgInputChangeForUpdate(
-                                    e.target.value,
-                                    actualEmpIdx
-                                  )
-                                }
-                                //   onBlur={(e) => {
-                                //     const val = e.target.value;
-                                //     if (val && !isValidOrg(val)) {
-                                //       toast.error("Please enter a valid numeric Organization ID from the available list.", {
-                                //         autoClose: 3000,
-                                //       });
-                                //       // Don't clear the value automatically - let user fix it
-                                //     } else {
-                                //       handleEmployeeDataBlur(actualEmpIdx, emp);
-                                //     }
-                                //   }}
-                                onBlur={(e) => {
-                                  if (planType === "NBBUD") return; // Add this line
-                                  const val = e.target.value;
-                                  const originalValue = row.orgId;
-
-                                  if (
-                                    val !== originalValue &&
-                                    val &&
-                                    !isValidOrgForUpdate(
-                                      val,
-                                      updateOrganizationOptions
-                                    )
-                                  ) {
-                                    toast.error(
-                                      "Please enter a valid numeric Organization ID from the available list.",
-                                      {
-                                        autoClose: 3000,
-                                      }
-                                    );
-                                  } else {
-                                    handleEmployeeDataBlur(actualEmpIdx, emp);
-                                  }
-                                }}
-                                className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                list={`organization-list-${actualEmpIdx}`}
-                                placeholder="Enter Organization ID"
-                              />
-                            ) : (
-                              row.orgId
-                            )}
-                            <datalist id={`organization-list-${actualEmpIdx}`}>
-                              {updateOrganizationOptions.map((org, index) => (
-                                <option
-                                  key={`${org.value}-${index}`}
-                                  value={org.value}
-                                >
-                                  {org.label}
-                                </option>
-                              ))}
-                            </datalist>
-                          </td>
-
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {isBudPlan && isEditable ? (
-                              <input
-                                type="text"
-                                value={
-                                  editedData.glcPlc !== undefined
-                                    ? editedData.glcPlc
-                                    : row.glcPlc
-                                }
-                                onChange={(e) =>
-                                  handlePlcInputChangeForUpdate(
-                                    e.target.value,
-                                    actualEmpIdx
-                                  )
-                                }
-                                onBlur={(e) => {
-                                  if (planType === "NBBUD") return; // Add this line
-                                  const val = e.target.value;
-                                  const originalValue = row.glcPlc;
-
-                                  if (
-                                    val !== originalValue &&
-                                    val &&
-                                    !isValidPlcForUpdate(val, updatePlcOptions)
-                                  ) {
-                                    toast.error(
-                                      "Please enter a valid PLC from the available list.",
-                                      {
-                                        autoClose: 3000,
-                                      }
-                                    );
-                                  } else {
-                                    handleEmployeeDataBlur(actualEmpIdx, emp);
-                                  }
-                                }}
-                                className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                                list={`plc-list-${actualEmpIdx}`}
-                                placeholder="Enter PLC"
-                              />
-                            ) : (
-                              row.glcPlc
-                            )}
-                            <datalist id={`plc-list-${actualEmpIdx}`}>
-                              {/* Use updatePlcOptions if available, otherwise fallback to plcOptions */}
-                              {(updatePlcOptions.length > 0
-                                ? updatePlcOptions
-                                : plcOptions
-                              ).map((plc, index) => (
-                                <option
-                                  key={`${plc.value}-${index}`}
-                                  value={plc.value}
-                                >
-                                  {plc.label}
-                                </option>
-                              ))}
-                            </datalist>
-                          </td>
-
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
-                            {isFieldEditable && isEditable ? (
-                              <input
-                                type="checkbox"
-                                checked={
-                                  editedData.isRev !== undefined
-                                    ? editedData.isRev
-                                    : emp.emple.isRev
-                                }
-                                onChange={(e) =>
-                                  handleEmployeeDataChange(
-                                    actualEmpIdx,
-                                    "isRev",
-                                    e.target.checked
-                                  )
-                                }
-                                onBlur={() =>
-                                  handleEmployeeDataBlur(actualEmpIdx, emp)
-                                }
-                                className="w-4 h-4"
-                              />
-                            ) : (
-                              row.isRev
-                            )}
-                          </td>
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
-                            {isFieldEditable && isEditable ? (
-                              <input
-                                type="checkbox"
-                                checked={
-                                  editedData.isBrd !== undefined
-                                    ? editedData.isBrd
-                                    : emp.emple.isBrd
-                                }
-                                onChange={(e) =>
-                                  handleEmployeeDataChange(
-                                    actualEmpIdx,
-                                    "isBrd",
-                                    e.target.checked
-                                  )
-                                }
-                                onBlur={() =>
-                                  handleEmployeeDataBlur(actualEmpIdx, emp)
-                                }
-                                className="w-4 h-4"
-                              />
-                            ) : (
-                              row.isBrd
-                            )}
-                          </td>
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {row.status}
-                          </td>
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {isFieldEditable && isEditable ? (
-                              <input
-                                type="text"
-                                value={
-                                  editedData.perHourRate !== undefined
-                                    ? editedData.perHourRate
-                                    : row.perHourRate
-                                }
-                                onChange={(e) =>
-                                  handleEmployeeDataChange(
-                                    actualEmpIdx,
-                                    "perHourRate",
-                                    e.target.value.replace(/[^0-9.]/g, "")
-                                  )
-                                }
-                                onBlur={() =>
-                                  handleEmployeeDataBlur(actualEmpIdx, emp)
-                                }
-                                className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
-                              />
-                            ) : (
-                              row.perHourRate
-                            )}
-                          </td>
-                          <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
-                            {row.total}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
-            <div className="synchronized-table-scroll last">
-              <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
-                <thead className="sticky-thead">
+                              }}
+                              className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                              list={`plc-list-${actualEmpIdx}`}
+                              placeholder="Enter PLC"
+                            />
+                          ) : (
+                            row.glcPlc
+                          )}
+                          <datalist id={`plc-list-${actualEmpIdx}`}>
+                            {(updatePlcOptions.length > 0
+                              ? updatePlcOptions
+                              : plcOptions
+                            ).map((plc, index) => (
+                              <option
+                                key={`${plc.value}-${index}`}
+                                value={plc.value}
+                              >
+                                {plc.label}
+                              </option>
+                            ))}
+                          </datalist>
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
+                          {isBudPlan && isEditable ? (
+                            <input
+                              type="checkbox"
+                              checked={
+                                editedData.isRev !== undefined
+                                  ? editedData.isRev
+                                  : emp.emple.isRev
+                              }
+                              onChange={(e) =>
+                                handleEmployeeDataChange(
+                                  actualEmpIdx,
+                                  "isRev",
+                                  e.target.checked
+                                )
+                              }
+                              onBlur={() =>
+                                handleEmployeeDataBlur(actualEmpIdx, emp)
+                              }
+                              className="w-4 h-4"
+                            />
+                          ) : (
+                            row.isRev
+                          )}
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px] text-center">
+                          {isBudPlan && isEditable ? (
+                            <input
+                              type="checkbox"
+                              checked={
+                                editedData.isBrd !== undefined
+                                  ? editedData.isBrd
+                                  : emp.emple.isBrd
+                              }
+                              onChange={(e) =>
+                                handleEmployeeDataChange(
+                                  actualEmpIdx,
+                                  "isBrd",
+                                  e.target.checked
+                                )
+                              }
+                              onBlur={() =>
+                                handleEmployeeDataBlur(actualEmpIdx, emp)
+                              }
+                              className="w-4 h-4"
+                            />
+                          ) : (
+                            row.isBrd
+                          )}
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {row.status}
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {isBudPlan && isEditable ? (
+                            <input
+                              type="text"
+                              value={
+                                editedData.perHourRate !== undefined
+                                  ? editedData.perHourRate
+                                  : row.perHourRate
+                              }
+                              onChange={(e) =>
+                                handleEmployeeDataChange(
+                                  actualEmpIdx,
+                                  "perHourRate",
+                                  e.target.value.replace(/[^0-9.]/g, "")
+                                )
+                              }
+                              onBlur={() =>
+                                handleEmployeeDataBlur(actualEmpIdx, emp)
+                              }
+                              className="w-full border border-gray-300 rounded px-1 py-0.5 text-xs"
+                            />
+                          ) : (
+                            row.perHourRate
+                          )}
+                        </td>
+                        <td className="p-1.5 border-r border-gray-200 text-xs text-gray-700 min-w-[70px]">
+                          {row.total}
+                        </td>
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+          </div>
+          <div
+            ref={secondTableRef}
+            onScroll={handleSecondScroll}
+            style={{
+              maxHeight: "400px",
+              overflowY: "auto", // show scrollbar
+              overflowX: "auto",
+            }}
+          >
+            {" "}
+            {/* Added maxHeight and overflowY for vertical scrolling */}
+            <table className="min-w-full text-xs text-center border-collapse border border-gray-300 rounded-lg">
+              <thead
+                className="sticky-thead"
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  backgroundColor: "#fff",
+                  zIndex: 1,
+                }}
+              >
+                {" "}
+                {/* Added sticky positioning and background for thead */}
+                <tr
+                  style={{
+                    height: `${ROW_HEIGHT_DEFAULT}px`,
+                    lineHeight: "normal",
+                  }}
+                >
+                  {sortedDurations.map((duration) => {
+                    const uniqueKey = `${duration.monthNo}_${duration.year}`;
+                    return (
+                      <th
+                        key={uniqueKey}
+                        className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
+                          selectedColumnKey === uniqueKey ? "bg-yellow-100" : ""
+                        }`}
+                        style={{ cursor: isEditable ? "pointer" : "default" }}
+                        onClick={() => handleColumnHeaderClick(uniqueKey)}
+                      >
+                        <div className="flex flex-col items-center justify-center h-full">
+                          <span className="whitespace-nowrap text-xs text-gray-900 font-normal">
+                            {duration.month}
+                          </span>
+                          <span className="text-xs text-gray-600 font-normal">
+                            {duration.workingHours || 0} hrs
+                          </span>
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {showNewForm && (
                   <tr
+                    key="new-entry"
+                    className="bg-gray-50"
                     style={{
                       height: `${ROW_HEIGHT_DEFAULT}px`,
                       lineHeight: "normal",
@@ -3666,168 +4489,132 @@ const ProjectHoursDetails = ({
                   >
                     {sortedDurations.map((duration) => {
                       const uniqueKey = `${duration.monthNo}_${duration.year}`;
+                      const isInputEditable =
+                        isEditable &&
+                        isMonthEditable(duration, closedPeriod, planType);
                       return (
-                        <th
-                          key={uniqueKey}
-                          className={`px-2 py-1.5 border border-gray-200 text-center min-w-[80px] text-xs text-gray-900 font-normal ${
-                            selectedColumnKey === uniqueKey
-                              ? "bg-yellow-100"
+                        <td
+                          key={`new-${uniqueKey}`}
+                          className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+                            planType === "EAC"
+                              ? isInputEditable
+                                ? "bg-green-50"
+                                : "bg-gray-200"
                               : ""
                           }`}
-                          style={{ cursor: isEditable ? "pointer" : "default" }}
-                          onClick={() => handleColumnHeaderClick(uniqueKey)}
                         >
-                          <div className="flex flex-col items-center justify-center h-full">
-                            <span className="whitespace-nowrap text-xs text-gray-900 font-normal">
-                              {duration.month}
-                            </span>
-                            <span className="text-xs text-gray-600 font-normal">
-                              {duration.workingHours || 0} hrs
-                            </span>
-                          </div>
-                        </th>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={newEntryPeriodHours[uniqueKey] ?? "0"}
+                            onChange={(e) =>
+                              isInputEditable &&
+                              setNewEntryPeriodHours((prev) => ({
+                                ...prev,
+                                [uniqueKey]: e.target.value.replace(
+                                  /[^0-9.]/g,
+                                  ""
+                                ),
+                              }))
+                            }
+                            className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+                              !isInputEditable
+                                ? "cursor-not-allowed text-gray-400"
+                                : "text-gray-700"
+                            }`}
+                            disabled={!isInputEditable}
+                            placeholder="Enter Hours"
+                          />
+                        </td>
                       );
                     })}
                   </tr>
-                </thead>
-                <tbody>
-                  {showNewForm && (
-                    <tr
-                      key="new-entry"
-                      className="bg-gray-50"
-                      style={{
-                        height: `${ROW_HEIGHT_DEFAULT}px`,
-                        lineHeight: "normal",
-                      }}
-                    >
-                      {sortedDurations.map((duration) => {
-                        const uniqueKey = `${duration.monthNo}_${duration.year}`;
-                        const isInputEditable =
-                          isEditable &&
-                          isMonthEditable(duration, closedPeriod, planType);
-                        return (
-                          <td
-                            key={`new-${uniqueKey}`}
-                            className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
-                              planType === "EAC"
-                                ? isInputEditable
-                                  ? "bg-green-50"
-                                  : "bg-gray-200"
-                                : ""
-                            }`}
-                          >
-                            <input
-                              type="text"
-                              inputMode="numeric"
-                              value={newEntryPeriodHours[uniqueKey] ?? "0"}
-                              onChange={(e) =>
-                                isInputEditable &&
-                                setNewEntryPeriodHours((prev) => ({
-                                  ...prev,
-                                  [uniqueKey]: e.target.value.replace(
-                                    /[^0-9.]/g,
-                                    ""
-                                  ),
-                                }))
-                              }
-                              className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
-                                !isInputEditable
-                                  ? "cursor-not-allowed text-gray-400"
-                                  : "text-gray-700"
+                )}
+                {localEmployees
+                  .filter((_, idx) => !hiddenRows[idx])
+                  .map((emp, idx) => {
+                    const actualEmpIdx = localEmployees.findIndex(
+                      (e) => e === emp
+                    );
+                    const monthHours = getMonthHours(emp);
+                    return (
+                      <tr
+                        key={`hours-${actualEmpIdx}`}
+                        className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
+                          selectedRowIndex === actualEmpIdx
+                            ? "bg-yellow-100"
+                            : "even:bg-gray-50"
+                        }`}
+                        style={{
+                          height: `${ROW_HEIGHT_DEFAULT}px`,
+                          lineHeight: "normal",
+                          cursor: isEditable ? "pointer" : "default",
+                        }}
+                        onClick={() => handleRowClick(actualEmpIdx)}
+                      >
+                        {sortedDurations.map((duration) => {
+                          const uniqueKey = `${duration.monthNo}_${duration.year}`;
+                          const forecast = monthHours[uniqueKey];
+                          const value =
+                            inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
+                            (forecast?.value !== undefined
+                              ? forecast.value
+                              : "0");
+                          const isInputEditable =
+                            isEditable &&
+                            isMonthEditable(duration, closedPeriod, planType);
+                          return (
+                            <td
+                              key={`hours-${actualEmpIdx}-${uniqueKey}`}
+                              className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
+                                selectedColumnKey === uniqueKey
+                                  ? "bg-yellow-100"
+                                  : ""
+                              } ${
+                                planType === "EAC"
+                                  ? isInputEditable
+                                    ? "bg-green-50"
+                                    : "bg-gray-200"
+                                  : ""
                               }`}
-                              disabled={!isInputEditable}
-                              placeholder="Enter Hours"
-                            />
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  )}
-                  {localEmployees
-                    .filter((_, idx) => !hiddenRows[idx])
-                    .map((emp, idx) => {
-                      const actualEmpIdx = localEmployees.findIndex(
-                        (e) => e === emp
-                      );
-                      const monthHours = getMonthHours(emp);
-                      return (
-                        <tr
-                          key={`hours-${actualEmpIdx}`}
-                          className={`whitespace-nowrap hover:bg-blue-50 transition border-b border-gray-200 ${
-                            selectedRowIndex === actualEmpIdx
-                              ? "bg-yellow-100"
-                              : "even:bg-gray-50"
-                          }`}
-                          style={{
-                            height: `${ROW_HEIGHT_DEFAULT}px`,
-                            lineHeight: "normal",
-                            cursor: isEditable ? "pointer" : "default",
-                          }}
-                          onClick={() => handleRowClick(actualEmpIdx)}
-                        >
-                          {sortedDurations.map((duration) => {
-                            const uniqueKey = `${duration.monthNo}_${duration.year}`;
-                            const forecast = monthHours[uniqueKey];
-                            const value =
-                              inputValues[`${actualEmpIdx}_${uniqueKey}`] ??
-                              (forecast?.value !== undefined
-                                ? forecast.value
-                                : "0");
-                            const isInputEditable =
-                              isEditable &&
-                              isMonthEditable(duration, closedPeriod, planType);
-                            return (
-                              <td
-                                key={`hours-${actualEmpIdx}-${uniqueKey}`}
-                                className={`px-2 py-1.5 border-r border-gray-200 text-center min-w-[80px] ${
-                                  selectedColumnKey === uniqueKey
-                                    ? "bg-yellow-100"
-                                    : ""
-                                } ${
-                                  planType === "EAC"
-                                    ? isInputEditable
-                                      ? "bg-green-50"
-                                      : "bg-gray-200"
-                                    : ""
+                            >
+                              <input
+                                type="text"
+                                inputMode="numeric"
+                                className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
+                                  !isInputEditable
+                                    ? "cursor-not-allowed text-gray-400"
+                                    : "text-gray-700"
                                 }`}
-                              >
-                                <input
-                                  type="text"
-                                  inputMode="numeric"
-                                  className={`text-center border border-gray-300 bg-white text-xs w-[50px] h-[18px] p-[2px] ${
-                                    !isInputEditable
-                                      ? "cursor-not-allowed text-gray-400"
-                                      : "text-gray-700"
-                                  }`}
-                                  value={value}
-                                  onChange={(e) =>
-                                    handleInputChange(
-                                      actualEmpIdx,
-                                      uniqueKey,
-                                      e.target.value.replace(/[^0-9.]/g, "")
-                                    )
-                                  }
-                                  onBlur={(e) =>
-                                    handleForecastHoursBlur(
-                                      actualEmpIdx,
-                                      uniqueKey,
-                                      e.target.value
-                                    )
-                                  }
-                                  disabled={!isInputEditable}
-                                  placeholder="Enter Hours"
-                                />
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
+                                value={value}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    actualEmpIdx,
+                                    uniqueKey,
+                                    e.target.value.replace(/[^0-9.]/g, "")
+                                  )
+                                }
+                                onBlur={(e) =>
+                                  handleForecastHoursBlur(
+                                    actualEmpIdx,
+                                    uniqueKey,
+                                    e.target.value
+                                  )
+                                }
+                                disabled={!isInputEditable}
+                                placeholder="Enter Hours"
+                              />
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
           </div>
         </div>
+         
       )}
       {showFindReplace && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
